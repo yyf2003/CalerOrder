@@ -1,0 +1,699 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="KalerOrderDBModelStoreContainer" CdmEntityContainer="KalerOrderDBEntities">
+    <FunctionImportMapping FunctionImportName="pro_GetModulesById" FunctionName="KalerOrderDBModel.Store.pro_GetModulesById">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="KalerOrderDBModel.pro_GetModulesById_Result">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+          <ScalarProperty Name="ModuleName" ColumnName="ModuleName" />
+          <ScalarProperty Name="OrderNum" ColumnName="OrderNum" />
+          <ScalarProperty Name="Url" ColumnName="Url" />
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="IsLeaf" ColumnName="IsLeaf" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <EntitySetMapping Name="BaseCategory">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.BaseCategory">
+        <MappingFragment StoreEntitySet="BaseCategory">
+          <ScalarProperty Name="BaseCode" ColumnName="BaseCode" />
+          <ScalarProperty Name="CategoryName" ColumnName="CategoryName" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="BaseInfo">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.BaseInfo">
+        <MappingFragment StoreEntitySet="BaseInfo">
+          <ScalarProperty Name="BaseCategoryId" ColumnName="BaseCategoryId" />
+          <ScalarProperty Name="BaseCode" ColumnName="BaseCode" />
+          <ScalarProperty Name="BaseName" ColumnName="BaseName" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CheckOrderPlanDetail">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.CheckOrderPlanDetail">
+        <MappingFragment StoreEntitySet="CheckOrderPlanDetail">
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+          <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+          <ScalarProperty Name="Format" ColumnName="Format" />
+          <ScalarProperty Name="MachineFrameIds" ColumnName="MachineFrameIds" />
+          <ScalarProperty Name="PositionName" ColumnName="PositionName" />
+          <ScalarProperty Name="PositionId" ColumnName="PositionId" />
+          <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
+          <ScalarProperty Name="CityTier" ColumnName="CityTier" />
+          <ScalarProperty Name="CityId" ColumnName="CityId" />
+          <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+          <ScalarProperty Name="RegionNames" ColumnName="RegionNames" />
+          <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+          <ScalarProperty Name="PlanId" ColumnName="PlanId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Company">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.Company">
+        <MappingFragment StoreEntitySet="Company">
+          <ScalarProperty Name="BaseCode" ColumnName="BaseCode" />
+          <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
+          <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+          <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Customer">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.Customer">
+        <MappingFragment StoreEntitySet="Customer">
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="Tel" ColumnName="Tel" />
+          <ScalarProperty Name="Contact" ColumnName="Contact" />
+          <ScalarProperty Name="CustomerShortName" ColumnName="CustomerShortName" />
+          <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+          <ScalarProperty Name="CustomerCode" ColumnName="CustomerCode" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ListOrderDetail">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.ListOrderDetail">
+        <MappingFragment StoreEntitySet="ListOrderDetail">
+          <ScalarProperty Name="IsFinishSplit" ColumnName="IsFinishSplit" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="ChooseImg" ColumnName="ChooseImg" />
+          <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+          <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="Sheet" ColumnName="Sheet" />
+          <ScalarProperty Name="PositionId" ColumnName="PositionId" />
+          <ScalarProperty Name="ShopId" ColumnName="ShopId" />
+          <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="MachineFrame">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.MachineFrame">
+        <MappingFragment StoreEntitySet="MachineFrame">
+          <ScalarProperty Name="CategoryName" ColumnName="CategoryName" />
+          <ScalarProperty Name="PositionId" ColumnName="PositionId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Material">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.Material">
+        <MappingFragment StoreEntitySet="Material">
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="Unit" ColumnName="Unit" />
+          <ScalarProperty Name="Area" ColumnName="Area" />
+          <ScalarProperty Name="Length" ColumnName="Length" />
+          <ScalarProperty Name="Width" ColumnName="Width" />
+          <ScalarProperty Name="MaterialName" ColumnName="MaterialName" />
+          <ScalarProperty Name="MaterialBrandId" ColumnName="MaterialBrandId" />
+          <ScalarProperty Name="MaterialTypeId" ColumnName="MaterialTypeId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="MaterialBrand">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.MaterialBrand">
+        <MappingFragment StoreEntitySet="MaterialBrand">
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="BrandName" ColumnName="BrandName" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="MaterialPrice">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.MaterialPrice">
+        <MappingFragment StoreEntitySet="MaterialPrice">
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="SalePrice" ColumnName="SalePrice" />
+          <ScalarProperty Name="CostPrice" ColumnName="CostPrice" />
+          <ScalarProperty Name="MaterialTypeId" ColumnName="MaterialTypeId" />
+          <ScalarProperty Name="CityId" ColumnName="CityId" />
+          <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+          <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+          <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="MaterialTemp">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.MaterialTemp">
+        <MappingFragment StoreEntitySet="MaterialTemp">
+          <ScalarProperty Name="MeasurementName" ColumnName="MeasurementName" />
+          <ScalarProperty Name="BrandName" ColumnName="BrandName" />
+          <ScalarProperty Name="TypeStyle" ColumnName="TypeStyle" />
+          <ScalarProperty Name="Area" ColumnName="Area" />
+          <ScalarProperty Name="Length" ColumnName="Length" />
+          <ScalarProperty Name="Width" ColumnName="Width" />
+          <ScalarProperty Name="MaterialName" ColumnName="MaterialName" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="MaterialType">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.MaterialType">
+        <MappingFragment StoreEntitySet="MaterialType">
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="MaterialTypeName" ColumnName="MaterialTypeName" />
+          <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="MergeOriginalOrder">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.MergeOriginalOrder">
+        <MappingFragment StoreEntitySet="MergeOriginalOrder">
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="ChooseImg" ColumnName="ChooseImg" />
+          <ScalarProperty Name="POPType" ColumnName="POPType" />
+          <ScalarProperty Name="POPName" ColumnName="POPName" />
+          <ScalarProperty Name="GraphicNo" ColumnName="GraphicNo" />
+          <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+          <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="Sheet" ColumnName="Sheet" />
+          <ScalarProperty Name="PositionId" ColumnName="PositionId" />
+          <ScalarProperty Name="ShopId" ColumnName="ShopId" />
+          <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Module">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.Module">
+        <MappingFragment StoreEntitySet="Module">
+          <ScalarProperty Name="IsShowOnHome" ColumnName="IsShowOnHome" />
+          <ScalarProperty Name="ImgUrl" ColumnName="ImgUrl" />
+          <ScalarProperty Name="IsLeaf" ColumnName="IsLeaf" />
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="Url" ColumnName="Url" />
+          <ScalarProperty Name="OrderNum" ColumnName="OrderNum" />
+          <ScalarProperty Name="ModuleName" ColumnName="ModuleName" />
+          <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="OrderPlan">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.OrderPlan">
+        <MappingFragment StoreEntitySet="OrderPlan">
+          <ScalarProperty Name="ProjectName" ColumnName="ProjectName" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
+          <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+          <ScalarProperty Name="BeginDate" ColumnName="BeginDate" />
+          <ScalarProperty Name="WindowDeep" ColumnName="WindowDeep" />
+          <ScalarProperty Name="WindowHigh" ColumnName="WindowHigh" />
+          <ScalarProperty Name="WindowWidth" ColumnName="WindowWidth" />
+          <ScalarProperty Name="GraphicLength" ColumnName="GraphicLength" />
+          <ScalarProperty Name="GraphicWidth" ColumnName="GraphicWidth" />
+          <ScalarProperty Name="GraphicMaterial" ColumnName="GraphicMaterial" />
+          <ScalarProperty Name="GraphicNo" ColumnName="GraphicNo" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+          <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+          <ScalarProperty Name="Format" ColumnName="Format" />
+          <ScalarProperty Name="MachineFrameNames" ColumnName="MachineFrameNames" />
+          <ScalarProperty Name="MachineFrameIds" ColumnName="MachineFrameIds" />
+          <ScalarProperty Name="PositionName" ColumnName="PositionName" />
+          <ScalarProperty Name="PositionId" ColumnName="PositionId" />
+          <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
+          <ScalarProperty Name="CityTier" ColumnName="CityTier" />
+          <ScalarProperty Name="CityId" ColumnName="CityId" />
+          <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+          <ScalarProperty Name="RegionNames" ColumnName="RegionNames" />
+          <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+          <ScalarProperty Name="ShopNos" ColumnName="ShopNos" />
+          <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+          <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+          <ScalarProperty Name="PlanType" ColumnName="PlanType" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Place">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.Place">
+        <MappingFragment StoreEntitySet="Place">
+          <ScalarProperty Name="PlaceName" ColumnName="PlaceName" />
+          <ScalarProperty Name="ParentID" ColumnName="ParentID" />
+          <ScalarProperty Name="ID" ColumnName="ID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="POP">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.POP">
+        <MappingFragment StoreEntitySet="POP">
+          <ScalarProperty Name="DoorPosition" ColumnName="DoorPosition" />
+          <ScalarProperty Name="IsHang" ColumnName="IsHang" />
+          <ScalarProperty Name="WindowStick" ColumnName="WindowStick" />
+          <ScalarProperty Name="Floor" ColumnName="Floor" />
+          <ScalarProperty Name="RightSideStick" ColumnName="RightSideStick" />
+          <ScalarProperty Name="LeftSideStick" ColumnName="LeftSideStick" />
+          <ScalarProperty Name="IsElectricity" ColumnName="IsElectricity" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="FixtureType" ColumnName="FixtureType" />
+          <ScalarProperty Name="ExpireDate" ColumnName="ExpireDate" />
+          <ScalarProperty Name="Area" ColumnName="Area" />
+          <ScalarProperty Name="PlatformHeight" ColumnName="PlatformHeight" />
+          <ScalarProperty Name="PlatformWidth" ColumnName="PlatformWidth" />
+          <ScalarProperty Name="PlatformLength" ColumnName="PlatformLength" />
+          <ScalarProperty Name="PositionDescription" ColumnName="PositionDescription" />
+          <ScalarProperty Name="Pannel" ColumnName="Pannel" />
+          <ScalarProperty Name="ModulaQuantityHeight" ColumnName="ModulaQuantityHeight" />
+          <ScalarProperty Name="Frame" ColumnName="Frame" />
+          <ScalarProperty Name="ModulaQuantityWidth" ColumnName="ModulaQuantityWidth" />
+          <ScalarProperty Name="Backdrop" ColumnName="Backdrop" />
+          <ScalarProperty Name="Glass" ColumnName="Glass" />
+          <ScalarProperty Name="MaterialInfo" ColumnName="MaterialInfo" />
+          <ScalarProperty Name="GraphicMaterial" ColumnName="GraphicMaterial" />
+          <ScalarProperty Name="DoubleFace" ColumnName="DoubleFace" />
+          <ScalarProperty Name="GraphicLength" ColumnName="GraphicLength" />
+          <ScalarProperty Name="GraphicWidth" ColumnName="GraphicWidth" />
+          <ScalarProperty Name="WindowSize" ColumnName="WindowSize" />
+          <ScalarProperty Name="WindowDeep" ColumnName="WindowDeep" />
+          <ScalarProperty Name="WindowHigh" ColumnName="WindowHigh" />
+          <ScalarProperty Name="WindowWide" ColumnName="WindowWide" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
+          <ScalarProperty Name="Modula" ColumnName="Modula" />
+          <ScalarProperty Name="StandardDimension" ColumnName="StandardDimension" />
+          <ScalarProperty Name="Category" ColumnName="Category" />
+          <ScalarProperty Name="CornerType" ColumnName="CornerType" />
+          <ScalarProperty Name="Style" ColumnName="Style" />
+          <ScalarProperty Name="POPType" ColumnName="POPType" />
+          <ScalarProperty Name="POPName" ColumnName="POPName" />
+          <ScalarProperty Name="GraphicNo" ColumnName="GraphicNo" />
+          <ScalarProperty Name="Sheet" ColumnName="Sheet" />
+          <ScalarProperty Name="PositionId" ColumnName="PositionId" />
+          <ScalarProperty Name="ShopId" ColumnName="ShopId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="POPOrderDetail">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.POPOrderDetail">
+        <MappingFragment StoreEntitySet="POPOrderDetail">
+          <ScalarProperty Name="IsFinishSplit" ColumnName="IsFinishSplit" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="ChooseImg" ColumnName="ChooseImg" />
+          <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+          <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="POPType" ColumnName="POPType" />
+          <ScalarProperty Name="POPName" ColumnName="POPName" />
+          <ScalarProperty Name="GraphicNo" ColumnName="GraphicNo" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="Sheet" ColumnName="Sheet" />
+          <ScalarProperty Name="PositionId" ColumnName="PositionId" />
+          <ScalarProperty Name="ShopId" ColumnName="ShopId" />
+          <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Position">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.Position">
+        <MappingFragment StoreEntitySet="Position">
+          <ScalarProperty Name="PositionName" ColumnName="PositionName" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ProvinceInRegion">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.ProvinceInRegion">
+        <MappingFragment StoreEntitySet="ProvinceInRegion">
+          <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+          <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Region">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.Region">
+        <MappingFragment StoreEntitySet="Region">
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="RegionName" ColumnName="RegionName" />
+          <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Role">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.Role">
+        <MappingFragment StoreEntitySet="Role">
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="RoleName" ColumnName="RoleName" />
+          <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="RoleInModule">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.RoleInModule">
+        <MappingFragment StoreEntitySet="RoleInModule">
+          <ScalarProperty Name="OperatePermission" ColumnName="OperatePermission" />
+          <ScalarProperty Name="ModuleId" ColumnName="ModuleId" />
+          <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ShopMachineFrame">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.ShopMachineFrame">
+        <MappingFragment StoreEntitySet="ShopMachineFrame">
+          <ScalarProperty Name="Count" ColumnName="Count" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="MachineFrameId" ColumnName="MachineFrameId" />
+          <ScalarProperty Name="PositionId" ColumnName="PositionId" />
+          <ScalarProperty Name="ShopId" ColumnName="ShopId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SplitOrderPlanDetail">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.SplitOrderPlanDetail">
+        <MappingFragment StoreEntitySet="SplitOrderPlanDetail">
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="RackSalePrice" ColumnName="RackSalePrice" />
+          <ScalarProperty Name="Supplier" ColumnName="Supplier" />
+          <ScalarProperty Name="GraphicMaterial" ColumnName="GraphicMaterial" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="GraphicLength" ColumnName="GraphicLength" />
+          <ScalarProperty Name="GraphicWidth" ColumnName="GraphicWidth" />
+          <ScalarProperty Name="OrderType" ColumnName="OrderType" />
+          <ScalarProperty Name="PlanId" ColumnName="PlanId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Subject">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.Subject">
+        <MappingFragment StoreEntitySet="Subject">
+          <ScalarProperty Name="SplitPlanIds" ColumnName="SplitPlanIds" />
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="ApproveRemark" ColumnName="ApproveRemark" />
+          <ScalarProperty Name="ApproveDate" ColumnName="ApproveDate" />
+          <ScalarProperty Name="ApproveUserId" ColumnName="ApproveUserId" />
+          <ScalarProperty Name="ApproveState" ColumnName="ApproveState" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+          <ScalarProperty Name="BeginDate" ColumnName="BeginDate" />
+          <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+          <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+          <ScalarProperty Name="Tel" ColumnName="Tel" />
+          <ScalarProperty Name="Contact" ColumnName="Contact" />
+          <ScalarProperty Name="AddOrderType" ColumnName="AddOrderType" />
+          <ScalarProperty Name="SubjectNo" ColumnName="SubjectNo" />
+          <ScalarProperty Name="OutSubjectName" ColumnName="OutSubjectName" />
+          <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SupplementOrderDetail">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.SupplementOrderDetail">
+        <MappingFragment StoreEntitySet="SupplementOrderDetail">
+          <ScalarProperty Name="IsFinishSplit" ColumnName="IsFinishSplit" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="ChooseImg" ColumnName="ChooseImg" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="Sheet" ColumnName="Sheet" />
+          <ScalarProperty Name="PositionId" ColumnName="PositionId" />
+          <ScalarProperty Name="ShopId" ColumnName="ShopId" />
+          <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="UserInCustomer">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.UserInCustomer">
+        <MappingFragment StoreEntitySet="UserInCustomer">
+          <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="UserInfo">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.UserInfo">
+        <MappingFragment StoreEntitySet="UserInfo">
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="RealName" ColumnName="RealName" />
+          <ScalarProperty Name="PassWord" ColumnName="PassWord" />
+          <ScalarProperty Name="UserName" ColumnName="UserName" />
+          <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="UserInRole">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.UserInRole">
+        <MappingFragment StoreEntitySet="UserInRole">
+          <ScalarProperty Name="RoleId" ColumnName="RoleId" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CityInOrderPlan">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.CityInOrderPlan">
+        <MappingFragment StoreEntitySet="CityInOrderPlan">
+          <ScalarProperty Name="CityName" ColumnName="CityName" />
+          <ScalarProperty Name="CityId" ColumnName="CityId" />
+          <ScalarProperty Name="PlanType" ColumnName="PlanType" />
+          <ScalarProperty Name="PlanId" ColumnName="PlanId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CheckOrderResult">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.CheckOrderResult">
+        <MappingFragment StoreEntitySet="CheckOrderResult">
+          <ScalarProperty Name="CityId" ColumnName="CityId" />
+          <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+          <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+          <ScalarProperty Name="OrderPositionCount" ColumnName="OrderPositionCount" />
+          <ScalarProperty Name="BasicPositionCount" ColumnName="BasicPositionCount" />
+          <ScalarProperty Name="PositionId" ColumnName="PositionId" />
+          <ScalarProperty Name="CheckOrderId" ColumnName="CheckOrderId" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+          <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+          <ScalarProperty Name="Format" ColumnName="Format" />
+          <ScalarProperty Name="PositionName" ColumnName="PositionName" />
+          <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
+          <ScalarProperty Name="CityTier" ColumnName="CityTier" />
+          <ScalarProperty Name="ProvinceName" ColumnName="ProvinceName" />
+          <ScalarProperty Name="RegionNames" ColumnName="RegionNames" />
+          <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
+          <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+          <ScalarProperty Name="PlanDetailId" ColumnName="PlanDetailId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CheckOrder">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.CheckOrder">
+        <MappingFragment StoreEntitySet="CheckOrder">
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+          <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="PlanIds" ColumnName="PlanIds" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Shop">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.Shop">
+        <MappingFragment StoreEntitySet="Shop">
+          <ScalarProperty Name="CityName" ColumnName="CityName" />
+          <ScalarProperty Name="ProvinceName" ColumnName="ProvinceName" />
+          <ScalarProperty Name="RegionName" ColumnName="RegionName" />
+          <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+          <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+          <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+          <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="OpeningDate" ColumnName="OpeningDate" />
+          <ScalarProperty Name="BusinessModel" ColumnName="BusinessModel" />
+          <ScalarProperty Name="LocationType" ColumnName="LocationType" />
+          <ScalarProperty Name="Format" ColumnName="Format" />
+          <ScalarProperty Name="Channel" ColumnName="Channel" />
+          <ScalarProperty Name="Tel2" ColumnName="Tel2" />
+          <ScalarProperty Name="Contact2" ColumnName="Contact2" />
+          <ScalarProperty Name="Tel1" ColumnName="Tel1" />
+          <ScalarProperty Name="Contact1" ColumnName="Contact1" />
+          <ScalarProperty Name="POPAddress" ColumnName="POPAddress" />
+          <ScalarProperty Name="AgentName" ColumnName="AgentName" />
+          <ScalarProperty Name="AgentCode" ColumnName="AgentCode" />
+          <ScalarProperty Name="InstallLevel" ColumnName="InstallLevel" />
+          <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
+          <ScalarProperty Name="CityTier" ColumnName="CityTier" />
+          <ScalarProperty Name="CityId" ColumnName="CityId" />
+          <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+          <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+          <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+          <ScalarProperty Name="ShopNo" ColumnName="ShopNo" />
+          <ScalarProperty Name="ShopName" ColumnName="ShopName" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ProvinceInOrderPlan">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.ProvinceInOrderPlan">
+        <MappingFragment StoreEntitySet="ProvinceInOrderPlan">
+          <ScalarProperty Name="ProvinceName" ColumnName="ProvinceName" />
+          <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+          <ScalarProperty Name="PlanType" ColumnName="PlanType" />
+          <ScalarProperty Name="PlanId" ColumnName="PlanId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="FinalOrderDetail">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.FinalOrderDetail">
+        <MappingFragment StoreEntitySet="FinalOrderDetail">
+          <ScalarProperty Name="ChooseImg" ColumnName="ChooseImg" />
+          <ScalarProperty Name="DoorPosition" ColumnName="DoorPosition" />
+          <ScalarProperty Name="IsHang" ColumnName="IsHang" />
+          <ScalarProperty Name="WindowStick" ColumnName="WindowStick" />
+          <ScalarProperty Name="Floor" ColumnName="Floor" />
+          <ScalarProperty Name="RightSideStick" ColumnName="RightSideStick" />
+          <ScalarProperty Name="LeftSideStick" ColumnName="LeftSideStick" />
+          <ScalarProperty Name="IsElectricity" ColumnName="IsElectricity" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
+          <ScalarProperty Name="GraphicMaterial" ColumnName="GraphicMaterial" />
+          <ScalarProperty Name="Area" ColumnName="Area" />
+          <ScalarProperty Name="GraphicLength" ColumnName="GraphicLength" />
+          <ScalarProperty Name="GraphicWidth" ColumnName="GraphicWidth" />
+          <ScalarProperty Name="WindowSize" ColumnName="WindowSize" />
+          <ScalarProperty Name="WindowDeep" ColumnName="WindowDeep" />
+          <ScalarProperty Name="WindowHigh" ColumnName="WindowHigh" />
+          <ScalarProperty Name="WindowWide" ColumnName="WindowWide" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="Sheet" ColumnName="Sheet" />
+          <ScalarProperty Name="POPType" ColumnName="POPType" />
+          <ScalarProperty Name="POPName" ColumnName="POPName" />
+          <ScalarProperty Name="GraphicNo" ColumnName="GraphicNo" />
+          <ScalarProperty Name="MachineFrame" ColumnName="MachineFrame" />
+          <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+          <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+          <ScalarProperty Name="BusinessModel" ColumnName="BusinessModel" />
+          <ScalarProperty Name="LocationType" ColumnName="LocationType" />
+          <ScalarProperty Name="Format" ColumnName="Format" />
+          <ScalarProperty Name="Channel" ColumnName="Channel" />
+          <ScalarProperty Name="Tel" ColumnName="Tel" />
+          <ScalarProperty Name="Contact" ColumnName="Contact" />
+          <ScalarProperty Name="POPAddress" ColumnName="POPAddress" />
+          <ScalarProperty Name="AgentName" ColumnName="AgentName" />
+          <ScalarProperty Name="AgentCode" ColumnName="AgentCode" />
+          <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
+          <ScalarProperty Name="CityTier" ColumnName="CityTier" />
+          <ScalarProperty Name="City" ColumnName="City" />
+          <ScalarProperty Name="Province" ColumnName="Province" />
+          <ScalarProperty Name="Region" ColumnName="Region" />
+          <ScalarProperty Name="OrderType" ColumnName="OrderType" />
+          <ScalarProperty Name="ShopName" ColumnName="ShopName" />
+          <ScalarProperty Name="ShopNo" ColumnName="ShopNo" />
+          <ScalarProperty Name="ShopId" ColumnName="ShopId" />
+          <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="FinalOrderDetailTemp">
+      <EntityTypeMapping TypeName="KalerOrderDBModel.FinalOrderDetailTemp">
+        <MappingFragment StoreEntitySet="FinalOrderDetailTemp">
+          <ScalarProperty Name="ChooseImg" ColumnName="ChooseImg" />
+          <ScalarProperty Name="DoorPosition" ColumnName="DoorPosition" />
+          <ScalarProperty Name="IsHang" ColumnName="IsHang" />
+          <ScalarProperty Name="WindowStick" ColumnName="WindowStick" />
+          <ScalarProperty Name="Floor" ColumnName="Floor" />
+          <ScalarProperty Name="RightSideStick" ColumnName="RightSideStick" />
+          <ScalarProperty Name="LeftSideStick" ColumnName="LeftSideStick" />
+          <ScalarProperty Name="IsElectricity" ColumnName="IsElectricity" />
+          <ScalarProperty Name="Remark" ColumnName="Remark" />
+          <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
+          <ScalarProperty Name="GraphicMaterial" ColumnName="GraphicMaterial" />
+          <ScalarProperty Name="Area" ColumnName="Area" />
+          <ScalarProperty Name="GraphicLength" ColumnName="GraphicLength" />
+          <ScalarProperty Name="GraphicWidth" ColumnName="GraphicWidth" />
+          <ScalarProperty Name="WindowSize" ColumnName="WindowSize" />
+          <ScalarProperty Name="WindowDeep" ColumnName="WindowDeep" />
+          <ScalarProperty Name="WindowHigh" ColumnName="WindowHigh" />
+          <ScalarProperty Name="WindowWide" ColumnName="WindowWide" />
+          <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="Sheet" ColumnName="Sheet" />
+          <ScalarProperty Name="POPType" ColumnName="POPType" />
+          <ScalarProperty Name="POPName" ColumnName="POPName" />
+          <ScalarProperty Name="GraphicNo" ColumnName="GraphicNo" />
+          <ScalarProperty Name="MachineFrame" ColumnName="MachineFrame" />
+          <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+          <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+          <ScalarProperty Name="BusinessModel" ColumnName="BusinessModel" />
+          <ScalarProperty Name="LocationType" ColumnName="LocationType" />
+          <ScalarProperty Name="Format" ColumnName="Format" />
+          <ScalarProperty Name="Channel" ColumnName="Channel" />
+          <ScalarProperty Name="Tel" ColumnName="Tel" />
+          <ScalarProperty Name="Contact" ColumnName="Contact" />
+          <ScalarProperty Name="POPAddress" ColumnName="POPAddress" />
+          <ScalarProperty Name="AgentName" ColumnName="AgentName" />
+          <ScalarProperty Name="AgentCode" ColumnName="AgentCode" />
+          <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
+          <ScalarProperty Name="CityTier" ColumnName="CityTier" />
+          <ScalarProperty Name="City" ColumnName="City" />
+          <ScalarProperty Name="Province" ColumnName="Province" />
+          <ScalarProperty Name="Region" ColumnName="Region" />
+          <ScalarProperty Name="OrderType" ColumnName="OrderType" />
+          <ScalarProperty Name="ShopName" ColumnName="ShopName" />
+          <ScalarProperty Name="ShopNo" ColumnName="ShopNo" />
+          <ScalarProperty Name="ShopId" ColumnName="ShopId" />
+          <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

@@ -1,0 +1,62 @@
+﻿    #TastTX
+        {
+            width: 200px;
+            height: 80px;
+            background-color: #FFF;
+            border: 1px solid white;
+        }
+        #TastTX a
+        {
+            width: 200px;
+            height: 20px;
+            font-size: 14px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        #TastTX_Top
+        {
+            width: 200px;
+            height: 18px;
+            background-color: #ECECEC;
+            font-size: 15px;
+            padding-top:5px;
+            color:red
+        }
+        #TastTX_Top div
+        {
+            width: 20px;
+            height: 18px;
+            font-size: 15px;
+            color: Red;
+            border-left: 1px solid white;
+            text-align: center;
+            cursor: pointer;
+        }
+        #TastTX_bottom div
+        {
+            width: 30px;
+            background-color: Silver;
+            text-align: center;
+            border: 1px solid white;
+            margin-left: 5px;
+        }
+        #TastTX_Center
+        {
+            padding-left:15px;
+            padding-top: 5px;
+        }
+        .span_c
+        {
+            color: Orange;
+            font-size: 18px;
+        }
+        #TastTX a:hover
+        {
+            color: Blue;
+            text-decoration: none;
+        }
+        #TastTX a
+        {
+            text-decoration: none;
+            color: Black;
+        }

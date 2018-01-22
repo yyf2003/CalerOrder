@@ -1,0 +1,41 @@
+body{
+	color: #666666;
+	font:12px "ËÎÌו";
+	background: url(../image/bg.jpg) top repeat ;}	
+.main{
+	width:910px;
+	height:460px;
+	margin-top:100px;}
+.main_img{
+	background:url(../image/login_bei.PNG) bottom no-repeat;
+	width:890px;
+	height:394px;}
+.login{
+	background:url(../image/login_bei.PNG) bottom no-repeat; 
+	width:890px; height:54px;
+	margin-top:10px;}
+.login_01{
+	background:url(../image/copyRBg.jpg) repeat top;
+	width:890px;
+	height:40px;
+	line-height:40px;}
+.sub_01{
+	float:left;
+	width:350px;
+	padding-left:20px;
+	color:#FFF;}
+	
+.sub_02{
+	float:left;
+	width:480px;
+	padding-left:25px;
+    line-height:30px;
+	}
+.sub_02_ul{ margin:0px; }
+.sub_02_ul li{
+	font-size:12px; color:#fff;
+	float:left;
+	line-height:30px;
+	margin-left:10px;}
+.sub_02_ul li p{ float:left; margin:10px 0 0 15px;*margin:1px 0 0 0;}
+.sub_02_ul li span{ display:block; margin:8px 0 0 0;*margin:1px 0 0 0;}

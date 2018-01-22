@@ -1,0 +1,419 @@
+﻿using System;
+using System.Linq;
+using System.Text;
+using System.Web;
+using System.Collections;
+using System.Collections.Generic;
+using BLL;
+using DAL;
+using Models;
+using Newtonsoft.Json;
+using Common;
+
+namespace WebApp.Customer.Handler
+{
+    /// <summary>
+    /// Shops 的摘要说明
+    /// </summary>
+    public class Shops : IHttpHandler
+    {
+        int shopId;
+        ShopBLL shopBll = new ShopBLL();
+        //Shop model;
+        int customerId;
+        public void ProcessRequest(HttpContext context)
+        {
+            context.Response.ContentType = "text/plain";
+            string type = string.Empty;
+            string result = string.Empty;
+            if (context.Request.QueryString["type"] != null)
+            {
+                type = context.Request.QueryString["type"];
+            }
+            if (context.Request.QueryString["customerid"] != null)
+            {
+                customerId = int.Parse(context.Request.QueryString["customerid"]);
+            }
+            switch (type)
+            { 
+                case "checkshop":
+                    shopId = int.Parse(context.Request.QueryString["shopid"]);
+                    result = GetShopModel(shopId);
+                    break;
+                case "GetRegion":
+                    result = GetRegion();
+                    break;
+                case "GetProvince":
+                    string region = context.Request.QueryString["region"];
+                    result=GetProvince(region);
+                    break;
+                case "GetCity":
+                    string province = context.Request.QueryString["province"];
+                    result = GetCity(province);
+                    break;
+                case "edit":
+                    string jsonString = context.Request.QueryString["jsonString"];
+                    result = UpdateShop(jsonString);
+                    break;
+                case "GetCSUser"://获取客服
+                    string regionName = string.Empty;
+                    string provinceName = string.Empty;
+                    if (context.Request.QueryString["region"] != null)
+                        regionName = context.Request.QueryString["region"];
+                    if (context.Request.QueryString["province"] != null)
+                        provinceName = context.Request.QueryString["province"];
+                    result = GetCSUserList(regionName, provinceName);
+                    break;
+                case "bindRegion":
+                    result = BindRegion();
+                    break;
+                case "bindProvince":
+                    int regionId = 0;
+                    if (context.Request.QueryString["regionId"] != null)
+                        regionId = int.Parse(context.Request.QueryString["regionId"]);
+                    result = BindProvince(regionId);
+                    break;
+                case "bindCity":
+                    int provinceId = 0;
+                    if (context.Request.QueryString["provinceId"] != null)
+                        provinceId = int.Parse(context.Request.QueryString["provinceId"]);
+                    result = BindCity(provinceId);
+                    break;
+                case "bindArea":
+                    int cityId = 0;
+                    if (context.Request.QueryString["cityId"] != null)
+                        cityId = int.Parse(context.Request.QueryString["cityId"]);
+                    result = BindCity(cityId);
+                    break;
+            }
+            context.Response.Write(result);
+        }
+
+
+        string GetShopModel(int id)
+        {
+            var model1 = (from shop in CurrentContext.DbContext.Shop
+                         join customer in CurrentContext.DbContext.Customer
+                         on shop.CustomerId equals customer.Id
+                         join user1 in CurrentContext.DbContext.UserInfo
+                         on shop.CSUserId equals user1.UserId into userTemp
+                         from user in userTemp.DefaultIfEmpty()
+                         where shop.Id == id
+                         select new { 
+                            shop,
+                            customer.CustomerName,
+                            CSUserName=user.RealName
+                         }).FirstOrDefault();
+            if (model1 != null)
+            {
+                StringBuilder json = new StringBuilder();
+                string opendate = string.Empty;
+                if (model1.shop.OpeningDate != null)
+                {
+                    opendate = DateTime.Parse(model1.shop.OpeningDate.ToString()).ToShortDateString();
+                }
+                string Status = !string.IsNullOrWhiteSpace(model1.shop.Status) ? model1.shop.Status : "正常";
+                json.Append("{\"ShopName\":\"" + model1.shop.ShopName + "\",\"ShopNo\":\"" + model1.shop.ShopNo + "\",\"CustomerId\":\"" + (model1.shop.CustomerId ?? 0) + "\",\"Customer\":\"" + model1.CustomerName + "\",\"RegionName\":\"" + model1.shop.RegionName + "\",\"ProvinceName\":\"" + model1.shop.ProvinceName + "\",\"CityName\":\"" + model1.shop.CityName + "\",\"AreaName\":\"" + model1.shop.AreaName + "\",\"CityTier\":\"" + model1.shop.CityTier + "\",\"IsInstall\":\"" + model1.shop.IsInstall + "\",\"AgentCode\":\"" + model1.shop.AgentCode + "\",\"AgentName\":\"" + model1.shop.AgentName + "\",\"POPAddress\":\"" + model1.shop.POPAddress + "\",\"Contact1\":\"" + model1.shop.Contact1 + "\",\"Tel1\":\"" + model1.shop.Tel1 + "\",\"Contact2\":\"" + model1.shop.Contact2 + "\",\"Tel2\":\"" + model1.shop.Tel2 + "\",\"Channel\":\"" + model1.shop.Channel + "\",\"Format\":\"" + model1.shop.Format + "\",\"LocationType\":\"" + model1.shop.LocationType + "\",\"BusinessModel\":\"" + model1.shop.BusinessModel + "\",\"OpeningDate\":\"" + opendate + "\",\"Status\":\"" + Status + "\",\"CSUserId\":\"" + model1.shop.CSUserId + "\",\"CSUserName\":\"" + model1.CSUserName + "\",\"Remark\":\"" + model1.shop.Remark + "\",\"InstallPrice\":\"" + model1.shop.InstallPrice + "\",\"WindowInstallPrice\":\"" + model1.shop.WindowInstallPrice + "\",\"POSScale\":\"" + model1.shop.POSScale + "\",\"BasicInstallPrice\":\"" + model1.shop.BasicInstallPrice + "\",\"ProvinceId\":\"" + (model1.shop.ProvinceId ?? 0) + "\",\"CityId\":\"" + (model1.shop.CityId ?? 0) + "\",\"AreaId\":\"" + (model1.shop.AreaId ?? 0) + "\"}");
+                return "["+json.ToString()+"]";
+            }
+            return "";
+        }
+
+        string GetRegion()
+        {
+            var list = shopBll.GetList(s => s.CustomerId==customerId).Select(s => s.RegionName).Distinct().ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s =>
+                {
+                    json.Append("{\"RegionName\":\"" + s + "\"},");
+                });
+                return "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            else
+                return "";
+        }
+
+        string GetProvince(string region)
+        {
+            region = region.ToLower();
+            var list = shopBll.GetList(s => s.RegionName.ToLower() == region).Select(s => s.ProvinceName).Distinct().ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s => {
+                    json.Append("{\"ProvinceName\":\""+s+"\"},");
+                });
+                return "[" + json.ToString() + "]";
+            }
+            else
+                return "";
+        }
+
+        string GetCity(string province)
+        {
+            province = province.ToLower();
+            var list = shopBll.GetList(s => s.ProvinceName.ToLower() == province).Select(s => s.CityName).Distinct().ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s =>
+                {
+                    json.Append("{\"CityName\":\"" + s + "\"},");
+                });
+                return "[" + json.ToString() + "]";
+            }
+            else
+                return "";
+        }
+
+        string UpdateShop(string jsonString)
+        {
+            string result = "提交失败！";
+            if (!string.IsNullOrWhiteSpace(jsonString))
+            {
+                Shop model = JsonConvert.DeserializeObject<Shop>(jsonString);
+                if (model != null)
+                {
+                    BaseDataChangeLogBLL changeLogBll = new BaseDataChangeLogBLL();
+                    ShopChangeDetailBLL detailBll = new ShopChangeDetailBLL();
+                    ShopChangeDetail shopChangeDetailModel;
+                    if (!CheckShop(model))
+                    {
+                        Shop newModel = shopBll.GetModel(model.Id);
+                        if (newModel != null)
+                        {
+                            model.AddDate = newModel.AddDate;
+                            model.AddUserId = newModel.AddUserId;
+                            model.CustomerId = newModel.CustomerId;
+                            model.IsDelete = newModel.IsDelete;
+                            
+                            shopBll.Update(model);
+
+                            BaseDataChangeLog logModel = new BaseDataChangeLog();
+                            logModel.AddDate = DateTime.Now;
+                            logModel.AddUserId = new BasePage().CurrentUser.UserId;
+                            logModel.ItemType = (int)BaseDataChangeItemEnum.Shop;
+                            logModel.ChangeType = (int)DataChangeTypeEnum.Edit;
+                            logModel.ShopId = model.Id;
+                            changeLogBll.Add(logModel);
+
+                            
+                            shopChangeDetailModel = new ShopChangeDetail();
+                            shopChangeDetailModel.ShopId = newModel.Id;
+                            shopChangeDetailModel.AgentCode = newModel.AgentCode;
+                            shopChangeDetailModel.AgentName = newModel.AgentName;
+                            shopChangeDetailModel.AreaName = newModel.AreaName;
+                            shopChangeDetailModel.BasicInstallPrice = newModel.BasicInstallPrice;
+                            shopChangeDetailModel.BusinessModel = newModel.BusinessModel;
+                            shopChangeDetailModel.Category = newModel.Category;
+                            shopChangeDetailModel.Channel = newModel.Channel;
+                            shopChangeDetailModel.CityName = newModel.CityName;
+                            shopChangeDetailModel.CityTier = newModel.CityTier;
+                            shopChangeDetailModel.Contact1 = newModel.Contact1;
+                            shopChangeDetailModel.Contact2 = newModel.Contact2;
+                            shopChangeDetailModel.CustomerId = newModel.CustomerId;
+                            shopChangeDetailModel.Format = newModel.Format;
+                            shopChangeDetailModel.IsInstall = newModel.IsInstall;
+                            shopChangeDetailModel.LocationType = newModel.LocationType;
+                            shopChangeDetailModel.LogId = logModel.Id;
+                            shopChangeDetailModel.POPAddress = newModel.POPAddress;
+                            shopChangeDetailModel.ProvinceName = newModel.ProvinceName;
+                            shopChangeDetailModel.RegionName = newModel.RegionName;
+                            shopChangeDetailModel.Remark = newModel.Remark;
+                            shopChangeDetailModel.ShopName = newModel.ShopName;
+                            shopChangeDetailModel.ShopNo = newModel.ShopNo;
+                            shopChangeDetailModel.ShopType = newModel.ShopType;
+                            shopChangeDetailModel.Status = newModel.Status;
+                            shopChangeDetailModel.Tel1 = newModel.Tel1;
+                            shopChangeDetailModel.Tel2 = newModel.Tel2;
+                            shopChangeDetailModel.CSUserId = newModel.CSUserId;
+                            shopChangeDetailModel.ChangeType = "修改前";
+                            shopChangeDetailModel.AddDate = DateTime.Now;
+                            shopChangeDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                            detailBll.Add(shopChangeDetailModel);
+
+
+                            shopChangeDetailModel = new ShopChangeDetail();
+                            shopChangeDetailModel.ShopId = model.Id;
+                            shopChangeDetailModel.AgentCode = model.AgentCode;
+                            shopChangeDetailModel.AgentName = model.AgentName;
+                            shopChangeDetailModel.AreaName = model.AreaName;
+                            shopChangeDetailModel.BasicInstallPrice = model.BasicInstallPrice;
+                            shopChangeDetailModel.BusinessModel = model.BusinessModel;
+                            shopChangeDetailModel.Category = model.Category;
+                            shopChangeDetailModel.Channel = model.Channel;
+                            shopChangeDetailModel.CityName = model.CityName;
+                            shopChangeDetailModel.CityTier = model.CityTier;
+                            shopChangeDetailModel.Contact1 = model.Contact1;
+                            shopChangeDetailModel.Contact2 = model.Contact2;
+                            shopChangeDetailModel.CustomerId = model.CustomerId;
+                            shopChangeDetailModel.Format = model.Format;
+                            shopChangeDetailModel.IsInstall = model.IsInstall;
+                            shopChangeDetailModel.LocationType = model.LocationType;
+                            shopChangeDetailModel.LogId = logModel.Id;
+                            shopChangeDetailModel.POPAddress = model.POPAddress;
+                            shopChangeDetailModel.ProvinceName = model.ProvinceName;
+                            shopChangeDetailModel.RegionName = model.RegionName;
+                            shopChangeDetailModel.Remark = model.Remark;
+                            shopChangeDetailModel.ShopName = model.ShopName;
+                            shopChangeDetailModel.ShopNo = model.ShopNo;
+                            shopChangeDetailModel.ShopType = model.ShopType;
+                            shopChangeDetailModel.Status = model.Status;
+                            shopChangeDetailModel.Tel1 = model.Tel1;
+                            shopChangeDetailModel.Tel2 = model.Tel2;
+                            shopChangeDetailModel.CSUserId = model.CSUserId;
+                            shopChangeDetailModel.ChangeType = "修改后";
+                            shopChangeDetailModel.AddDate = DateTime.Now;
+                            shopChangeDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                            detailBll.Add(shopChangeDetailModel);
+
+
+                            result = "ok";
+                        }
+                    }
+                    else
+                    {
+                        result = "exist";
+                    }
+                }
+            }
+            return result;
+        }
+
+        bool CheckShop(Shop model)
+        {
+            var list = shopBll.GetList(s => s.ShopNo.ToLower() == model.ShopNo.ToLower() && s.Id != model.Id);
+            return list.Any();
+        }
+
+        string GetCSUserList(string regionName, string provinceName)
+        {
+            var list = (from ur in CurrentContext.DbContext.UserInRegion
+                       join user in CurrentContext.DbContext.UserInfo
+                       on ur.UserId equals user.UserId
+                       join userRole in CurrentContext.DbContext.UserInRole
+                       on user.UserId equals userRole.UserId
+                        where userRole.RoleId==5
+                       select new { 
+                          
+                          user,
+                          ur.RegionId,
+                          ur.ProvinceId,
+                          ur.CityId,
+                          ur.AreaId
+                       }).ToList();
+            List<UserInfo> userList = new List<UserInfo>();
+            if (!string.IsNullOrWhiteSpace(regionName))
+            {
+                int regionId = 0;
+                var region = new RegionBLL().GetList(s=>s.CustomerId==customerId && s.RegionName.ToLower()==regionName.ToLower()).FirstOrDefault();
+                if (region != null)
+                {
+                    regionId = region.Id;
+                }
+                
+                list.ForEach(s => {
+                    bool flag = false;
+                    if (!string.IsNullOrWhiteSpace(s.RegionId))
+                    {
+                        if (StringHelper.ToIntList(s.RegionId, ',').Contains(regionId))
+                        {
+                            flag = true;
+                        }
+                    }
+                    if (flag && !userList.Contains(s.user))
+                        userList.Add(s.user);
+                });
+                
+            }
+            if (!string.IsNullOrWhiteSpace(provinceName))
+            {
+                int provinceId = 0;
+                var province = new PlaceBLL().GetList(s => s.PlaceName == provinceName && s.AreaDeep==2).FirstOrDefault();
+                if (province != null)
+                {
+                    provinceId = province.ID;
+                }
+                list.ForEach(s =>
+                {
+                    bool flag = false;
+                    if (!string.IsNullOrWhiteSpace(s.ProvinceId))
+                    {
+                        if (StringHelper.ToIntList(s.ProvinceId, ',').Contains(provinceId))
+                        {
+                            flag = true;
+                        }
+                    }
+                    if (flag && !userList.Contains(s.user))
+                        userList.Add(s.user);
+                });
+            }
+            if (userList.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                userList.ForEach(s => {
+                    json.Append("{\"UserId\":\""+s.UserId+"\",\"RealName\":\""+s.RealName+"\"},");
+                });
+                return "["+json.ToString().TrimEnd(',')+"]";
+            }
+            return "";
+        }
+
+        string BindRegion()
+        {
+            var list = new RegionBLL().GetList(s=>s.CustomerId==customerId);
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s => {
+                    json.Append("{\"Id\":\"" + s.Id + "\",\"RegionName\":\"" + s.RegionName + "\"},");
+                });
+                return "["+json.ToString().TrimEnd(',')+"]";
+            }
+            return "";
+        }
+
+        string BindProvince(int regionId)
+        {
+            var list = (from pir in CurrentContext.DbContext.ProvinceInRegion
+                       join province in CurrentContext.DbContext.Place
+                       on pir.ProvinceId equals province.ID
+                       where pir.RegionId == regionId
+                       select province).ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s => {
+                    json.Append("{\"Id\":\""+s.ID+"\",\"ProvinceName\":\""+s.PlaceName+"\"},");
+                });
+                return "["+json.ToString().TrimEnd(',')+"]";
+            }
+            return "";
+        }
+
+        string BindCity(int provinceId)
+        {
+            var list = new PlaceBLL().GetList(s => s.ParentID == provinceId);
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s =>
+                {
+                    json.Append("{\"Id\":\"" + s.ID + "\",\"PlaceName\":\"" + s.PlaceName + "\"},");
+                });
+                return "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            return "";
+        }
+
+        public bool IsReusable
+        {
+            get
+            {
+                return false;
+            }
+        }
+    }
+}

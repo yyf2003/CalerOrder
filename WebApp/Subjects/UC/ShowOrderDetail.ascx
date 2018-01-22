@@ -1,0 +1,610 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ShowOrderDetail.ascx.cs"
+    Inherits="WebApp.Subjects.UC.ShowOrderDetail" %>
+<%@ Register Assembly="AspNetPager" Namespace="Wuqi.Webdiyer" TagPrefix="webdiyer" %>
+<%@ Register Src="ADOriginalOrder.ascx" TagName="ADOriginalOrder" TagPrefix="uc1" %>
+<style type="text/css">
+    .style1
+    {
+        width: 120px;
+        height: 20px;
+    }
+    .style2
+    {
+        width: 300px;
+        height: 20px;
+    }
+    .style3
+    {
+        height: 20px;
+    }
+</style>
+<script type="text/javascript">
+    var subjectId = '<%=subjectId %>';
+    //     function ShowIframe() {
+    //         $("#loading").hide();
+    //         $("#showframe").show();
+    //     }
+    function ShowIframe(isShow,type) {
+
+        //height = height || "ok";
+
+        $("#loading").hide();
+        if (isShow==1) {
+            $("#showframe").show();
+            if (type == 2) {
+                $("#showframe").sttr("height",500);
+            }
+        }
+        else
+            $("#showEmpty").show();
+    }
+</script>
+<asp:ScriptManager ID="ScriptManager1" runat="server">
+</asp:ScriptManager>
+<div class="tr">
+    >>项目信息
+</div>
+<table class="table">
+    <tr class="tr_bai">
+        <td style="width: 120px;">
+            内部项目编号
+        </td>
+        <td style="text-align: left; padding-left: 5px; width: 300px;">
+            <asp:Label ID="labSubjectNo" runat="server" Text=""></asp:Label>
+        </td>
+        <td style="width: 120px;">
+        </td>
+        <td style="text-align: left; padding-left: 5px;">
+        </td>
+    </tr>
+    <tr class="tr_bai">
+        <td class="style1">
+            项目名称
+        </td>
+        <td style="text-align: left; padding-left: 5px;" class="style2">
+            <asp:Label ID="labSubjectName" runat="server" Text=""></asp:Label>
+        </td>
+        <td class="style1">
+            外部项目名称
+        </td>
+        <td style="text-align: left; padding-left: 5px;" class="style3">
+            <asp:Label ID="labOutSubjectName" runat="server" Text=""></asp:Label>
+        </td>
+    </tr>
+    <tr class="tr_bai">
+        <td>
+            开始时间
+        </td>
+        <td style="text-align: left; padding-left: 5px; width: 300px;">
+            <asp:Label ID="labBeginDate" runat="server" Text=""></asp:Label>
+        </td>
+        <td style="width: 120px;">
+            结束时间
+        </td>
+        <td style="text-align: left; padding-left: 5px;">
+            <asp:Label ID="labEndDate" runat="server" Text=""></asp:Label>
+        </td>
+    </tr>
+    <tr class="tr_bai">
+        <td>
+            项目创建人
+        </td>
+        <td style="text-align: left; padding-left: 5px; width: 300px;">
+            <asp:Label ID="labAddUserName" runat="server" Text=""></asp:Label>
+        </td>
+        <td style="width: 120px;">
+            所属客户
+        </td>
+        <td style="text-align: left; padding-left: 5px;">
+             <asp:Label ID="labCustomerName" runat="server" Text=""></asp:Label>
+        </td>
+    </tr>
+   
+    <tr class="tr_bai">
+        <td>
+            订单类型
+        </td>
+        <td colspan="3" style="text-align: left; padding-left: 5px;">
+            <asp:Label ID="labSubjectType" runat="server" Text=""></asp:Label>
+        </td>
+    </tr>
+    <tr class="tr_bai">
+        <td>
+            备注
+        </td>
+        <td colspan="3" style="text-align: left; padding-left: 5px;">
+            <asp:Label ID="labRemark" runat="server" Text=""></asp:Label>
+        </td>
+    </tr>
+</table>
+<br />
+<%--<uc1:ADOriginalOrder ID="ADOriginalOrder2" runat="server" />--%>
+<div id="loading" style="text-align: center; padding-top: 50px; height: 200px;">
+    <img src="../image/WaitImg/loading1.gif" />
+    <br />
+    正在加载订单，请稍等...
+</div>
+<div id="showframe" style="display: none;">
+    <iframe id="frame1" name="frame1" src="" frameborder="0" height="590" width="100%">
+    </iframe>
+</div>
+<div id="showEmpty" style="height: 50px; border: 1px solid #ccc; line-height: 50px;
+    color: Blue; text-align: center; display: none;">
+    无订单数据
+</div>
+
+<asp:Panel ID="Panel_PlanInfo" runat="server">
+
+<!--方案信息-->
+<div class="tab" style="margin-top: 10px;">
+    <span style="font-weight: bold;">拆单方案</span>
+    <hr style="margin-top: 8px; margin-bottom: 5px; border: 1px solid; color: #000;" />
+</div>
+<div>
+    <div style="margin-left: -10px;">
+        <div id="showLoading" style="text-align: center;">
+            <img src="../../image/WaitImg/loading1.gif" />
+        </div>
+        <table id="tbPlanList1" style="width: 100%;">
+        </table>
+    </div>
+</div>
+<br />
+<div class="tab" style="margin-top: 10px;">
+    <span style="font-weight: bold;">拆分后订单信息</span> &nbsp;&nbsp;
+    <asp:LinkButton ID="lbExport" runat="server" OnClick="lbExport_Click" OnClientClick="return check(this)">导出订单</asp:LinkButton>
+    <asp:Label ID="Label2" runat="server" Text="(含空尺寸数据)"></asp:Label>
+    <img id="downloading1" src="/image/WaitImg/loadingA.gif" style="display: none;" />
+    &nbsp;&nbsp;&nbsp;&nbsp;<asp:LinkButton ID="lbExport1" runat="server" OnClick="lbExport1_Click"
+        OnClientClick="return check(this)">导出订单</asp:LinkButton>
+    <asp:Label ID="Label1" runat="server" Text="(非空尺寸数据)"></asp:Label>
+    <img id="downloading2" src="/image/WaitImg/loadingA.gif" style="display: none;" />
+    <hr style="margin-top: 8px; margin-bottom: 5px; border: 1px solid; color: #000;" />
+</div>
+<table style="width: 100%; margin-left: 5px; font-size: 13px;">
+    <tr>
+        <td style="width: 600px;">
+            <span style="color: Blue;">店铺编号：</span>
+            <asp:TextBox ID="txtShopNo" runat="server"></asp:TextBox>
+            &nbsp;&nbsp; <span style="color: Blue;">店铺名称：</span>
+            <asp:TextBox ID="txtShopName" runat="server" Style="width: 150px;"></asp:TextBox>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span style="color: Blue;">区域：</span>
+            <asp:CheckBoxList ID="cblRegion" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+            </asp:CheckBoxList>
+            &nbsp;&nbsp;&nbsp; <span style="color: Blue;">关键字：</span>
+            <asp:TextBox ID="txtKeyWord" runat="server" placeholder="位置/位置描述/器架类型/材质" Style="width: 180px;"></asp:TextBox>
+            <asp:Button ID="btnSearch" runat="server" Text="查 询" class="easyui-linkbutton" Style="width: 65px;
+                height: 26px; margin-left: 50px;" OnClick="btnSearch_Click" />
+                <img id="loadSearch" src="/image/WaitImg/loadingA.gif" style="display: none;" />
+        </td>
+    </tr>
+</table>
+<asp:UpdatePanel ID="UpdatePanel1" runat="server">
+    <Triggers>
+        <asp:AsyncPostBackTrigger ControlID="AspNetPager1" EventName="pagechanged" />
+        <asp:AsyncPostBackTrigger ControlID="btnSearch" EventName="click" />
+    </Triggers>
+    <ContentTemplate>
+        <div class="tab" style="overflow: auto;">
+            <asp:Repeater ID="gvPOP" runat="server" OnItemDataBound="gvPOP_ItemDataBound">
+                <HeaderTemplate>
+                    <%if (gvPOP.Items.Count == 0)
+                      { %>
+                    <table class="table">
+                        <%}
+                      else
+                      {%>
+                        <table class="table1" style="width: 2500px;">
+                            <tr class="tr_hui">
+                                <td style="width: 40px;">
+                                    序号
+                                </td>
+                                <td style="width: 50px;">
+                                    订单类型
+                                </td>
+                                <td>
+                                    店铺编号
+                                </td>
+                                <td>
+                                    店铺名称
+                                </td>
+                                <td>
+                                    区域
+                                </td>
+                                <td>
+                                    省份
+                                </td>
+                                <td>
+                                    城市
+                                </td>
+                                <td>
+                                    城市级别
+                                </td>
+                                <%--<td>
+                                    店铺类型
+                                </td>
+                                <td>
+                                    物料支持
+                                </td>
+                                <td>
+                                    店铺规模大小
+                                </td>
+                                <td>
+                                    POP编号
+                                </td>
+                                <td>
+                                    POP名称
+                                </td>
+                                <td>
+                                    POP类型
+                                </td>--%>
+                                <td>
+                                    位置
+                                </td>
+                                <td>
+                                    级别
+                                </td>
+                                <td>
+                                    位置描述
+                                </td>
+                                <td>
+                                    器架类型
+                                </td>
+                                <td>
+                                    性别
+                                </td>
+                                <td>
+                                    数量
+                                </td>
+                                <td>
+                                    POP宽(mm)
+                                </td>
+                                <td>
+                                    POP高(mm)
+                                </td>
+                                <td>
+                                    面积(M2)
+                                </td>
+                                <td>
+                                    POP材质
+                                </td>
+                                <td>
+                                    位置宽(mm)
+                                </td>
+                                <td>
+                                    位置高(mm)
+                                </td>
+                                <td>
+                                    位置深(mm)
+                                </td>
+                                <td>
+                                    位置规模
+                                </td>
+                                <td>
+                                    样式
+                                </td>
+                                <td>
+                                    角落类型
+                                </td>
+                                <td>
+                                    系列
+                                </td>
+                                <td>
+                                    是否标准规格
+                                </td>
+                                <td>
+                                    是否格栅
+                                </td>
+                                <td>
+                                    是否框架
+                                </td>
+                                <td>
+                                    单/双面
+                                </td>
+                                <td>
+                                    是否有玻璃
+                                </td>
+                                <td>
+                                    背景
+                                </td>
+                                <td>
+                                    格栅横向数量
+                                </td>
+                                <td>
+                                    格栅纵向数量
+                                </td>
+                                <td>
+                                    平台长(mm)
+                                </td>
+                                <td>
+                                    平台宽(mm)
+                                </td>
+                                <td>
+                                    平台高(mm)
+                                </td>
+                                <td>
+                                    设备类别
+                                </td>
+                                <td>
+                                    选图
+                                </td>
+                                <td>
+                                    备注
+                                </td>
+                            </tr>
+                            <%} %>
+                </HeaderTemplate>
+                <ItemTemplate>
+                    <tr class="tr_bai">
+                        <td style="width: 40px;">
+                            <%#Container.ItemIndex + 1%>
+                        </td>
+                        <td style="width: 50px;">
+                            <%#Eval("order.OrderType") != null ? Eval("order.OrderType").ToString() == "1" ? "pop" : "道具" : "POP"%>
+                        </td>
+                        <td>
+                            <%--店铺编号--%>
+                            <%#Eval("shop.ShopNo")%>
+                        </td>
+                        <td>
+                            <%--店铺名称--%>
+                            <%#Eval("shop.ShopName")%>
+                        </td>
+                        <td>
+                            <%--区域--%>
+                            <%#Eval("shop.RegionName")%>
+                        </td>
+                        <td>
+                            <%--省份--%>
+                            <%#Eval("shop.ProvinceName")%>
+                        </td>
+                        <td>
+                            <%--城市--%>
+                            <%#Eval("shop.CityName")%>
+                        </td>
+                        <td>
+                            <%--城市级别--%>
+                            <%#Eval("shop.CityTier")%>
+                        </td>
+                        <%--<td>
+                            
+                            <%#Eval("order.Format")%>
+                        </td>
+                        <td>
+                            
+                            <%#Eval("order.MaterialSupport")%>
+                        </td>
+                        <td>
+                           
+                            <%#Eval("order.POSScale")%>
+                        </td>
+                        <td>
+                            
+                            <%#Eval("order.GraphicNo")%>
+                        </td>
+                        <td>
+                           
+                            <%#Eval("pop") != null ? Eval("pop.POPName") : ""%>
+                        </td>
+                        <td>
+                            
+                            <%#Eval("pop") != null ? Eval("pop.POPType") : ""%>
+                        </td>--%>
+                        <td>
+                            <%--位置--%>
+                            <%#Eval("order.Sheet")%>
+                        </td>
+                        <td>
+                            <%--展桌级别--%>
+                            <asp:Label ID="labLevel" runat="server" Text=""></asp:Label>
+                        </td>
+                        <td>
+                            <%--位置描述--%>
+                            <%#Eval("order.PositionDescription")%>
+                        </td>
+                        <td>
+                            <%--器架类型--%>
+                            <%#Eval("order.MachineFrame")%>
+                        </td>
+                        <td>
+                            <%--性别--%>
+                            <%--<%#Eval("order.Gender")%>--%>
+                            <%#Eval("order.OrderGender") != null ? Eval("order.OrderGender") : Eval("order.Gender")%>
+                        </td>
+                        <td>
+                            <%--数量--%>
+                            <%#Eval("order.Quantity")%>
+                        </td>
+                        <td>
+                            <%--POP宽(mm)--%>
+                            <%#Eval("order.GraphicWidth")%>
+                        </td>
+                        <td>
+                            <%-- POP高(mm)--%>
+                            <%#Eval("order.GraphicLength")%>
+                        </td>
+                        <td>
+                            <%--面积(M2)--%>
+                            <%#Eval("order.Area")%>
+                        </td>
+                        <td>
+                            <%--POP材质--%>
+                            <%#Eval("order.GraphicMaterial")%>
+                        </td>
+                        <td>
+                            <%--位置宽(mm)--%>
+                            <%#Eval("pop") != null ? Eval("pop.WindowWide") : ""%>
+                        </td>
+                        <td>
+                            <%--位置高(mm)--%>
+                            <%#Eval("pop") != null ? Eval("pop.WindowHigh") : ""%>
+                        </td>
+                        <td>
+                            <%--位置深(mm)--%>
+                            <%#Eval("pop") != null ? Eval("pop.WindowDeep") : ""%>
+                        </td>
+                        <td>
+                            <%--位置规模--%>
+                            <%#Eval("pop") != null ? Eval("pop.WindowSize") : ""%>
+                        </td>
+                        <td>
+                            <%--样式--%>
+                            <%#Eval("pop") != null ? Eval("pop.Style") : ""%>
+                        </td>
+                        <td>
+                            <%--角落类型--%>
+                            <%#Eval("pop") != null ? Eval("pop.CornerType") : ""%>
+                        </td>
+                        <td>
+                            <%--系列--%>
+                            <%#Eval("pop") != null ? Eval("pop.Category") : ""%>
+                        </td>
+                        <td>
+                            <%--是否标准规格--%>
+                            <%#Eval("pop") != null ? Eval("pop.StandardDimension") : ""%>
+                        </td>
+                        <td>
+                            <%--是否格栅--%>
+                            <%#Eval("pop") != null ? Eval("pop.Modula") : ""%>
+                        </td>
+                        <td>
+                            <%--是否框架--%>
+                            <%#Eval("pop") != null ? Eval("pop.Frame") : ""%>
+                        </td>
+                        <td>
+                            <%--单/双面--%>
+                            <%#Eval("pop") != null ? Eval("pop.DoubleFace") : ""%>
+                        </td>
+                        <td>
+                            <%--是否有玻璃--%>
+                            <%#Eval("pop") != null ? Eval("pop.Glass") : ""%>
+                        </td>
+                        <td>
+                            <%--背景--%>
+                            <%#Eval("pop") != null ? Eval("pop.Backdrop") : ""%>
+                        </td>
+                        <td>
+                            <%--格栅横向数量--%>
+                            <%#Eval("pop") != null ? Eval("pop.ModulaQuantityWidth") : ""%>
+                        </td>
+                        <td>
+                            <%--格栅纵向数量--%>
+                            <%#Eval("pop") != null ? Eval("pop.ModulaQuantityHeight") : ""%>
+                        </td>
+                        <td>
+                            <%--平台长(mm)--%>
+                            <%#Eval("pop") != null ? Eval("pop.PlatformLength") : ""%>
+                        </td>
+                        <td>
+                            <%--平台宽(mm)--%>
+                            <%#Eval("pop") != null ? Eval("pop.PlatformWidth") : ""%>
+                        </td>
+                        <td>
+                            <%--平台高(mm)--%>
+                            <%#Eval("pop") != null ? Eval("pop.PlatformHeight") : ""%>
+                        </td>
+                        <td>
+                            <%--设备类别--%>
+                            <%#Eval("pop") != null ? Eval("pop.FixtureType") : ""%>
+                        </td>
+                        <td>
+                            <%--选图--%>
+                            <%#Eval("order.ChooseImg")%>
+                        </td>
+                        <td>
+                            <%--备注--%>
+                            <%#Eval("order.Remark")%>
+                        </td>
+                    </tr>
+                </ItemTemplate>
+                <FooterTemplate>
+                    <%if (gvPOP.Items.Count == 0)
+                      { %>
+                    <tr>
+                        <td>
+                            --无数据--
+                        </td>
+                    </tr>
+                    <%} %>
+                    </table>
+                </FooterTemplate>
+            </asp:Repeater>
+        </div>
+        <div class="tab" style="text-align: center;">
+            <webdiyer:AspNetPager ID="AspNetPager1" runat="server" PageSize="20" CssClass="paginator"
+                CurrentPageButtonClass="cpb" AlwaysShow="True" FirstPageText="首页" LastPageText="尾页"
+                NextPageText="下一页" PrevPageText="上一页" ShowCustomInfoSection="Left" ShowInputBox="Never"
+                CustomInfoTextAlign="Left" LayoutType="Table" OnPageChanged="AspNetPager1_PageChanged">
+            </webdiyer:AspNetPager>
+        </div>
+    </ContentTemplate>
+    <Triggers>
+        <asp:AsyncPostBackTrigger ControlID="AspNetPager1" EventName="pagechanged" />
+    </Triggers>
+</asp:UpdatePanel>
+</asp:Panel>
+
+
+<asp:Panel ID="Panel1" runat="server" Visible="false">
+    <br />
+    <div class="tr">
+        >>审批记录</div>
+    <div id="approveInfoDiv" runat="server">
+    </div>
+</asp:Panel>
+<asp:HiddenField ID="hfCustomerId" runat="server" />
+<asp:HiddenField ID="hfSubjectId" runat="server" />
+<asp:HiddenField ID="hfPlanIds" runat="server" />
+<script src="../../Scripts/jquery-1.7.2.js" type="text/javascript"></script>
+<script src="../../easyui1.4/jquery.easyui.min.js" type="text/javascript"></script>
+<script src="../../easyui1.4/datagrid-detailview.js" type="text/javascript"></script>
+<script src="/Subjects/js/ShowOrderDetail.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#frame1").attr("src", "/Subjects/ADOrders/loadUC.aspx?subjectId=" + subjectId);
+    })
+    function check(obj) {
+        $("#ShowOrderDetail1_lbExport,#ShowOrderDetail1_lbExport1").attr("disabled", true);
+
+        $(obj).next("img").show();
+        checkExport(obj);
+        return true;
+    }
+
+    var timer;
+    function checkExport(obj) {
+        timer = setInterval(function () {
+            $.ajax({
+                type: "get",
+                url: "/Subjects/Handler/CheckExport.ashx",
+                cache: false,
+                success: function (data) {
+
+                    if (data == "ok") {
+                        $("#ShowOrderDetail1_lbExport,#ShowOrderDetail1_lbExport1").attr("disabled", false);
+                        $(obj).next("img").hide();
+                        clearInterval(timer);
+                    }
+
+                }
+            })
+
+        }, 1000);
+    }
+
+
+    Sys.WebForms.PageRequestManager.getInstance().add_initializeRequest(function (sender, e) {
+        var id = e.get_postBackElement().id;
+        if (id.indexOf("btnSearch") != -1) {
+            $("#loadSearch").show();
+        }
+    })
+    Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function (sender, e) {
+        $("#loadSearch").hide();
+    })
+    
+</script>

@@ -1,0 +1,137 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using DAL;
+using Common;
+
+
+namespace WebApp.Subjects.SupplementByRegion
+{
+    public partial class ApproveList : BasePage
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                BindData();
+            }
+        }
+
+
+        void BindData()
+        {
+            int approveState = int.Parse(rblApproveState.SelectedValue);
+            List<int> customerIds = CurrentUser.Customers.Select(u => u.CustomerId).ToList();
+            List<int> companyList = MySonCompanyList.Select(s => s.Id).ToList();
+            var list = (from subject in CurrentContext.DbContext.Subject
+                        join customer in CurrentContext.DbContext.Customer
+                        on subject.CustomerId equals customer.Id
+                        join user in CurrentContext.DbContext.UserInfo
+                        on subject.AddUserId equals user.UserId
+                        where subject.Status == 4 && companyList.Contains(subject.CompanyId ?? 0) && customerIds.Contains(subject.CustomerId ?? 0) && (subject.IsDelete == null || subject.IsDelete == false)
+                        && subject.SubjectType == (int)SubjectTypeEnum.分区补单
+                        select new
+                        {
+                            subject.Id,
+                            subject.AddDate,
+                            subject.ApproveState,
+                            subject.ApproveUserId,
+                            subject.BeginDate,
+                            subject.Status,
+                            subject.SubjectName,
+                            subject.SubjectNo,
+                            subject.Tel,
+                            customer.CustomerName,
+                            user.RealName,
+                            subject.SubjectType,
+                            subject.SupplementRegion
+                        }).ToList();
+            if (!IsPostBack)
+            {
+                List<string> region = list.Select(s => s.SupplementRegion).Distinct().ToList();
+                cblRegion.Items.Clear();
+                region.ForEach(s =>
+                {
+                    ListItem li = new ListItem();
+                    li.Text = s + "&nbsp;&nbsp;";
+                    li.Value = s;
+                    cblRegion.Items.Add(li);
+                });
+            }
+            list = list.Where(s => (approveState == 0 ? (s.ApproveState == 0 || s.ApproveState == null) : s.ApproveState > 0)).ToList();
+            if (!string.IsNullOrWhiteSpace(tbSubjectName.Text))
+            {
+                list = list.Where(s => s.SubjectName.Contains(tbSubjectName.Text.Trim())).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(tbSubjectNo.Text))
+            {
+                list = list.Where(s => s.SubjectNo == tbSubjectNo.Text.Trim()).ToList();
+            }
+            List<string> regionList = new List<string>();
+            foreach (ListItem li in cblRegion.Items)
+            {
+                if (li.Selected)
+                {
+                    regionList.Add(li.Value.ToLower());
+                }
+            }
+            if (regionList.Any())
+            {
+                list = list.Where(s => regionList.Contains(s.SupplementRegion.ToLower())).ToList();
+            }
+            AspNetPager1.RecordCount = list.Count;
+            this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
+            gv.DataSource = list.OrderBy(s => s.ApproveState).ThenByDescending(s => s.Id).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            
+            gv.DataBind();
+            if (approveState == 0)
+            {
+                gv.Columns[gv.Columns.Count - 2].Visible = false;
+                gv.Columns[gv.Columns.Count - 1].Visible = true;
+            }
+            else
+            {
+                gv.Columns[gv.Columns.Count - 2].Visible = true;
+                gv.Columns[gv.Columns.Count - 1].Visible = false;
+            }
+        }
+
+        protected void Button2_Click(object sender, EventArgs e)
+        {
+            AspNetPager1.CurrentPageIndex = 1;
+            BindData();
+        }
+
+        protected void AspNetPager1_PageChanged(object sender, EventArgs e)
+        {
+            BindData();
+        }
+
+        protected void gv_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "Approve")
+            {
+                int subjectId = int.Parse(e.CommandArgument.ToString());
+
+                string url = string.Format("Approve.aspx?subjectId={0}", subjectId);
+                Response.Redirect(url, false);
+            }
+            if (e.CommandName == "Check")
+            {
+                int subjectId = int.Parse(e.CommandArgument.ToString());
+
+                string url = string.Format("CheckDetail.aspx?subjectId={0}", subjectId);
+                Response.Redirect(url, false);
+            }
+        }
+
+        protected void gv_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+
+        }
+    }
+}

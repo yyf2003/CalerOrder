@@ -1,0 +1,157 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Transactions;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using DAL;
+using Models;
+
+namespace WebApp.Subjects.HandMadeOrder
+{
+    public partial class Approve : BasePage
+    {
+        int subjectId;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(Request.QueryString["subjectId"]);
+            }
+            if (!IsPostBack)
+            {
+                BindSubject();
+                BindPOPList();
+                BindHCList();
+            }
+        }
+
+        void BindSubject()
+        {
+            var subjectModel = (from subject in CurrentContext.DbContext.Subject
+                                join customer in CurrentContext.DbContext.Customer
+                                on subject.CustomerId equals customer.Id
+                                join user in CurrentContext.DbContext.UserInfo
+                                on subject.AddUserId equals user.UserId
+                                
+                                where subject.Id == subjectId
+                                select new
+                                {
+                                    subject,
+                                    customer.CustomerName,
+                                    AddUserName = user.UserName
+                                }).FirstOrDefault();
+            if (subjectModel != null)
+            {
+                labSubjectNo.Text = subjectModel.subject.SubjectNo;
+                labSubjectName.Text = subjectModel.subject.SubjectName;
+                labOutSubjectName.Text = subjectModel.subject.OutSubjectName;
+                labBeginDate.Text = subjectModel.subject.BeginDate != null ? DateTime.Parse(subjectModel.subject.BeginDate.ToString()).ToShortDateString() : "";
+                labEndDate.Text = subjectModel.subject.EndDate != null ? DateTime.Parse(subjectModel.subject.EndDate.ToString()).ToShortDateString() : "";
+                labAddUserName.Text = subjectModel.AddUserName;
+                
+                labCustomerName.Text = subjectModel.CustomerName;
+                int subjectType = subjectModel.subject.SubjectType ?? 1;
+                labSubjectType.Text = subjectType == 1 ? "POP订单" : subjectType == 2 ? "费用订单" : "补单";
+                labRemark.Text = subjectModel.subject.Remark;
+                
+            }
+        }
+
+        void BindPOPList()
+        {
+            var list = (from order in CurrentContext.DbContext.HandMadeOrderDetail
+                        join shop in CurrentContext.DbContext.Shop
+                        on order.ShopId equals shop.Id
+                        where order.SubjectId == subjectId
+                        select new
+                        {
+                            order,
+                            shop
+                        }).ToList();
+           
+            AspNetPager1.RecordCount = list.Count;
+            this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
+            popList.DataSource = list.OrderBy(s => s.order.Id).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            popList.DataBind();
+        }
+
+        void BindHCList()
+        {
+            var list = (from order in CurrentContext.DbContext.HCOrderDetail
+                        join pop in CurrentContext.DbContext.POP
+                        on new { order.ShopId, order.GraphicNo, order.Sheet } equals new { pop.ShopId, pop.GraphicNo, pop.Sheet }
+                        join shop in CurrentContext.DbContext.Shop
+                        on order.ShopId equals shop.Id
+                        where order.SubjectId == subjectId
+                        select new
+                        {
+                            order,
+                            pop,
+                            shop
+                        }).ToList();
+            string shopNo = txtShopNo2.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(shopNo))
+            {
+                list = list.Where(s => s.shop.ShopNo.ToLower().Contains(shopNo.ToLower())).ToList();
+            }
+            AspNetPager2.RecordCount = list.Count;
+            this.AspNetPager2.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager2.CurrentPageIndex, this.AspNetPager2.PageCount, this.AspNetPager2.RecordCount, this.AspNetPager2.PageSize });
+            hcList.DataSource = list.OrderBy(s => s.order.ShopId).Skip((AspNetPager2.CurrentPageIndex - 1) * AspNetPager2.PageSize).Take(AspNetPager2.PageSize).ToList();
+
+            hcList.DataBind();
+        }
+
+        protected void AspNetPager1_PageChanged(object sender, EventArgs e)
+        {
+            BindPOPList();
+        }
+
+
+        protected void AspNetPager2_PageChanged(object sender, EventArgs e)
+        {
+            BindHCList();
+        }
+
+        protected void btnSreach1_Click(object sender, EventArgs e)
+        {
+            BindPOPList();
+        }
+
+        protected void btnSreach2_Click(object sender, EventArgs e)
+        {
+            BindHCList();
+        }
+
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            int result = int.Parse(rblApproveResult.SelectedValue);
+            string remark = txtRemark.Text.Trim();
+            SubjectBLL subjectBll = new SubjectBLL();
+            using (TransactionScope tran = new TransactionScope())
+            {
+                try
+                {
+                    Models.Subject model = subjectBll.GetModel(subjectId);
+                    if (model != null)
+                    {
+
+                        model.ApproveState = result;
+                        model.ApproveUserId = CurrentUser.UserId;
+                        subjectBll.Update(model);
+                        ApproveInfo approveModel = new ApproveInfo() { AddDate = DateTime.Now, AddUserId = CurrentUser.UserId, Remark = txtRemark.Text.Trim(), Result = result, SubjectId = subjectId };
+                        new ApproveInfoBLL().Add(approveModel);
+                        tran.Complete();
+                        Alert("审批成功！", "/Subjects/ApproveList.aspx");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Alert("审批失败：" + ex.Message);
+                }
+            }
+        }
+    }
+}

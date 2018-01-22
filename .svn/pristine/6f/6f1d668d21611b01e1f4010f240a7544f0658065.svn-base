@@ -1,0 +1,248 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using DAL;
+using Models;
+using System.Text;
+using Common;
+using System.Transactions;
+
+namespace WebApp.OrderChangeManage.js
+{
+    public partial class AddNewApplication : BasePage
+    {
+        int applicationId;
+        List<EnumEntity> ChangeTypeList = new List<EnumEntity>();
+        OrderChangeApplicationBLL applicationBll = new OrderChangeApplicationBLL();
+        OrderChangeApplicationDetailBLL detailBll = new OrderChangeApplicationDetailBLL();
+        List<OrderChangeApplicationDetail> bindDetailList = new List<OrderChangeApplicationDetail>();
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["Id"] != null)
+            {
+                applicationId = int.Parse(Request.QueryString["Id"]);
+            }
+            ChangeTypeList = CommonMethod.GetEnumList<OrderChangeTypeEnum>();
+            if (!IsPostBack)
+            {
+                if (applicationId > 0)
+                {
+                    var model = (from application in CurrentContext.DbContext.OrderChangeApplication
+                                join guidance in CurrentContext.DbContext.SubjectGuidance
+                                on application.SubjectGuidanceId equals guidance.ItemId
+                                 where application.Id == applicationId
+                                select new {
+                                    application.SubjectGuidanceId,
+                                    guidance.GuidanceYear,
+                                    guidance.GuidanceMonth
+                                }).FirstOrDefault();
+                    if (model != null && model.GuidanceYear!=null && model.GuidanceMonth!=null)
+                    {
+                        //int year = int.Parse(model.GuidanceYear.ToString());
+                        //int month = int.Parse(model.GuidanceMonth.ToString());
+                        string month = model.GuidanceYear + "-" + model.GuidanceMonth;
+                        if (StringHelper.IsDateTime(month))
+                        {
+                            txtGuidanceMonth.Text = month;
+                            txtGuidanceMonth.Enabled = false;
+                            ChangeMonth();
+                            ddlGuidance.SelectedValue = model.SubjectGuidanceId.ToString();
+                            ddlGuidance.Enabled = false;
+                        }
+                    }
+                    //bindDetailList = detailBll.GetList(s => s.ApplicationId == applicationId);
+                }
+                BindSubject();
+            }
+        }
+
+        protected void txtGuidanceMonth_TextChanged(object sender, EventArgs e)
+        {
+            ChangeMonth();
+        }
+
+        void ChangeMonth()
+        {
+            ddlGuidance.Items.Clear();
+            ddlGuidance.Items.Add(new ListItem("--请选择--", "0"));
+            string monthStr = txtGuidanceMonth.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(monthStr) && StringHelper.IsDateTime(monthStr))
+            {
+                DateTime monthDate = DateTime.Parse(monthStr);
+                int year = monthDate.Year;
+                int month = monthDate.Month;
+                var list = new SubjectGuidanceBLL().GetList(s => s.GuidanceYear == year && s.GuidanceMonth == month && (s.IsDelete == false || s.IsDelete == null));
+                if (list.Any())
+                {
+                    list.ForEach(s =>
+                    {
+                        ListItem li = new ListItem();
+                        li.Value = s.ItemId.ToString();
+                        li.Text = s.ItemName;
+                        ddlGuidance.Items.Add(li);
+                    });
+                }
+            }
+        }
+
+        void BindSubject()
+        {
+            int guidanceId = int.Parse(ddlGuidance.SelectedValue);
+            bindDetailList = detailBll.GetList(s => s.ApplicationId == applicationId);
+            var list = new SubjectBLL().GetList(s => s.GuidanceId == guidanceId && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && (s.SubjectType != (int)SubjectTypeEnum.二次安装费 && s.SubjectType != (int)SubjectTypeEnum.运费 && s.SubjectType != (int)SubjectTypeEnum.新开店安装费));
+            if (CurrentUser.RoleId == 2)
+            {
+                list = list.Where(s=>s.AddUserId==CurrentUser.UserId).ToList();
+            }
+            Repeater1.DataSource = list;
+            Repeater1.DataBind();
+        }
+
+        protected void Repeater1_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemIndex != -1)
+            {
+                Object item = e.Item.DataItem;
+                if (item != null)
+                {
+                    object subjectIdObj = item.GetType().GetProperty("Id").GetValue(item, null);
+                    int subjectId = subjectIdObj != null ? int.Parse(subjectIdObj.ToString()) : 0;
+                    object subjectTypeObj = item.GetType().GetProperty("SubjectType").GetValue(item, null);
+                    int subjectType = subjectTypeObj != null ? int.Parse(subjectTypeObj.ToString()) : 1;
+                    RadioButtonList rblType = (RadioButtonList)e.Item.FindControl("rblChangeType");
+                    if (ChangeTypeList.Any())
+                    {
+                        ChangeTypeList.ForEach(s =>
+                        {
+                            ListItem li = new ListItem();
+                            li.Value = s.Value.ToString();
+                            li.Text = s.Desction + "&nbsp;";
+                            if ((subjectType == (int)SubjectTypeEnum.补单 || subjectType == (int)SubjectTypeEnum.分区补单) &&s.Value == (int)OrderChangeTypeEnum.Supplement)
+                            {
+                                li.Enabled = false;
+                            }
+                            rblType.Items.Add(li);
+                        });
+                    }
+                    if (bindDetailList.Any())
+                    {
+                        CheckBox cbOne = (CheckBox)e.Item.FindControl("cbOne");
+                        TextBox txtRemark = (TextBox)e.Item.FindControl("txtRemark");
+                        var model = bindDetailList.Where(s => s.SubjectId == subjectId).FirstOrDefault();
+                        if (model != null)
+                        {
+                            cbOne.Checked = true;
+                            rblType.SelectedValue = model.ChangeType.ToString();
+                            txtRemark.Text = model.Remark;
+                        }
+                    }
+                    
+                }
+            }
+        }
+
+        protected void ddlGuidance_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            BindSubject();
+        }
+
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            using (TransactionScope tran = new TransactionScope())
+            {
+                try
+                {
+                    int selectedNum = 0;
+                    string errorMsg = string.Empty;
+                    
+                    int guidanceId = int.Parse(ddlGuidance.SelectedValue);
+                    if (guidanceId > 0)
+                    {
+                        OrderChangeApplication applicationModel = new OrderChangeApplication();
+                        if (applicationId > 0)
+                        {
+                            detailBll.Delete(s => s.ApplicationId == applicationId);
+                            applicationModel = applicationBll.GetModel(applicationId);
+                        }
+                        applicationModel.SubjectGuidanceId = guidanceId;
+                        if (applicationId > 0)
+                        {
+                            applicationBll.Update(applicationModel);
+                        }
+                        else
+                        {
+                            applicationModel.AddDate = DateTime.Now;
+                            applicationModel.AddUserId = CurrentUser.UserId;
+                            applicationModel.IsDelete = false;
+                            applicationBll.Add(applicationModel);
+                        }
+                        OrderChangeApplicationDetail detailModel;
+                        foreach (RepeaterItem item in Repeater1.Items)
+                        {
+                            if (item.ItemIndex != -1)
+                            {
+                                CheckBox cbOne = (CheckBox)item.FindControl("cbOne");
+                                if (cbOne.Checked)
+                                {
+                                    selectedNum++;
+                                    HiddenField hfSubjectId = (HiddenField)item.FindControl("hfSubjectId");
+                                    int subjectId = int.Parse(hfSubjectId.Value);
+                                    RadioButtonList rblChangeType = (RadioButtonList)item.FindControl("rblChangeType");
+                                    if (!string.IsNullOrWhiteSpace(rblChangeType.SelectedValue))
+                                    {
+                                        int changeType = int.Parse(rblChangeType.SelectedValue);
+                                        TextBox txtRemark = (TextBox)item.FindControl("txtRemark");
+                                        string remark = txtRemark.Text.Trim();
+                                        if (string.IsNullOrWhiteSpace(remark))
+                                        {
+                                            errorMsg = "请填写变更说明";
+                                            break;
+                                        }
+                                        detailModel = new OrderChangeApplicationDetail();
+                                        detailModel.ApplicationId = applicationModel.Id;
+                                        detailModel.ChangeType = changeType;
+                                        detailModel.Remark = remark;
+                                        detailModel.SubjectId = subjectId;
+                                        detailBll.Add(detailModel);
+                                    }
+                                    else
+                                    {
+                                        errorMsg = "请选择变更类型";
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (selectedNum == 0)
+                        {
+                            errorMsg = "请选择要变更的项目";
+                        }
+                        if (!string.IsNullOrWhiteSpace(errorMsg))
+                        {
+                            throw new Exception(errorMsg);
+                        }
+                        else
+                        {
+                            tran.Complete();
+                            ScriptManager.RegisterStartupScript(UpdatePanel1, this.GetType(), "js", "Success()", true);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ScriptManager.RegisterStartupScript(UpdatePanel1, this.GetType(), "js", "ShowError('"+ex.Message+"')", true);
+                }
+            }
+            
+        }
+
+        protected void btnBack_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("ApplicationList.aspx",false);
+        }
+    }
+}

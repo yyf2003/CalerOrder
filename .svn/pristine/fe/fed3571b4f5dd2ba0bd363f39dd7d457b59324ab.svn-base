@@ -1,0 +1,256 @@
+﻿using System;
+using System.Linq;
+using System.Text;
+using System.Web;
+using BLL;
+using DAL;
+using Models;
+using Newtonsoft.Json;
+
+namespace WebApp.Customer.Handler
+{
+    /// <summary>
+    /// POPList 的摘要说明
+    /// </summary>
+    public class POPList : IHttpHandler
+    {
+
+        public void ProcessRequest(HttpContext context)
+        {
+            context.Response.ContentType = "text/plain";
+            string type = string.Empty;
+            string result = string.Empty;
+            if (context.Request.QueryString["type"] != null)
+            {
+                type = context.Request.QueryString["type"];
+            }
+            switch (type)
+            { 
+                case "getPOP":
+                    int id = int.Parse(context.Request.QueryString["id"]);
+                    result= GetPOP(id);
+                    break;
+                case "getSheetList":
+                    result = GetSheetList();
+                    break;
+                case "getMaterialCategory":
+                    result = GetMaterialCategory();
+                    break;
+                case "getOrderMaterial":
+                    int categoryId=0;
+                    if (context.Request.QueryString["categoryId"] != null)
+                        categoryId = int.Parse(context.Request.QueryString["categoryId"]);
+                    result = GetOrderMaterial(categoryId);
+                    break;
+                case "edit":
+                    string jsonString = context.Request.QueryString["jsonString"];
+                    if (!string.IsNullOrWhiteSpace(jsonString))
+                    {
+                        jsonString = jsonString.Replace("+", "%2B");
+                        jsonString = HttpUtility.UrlDecode(jsonString);
+                    }
+                    result = UpdatePOP(jsonString);
+                    break;
+            }
+
+            context.Response.Write(result);
+        }
+
+        string GetPOP(int popId)
+        {
+            var model = (from pop in CurrentContext.DbContext.POP
+                         join shop in CurrentContext.DbContext.Shop
+                         on pop.ShopId equals shop.Id
+                         where pop.Id==popId
+                         select new
+                         {
+                             pop,
+                             shop.ShopNo
+                         }
+                      ).FirstOrDefault();
+            if (model != null)
+            {
+                StringBuilder json = new StringBuilder();
+                string IsValid = model.pop.IsValid == false ? "0" : "1";
+                json.Append("{\"Id\":\"" + model.pop.Id + "\",\"ShopNo\":\"" + model.ShopNo + "\",\"Sheet\":\"" + model.pop.Sheet + "\",\"GraphicNo\":\"" + model.pop.GraphicNo + "\",\"Gender\":\"" + model.pop.Gender + "\",\"Quantity\":\"" + model.pop.Quantity + "\",\"WindowWide\":\"" + model.pop.WindowWide + "\",\"WindowHigh\":\"" + model.pop.WindowHigh + "\",\"WindowDeep\":\"" + model.pop.WindowDeep + "\",\"WindowSize\":\"" + model.pop.WindowSize + "\",\"GraphicWidth\":\"" + model.pop.GraphicWidth + "\",\"GraphicLength\":\"" + model.pop.GraphicLength + "\",\"DoubleFace\":\"" + model.pop.DoubleFace + "\",\"GraphicMaterial\":\"" + model.pop.GraphicMaterial + "\",\"Glass\":\"" + model.pop.Glass + "\",\"Backdrop\":\"" + model.pop.Backdrop + "\",\"PositionDescription\":\"" + model.pop.PositionDescription + "\",\"Area\":\"" + model.pop.Area + "\",\"Remark\":\"" + model.pop.Remark + "\",\"IsElectricity\":\"" + model.pop.IsElectricity + "\",\"IsHang\":\"" + model.pop.IsHang + "\",\"DoorPosition\":\"" + model.pop.DoorPosition + "\",\"IsValid\":\"" + IsValid + "\",\"OOHInstallPrice\":\"" + model.pop.OOHInstallPrice + "\",\"MaterialCategoryId\":\"" + model.pop.MaterialCategoryId + "\",\"OrderGraphicMaterialId\":\"" + model.pop.OrderGraphicMaterialId + "\",\"Category\":\"" + model.pop.Category + "\",\"CornerType\":\""+model.pop.CornerType+"\"}");
+                return "["+json.ToString().TrimEnd(',')+"]";
+            }
+            else
+                return "";
+        }
+
+        string GetSheetList()
+        {
+            var list = new PositionBLL().GetList(s=>1==1);
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s => {
+                    json.Append("{\"SheetName\":\""+s.PositionName+"\"},");
+                });
+                return "["+json.ToString().TrimEnd(',')+"]";
+            }
+            return "";
+        }
+
+        POPBLL popBll = new POPBLL();
+        string UpdatePOP(string jsonStr)
+        {
+            string result = "提交失败！";
+            if (!string.IsNullOrWhiteSpace(jsonStr))
+            {
+                POP model = JsonConvert.DeserializeObject<POP>(jsonStr);
+                if (model != null)
+                {
+                    int shopId = GetShopId(model.ShopNo);
+                    if (shopId > 0)
+                    {
+                        
+                        model.ShopId = shopId;
+                        if (!CheckPOP(model))
+                        {
+                            if (model.Id > 0)
+                            {
+                                //更新
+                                POP newModel = popBll.GetModel(model.Id);
+                                if (newModel != null)
+                                {
+                                    //newModel.Area = (model.GraphicLength * model.GraphicWidth) / 1000000;
+                                    //newModel.Backdrop = model.Backdrop;
+                                    //newModel.DoorPosition = model.DoorPosition;
+                                    //newModel.DoubleFace = model.DoubleFace;
+                                    //newModel.Category = model.Category;
+                                    //newModel.FixtureType = model.FixtureType;
+                                    //newModel.Gender = model.Gender;
+                                    //newModel.Glass = model.Glass;
+                                    //newModel.GraphicLength = model.GraphicLength;
+                                    //newModel.GraphicMaterial = model.GraphicMaterial;
+                                    //newModel.GraphicNo = model.GraphicNo.ToUpper();
+                                    //newModel.GraphicWidth = model.GraphicWidth;
+                                    //newModel.IsElectricity = model.IsElectricity;
+                                    //newModel.IsHang = model.IsHang;
+                                    //newModel.IsValid = model.IsValid;
+                                    //newModel.PositionDescription = model.PositionDescription;
+                                    //newModel.Quantity = model.Quantity;
+                                    //newModel.Remark = model.Remark;
+                                    //newModel.Sheet = model.Sheet;
+                                    //newModel.ShopId = model.ShopId;
+                                    //newModel.WindowDeep = model.WindowDeep;
+                                    //newModel.WindowHigh = model.WindowHigh;
+                                    //newModel.WindowSize = model.WindowSize;
+                                    //newModel.WindowWide = model.WindowWide;
+                                    //newModel.OOHInstallPrice = model.OOHInstallPrice;
+                                    //newModel.MaterialCategoryId = model.MaterialCategoryId;
+                                    //newModel.OrderGraphicMaterialId = model.OrderGraphicMaterialId;
+                                    //newModel.CornerType = model.CornerType;
+                                    model.GraphicNo = model.GraphicNo.ToUpper();
+                                    popBll.Update(model);
+                                    result = "ok";
+                                }
+                            }
+                            else
+                            { 
+                               //新增
+                                //POP newModel = new POP();
+                                //newModel.Area = (model.GraphicLength * model.GraphicWidth) / 1000000;
+                                //newModel.Backdrop = model.Backdrop;
+                                //newModel.DoorPosition = model.DoorPosition;
+                                //newModel.DoubleFace = model.DoubleFace;
+                                //newModel.FixtureType = model.FixtureType;
+                                //newModel.Category = model.Category;
+                                //newModel.Gender = model.Gender;
+                                //newModel.Glass = model.Glass;
+                                //newModel.GraphicLength = model.GraphicLength;
+                                //newModel.GraphicMaterial = model.GraphicMaterial;
+                                //newModel.GraphicNo = model.GraphicNo.ToUpper();
+                                //newModel.GraphicWidth = model.GraphicWidth;
+                                //newModel.IsElectricity = model.IsElectricity;
+                                //newModel.IsHang = model.IsHang;
+                                //newModel.IsValid = model.IsValid;
+                                //newModel.PositionDescription = model.PositionDescription;
+                                //newModel.Quantity = model.Quantity;
+                                //newModel.Remark = model.Remark;
+                                //newModel.Sheet = model.Sheet;
+                                //newModel.ShopId = model.ShopId;
+                                //newModel.WindowDeep = model.WindowDeep;
+                                //newModel.WindowHigh = model.WindowHigh;
+                                //newModel.WindowSize = model.WindowSize;
+                                //newModel.WindowWide = model.WindowWide;
+                                //newModel.OOHInstallPrice = model.OOHInstallPrice;
+                                //newModel.MaterialCategoryId = model.MaterialCategoryId;
+                                //newModel.OrderGraphicMaterialId = model.OrderGraphicMaterialId;
+                                //newModel.CornerType = model.CornerType;
+                                model.GraphicNo = model.GraphicNo.ToUpper();
+                                popBll.Add(model);
+                                result = "ok";
+                                   
+                            }
+                            
+
+                        }
+                        else
+                            result = "该POP已存在";
+                    }
+                    else
+                        result = "该店铺不存在";
+                }
+            }
+            return result;
+        }
+
+        bool CheckPOP(POP model)
+        {
+            var list = popBll.GetList(s=>s.ShopId==model.ShopId && s.Sheet==model.Sheet && s.GraphicNo.ToUpper()==model.GraphicNo.ToUpper());
+            if (model.Id > 0)
+                list = list.Where(s => s.Id != model.Id).ToList();
+            return list.Any();
+        }
+
+        int GetShopId(string shopNo)
+        {
+            var model = new ShopBLL().GetList(s => s.ShopNo.ToUpper() == shopNo.ToUpper()).FirstOrDefault();
+            if (model != null)
+            {
+                return model.Id;
+            }
+            else
+                return 0;
+        }
+
+        string GetMaterialCategory()
+        {
+            var list = new MaterialCategoryBLL().GetList(s=>s.IsDelete==false ||s.IsDelete==null);
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s => {
+                    json.Append("{\"Id\":\"" + s.Id + "\",\"CategoryName\":\""+s.CategoryName+"\"},");
+                });
+                return "["+json.ToString().TrimEnd(',')+"]";
+            }
+            return "";
+        }
+
+        string GetOrderMaterial(int categoryId)
+        {
+            var list = new OrderMaterialMppingBLL().GetList(s => s.BasicCategoryId == categoryId).OrderBy(s => s.OrderMaterialName).ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s => {
+                    json.Append("{\"Id\":\"" + s.Id + "\",\"OrderMaterialName\":\"" + s.OrderMaterialName + "\"},");
+                });
+                return "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            return "";
+        }
+
+        public bool IsReusable
+        {
+            get
+            {
+                return false;
+            }
+        }
+    }
+}

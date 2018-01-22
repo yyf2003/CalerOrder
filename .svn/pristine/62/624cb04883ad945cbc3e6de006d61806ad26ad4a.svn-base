@@ -1,0 +1,192 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace Common
+{
+    public class StringHelper
+    {
+        public static int IsInt(string str)
+        {
+            int num = 0;
+            if (!string.IsNullOrWhiteSpace(str))
+               int.TryParse(str, out num);
+            return num;
+        }
+
+        public static bool IsIntVal(string str)
+        {
+            int num = 0;
+            return int.TryParse(str, out num);
+        }
+
+        public static decimal IsDecimal(string str)
+        {
+            decimal num = 0;
+            if (!string.IsNullOrWhiteSpace(str))
+               decimal.TryParse(str, out num);
+            return num;
+        }
+
+        public static bool IsDecimalVal(string str)
+        {
+            decimal num = 0;
+            return decimal.TryParse(str, out num);
+        }
+
+        public static bool IsDateTime(string str)
+        {
+            DateTime date = new DateTime();
+            if (DateTime.TryParse(str, out date))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static List<int> ToIntList(string str,char separator)
+        {
+            List<int> list = new List<int>();
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                string[] arr = str.Split(separator);
+                foreach (string s in arr)
+                {
+                    if (!string.IsNullOrWhiteSpace(s))
+                        list.Add(IsInt(s));
+                }
+            }
+            return list;
+        }
+
+        public static List<decimal> ToDecimalList(string str, char separator)
+        {
+            List<decimal> list = new List<decimal>();
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                string[] arr = str.Split(separator);
+                foreach (string s in arr)
+                {
+                    if (!string.IsNullOrWhiteSpace(s))
+                        list.Add(IsDecimal(s));
+                }
+            }
+            return list;
+        }
+
+        public static List<string> ToStringList(string str, char separator)
+        {
+            List<string> list = new List<string>();
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                string[] arr = str.Split(separator);
+                foreach (string s in arr)
+                {
+                    if (!string.IsNullOrWhiteSpace(s))
+                        list.Add(s.Trim());
+                }
+            }
+            return list;
+        }
+
+        public static List<string> ToStringList(string str, char separator,LowerUpperEnum LetterType)
+        {
+            List<string> list = new List<string>();
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                string[] arr = str.Split(separator);
+                foreach (string s in arr)
+                {
+                    if (!string.IsNullOrWhiteSpace(s))
+                    {
+                        if (LetterType != null)
+                        {
+                            if (LetterType == LowerUpperEnum.ToLower)
+                                list.Add(s.Trim().ToLower());
+                            else if (LetterType == LowerUpperEnum.ToUpper)
+                                list.Add(s.Trim().ToUpper());
+                            else
+                                list.Add(s.Trim());
+                        }
+                        else
+                            list.Add(s.Trim());
+                    }
+                }
+            }
+            return list;
+        }
+
+        public static List<string> ToStringListAllowSpace(string str, char separator)
+        {
+            List<string> list = new List<string>();
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                string[] arr = str.Split(separator);
+                foreach (string s in arr)
+                {
+                   list.Add(s.Trim());
+                }
+            }
+            return list;
+        }
+
+        public static string ListToString(List<string> list, string separator=null)
+        {
+            StringBuilder str = new StringBuilder();
+            if (string.IsNullOrWhiteSpace(separator))
+                separator = ",";
+            if (list.Any())
+            {
+                list.ForEach(s => {
+                    str.Append(s);
+                    str.Append(separator);
+                });
+                
+            }
+            return str.ToString().TrimEnd(char.Parse(separator));
+        }
+
+        public static string ListToString(List<int> list)
+        {
+            StringBuilder str = new StringBuilder();
+            if (list.Any())
+            {
+                list.ForEach(s =>
+                {
+                    str.Append(s);
+                    str.Append(",");
+                });
+
+            }
+            return str.ToString().TrimEnd(',');
+        }
+
+        public static void ToUpperOrLowerList(ref List<string> list,LowerUpperEnum LowerUpper)
+        {
+            if (list.Any())
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (!string.IsNullOrWhiteSpace(list[i]))
+                    {
+                        if (LowerUpper == LowerUpperEnum.ToLower)
+                            list[i] = list[i].ToLower();
+                        else
+                            list[i] = list[i].ToUpper();
+                    }
+                }
+            }
+        }
+
+        public static string ReplaceSpace(string str)
+        {
+            
+            string s = Regex.Replace(str, @"\s", "");
+            return s;
+        }
+
+       
+    }
+}

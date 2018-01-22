@@ -1,0 +1,704 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="KalerOrderDBModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+  <EntityContainer Name="KalerOrderDBEntities" annotation:LazyLoadingEnabled="true">
+    <FunctionImport Name="pro_GetModulesById" ReturnType="Collection(KalerOrderDBModel.pro_GetModulesById_Result)">
+      <Parameter Name="moduleId1" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <EntitySet Name="BaseCategory" EntityType="KalerOrderDBModel.BaseCategory" />
+    <EntitySet Name="BaseInfo" EntityType="KalerOrderDBModel.BaseInfo" />
+    <EntitySet Name="CheckOrderPlanDetail" EntityType="KalerOrderDBModel.CheckOrderPlanDetail" />
+    <EntitySet Name="Company" EntityType="KalerOrderDBModel.Company" />
+    <EntitySet Name="Customer" EntityType="KalerOrderDBModel.Customer" />
+    <EntitySet Name="ListOrderDetail" EntityType="KalerOrderDBModel.ListOrderDetail" />
+    <EntitySet Name="MachineFrame" EntityType="KalerOrderDBModel.MachineFrame" />
+    <EntitySet Name="Material" EntityType="KalerOrderDBModel.Material" />
+    <EntitySet Name="MaterialBrand" EntityType="KalerOrderDBModel.MaterialBrand" />
+    <EntitySet Name="MaterialPrice" EntityType="KalerOrderDBModel.MaterialPrice" />
+    <EntitySet Name="MaterialTemp" EntityType="KalerOrderDBModel.MaterialTemp" />
+    <EntitySet Name="MaterialType" EntityType="KalerOrderDBModel.MaterialType" />
+    <EntitySet Name="MergeOriginalOrder" EntityType="KalerOrderDBModel.MergeOriginalOrder" />
+    <EntitySet Name="Module" EntityType="KalerOrderDBModel.Module" />
+    <EntitySet Name="OrderPlan" EntityType="KalerOrderDBModel.OrderPlan" />
+    <EntitySet Name="Place" EntityType="KalerOrderDBModel.Place" />
+    <EntitySet Name="POP" EntityType="KalerOrderDBModel.POP" />
+    <EntitySet Name="POPOrderDetail" EntityType="KalerOrderDBModel.POPOrderDetail" />
+    <EntitySet Name="Position" EntityType="KalerOrderDBModel.Position" />
+    <EntitySet Name="ProvinceInRegion" EntityType="KalerOrderDBModel.ProvinceInRegion" />
+    <EntitySet Name="Region" EntityType="KalerOrderDBModel.Region" />
+    <EntitySet Name="Role" EntityType="KalerOrderDBModel.Role" />
+    <EntitySet Name="RoleInModule" EntityType="KalerOrderDBModel.RoleInModule" />
+    <EntitySet Name="ShopMachineFrame" EntityType="KalerOrderDBModel.ShopMachineFrame" />
+    <EntitySet Name="SplitOrderPlanDetail" EntityType="KalerOrderDBModel.SplitOrderPlanDetail" />
+    <EntitySet Name="Subject" EntityType="KalerOrderDBModel.Subject" />
+    <EntitySet Name="SupplementOrderDetail" EntityType="KalerOrderDBModel.SupplementOrderDetail" />
+    <EntitySet Name="UserInCustomer" EntityType="KalerOrderDBModel.UserInCustomer" />
+    <EntitySet Name="UserInfo" EntityType="KalerOrderDBModel.UserInfo" />
+    <EntitySet Name="UserInRole" EntityType="KalerOrderDBModel.UserInRole" />
+    <EntitySet Name="CityInOrderPlan" EntityType="KalerOrderDBModel.CityInOrderPlan" />
+    <EntitySet Name="CheckOrderResult" EntityType="KalerOrderDBModel.CheckOrderResult" />
+    <EntitySet Name="CheckOrder" EntityType="KalerOrderDBModel.CheckOrder" />
+    <EntitySet Name="Shop" EntityType="KalerOrderDBModel.Shop" />
+    <EntitySet Name="ProvinceInOrderPlan" EntityType="KalerOrderDBModel.ProvinceInOrderPlan" />
+    <EntitySet Name="FinalOrderDetail" EntityType="KalerOrderDBModel.FinalOrderDetail" />
+    <EntitySet Name="FinalOrderDetailTemp" EntityType="KalerOrderDBModel.FinalOrderDetailTemp" />
+  </EntityContainer>
+  <ComplexType Name="pro_GetModulesById_Result">
+    <Property Type="Int32" Name="Id" Nullable="true" />
+    <Property Type="Int32" Name="ParentId" Nullable="true" />
+    <Property Type="String" Name="ModuleName" Nullable="true" MaxLength="50" />
+    <Property Type="Int32" Name="OrderNum" Nullable="true" />
+    <Property Type="String" Name="Url" Nullable="true" MaxLength="100" />
+    <Property Type="Boolean" Name="IsDelete" Nullable="true" />
+    <Property Type="Boolean" Name="IsLeaf" Nullable="true" />
+  </ComplexType>
+  <EntityType Name="BaseCategory">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="CategoryName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="BaseCode" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="BaseInfo">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="BaseName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="BaseCode" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="BaseCategoryId" />
+  </EntityType>
+  <EntityType Name="CheckOrderPlanDetail">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="PlanId" />
+    <Property Type="String" Name="RegionId" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="RegionNames" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ProvinceId" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CityId" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CityTier" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsInstall" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="PositionId" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="PositionName" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MachineFrameIds" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Format" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MaterialSupport" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POSScale" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Gender" MaxLength="100" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Company">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="ParentId" />
+    <Property Type="String" Name="CompanyCode" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CompanyName" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="BaseCode" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Customer">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="CustomerCode" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CustomerName" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CustomerShortName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Contact" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Tel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Boolean" Name="IsDelete" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="DateTime" Name="AddDate" />
+  </EntityType>
+  <EntityType Name="ListOrderDetail">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="SubjectId" />
+    <Property Type="Int32" Name="ShopId" />
+    <Property Type="Int32" Name="PositionId" />
+    <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="Quantity" />
+    <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POSScale" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ChooseImg" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Remark" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="Boolean" Name="IsFinishSplit" />
+  </EntityType>
+  <EntityType Name="MachineFrame">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="PositionId" />
+    <Property Type="String" Name="CategoryName" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Material">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="MaterialTypeId" />
+    <Property Type="Int32" Name="MaterialBrandId" />
+    <Property Type="String" Name="MaterialName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Decimal" Name="Width" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="Length" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="Area" Precision="18" Scale="0" />
+    <Property Type="String" Name="Unit" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Remark" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="Boolean" Name="IsDelete" />
+  </EntityType>
+  <EntityType Name="MaterialBrand">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="BrandName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="String" Name="Remark" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="Boolean" Name="IsDelete" />
+  </EntityType>
+  <EntityType Name="MaterialPrice">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="CustomerId" />
+    <Property Type="Int32" Name="RegionId" />
+    <Property Type="Int32" Name="ProvinceId" />
+    <Property Type="Int32" Name="CityId" />
+    <Property Type="Int32" Name="MaterialTypeId" />
+    <Property Type="Decimal" Name="CostPrice" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="SalePrice" Precision="18" Scale="0" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="Boolean" Name="IsDelete" />
+  </EntityType>
+  <EntityType Name="MaterialTemp">
+    <Key>
+      <PropertyRef Name="MaterialName" />
+      <PropertyRef Name="Width" />
+      <PropertyRef Name="Length" />
+      <PropertyRef Name="Area" />
+      <PropertyRef Name="TypeStyle" />
+      <PropertyRef Name="BrandName" />
+      <PropertyRef Name="MeasurementName" />
+    </Key>
+    <Property Type="String" Name="MaterialName" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Type="Int32" Name="Width" Nullable="false" />
+    <Property Type="Int32" Name="Length" Nullable="false" />
+    <Property Type="Int32" Name="Area" Nullable="false" />
+    <Property Type="String" Name="TypeStyle" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="BrandName" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Type="String" Name="MeasurementName" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="MaterialType">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="ParentId" />
+    <Property Type="String" Name="MaterialTypeName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="Boolean" Name="IsDelete" />
+  </EntityType>
+  <EntityType Name="MergeOriginalOrder">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="SubjectId" />
+    <Property Type="Int32" Name="ShopId" />
+    <Property Type="Int32" Name="PositionId" />
+    <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="Quantity" />
+    <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POSScale" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="GraphicNo" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ChooseImg" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Remark" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="DateTime" Name="AddDate" />
+  </EntityType>
+  <EntityType Name="Module">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="ParentId" />
+    <Property Type="String" Name="ModuleName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="OrderNum" />
+    <Property Type="String" Name="Url" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Boolean" Name="IsDelete" />
+    <Property Type="Boolean" Name="IsLeaf" />
+    <Property Type="String" Name="ImgUrl" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Boolean" Name="IsShowOnHome" />
+  </EntityType>
+  <EntityType Name="OrderPlan">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="PlanType" />
+    <Property Type="Int32" Name="CustomerId" />
+    <Property Type="Int32" Name="SubjectId" />
+    <Property Type="String" Name="ShopNos" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="RegionId" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="RegionNames" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ProvinceId" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CityId" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CityTier" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="PositionId" />
+    <Property Type="String" Name="PositionName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MachineFrameIds" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MachineFrameNames" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Format" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MaterialSupport" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POSScale" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Gender" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="Quantity" />
+    <Property Type="String" Name="GraphicNo" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="GraphicMaterial" MaxLength="60" FixedLength="false" Unicode="false" />
+    <Property Type="Decimal" Name="GraphicWidth" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="GraphicLength" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="WindowWidth" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="WindowHigh" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="WindowDeep" Precision="18" Scale="0" />
+    <Property Type="DateTime" Name="BeginDate" />
+    <Property Type="DateTime" Name="EndDate" />
+    <Property Type="String" Name="ProjectId" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="String" Name="ProjectName" MaxLength="500" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Place">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Type="Int32" Name="ID" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="ParentID" />
+    <Property Type="String" Name="PlaceName" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="POP">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="ShopId" />
+    <Property Type="Int32" Name="PositionId" />
+    <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="GraphicNo" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPName" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Style" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CornerType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Category" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="StandardDimension" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Modula" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ActivityType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="Quantity" />
+    <Property Type="Decimal" Name="WindowWide" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="WindowHigh" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="WindowDeep" Precision="18" Scale="0" />
+    <Property Type="String" Name="WindowSize" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Decimal" Name="GraphicWidth" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="GraphicLength" Precision="18" Scale="0" />
+    <Property Type="String" Name="DoubleFace" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="GraphicMaterial" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MaterialInfo" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Glass" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Backdrop" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="ModulaQuantityWidth" />
+    <Property Type="String" Name="Frame" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="ModulaQuantityHeight" />
+    <Property Type="String" Name="Pannel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="PositionDescription" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="Decimal" Name="PlatformLength" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="PlatformWidth" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="PlatformHeight" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="Area" Precision="18" Scale="0" />
+    <Property Type="DateTime" Name="ExpireDate" />
+    <Property Type="String" Name="FixtureType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="String" Name="IsElectricity" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="LeftSideStick" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="RightSideStick" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Floor" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="WindowStick" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsHang" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="DoorPosition" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="POPOrderDetail">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="SubjectId" />
+    <Property Type="Int32" Name="ShopId" />
+    <Property Type="Int32" Name="PositionId" />
+    <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="GraphicNo" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="Quantity" />
+    <Property Type="String" Name="MaterialSupport" MaxLength="10" FixedLength="true" Unicode="true" />
+    <Property Type="String" Name="POSScale" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ChooseImg" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Remark" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="Boolean" Name="IsFinishSplit" />
+  </EntityType>
+  <EntityType Name="Position">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="PositionName" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="ProvinceInRegion">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="RegionId" />
+    <Property Type="Int32" Name="ProvinceId" />
+  </EntityType>
+  <EntityType Name="Region">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="CustomerId" />
+    <Property Type="String" Name="RegionName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Boolean" Name="IsDelete" />
+  </EntityType>
+  <EntityType Name="Role">
+    <Key>
+      <PropertyRef Name="RoleId" />
+    </Key>
+    <Property Type="Int32" Name="RoleId" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="RoleName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Boolean" Name="IsDelete" />
+  </EntityType>
+  <EntityType Name="RoleInModule">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="RoleId" />
+    <Property Type="Int32" Name="ModuleId" />
+    <Property Type="String" Name="OperatePermission" MaxLength="100" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="ShopMachineFrame">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="ShopId" />
+    <Property Type="Int32" Name="PositionId" />
+    <Property Type="Int32" Name="MachineFrameId" />
+    <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="Count" />
+  </EntityType>
+  <EntityType Name="SplitOrderPlanDetail">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="PlanId" />
+    <Property Type="Int32" Name="OrderType" />
+    <Property Type="Decimal" Name="GraphicWidth" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="GraphicLength" Precision="18" Scale="0" />
+    <Property Type="Int32" Name="Quantity" />
+    <Property Type="String" Name="GraphicMaterial" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Supplier" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Decimal" Name="RackSalePrice" Precision="18" Scale="0" />
+    <Property Type="String" Name="Remark" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="DateTime" Name="AddDate" />
+  </EntityType>
+  <EntityType Name="Subject">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="SubjectName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="OutSubjectName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="SubjectNo" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="AddOrderType" />
+    <Property Type="String" Name="Contact" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Tel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="CompanyId" />
+    <Property Type="Int32" Name="CustomerId" />
+    <Property Type="DateTime" Name="BeginDate" />
+    <Property Type="DateTime" Name="EndDate" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="Int32" Name="Status" />
+    <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="ApproveState" />
+    <Property Type="Int32" Name="ApproveUserId" />
+    <Property Type="DateTime" Name="ApproveDate" />
+    <Property Type="String" Name="ApproveRemark" MaxLength="500" FixedLength="false" Unicode="false" />
+    <Property Type="Boolean" Name="IsDelete" />
+    <Property Type="String" Name="SplitPlanIds" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="SupplementOrderDetail">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="SubjectId" />
+    <Property Type="Int32" Name="ShopId" />
+    <Property Type="Int32" Name="PositionId" />
+    <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="Quantity" />
+    <Property Type="String" Name="ChooseImg" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Remark" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="Boolean" Name="IsFinishSplit" />
+  </EntityType>
+  <EntityType Name="UserInCustomer">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="UserId" />
+    <Property Type="Int32" Name="CustomerId" />
+  </EntityType>
+  <EntityType Name="UserInfo">
+    <Key>
+      <PropertyRef Name="UserId" />
+    </Key>
+    <Property Type="Int32" Name="UserId" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="CompanyId" />
+    <Property Type="String" Name="UserName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="PassWord" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="RealName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Boolean" Name="IsDelete" />
+    <Property Type="DateTime" Name="AddDate" />
+  </EntityType>
+  <EntityType Name="UserInRole">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="UserId" />
+    <Property Type="Int32" Name="RoleId" />
+  </EntityType>
+  <EntityType Name="CityInOrderPlan">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="PlanId" />
+    <Property Type="Int32" Name="PlanType" />
+    <Property Type="Int32" Name="CityId" />
+    <Property Type="String" Name="CityName" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="CheckOrderResult">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="PlanDetailId" />
+    <Property Type="Int32" Name="SubjectId" />
+    <Property Type="String" Name="SubjectName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="RegionNames" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ProvinceName" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CityTier" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="PositionName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Format" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MaterialSupport" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POSScale" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Gender" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="CheckOrderId" />
+    <Property Type="Int32" Name="PositionId" />
+    <Property Type="Int32" Name="BasicPositionCount" />
+    <Property Type="Int32" Name="OrderPositionCount" />
+    <Property Type="String" Name="RegionId" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ProvinceId" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CityId" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="CheckOrder">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="String" Name="PlanIds" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="Int32" Name="CustomerId" />
+    <Property Type="Int32" Name="CompanyId" />
+    <Property Type="Boolean" Name="IsDelete" />
+  </EntityType>
+  <EntityType Name="Shop">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="ShopName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ShopNo" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="CustomerId" />
+    <Property Type="Int32" Name="RegionId" />
+    <Property Type="Int32" Name="ProvinceId" />
+    <Property Type="Int32" Name="CityId" />
+    <Property Type="String" Name="CityTier" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="InstallLevel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="AgentCode" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="AgentName" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPAddress" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Contact1" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Tel1" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Contact2" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Tel2" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Channel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Format" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="LocationType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="BusinessModel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="DateTime" Name="OpeningDate" />
+    <Property Type="String" Name="Status" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POSScale" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="AddUserId" />
+    <Property Type="DateTime" Name="AddDate" />
+    <Property Type="Boolean" Name="IsDelete" />
+    <Property Type="String" Name="RegionName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ProvinceName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CityName" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="ProvinceInOrderPlan">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="PlanId" />
+    <Property Type="Int32" Name="PlanType" />
+    <Property Type="Int32" Name="ProvinceId" />
+    <Property Type="String" Name="ProvinceName" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="FinalOrderDetail">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="SubjectId" />
+    <Property Type="Int32" Name="ShopId" />
+    <Property Type="String" Name="ShopNo" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ShopName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="OrderType" />
+    <Property Type="String" Name="Region" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Province" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="City" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CityTier" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="AgentCode" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="AgentName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPAddress" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Contact" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Tel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Channel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Format" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="LocationType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="BusinessModel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POSScale" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MachineFrame" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="GraphicNo" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="Quantity" />
+    <Property Type="Decimal" Name="WindowWide" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="WindowHigh" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="WindowDeep" Precision="18" Scale="0" />
+    <Property Type="String" Name="WindowSize" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Decimal" Name="GraphicWidth" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="GraphicLength" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="Area" Precision="18" Scale="0" />
+    <Property Type="String" Name="GraphicMaterial" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Decimal" Name="UnitPrice" Precision="18" Scale="0" />
+    <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsElectricity" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="LeftSideStick" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="RightSideStick" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Floor" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="WindowStick" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsHang" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="DoorPosition" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ChooseImg" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="FinalOrderDetailTemp">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Int32" Name="SubjectId" />
+    <Property Type="Int32" Name="ShopId" />
+    <Property Type="String" Name="ShopNo" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ShopName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="OrderType" />
+    <Property Type="String" Name="Region" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Province" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="City" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="CityTier" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="AgentCode" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="AgentName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPAddress" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Contact" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Tel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Channel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Format" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="LocationType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="BusinessModel" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POSScale" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="MachineFrame" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="GraphicNo" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPName" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="POPType" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Int32" Name="Quantity" />
+    <Property Type="Decimal" Name="WindowWide" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="WindowHigh" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="WindowDeep" Precision="18" Scale="0" />
+    <Property Type="String" Name="WindowSize" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="Decimal" Name="GraphicWidth" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="GraphicLength" Precision="18" Scale="0" />
+    <Property Type="Decimal" Name="Area" Precision="18" Scale="0" />
+    <Property Type="String" Name="GraphicMaterial" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Type="Decimal" Name="UnitPrice" Precision="18" Scale="0" />
+    <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsElectricity" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="LeftSideStick" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="RightSideStick" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="Floor" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="WindowStick" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="IsHang" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="DoorPosition" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Type="String" Name="ChooseImg" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+</Schema>

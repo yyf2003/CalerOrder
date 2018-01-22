@@ -1,0 +1,3635 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{44B55B2C-D2A1-428F-9A3D-AD4116B0110F}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WebApp</RootNamespace>
+    <AssemblyName>WebApp</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <UseIISExpress>false</UseIISExpress>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AspNetPager, Version=7.3.2.0, Culture=neutral, PublicKeyToken=fb0a0fe055d40fd4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\AspNetPager.dll</HintPath>
+    </Reference>
+    <Reference Include="AsyncCtpLibrary, Version=1.0.4107.18181, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\AsyncCTP.0.3\lib\net40\AsyncCtpLibrary.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net40\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EPPlus, Version=4.1.0.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.1.0\lib\net40\EPPlus.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI, Version=2.2.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\npoi\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OOXML, Version=2.2.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\npoi\NPOI.OOXML.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXml4Net, Version=2.2.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\npoi\NPOI.OpenXml4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXmlFormats, Version=2.2.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\npoi\NPOI.OpenXmlFormats.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="11.aspx" />
+    <Content Include="About.aspx" />
+    <Content Include="AccountCheck\SupplementList.aspx" />
+    <Content Include="Account\ChangePassword.aspx" />
+    <Content Include="Account\ChangePasswordSuccess.aspx" />
+    <Content Include="Account\Login.aspx" />
+    <Content Include="Account\Register.aspx" />
+    <Content Include="BaseInfoManager\js\baseinfo.js" />
+    <Content Include="BaseInfoManager\List.aspx" />
+    <Content Include="bootstrap-3.3.2-dist\css\bootstrap-theme.css" />
+    <Content Include="bootstrap-3.3.2-dist\css\bootstrap-theme.min.css" />
+    <Content Include="bootstrap-3.3.2-dist\css\bootstrap.css" />
+    <Content Include="bootstrap-3.3.2-dist\css\bootstrap.min.css" />
+    <Content Include="bootstrap-3.3.2-dist\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="bootstrap-3.3.2-dist\js\bootstrap.js" />
+    <Content Include="bootstrap-3.3.2-dist\js\bootstrap.min.js" />
+    <Content Include="bootstrap-3.3.2-dist\js\npm.js" />
+    <Content Include="center.html" />
+    <Content Include="Common\Js\GetFiles.js" />
+    <Content Include="CompanyManage\js\list.js" />
+    <Content Include="CompanyManage\List.aspx" />
+    <Content Include="CSS\Attestationuse.css" />
+    <Content Include="CSS\DefaultTX.css" />
+    <Content Include="CSS\demo.css" />
+    <Content Include="CSS\global.css" />
+    <Content Include="CSS\login.css" />
+    <Content Include="CSS\login_style.css" />
+    <Content Include="CSS\map.css" />
+    <Content Include="CSS\pager.css" />
+    <Content Include="CSS\pagination.css" />
+    <Content Include="CSS\Recount.css" />
+    <Content Include="CSS\style.css" />
+    <Content Include="CSS\StyleSheet1.css" />
+    <Content Include="CSS\Systen_style.css" />
+    <Content Include="CSS\tab.css" />
+    <Content Include="CSS\tanchuang.css" />
+    <Content Include="CSS\uploader.css" />
+    <Content Include="Customer\ActivityList.aspx" />
+    <Content Include="Customer\AddCustomer.aspx" />
+    <Content Include="Customer\BasicMachineFrameList.aspx" />
+    <Content Include="Customer\CustomerList.aspx" />
+    <Content Include="Customer\ERPHostManage.aspx" />
+    <Content Include="Customer\ExportBasicMachineFrame.aspx" />
+    <Content Include="Customer\FrameBlackListManage.aspx" />
+    <Content Include="Customer\HCPOPList.aspx" />
+    <Content Include="Customer\ImportHCPOP.aspx" />
+    <Content Include="Customer\ImportMachineFrame.aspx" />
+    <Content Include="Customer\ImportShops.aspx" />
+    <Content Include="Customer\InstallPriceList.aspx" />
+    <Content Include="Customer\js\ActivityList.js" />
+    <Content Include="Customer\js\addCustomer.js" />
+    <Content Include="Customer\js\basicMachineFrameList.js" />
+    <Content Include="Customer\js\Customer.js" />
+    <Content Include="Customer\js\ERPHostManage.js" />
+    <Content Include="Customer\js\FrameBlackListManage.js" />
+    <Content Include="Customer\js\InstallPriceList.js" />
+    <Content Include="Customer\js\MachineFrame.js" />
+    <Content Include="Customer\js\OneShopMachineFrameList.js" />
+    <Content Include="Customer\js\OneShopPOPList.js" />
+    <Content Include="Customer\js\POPBlackListManage.js" />
+    <Content Include="Customer\js\poplist.js" />
+    <Content Include="Customer\js\shoplist.js" />
+    <Content Include="Customer\js\SubjectCategoryList.js" />
+    <Content Include="Customer\MachineFrameList.aspx" />
+    <Content Include="Customer\OneShopMachineFrameList.aspx" />
+    <Content Include="Customer\OneShopPOPList.aspx" />
+    <Content Include="Customer\POPBlackListManage.aspx" />
+    <Content Include="Customer\POPList.aspx" />
+    <Content Include="Customer\ShopDetail.aspx" />
+    <Content Include="Customer\ShopList.aspx" />
+    <Content Include="Customer\SubjectCategoryList.aspx" />
+    <Content Include="DLL\AspNetPager.dll" />
+    <Content Include="DLL\ICSharpCode.SharpZipLib.dll" />
+    <Content Include="DLL\MyXls.SL2.dll" />
+    <Content Include="DLL\Newtonsoft.Json.dll" />
+    <Content Include="DLL\npoi\NPOI.dll" />
+    <Content Include="DLL\npoi\NPOI.OOXML.dll" />
+    <Content Include="DLL\npoi\NPOI.OpenXml4Net.dll" />
+    <Content Include="DLL\npoi\NPOI.OpenXmlFormats.dll" />
+    <Content Include="down.html" />
+    <Content Include="easyui1.4\changelog.txt" />
+    <Content Include="easyui1.4\datagrid-detailview.js" />
+    <Content Include="easyui1.4\demo\accordion\actions.html" />
+    <Content Include="easyui1.4\demo\accordion\ajax.html" />
+    <Content Include="easyui1.4\demo\accordion\basic.html" />
+    <Content Include="easyui1.4\demo\accordion\expandable.html" />
+    <Content Include="easyui1.4\demo\accordion\fluid.html" />
+    <Content Include="easyui1.4\demo\accordion\multiple.html" />
+    <Content Include="easyui1.4\demo\accordion\tools.html" />
+    <Content Include="easyui1.4\demo\accordion\_content.html" />
+    <Content Include="easyui1.4\demo\calendar\basic.html" />
+    <Content Include="easyui1.4\demo\calendar\custom.html" />
+    <Content Include="easyui1.4\demo\calendar\disabledate.html" />
+    <Content Include="easyui1.4\demo\calendar\firstday.html" />
+    <Content Include="easyui1.4\demo\calendar\fluid.html" />
+    <Content Include="easyui1.4\demo\combobox\actions.html" />
+    <Content Include="easyui1.4\demo\combobox\basic.html" />
+    <Content Include="easyui1.4\demo\combobox\customformat.html" />
+    <Content Include="easyui1.4\demo\combobox\dynamicdata.html" />
+    <Content Include="easyui1.4\demo\combobox\fluid.html" />
+    <Content Include="easyui1.4\demo\combobox\group.html" />
+    <Content Include="easyui1.4\demo\combobox\icons.html" />
+    <Content Include="easyui1.4\demo\combobox\multiline.html" />
+    <Content Include="easyui1.4\demo\combobox\multiple.html" />
+    <Content Include="easyui1.4\demo\combobox\navigation.html" />
+    <Content Include="easyui1.4\demo\combobox\remotedata.html" />
+    <Content Include="easyui1.4\demo\combobox\remotejsonp.html" />
+    <Content Include="easyui1.4\demo\combogrid\actions.html" />
+    <Content Include="easyui1.4\demo\combogrid\basic.html" />
+    <Content Include="easyui1.4\demo\combogrid\fluid.html" />
+    <Content Include="easyui1.4\demo\combogrid\initvalue.html" />
+    <Content Include="easyui1.4\demo\combogrid\multiple.html" />
+    <Content Include="easyui1.4\demo\combogrid\navigation.html" />
+    <Content Include="easyui1.4\demo\combotree\actions.html" />
+    <Content Include="easyui1.4\demo\combotree\basic.html" />
+    <Content Include="easyui1.4\demo\combotree\fluid.html" />
+    <Content Include="easyui1.4\demo\combotree\initvalue.html" />
+    <Content Include="easyui1.4\demo\combotree\multiple.html" />
+    <Content Include="easyui1.4\demo\combo\basic.html" />
+    <Content Include="easyui1.4\demo\datagrid\aligncolumns.html" />
+    <Content Include="easyui1.4\demo\datagrid\basic.html" />
+    <Content Include="easyui1.4\demo\datagrid\cacheeditor.html" />
+    <Content Include="easyui1.4\demo\datagrid\cellediting.html" />
+    <Content Include="easyui1.4\demo\datagrid\cellstyle.html" />
+    <Content Include="easyui1.4\demo\datagrid\checkbox.html" />
+    <Content Include="easyui1.4\demo\datagrid\clientpagination.html" />
+    <Content Include="easyui1.4\demo\datagrid\columngroup.html" />
+    <Content Include="easyui1.4\demo\datagrid\complextoolbar.html" />
+    <Content Include="easyui1.4\demo\datagrid\contextmenu.html" />
+    <Content Include="easyui1.4\demo\datagrid\custompager.html" />
+    <Content Include="easyui1.4\demo\datagrid\fluid.html" />
+    <Content Include="easyui1.4\demo\datagrid\footer.html" />
+    <Content Include="easyui1.4\demo\datagrid\formatcolumns.html" />
+    <Content Include="easyui1.4\demo\datagrid\frozencolumns.html" />
+    <Content Include="easyui1.4\demo\datagrid\frozenrows.html" />
+    <Content Include="easyui1.4\demo\datagrid\mergecells.html" />
+    <Content Include="easyui1.4\demo\datagrid\multisorting.html" />
+    <Content Include="easyui1.4\demo\datagrid\rowborder.html" />
+    <Content Include="easyui1.4\demo\datagrid\rowediting.html" />
+    <Content Include="easyui1.4\demo\datagrid\rowstyle.html" />
+    <Content Include="easyui1.4\demo\datagrid\selection.html" />
+    <Content Include="easyui1.4\demo\datagrid\simpletoolbar.html" />
+    <Content Include="easyui1.4\demo\datagrid\transform.html" />
+    <Content Include="easyui1.4\demo\datebox\basic.html" />
+    <Content Include="easyui1.4\demo\datebox\buttons.html" />
+    <Content Include="easyui1.4\demo\datebox\dateformat.html" />
+    <Content Include="easyui1.4\demo\datebox\events.html" />
+    <Content Include="easyui1.4\demo\datebox\fluid.html" />
+    <Content Include="easyui1.4\demo\datebox\restrict.html" />
+    <Content Include="easyui1.4\demo\datebox\sharedcalendar.html" />
+    <Content Include="easyui1.4\demo\datebox\validate.html" />
+    <Content Include="easyui1.4\demo\datetimebox\basic.html" />
+    <Content Include="easyui1.4\demo\datetimebox\fluid.html" />
+    <Content Include="easyui1.4\demo\datetimebox\initvalue.html" />
+    <Content Include="easyui1.4\demo\datetimebox\showseconds.html" />
+    <Content Include="easyui1.4\demo\datetimespinner\basic.html" />
+    <Content Include="easyui1.4\demo\datetimespinner\clearicon.html" />
+    <Content Include="easyui1.4\demo\datetimespinner\fluid.html" />
+    <Content Include="easyui1.4\demo\datetimespinner\format.html" />
+    <Content Include="easyui1.4\demo\demo.css" />
+    <Content Include="easyui1.4\demo\dialog\basic.html" />
+    <Content Include="easyui1.4\demo\dialog\complextoolbar.html" />
+    <Content Include="easyui1.4\demo\dialog\fluid.html" />
+    <Content Include="easyui1.4\demo\dialog\toolbarbuttons.html" />
+    <Content Include="easyui1.4\demo\draggable\basic.html" />
+    <Content Include="easyui1.4\demo\draggable\constain.html" />
+    <Content Include="easyui1.4\demo\draggable\snap.html" />
+    <Content Include="easyui1.4\demo\droppable\accept.html" />
+    <Content Include="easyui1.4\demo\droppable\basic.html" />
+    <Content Include="easyui1.4\demo\droppable\sort.html" />
+    <Content Include="easyui1.4\demo\easyloader\basic.html" />
+    <Content Include="easyui1.4\demo\filebox\basic.html" />
+    <Content Include="easyui1.4\demo\filebox\buttonalign.html" />
+    <Content Include="easyui1.4\demo\filebox\fluid.html" />
+    <Content Include="easyui1.4\demo\form\basic.html" />
+    <Content Include="easyui1.4\demo\form\load.html" />
+    <Content Include="easyui1.4\demo\form\validateonsubmit.html" />
+    <Content Include="easyui1.4\demo\layout\addremove.html" />
+    <Content Include="easyui1.4\demo\layout\autoheight.html" />
+    <Content Include="easyui1.4\demo\layout\basic.html" />
+    <Content Include="easyui1.4\demo\layout\complex.html" />
+    <Content Include="easyui1.4\demo\layout\fluid.html" />
+    <Content Include="easyui1.4\demo\layout\full.html" />
+    <Content Include="easyui1.4\demo\layout\nestedlayout.html" />
+    <Content Include="easyui1.4\demo\layout\nocollapsible.html" />
+    <Content Include="easyui1.4\demo\layout\_content.html" />
+    <Content Include="easyui1.4\demo\linkbutton\basic.html" />
+    <Content Include="easyui1.4\demo\linkbutton\fluid.html" />
+    <Content Include="easyui1.4\demo\linkbutton\group.html" />
+    <Content Include="easyui1.4\demo\linkbutton\iconalign.html" />
+    <Content Include="easyui1.4\demo\linkbutton\plain.html" />
+    <Content Include="easyui1.4\demo\linkbutton\size.html" />
+    <Content Include="easyui1.4\demo\linkbutton\style.html" />
+    <Content Include="easyui1.4\demo\linkbutton\toggle.html" />
+    <Content Include="easyui1.4\demo\menubutton\actions.html" />
+    <Content Include="easyui1.4\demo\menubutton\alignment.html" />
+    <Content Include="easyui1.4\demo\menubutton\basic.html" />
+    <Content Include="easyui1.4\demo\menu\basic.html" />
+    <Content Include="easyui1.4\demo\menu\customitem.html" />
+    <Content Include="easyui1.4\demo\menu\events.html" />
+    <Content Include="easyui1.4\demo\messager\alert.html" />
+    <Content Include="easyui1.4\demo\messager\basic.html" />
+    <Content Include="easyui1.4\demo\messager\interactive.html" />
+    <Content Include="easyui1.4\demo\messager\position.html" />
+    <Content Include="easyui1.4\demo\numberbox\basic.html" />
+    <Content Include="easyui1.4\demo\numberbox\fluid.html" />
+    <Content Include="easyui1.4\demo\numberbox\format.html" />
+    <Content Include="easyui1.4\demo\numberbox\range.html" />
+    <Content Include="easyui1.4\demo\numberspinner\basic.html" />
+    <Content Include="easyui1.4\demo\numberspinner\fluid.html" />
+    <Content Include="easyui1.4\demo\numberspinner\increment.html" />
+    <Content Include="easyui1.4\demo\numberspinner\range.html" />
+    <Content Include="easyui1.4\demo\pagination\attaching.html" />
+    <Content Include="easyui1.4\demo\pagination\basic.html" />
+    <Content Include="easyui1.4\demo\pagination\custombuttons.html" />
+    <Content Include="easyui1.4\demo\pagination\layout.html" />
+    <Content Include="easyui1.4\demo\pagination\links.html" />
+    <Content Include="easyui1.4\demo\pagination\simple.html" />
+    <Content Include="easyui1.4\demo\panel\basic.html" />
+    <Content Include="easyui1.4\demo\panel\customtools.html" />
+    <Content Include="easyui1.4\demo\panel\fluid.html" />
+    <Content Include="easyui1.4\demo\panel\loadcontent.html" />
+    <Content Include="easyui1.4\demo\panel\nestedpanel.html" />
+    <Content Include="easyui1.4\demo\panel\paneltools.html" />
+    <Content Include="easyui1.4\demo\panel\_content.html" />
+    <Content Include="easyui1.4\demo\progressbar\basic.html" />
+    <Content Include="easyui1.4\demo\progressbar\fluid.html" />
+    <Content Include="easyui1.4\demo\propertygrid\basic.html" />
+    <Content Include="easyui1.4\demo\propertygrid\customcolumns.html" />
+    <Content Include="easyui1.4\demo\propertygrid\groupformat.html" />
+    <Content Include="easyui1.4\demo\resizable\basic.html" />
+    <Content Include="easyui1.4\demo\searchbox\basic.html" />
+    <Content Include="easyui1.4\demo\searchbox\category.html" />
+    <Content Include="easyui1.4\demo\searchbox\fluid.html" />
+    <Content Include="easyui1.4\demo\slider\basic.html" />
+    <Content Include="easyui1.4\demo\slider\fluid.html" />
+    <Content Include="easyui1.4\demo\slider\formattip.html" />
+    <Content Include="easyui1.4\demo\slider\nonlinear.html" />
+    <Content Include="easyui1.4\demo\slider\rule.html" />
+    <Content Include="easyui1.4\demo\slider\vertical.html" />
+    <Content Include="easyui1.4\demo\splitbutton\actions.html" />
+    <Content Include="easyui1.4\demo\splitbutton\basic.html" />
+    <Content Include="easyui1.4\demo\tabs\autoheight.html" />
+    <Content Include="easyui1.4\demo\tabs\basic.html" />
+    <Content Include="easyui1.4\demo\tabs\dropdown.html" />
+    <Content Include="easyui1.4\demo\tabs\fixedwidth.html" />
+    <Content Include="easyui1.4\demo\tabs\fluid.html" />
+    <Content Include="easyui1.4\demo\tabs\hover.html" />
+    <Content Include="easyui1.4\demo\tabs\images\modem.png" />
+    <Content Include="easyui1.4\demo\tabs\images\pda.png" />
+    <Content Include="easyui1.4\demo\tabs\images\scanner.png" />
+    <Content Include="easyui1.4\demo\tabs\images\tablet.png" />
+    <Content Include="easyui1.4\demo\tabs\nestedtabs.html" />
+    <Content Include="easyui1.4\demo\tabs\striptools.html" />
+    <Content Include="easyui1.4\demo\tabs\tabimage.html" />
+    <Content Include="easyui1.4\demo\tabs\tabposition.html" />
+    <Content Include="easyui1.4\demo\tabs\tabstools.html" />
+    <Content Include="easyui1.4\demo\tabs\_content.html" />
+    <Content Include="easyui1.4\demo\textbox\basic.html" />
+    <Content Include="easyui1.4\demo\textbox\button.html" />
+    <Content Include="easyui1.4\demo\textbox\clearicon.html" />
+    <Content Include="easyui1.4\demo\textbox\custom.html" />
+    <Content Include="easyui1.4\demo\textbox\fluid.html" />
+    <Content Include="easyui1.4\demo\textbox\icons.html" />
+    <Content Include="easyui1.4\demo\textbox\multiline.html" />
+    <Content Include="easyui1.4\demo\textbox\size.html" />
+    <Content Include="easyui1.4\demo\timespinner\actions.html" />
+    <Content Include="easyui1.4\demo\timespinner\basic.html" />
+    <Content Include="easyui1.4\demo\timespinner\fluid.html" />
+    <Content Include="easyui1.4\demo\timespinner\range.html" />
+    <Content Include="easyui1.4\demo\tooltip\ajax.html" />
+    <Content Include="easyui1.4\demo\tooltip\basic.html" />
+    <Content Include="easyui1.4\demo\tooltip\customcontent.html" />
+    <Content Include="easyui1.4\demo\tooltip\customstyle.html" />
+    <Content Include="easyui1.4\demo\tooltip\position.html" />
+    <Content Include="easyui1.4\demo\tooltip\toolbar.html" />
+    <Content Include="easyui1.4\demo\tooltip\tooltipdialog.html" />
+    <Content Include="easyui1.4\demo\tooltip\_content.html" />
+    <Content Include="easyui1.4\demo\tooltip\_dialog.html" />
+    <Content Include="easyui1.4\demo\treegrid\actions.html" />
+    <Content Include="easyui1.4\demo\treegrid\basic.html" />
+    <Content Include="easyui1.4\demo\treegrid\clientpagination.html" />
+    <Content Include="easyui1.4\demo\treegrid\contextmenu.html" />
+    <Content Include="easyui1.4\demo\treegrid\editable.html" />
+    <Content Include="easyui1.4\demo\treegrid\fluid.html" />
+    <Content Include="easyui1.4\demo\treegrid\footer.html" />
+    <Content Include="easyui1.4\demo\treegrid\lines.html" />
+    <Content Include="easyui1.4\demo\treegrid\reports.html" />
+    <Content Include="easyui1.4\demo\tree\actions.html" />
+    <Content Include="easyui1.4\demo\tree\animation.html" />
+    <Content Include="easyui1.4\demo\tree\basic.html" />
+    <Content Include="easyui1.4\demo\tree\checkbox.html" />
+    <Content Include="easyui1.4\demo\tree\contextmenu.html" />
+    <Content Include="easyui1.4\demo\tree\dnd.html" />
+    <Content Include="easyui1.4\demo\tree\editable.html" />
+    <Content Include="easyui1.4\demo\tree\formatting.html" />
+    <Content Include="easyui1.4\demo\tree\icons.html" />
+    <Content Include="easyui1.4\demo\tree\lazyload.html" />
+    <Content Include="easyui1.4\demo\tree\lines.html" />
+    <Content Include="easyui1.4\demo\validatebox\basic.html" />
+    <Content Include="easyui1.4\demo\validatebox\customtooltip.html" />
+    <Content Include="easyui1.4\demo\validatebox\validateonblur.html" />
+    <Content Include="easyui1.4\demo\window\basic.html" />
+    <Content Include="easyui1.4\demo\window\customtools.html" />
+    <Content Include="easyui1.4\demo\window\fluid.html" />
+    <Content Include="easyui1.4\demo\window\inlinewindow.html" />
+    <Content Include="easyui1.4\demo\window\modalwindow.html" />
+    <Content Include="easyui1.4\demo\window\windowlayout.html" />
+    <Content Include="easyui1.4\easyloader.js" />
+    <Content Include="easyui1.4\jquery.easyui.min.js" />
+    <Content Include="easyui1.4\jquery.min.js" />
+    <Content Include="easyui1.4\licence_gpl.txt" />
+    <Content Include="easyui1.4\locale\easyui-lang-af.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-am.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-ar.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-bg.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-ca.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-cs.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-cz.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-da.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-de.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-el.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-en.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-es.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-fr.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-it.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-jp.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-nl.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-pl.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-pt_BR.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-ru.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-sv_SE.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-tr.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-zh_CN.js" />
+    <Content Include="easyui1.4\locale\easyui-lang-zh_TW.js" />
+    <Content Include="easyui1.4\plugins\jquery.accordion.js" />
+    <Content Include="easyui1.4\plugins\jquery.calendar.js" />
+    <Content Include="easyui1.4\plugins\jquery.combo.js" />
+    <Content Include="easyui1.4\plugins\jquery.combobox.js" />
+    <Content Include="easyui1.4\plugins\jquery.combogrid.js" />
+    <Content Include="easyui1.4\plugins\jquery.combotree.js" />
+    <Content Include="easyui1.4\plugins\jquery.datagrid.js" />
+    <Content Include="easyui1.4\plugins\jquery.datebox.js" />
+    <Content Include="easyui1.4\plugins\jquery.datetimebox.js" />
+    <Content Include="easyui1.4\plugins\jquery.datetimespinner.js" />
+    <Content Include="easyui1.4\plugins\jquery.dialog.js" />
+    <Content Include="easyui1.4\plugins\jquery.draggable.js" />
+    <Content Include="easyui1.4\plugins\jquery.droppable.js" />
+    <Content Include="easyui1.4\plugins\jquery.filebox.js" />
+    <Content Include="easyui1.4\plugins\jquery.form.js" />
+    <Content Include="easyui1.4\plugins\jquery.layout.js" />
+    <Content Include="easyui1.4\plugins\jquery.linkbutton.js" />
+    <Content Include="easyui1.4\plugins\jquery.menu.js" />
+    <Content Include="easyui1.4\plugins\jquery.menubutton.js" />
+    <Content Include="easyui1.4\plugins\jquery.messager.js" />
+    <Content Include="easyui1.4\plugins\jquery.numberbox.js" />
+    <Content Include="easyui1.4\plugins\jquery.numberspinner.js" />
+    <Content Include="easyui1.4\plugins\jquery.pagination.js" />
+    <Content Include="easyui1.4\plugins\jquery.panel.js" />
+    <Content Include="easyui1.4\plugins\jquery.parser.js" />
+    <Content Include="easyui1.4\plugins\jquery.progressbar.js" />
+    <Content Include="easyui1.4\plugins\jquery.propertygrid.js" />
+    <Content Include="easyui1.4\plugins\jquery.resizable.js" />
+    <Content Include="easyui1.4\plugins\jquery.searchbox.js" />
+    <Content Include="easyui1.4\plugins\jquery.slider.js" />
+    <Content Include="easyui1.4\plugins\jquery.spinner.js" />
+    <Content Include="easyui1.4\plugins\jquery.splitbutton.js" />
+    <Content Include="easyui1.4\plugins\jquery.tabs.js" />
+    <Content Include="easyui1.4\plugins\jquery.textbox.js" />
+    <Content Include="easyui1.4\plugins\jquery.timespinner.js" />
+    <Content Include="easyui1.4\plugins\jquery.tooltip.js" />
+    <Content Include="easyui1.4\plugins\jquery.tree.js" />
+    <Content Include="easyui1.4\plugins\jquery.treegrid.js" />
+    <Content Include="easyui1.4\plugins\jquery.validatebox.js" />
+    <Content Include="easyui1.4\plugins\jquery.window.js" />
+    <Content Include="easyui1.4\readme.txt" />
+    <Content Include="easyui1.4\src\easyloader.js" />
+    <Content Include="easyui1.4\src\jquery.accordion.js" />
+    <Content Include="easyui1.4\src\jquery.calendar.js" />
+    <Content Include="easyui1.4\src\jquery.combobox.js" />
+    <Content Include="easyui1.4\src\jquery.datebox.js" />
+    <Content Include="easyui1.4\src\jquery.draggable.js" />
+    <Content Include="easyui1.4\src\jquery.droppable.js" />
+    <Content Include="easyui1.4\src\jquery.form.js" />
+    <Content Include="easyui1.4\src\jquery.linkbutton.js" />
+    <Content Include="easyui1.4\src\jquery.menu.js" />
+    <Content Include="easyui1.4\src\jquery.parser.js" />
+    <Content Include="easyui1.4\src\jquery.progressbar.js" />
+    <Content Include="easyui1.4\src\jquery.propertygrid.js" />
+    <Content Include="easyui1.4\src\jquery.resizable.js" />
+    <Content Include="easyui1.4\src\jquery.slider.js" />
+    <Content Include="easyui1.4\src\jquery.tabs.js" />
+    <Content Include="easyui1.4\src\jquery.window.js" />
+    <Content Include="easyui1.4\themes\black\accordion.css" />
+    <Content Include="easyui1.4\themes\black\calendar.css" />
+    <Content Include="easyui1.4\themes\black\combo.css" />
+    <Content Include="easyui1.4\themes\black\combobox.css" />
+    <Content Include="easyui1.4\themes\black\datagrid.css" />
+    <Content Include="easyui1.4\themes\black\datebox.css" />
+    <Content Include="easyui1.4\themes\black\dialog.css" />
+    <Content Include="easyui1.4\themes\black\easyui.css" />
+    <Content Include="easyui1.4\themes\black\filebox.css" />
+    <Content Include="easyui1.4\themes\black\images\accordion_arrows.png" />
+    <Content Include="easyui1.4\themes\black\images\blank.gif" />
+    <Content Include="easyui1.4\themes\black\images\calendar_arrows.png" />
+    <Content Include="easyui1.4\themes\black\images\combo_arrow.png" />
+    <Content Include="easyui1.4\themes\black\images\datagrid_icons.png" />
+    <Content Include="easyui1.4\themes\black\images\datebox_arrow.png" />
+    <Content Include="easyui1.4\themes\black\images\layout_arrows.png" />
+    <Content Include="easyui1.4\themes\black\images\linkbutton_bg.png" />
+    <Content Include="easyui1.4\themes\black\images\loading.gif" />
+    <Content Include="easyui1.4\themes\black\images\menu_arrows.png" />
+    <Content Include="easyui1.4\themes\black\images\messager_icons.png" />
+    <Content Include="easyui1.4\themes\black\images\pagination_icons.png" />
+    <Content Include="easyui1.4\themes\black\images\panel_tools.png" />
+    <Content Include="easyui1.4\themes\black\images\searchbox_button.png" />
+    <Content Include="easyui1.4\themes\black\images\slider_handle.png" />
+    <Content Include="easyui1.4\themes\black\images\spinner_arrows.png" />
+    <Content Include="easyui1.4\themes\black\images\tabs_icons.png" />
+    <Content Include="easyui1.4\themes\black\images\tree_icons.png" />
+    <Content Include="easyui1.4\themes\black\images\validatebox_warning.png" />
+    <Content Include="easyui1.4\themes\black\layout.css" />
+    <Content Include="easyui1.4\themes\black\linkbutton.css" />
+    <Content Include="easyui1.4\themes\black\menu.css" />
+    <Content Include="easyui1.4\themes\black\menubutton.css" />
+    <Content Include="easyui1.4\themes\black\messager.css" />
+    <Content Include="easyui1.4\themes\black\numberbox.css" />
+    <Content Include="easyui1.4\themes\black\pagination.css" />
+    <Content Include="easyui1.4\themes\black\panel.css" />
+    <Content Include="easyui1.4\themes\black\progressbar.css" />
+    <Content Include="easyui1.4\themes\black\propertygrid.css" />
+    <Content Include="easyui1.4\themes\black\searchbox.css" />
+    <Content Include="easyui1.4\themes\black\slider.css" />
+    <Content Include="easyui1.4\themes\black\spinner.css" />
+    <Content Include="easyui1.4\themes\black\splitbutton.css" />
+    <Content Include="easyui1.4\themes\black\tabs.css" />
+    <Content Include="easyui1.4\themes\black\textbox.css" />
+    <Content Include="easyui1.4\themes\black\tooltip.css" />
+    <Content Include="easyui1.4\themes\black\tree.css" />
+    <Content Include="easyui1.4\themes\black\validatebox.css" />
+    <Content Include="easyui1.4\themes\black\window.css" />
+    <Content Include="easyui1.4\themes\bootstrap\accordion.css" />
+    <Content Include="easyui1.4\themes\bootstrap\calendar.css" />
+    <Content Include="easyui1.4\themes\bootstrap\combo.css" />
+    <Content Include="easyui1.4\themes\bootstrap\combobox.css" />
+    <Content Include="easyui1.4\themes\bootstrap\datagrid.css" />
+    <Content Include="easyui1.4\themes\bootstrap\datebox.css" />
+    <Content Include="easyui1.4\themes\bootstrap\dialog.css" />
+    <Content Include="easyui1.4\themes\bootstrap\easyui.css" />
+    <Content Include="easyui1.4\themes\bootstrap\filebox.css" />
+    <Content Include="easyui1.4\themes\bootstrap\images\accordion_arrows.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\blank.gif" />
+    <Content Include="easyui1.4\themes\bootstrap\images\calendar_arrows.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\combo_arrow.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\datagrid_icons.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\datebox_arrow.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\layout_arrows.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\linkbutton_bg.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\loading.gif" />
+    <Content Include="easyui1.4\themes\bootstrap\images\menu_arrows.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\messager_icons.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\pagination_icons.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\panel_tools.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\searchbox_button.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\slider_handle.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\spinner_arrows.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\tabs_icons.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\tree_icons.png" />
+    <Content Include="easyui1.4\themes\bootstrap\images\validatebox_warning.png" />
+    <Content Include="easyui1.4\themes\bootstrap\layout.css" />
+    <Content Include="easyui1.4\themes\bootstrap\linkbutton.css" />
+    <Content Include="easyui1.4\themes\bootstrap\menu.css" />
+    <Content Include="easyui1.4\themes\bootstrap\menubutton.css" />
+    <Content Include="easyui1.4\themes\bootstrap\messager.css" />
+    <Content Include="easyui1.4\themes\bootstrap\numberbox.css" />
+    <Content Include="easyui1.4\themes\bootstrap\pagination.css" />
+    <Content Include="easyui1.4\themes\bootstrap\panel.css" />
+    <Content Include="easyui1.4\themes\bootstrap\progressbar.css" />
+    <Content Include="easyui1.4\themes\bootstrap\propertygrid.css" />
+    <Content Include="easyui1.4\themes\bootstrap\searchbox.css" />
+    <Content Include="easyui1.4\themes\bootstrap\slider.css" />
+    <Content Include="easyui1.4\themes\bootstrap\spinner.css" />
+    <Content Include="easyui1.4\themes\bootstrap\splitbutton.css" />
+    <Content Include="easyui1.4\themes\bootstrap\tabs.css" />
+    <Content Include="easyui1.4\themes\bootstrap\textbox.css" />
+    <Content Include="easyui1.4\themes\bootstrap\tooltip.css" />
+    <Content Include="easyui1.4\themes\bootstrap\tree.css" />
+    <Content Include="easyui1.4\themes\bootstrap\validatebox.css" />
+    <Content Include="easyui1.4\themes\bootstrap\window.css" />
+    <Content Include="easyui1.4\themes\color.css" />
+    <Content Include="easyui1.4\themes\default\accordion.css" />
+    <Content Include="easyui1.4\themes\default\calendar.css" />
+    <Content Include="easyui1.4\themes\default\combo.css" />
+    <Content Include="easyui1.4\themes\default\combobox.css" />
+    <Content Include="easyui1.4\themes\default\datagrid.css" />
+    <Content Include="easyui1.4\themes\default\datebox.css" />
+    <Content Include="easyui1.4\themes\default\dialog.css" />
+    <Content Include="easyui1.4\themes\default\easyui.css" />
+    <Content Include="easyui1.4\themes\default\filebox.css" />
+    <Content Include="easyui1.4\themes\default\images\accordion_arrows.png" />
+    <Content Include="easyui1.4\themes\default\images\blank.gif" />
+    <Content Include="easyui1.4\themes\default\images\calendar_arrows.png" />
+    <Content Include="easyui1.4\themes\default\images\combo_arrow.png" />
+    <Content Include="easyui1.4\themes\default\images\datagrid_icons.png" />
+    <Content Include="easyui1.4\themes\default\images\datebox_arrow.png" />
+    <Content Include="easyui1.4\themes\default\images\layout_arrows.png" />
+    <Content Include="easyui1.4\themes\default\images\linkbutton_bg.png" />
+    <Content Include="easyui1.4\themes\default\images\loading.gif" />
+    <Content Include="easyui1.4\themes\default\images\menu_arrows.png" />
+    <Content Include="easyui1.4\themes\default\images\messager_icons.png" />
+    <Content Include="easyui1.4\themes\default\images\pagination_icons.png" />
+    <Content Include="easyui1.4\themes\default\images\panel_tools.png" />
+    <Content Include="easyui1.4\themes\default\images\searchbox_button.png" />
+    <Content Include="easyui1.4\themes\default\images\slider_handle.png" />
+    <Content Include="easyui1.4\themes\default\images\spinner_arrows.png" />
+    <Content Include="easyui1.4\themes\default\images\tabs_icons.png" />
+    <Content Include="easyui1.4\themes\default\images\tree_icons.png" />
+    <Content Include="easyui1.4\themes\default\images\validatebox_warning.png" />
+    <Content Include="easyui1.4\themes\default\layout.css" />
+    <Content Include="easyui1.4\themes\default\linkbutton.css" />
+    <Content Include="easyui1.4\themes\default\menu.css" />
+    <Content Include="easyui1.4\themes\default\menubutton.css" />
+    <Content Include="easyui1.4\themes\default\messager.css" />
+    <Content Include="easyui1.4\themes\default\numberbox.css" />
+    <Content Include="easyui1.4\themes\default\pagination.css" />
+    <Content Include="easyui1.4\themes\default\panel.css" />
+    <Content Include="easyui1.4\themes\default\progressbar.css" />
+    <Content Include="easyui1.4\themes\default\propertygrid.css" />
+    <Content Include="easyui1.4\themes\default\searchbox.css" />
+    <Content Include="easyui1.4\themes\default\slider.css" />
+    <Content Include="easyui1.4\themes\default\spinner.css" />
+    <Content Include="easyui1.4\themes\default\splitbutton.css" />
+    <Content Include="easyui1.4\themes\default\tabs.css" />
+    <Content Include="easyui1.4\themes\default\textbox.css" />
+    <Content Include="easyui1.4\themes\default\tooltip.css" />
+    <Content Include="easyui1.4\themes\default\tree.css" />
+    <Content Include="easyui1.4\themes\default\validatebox.css" />
+    <Content Include="easyui1.4\themes\default\window.css" />
+    <Content Include="easyui1.4\themes\gray\accordion.css" />
+    <Content Include="easyui1.4\themes\gray\calendar.css" />
+    <Content Include="easyui1.4\themes\gray\combo.css" />
+    <Content Include="easyui1.4\themes\gray\combobox.css" />
+    <Content Include="easyui1.4\themes\gray\datagrid.css" />
+    <Content Include="easyui1.4\themes\gray\datebox.css" />
+    <Content Include="easyui1.4\themes\gray\dialog.css" />
+    <Content Include="easyui1.4\themes\gray\easyui.css" />
+    <Content Include="easyui1.4\themes\gray\filebox.css" />
+    <Content Include="easyui1.4\themes\gray\images\accordion_arrows.png" />
+    <Content Include="easyui1.4\themes\gray\images\blank.gif" />
+    <Content Include="easyui1.4\themes\gray\images\calendar_arrows.png" />
+    <Content Include="easyui1.4\themes\gray\images\combo_arrow.png" />
+    <Content Include="easyui1.4\themes\gray\images\datagrid_icons.png" />
+    <Content Include="easyui1.4\themes\gray\images\datebox_arrow.png" />
+    <Content Include="easyui1.4\themes\gray\images\layout_arrows.png" />
+    <Content Include="easyui1.4\themes\gray\images\linkbutton_bg.png" />
+    <Content Include="easyui1.4\themes\gray\images\loading.gif" />
+    <Content Include="easyui1.4\themes\gray\images\menu_arrows.png" />
+    <Content Include="easyui1.4\themes\gray\images\messager_icons.png" />
+    <Content Include="easyui1.4\themes\gray\images\pagination_icons.png" />
+    <Content Include="easyui1.4\themes\gray\images\panel_tools.png" />
+    <Content Include="easyui1.4\themes\gray\images\searchbox_button.png" />
+    <Content Include="easyui1.4\themes\gray\images\slider_handle.png" />
+    <Content Include="easyui1.4\themes\gray\images\spinner_arrows.png" />
+    <Content Include="easyui1.4\themes\gray\images\tabs_icons.png" />
+    <Content Include="easyui1.4\themes\gray\images\tree_icons.png" />
+    <Content Include="easyui1.4\themes\gray\images\validatebox_warning.png" />
+    <Content Include="easyui1.4\themes\gray\layout.css" />
+    <Content Include="easyui1.4\themes\gray\linkbutton.css" />
+    <Content Include="easyui1.4\themes\gray\menu.css" />
+    <Content Include="easyui1.4\themes\gray\menubutton.css" />
+    <Content Include="easyui1.4\themes\gray\messager.css" />
+    <Content Include="easyui1.4\themes\gray\numberbox.css" />
+    <Content Include="easyui1.4\themes\gray\pagination.css" />
+    <Content Include="easyui1.4\themes\gray\panel.css" />
+    <Content Include="easyui1.4\themes\gray\progressbar.css" />
+    <Content Include="easyui1.4\themes\gray\propertygrid.css" />
+    <Content Include="easyui1.4\themes\gray\searchbox.css" />
+    <Content Include="easyui1.4\themes\gray\slider.css" />
+    <Content Include="easyui1.4\themes\gray\spinner.css" />
+    <Content Include="easyui1.4\themes\gray\splitbutton.css" />
+    <Content Include="easyui1.4\themes\gray\tabs.css" />
+    <Content Include="easyui1.4\themes\gray\textbox.css" />
+    <Content Include="easyui1.4\themes\gray\tooltip.css" />
+    <Content Include="easyui1.4\themes\gray\tree.css" />
+    <Content Include="easyui1.4\themes\gray\validatebox.css" />
+    <Content Include="easyui1.4\themes\gray\window.css" />
+    <Content Include="easyui1.4\themes\icon.css" />
+    <Content Include="easyui1.4\themes\icons\back.png" />
+    <Content Include="easyui1.4\themes\icons\blank.gif" />
+    <Content Include="easyui1.4\themes\icons\cancel.png" />
+    <Content Include="easyui1.4\themes\icons\clear.png" />
+    <Content Include="easyui1.4\themes\icons\cut.png" />
+    <Content Include="easyui1.4\themes\icons\edit_add.png" />
+    <Content Include="easyui1.4\themes\icons\edit_remove.png" />
+    <Content Include="easyui1.4\themes\icons\filesave.png" />
+    <Content Include="easyui1.4\themes\icons\filter.png" />
+    <Content Include="easyui1.4\themes\icons\help.png" />
+    <Content Include="easyui1.4\themes\icons\large_chart.png" />
+    <Content Include="easyui1.4\themes\icons\large_clipart.png" />
+    <Content Include="easyui1.4\themes\icons\large_picture.png" />
+    <Content Include="easyui1.4\themes\icons\large_shapes.png" />
+    <Content Include="easyui1.4\themes\icons\large_smartart.png" />
+    <Content Include="easyui1.4\themes\icons\lock.png" />
+    <Content Include="easyui1.4\themes\icons\man.png" />
+    <Content Include="easyui1.4\themes\icons\mini_add.png" />
+    <Content Include="easyui1.4\themes\icons\mini_edit.png" />
+    <Content Include="easyui1.4\themes\icons\mini_refresh.png" />
+    <Content Include="easyui1.4\themes\icons\no.png" />
+    <Content Include="easyui1.4\themes\icons\ok.png" />
+    <Content Include="easyui1.4\themes\icons\pencil.png" />
+    <Content Include="easyui1.4\themes\icons\print.png" />
+    <Content Include="easyui1.4\themes\icons\redo.png" />
+    <Content Include="easyui1.4\themes\icons\reload.png" />
+    <Content Include="easyui1.4\themes\icons\search.png" />
+    <Content Include="easyui1.4\themes\icons\sum.png" />
+    <Content Include="easyui1.4\themes\icons\tip.png" />
+    <Content Include="easyui1.4\themes\icons\undo.png" />
+    <Content Include="easyui1.4\themes\metro\accordion.css" />
+    <Content Include="easyui1.4\themes\metro\calendar.css" />
+    <Content Include="easyui1.4\themes\metro\combo.css" />
+    <Content Include="easyui1.4\themes\metro\combobox.css" />
+    <Content Include="easyui1.4\themes\metro\datagrid.css" />
+    <Content Include="easyui1.4\themes\metro\datebox.css" />
+    <Content Include="easyui1.4\themes\metro\dialog.css" />
+    <Content Include="easyui1.4\themes\metro\easyui.css" />
+    <Content Include="easyui1.4\themes\metro\filebox.css" />
+    <Content Include="easyui1.4\themes\metro\images\accordion_arrows.png" />
+    <Content Include="easyui1.4\themes\metro\images\blank.gif" />
+    <Content Include="easyui1.4\themes\metro\images\calendar_arrows.png" />
+    <Content Include="easyui1.4\themes\metro\images\combo_arrow.png" />
+    <Content Include="easyui1.4\themes\metro\images\datagrid_icons.png" />
+    <Content Include="easyui1.4\themes\metro\images\datebox_arrow.png" />
+    <Content Include="easyui1.4\themes\metro\images\layout_arrows.png" />
+    <Content Include="easyui1.4\themes\metro\images\linkbutton_bg.png" />
+    <Content Include="easyui1.4\themes\metro\images\loading.gif" />
+    <Content Include="easyui1.4\themes\metro\images\menu_arrows.png" />
+    <Content Include="easyui1.4\themes\metro\images\messager_icons.png" />
+    <Content Include="easyui1.4\themes\metro\images\pagination_icons.png" />
+    <Content Include="easyui1.4\themes\metro\images\panel_tools.png" />
+    <Content Include="easyui1.4\themes\metro\images\searchbox_button.png" />
+    <Content Include="easyui1.4\themes\metro\images\slider_handle.png" />
+    <Content Include="easyui1.4\themes\metro\images\spinner_arrows.png" />
+    <Content Include="easyui1.4\themes\metro\images\tabs_icons.png" />
+    <Content Include="easyui1.4\themes\metro\images\tree_icons.png" />
+    <Content Include="easyui1.4\themes\metro\images\validatebox_warning.png" />
+    <Content Include="easyui1.4\themes\metro\layout.css" />
+    <Content Include="easyui1.4\themes\metro\linkbutton.css" />
+    <Content Include="easyui1.4\themes\metro\menu.css" />
+    <Content Include="easyui1.4\themes\metro\menubutton.css" />
+    <Content Include="easyui1.4\themes\metro\messager.css" />
+    <Content Include="easyui1.4\themes\metro\numberbox.css" />
+    <Content Include="easyui1.4\themes\metro\pagination.css" />
+    <Content Include="easyui1.4\themes\metro\panel.css" />
+    <Content Include="easyui1.4\themes\metro\progressbar.css" />
+    <Content Include="easyui1.4\themes\metro\propertygrid.css" />
+    <Content Include="easyui1.4\themes\metro\searchbox.css" />
+    <Content Include="easyui1.4\themes\metro\slider.css" />
+    <Content Include="easyui1.4\themes\metro\spinner.css" />
+    <Content Include="easyui1.4\themes\metro\splitbutton.css" />
+    <Content Include="easyui1.4\themes\metro\tabs.css" />
+    <Content Include="easyui1.4\themes\metro\textbox.css" />
+    <Content Include="easyui1.4\themes\metro\tooltip.css" />
+    <Content Include="easyui1.4\themes\metro\tree.css" />
+    <Content Include="easyui1.4\themes\metro\validatebox.css" />
+    <Content Include="easyui1.4\themes\metro\window.css" />
+    <Content Include="fancyBox\demo\1_b.jpg" />
+    <Content Include="fancyBox\demo\1_s.jpg" />
+    <Content Include="fancyBox\demo\2_b.jpg" />
+    <Content Include="fancyBox\demo\2_s.jpg" />
+    <Content Include="fancyBox\demo\3_b.jpg" />
+    <Content Include="fancyBox\demo\3_s.jpg" />
+    <Content Include="fancyBox\demo\4_b.jpg" />
+    <Content Include="fancyBox\demo\4_s.jpg" />
+    <Content Include="fancyBox\demo\5_b.jpg" />
+    <Content Include="fancyBox\demo\5_s.jpg" />
+    <Content Include="fancyBox\demo\ajax.txt" />
+    <Content Include="fancyBox\demo\iframe.html" />
+    <Content Include="fancyBox\demo\index.html" />
+    <Content Include="fancyBox\lib\jquery-1.8.2.min.js" />
+    <Content Include="fancyBox\lib\jquery.mousewheel-3.0.6.pack.js" />
+    <Content Include="fancyBox\source\blank.gif" />
+    <Content Include="fancyBox\source\fancybox_loading.gif" />
+    <Content Include="fancyBox\source\fancybox_overlay.png" />
+    <Content Include="fancyBox\source\fancybox_sprite.png" />
+    <Content Include="fancyBox\source\helpers\fancybox_buttons.png" />
+    <Content Include="fancyBox\source\helpers\jquery.fancybox-buttons.css" />
+    <Content Include="fancyBox\source\helpers\jquery.fancybox-buttons.js" />
+    <Content Include="fancyBox\source\helpers\jquery.fancybox-media.js" />
+    <Content Include="fancyBox\source\helpers\jquery.fancybox-thumbs.css" />
+    <Content Include="fancyBox\source\helpers\jquery.fancybox-thumbs.js" />
+    <Content Include="fancyBox\source\jquery.fancybox.css" />
+    <Content Include="fancyBox\source\jquery.fancybox.js" />
+    <Content Include="fancyBox\source\jquery.fancybox.pack.js" />
+    <Content Include="FileUploadUC\UpLoad.aspx" />
+    <Content Include="FileUploadUC\UpLoadUC.ascx" />
+    <Content Include="GetMatrerialPrice.aspx" />
+    <Content Include="image\50-150.png" />
+    <Content Include="image\appearance\a1.png" />
+    <Content Include="image\appearance\a2.png" />
+    <Content Include="image\appearance\approve.png" />
+    <Content Include="image\appearance\reject.png" />
+    <Content Include="image\btn\add.png" />
+    <Content Include="image\btn\bjtp.gif" />
+    <Content Include="image\btn\b_add.gif" />
+    <Content Include="image\btn\b_add.png" />
+    <Content Include="image\btn\b_Added.gif" />
+    <Content Include="image\btn\b_Cancel.gif" />
+    <Content Include="image\btn\b_confirm.gif" />
+    <Content Include="image\btn\b_Draft.gif" />
+    <Content Include="image\btn\b_Edit.gif" />
+    <Content Include="image\btn\b_fanhui.gif" />
+    <Content Include="image\btn\b_no.gif" />
+    <Content Include="image\btn\b_Save.gif" />
+    <Content Include="image\btn\b_Submit.gif" />
+    <Content Include="image\btn\b_Turn.gif" />
+    <Content Include="image\btn\b_yes.gif" />
+    <Content Include="image\btn\b_zengjia.gif" />
+    <Content Include="image\btn\cancel.gif" />
+    <Content Include="image\btn\delete.gif" />
+    <Content Include="image\btn\dw.gif" />
+    <Content Include="image\btn\edit.gif" />
+    <Content Include="image\btn\export.png" />
+    <Content Include="image\btn\fu_btn.gif" />
+    <Content Include="image\btn\h_Save.gif" />
+    <Content Include="image\btn\h_search.gif" />
+    <Content Include="image\btn\h_Statistics.gif" />
+    <Content Include="image\btn\up.gif" />
+    <Content Include="image\btn\update.gif" />
+    <Content Include="image\Cartoon.png" />
+    <Content Include="image\close.gif" />
+    <Content Include="image\close.png" />
+    <Content Include="image\copyRBg.jpg" />
+    <Content Include="image\dpxx.png" />
+    <Content Include="image\footbei.gif" />
+    <Content Include="image\go_left.gif" />
+    <Content Include="image\go_right.gif" />
+    <Content Include="image\h1_bei.gif" />
+    <Content Include="image\home.gif" />
+    <Content Include="image\home.png" />
+    <Content Include="image\img_011.jpg" />
+    <Content Include="image\img_guanggao\btn_enter.gif" />
+    <Content Include="image\img_guanggao\login1_03.gif" />
+    <Content Include="image\img_guanggao\login1_05.gif" />
+    <Content Include="image\line.gif" />
+    <Content Include="image\line_04.gif" />
+    <Content Include="image\loadingA.gif" />
+    <Content Include="image\login\icon-pwd.png" />
+    <Content Include="image\login\icon-user.gif" />
+    <Content Include="image\login\login-bg.png" />
+    <Content Include="image\login\login-top.png" />
+    <Content Include="image\login_bei.PNG" />
+    <Content Include="image\logo1.png" />
+    <Content Include="image\logo2.png" />
+    <Content Include="image\logo_02.png" />
+    <Content Include="image\lwc_not_saved.gif" />
+    <Content Include="image\main_right.gif" />
+    <Content Include="image\map\1.png" />
+    <Content Include="image\map\Area.png" />
+    <Content Include="image\map\Arrow.png" />
+    <Content Include="image\map\bei.gif" />
+    <Content Include="image\map\bei.png" />
+    <Content Include="image\map\btn.png" />
+    <Content Include="image\map\Close.png" />
+    <Content Include="image\map\defaultlogo.gif" />
+    <Content Include="image\map\Image.png" />
+    <Content Include="image\map\img01.gif" />
+    <Content Include="image\map\img1.gif" />
+    <Content Include="image\map\location.png" />
+    <Content Include="image\map\logo.png" />
+    <Content Include="image\map\Mapleft_bg.png" />
+    <Content Include="image\map\Mapleft_bg01.png" />
+    <Content Include="image\map\maptop_b.gif" />
+    <Content Include="image\map\marker\10.gif" />
+    <Content Include="image\map\marker\1010.gif" />
+    <Content Include="image\map\marker\1010big.gif" />
+    <Content Include="image\map\marker\104.gif" />
+    <Content Include="image\map\marker\104big.gif" />
+    <Content Include="image\map\marker\105.gif" />
+    <Content Include="image\map\marker\105big.gif" />
+    <Content Include="image\map\marker\106.gif" />
+    <Content Include="image\map\marker\106big.gif" />
+    <Content Include="image\map\marker\107.gif" />
+    <Content Include="image\map\marker\107big.gif" />
+    <Content Include="image\map\marker\108.gif" />
+    <Content Include="image\map\marker\108big.gif" />
+    <Content Include="image\map\marker\109.gif" />
+    <Content Include="image\map\marker\109big.gif" />
+    <Content Include="image\map\marker\10big.gif" />
+    <Content Include="image\map\marker\11.gif" />
+    <Content Include="image\map\marker\1110.gif" />
+    <Content Include="image\map\marker\1110big.gif" />
+    <Content Include="image\map\marker\114.gif" />
+    <Content Include="image\map\marker\114big.gif" />
+    <Content Include="image\map\marker\115.gif" />
+    <Content Include="image\map\marker\115big.gif" />
+    <Content Include="image\map\marker\116.gif" />
+    <Content Include="image\map\marker\116big.gif" />
+    <Content Include="image\map\marker\117.gif" />
+    <Content Include="image\map\marker\117big.gif" />
+    <Content Include="image\map\marker\118.gif" />
+    <Content Include="image\map\marker\118big.gif" />
+    <Content Include="image\map\marker\119.gif" />
+    <Content Include="image\map\marker\119big.gif" />
+    <Content Include="image\map\marker\11big.gif" />
+    <Content Include="image\map\marker\12.gif" />
+    <Content Include="image\map\marker\1210.gif" />
+    <Content Include="image\map\marker\1210big.gif" />
+    <Content Include="image\map\marker\124.gif" />
+    <Content Include="image\map\marker\124big.gif" />
+    <Content Include="image\map\marker\125.gif" />
+    <Content Include="image\map\marker\125big.gif" />
+    <Content Include="image\map\marker\126.gif" />
+    <Content Include="image\map\marker\126big.gif" />
+    <Content Include="image\map\marker\127.gif" />
+    <Content Include="image\map\marker\127big.gif" />
+    <Content Include="image\map\marker\128.gif" />
+    <Content Include="image\map\marker\128big.gif" />
+    <Content Include="image\map\marker\129.gif" />
+    <Content Include="image\map\marker\129big.gif" />
+    <Content Include="image\map\marker\12big.gif" />
+    <Content Include="image\map\marker\7.gif" />
+    <Content Include="image\map\marker\710.gif" />
+    <Content Include="image\map\marker\710big.gif" />
+    <Content Include="image\map\marker\74.gif" />
+    <Content Include="image\map\marker\74big.gif" />
+    <Content Include="image\map\marker\75.gif" />
+    <Content Include="image\map\marker\75big.gif" />
+    <Content Include="image\map\marker\76.gif" />
+    <Content Include="image\map\marker\76big.gif" />
+    <Content Include="image\map\marker\77.gif" />
+    <Content Include="image\map\marker\77big.gif" />
+    <Content Include="image\map\marker\78.gif" />
+    <Content Include="image\map\marker\78big.gif" />
+    <Content Include="image\map\marker\79.gif" />
+    <Content Include="image\map\marker\79big.gif" />
+    <Content Include="image\map\marker\7big.gif" />
+    <Content Include="image\map\marker\8.gif" />
+    <Content Include="image\map\marker\810.gif" />
+    <Content Include="image\map\marker\810big.gif" />
+    <Content Include="image\map\marker\84.gif" />
+    <Content Include="image\map\marker\84big.gif" />
+    <Content Include="image\map\marker\85.gif" />
+    <Content Include="image\map\marker\85big.gif" />
+    <Content Include="image\map\marker\86.gif" />
+    <Content Include="image\map\marker\86big.gif" />
+    <Content Include="image\map\marker\87.gif" />
+    <Content Include="image\map\marker\87big.gif" />
+    <Content Include="image\map\marker\88.gif" />
+    <Content Include="image\map\marker\88big.gif" />
+    <Content Include="image\map\marker\89.gif" />
+    <Content Include="image\map\marker\89big.gif" />
+    <Content Include="image\map\marker\8big.gif" />
+    <Content Include="image\map\marker\9.gif" />
+    <Content Include="image\map\marker\910.gif" />
+    <Content Include="image\map\marker\910big.gif" />
+    <Content Include="image\map\marker\94.gif" />
+    <Content Include="image\map\marker\94big.gif" />
+    <Content Include="image\map\marker\95.gif" />
+    <Content Include="image\map\marker\95big.gif" />
+    <Content Include="image\map\marker\96.gif" />
+    <Content Include="image\map\marker\96big.gif" />
+    <Content Include="image\map\marker\97.gif" />
+    <Content Include="image\map\marker\97big.gif" />
+    <Content Include="image\map\marker\98.gif" />
+    <Content Include="image\map\marker\98big.gif" />
+    <Content Include="image\map\marker\99.gif" />
+    <Content Include="image\map\marker\99big.gif" />
+    <Content Include="image\map\marker\9big.gif" />
+    <Content Include="image\map\oppo.png" />
+    <Content Include="image\map\Search.gif" />
+    <Content Include="image\map\Star.png" />
+    <Content Include="image\map\streetview-ani.gif" />
+    <Content Include="image\map\time.png" />
+    <Content Include="image\nav_01.gif" />
+    <Content Include="image\new_bei.gif" />
+    <Content Include="image\pass_16.gif" />
+    <Content Include="image\PKLOGO.png" />
+    <Content Include="image\Quit.png" />
+    <Content Include="image\seleFile.png" />
+    <Content Include="image\table_1.gif" />
+    <Content Include="image\TR_bei.gif" />
+    <Content Include="image\ttle.gif" />
+    <Content Include="image\UpLoadFileType\avi.png" />
+    <Content Include="image\UpLoadFileType\del.gif" />
+    <Content Include="image\UpLoadFileType\directory.png" />
+    <Content Include="image\UpLoadFileType\EXCEL.png" />
+    <Content Include="image\UpLoadFileType\mov.png" />
+    <Content Include="image\UpLoadFileType\music.png" />
+    <Content Include="image\UpLoadFileType\Others.png" />
+    <Content Include="image\UpLoadFileType\pdf.png" />
+    <Content Include="image\UpLoadFileType\PPT.png" />
+    <Content Include="image\UpLoadFileType\rar.png" />
+    <Content Include="image\UpLoadFileType\systemfile.png" />
+    <Content Include="image\UpLoadFileType\table_top_bg.gif" />
+    <Content Include="image\UpLoadFileType\WORD.png" />
+    <Content Include="image\UpLoadFileType\yasuo.png" />
+    <Content Include="image\user.jpg" />
+    <Content Include="image\User.png" />
+    <Content Include="image\WaitImg\loading.gif" />
+    <Content Include="image\WaitImg\loading1.gif" />
+    <Content Include="image\WaitImg\loadingA.gif" />
+    <Content Include="image\loadingB.gif" />
+    <Content Include="image\xitong.png" />
+    <Content Include="importPlace.aspx" />
+    <Content Include="index.aspx" />
+    <Content Include="index.htm" />
+    <Content Include="jqGrid\css\ui.jqgrid-bootstrap-ui.css" />
+    <Content Include="jqGrid\css\ui.jqgrid-bootstrap.css" />
+    <Content Include="jqGrid\css\ui.jqgrid.css" />
+    <Content Include="jqGrid\js\Changes.txt" />
+    <Content Include="jqGrid\js\i18n\grid.locale-ar.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-bg.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-ca.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-cn.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-cs.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-de.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-dk.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-el.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-en.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-es.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-fa.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-fi.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-fr.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-gl.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-he.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-hr.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-hu.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-id.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-is.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-it.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-ja.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-kr.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-lt.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-me.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-nl.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-no.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-pl.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-pt-br.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-pt.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-ro.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-ru.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-sk.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-sq.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-sr-latin.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-sr.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-sv.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-th.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-tr.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-tw.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-uk.js" />
+    <Content Include="jqGrid\js\i18n\grid.locale-vi.js" />
+    <Content Include="jqGrid\js\install.txt" />
+    <Content Include="jqGrid\js\jquery-1.11.0.min.js" />
+    <Content Include="jqGrid\js\jquery.jqGrid.min.js" />
+    <Content Include="jqGrid\plugins\grid.addons.js" />
+    <Content Include="jqGrid\plugins\grid.postext.js" />
+    <Content Include="jqGrid\plugins\grid.setcolumns.js" />
+    <Content Include="jqGrid\plugins\jquery.contextmenu.js" />
+    <Content Include="jqGrid\plugins\jquery.searchFilter.js" />
+    <Content Include="jqGrid\plugins\jquery.tablednd.js" />
+    <Content Include="jqGrid\plugins\searchFilter.css" />
+    <Content Include="jqGrid\plugins\ui.multiselect.css" />
+    <Content Include="jqGrid\plugins\ui.multiselect.js" />
+    <Content Include="jqGrid\src\css\ui.jqgrid-bootstrap-ui.css" />
+    <Content Include="jqGrid\src\css\ui.jqgrid-bootstrap.css" />
+    <Content Include="jqGrid\src\css\ui.jqgrid.css" />
+    <Content Include="jqGrid\src\css\ui.multiselect.css" />
+    <Content Include="jqGrid\src\grid.base.js" />
+    <Content Include="jqGrid\src\grid.celledit.js" />
+    <Content Include="jqGrid\src\grid.common.js" />
+    <Content Include="jqGrid\src\grid.filter.js" />
+    <Content Include="jqGrid\src\grid.formedit.js" />
+    <Content Include="jqGrid\src\grid.grouping.js" />
+    <Content Include="jqGrid\src\grid.import.js" />
+    <Content Include="jqGrid\src\grid.inlinedit.js" />
+    <Content Include="jqGrid\src\grid.jqueryui.js" />
+    <Content Include="jqGrid\src\grid.pivot.js" />
+    <Content Include="jqGrid\src\grid.subgrid.js" />
+    <Content Include="jqGrid\src\grid.treegrid.js" />
+    <Content Include="jqGrid\src\grid.utils.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-ar.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-bg.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-ca.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-cn.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-cs.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-de.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-dk.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-el.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-en.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-es.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-fa.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-fi.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-fr.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-gl.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-he.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-hr.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-hu.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-id.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-is.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-it.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-ja.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-kr.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-lt.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-me.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-nl.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-no.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-pl.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-pt-br.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-pt.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-ro.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-ru.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-sk.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-sq.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-sr-latin.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-sr.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-sv.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-th.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-tr.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-tw.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-uk.js" />
+    <Content Include="jqGrid\src\i18n\grid.locale-vi.js" />
+    <Content Include="jqGrid\src\jqDnR.js" />
+    <Content Include="jqGrid\src\jqModal.js" />
+    <Content Include="jqGrid\src\jquery.fmatter.js" />
+    <Content Include="jqGrid\src\jquery.jqGrid.js" />
+    <Content Include="jqGrid\src\jquery.sortable.js" />
+    <Content Include="layer\layer.js" />
+    <Content Include="layer\skin\default\icon-ext.png" />
+    <Content Include="layer\skin\default\icon.png" />
+    <Content Include="layer\skin\default\layer.css" />
+    <Content Include="layer\skin\default\loading-0.gif" />
+    <Content Include="layer\skin\default\loading-1.gif" />
+    <Content Include="layer\skin\default\loading-2.gif" />
+    <Content Include="layui\css\layui.css" />
+    <Content Include="layui\css\layui.mobile.css" />
+    <Content Include="layui\css\modules\code.css" />
+    <Content Include="layui\css\modules\laydate\icon.png" />
+    <Content Include="layui\css\modules\laydate\laydate.css" />
+    <Content Include="layui\css\modules\layer\default\icon-ext.png" />
+    <Content Include="layui\css\modules\layer\default\icon.png" />
+    <Content Include="layui\css\modules\layer\default\layer.css" />
+    <Content Include="layui\css\modules\layer\default\loading-0.gif" />
+    <Content Include="layui\css\modules\layer\default\loading-1.gif" />
+    <Content Include="layui\css\modules\layer\default\loading-2.gif" />
+    <Content Include="layui\font\iconfont.svg" />
+    <Content Include="layui\images\face\0.gif" />
+    <Content Include="layui\images\face\1.gif" />
+    <Content Include="layui\images\face\10.gif" />
+    <Content Include="layui\images\face\11.gif" />
+    <Content Include="layui\images\face\12.gif" />
+    <Content Include="layui\images\face\13.gif" />
+    <Content Include="layui\images\face\14.gif" />
+    <Content Include="layui\images\face\15.gif" />
+    <Content Include="layui\images\face\16.gif" />
+    <Content Include="layui\images\face\17.gif" />
+    <Content Include="layui\images\face\18.gif" />
+    <Content Include="layui\images\face\19.gif" />
+    <Content Include="layui\images\face\2.gif" />
+    <Content Include="layui\images\face\20.gif" />
+    <Content Include="layui\images\face\21.gif" />
+    <Content Include="layui\images\face\22.gif" />
+    <Content Include="layui\images\face\23.gif" />
+    <Content Include="layui\images\face\24.gif" />
+    <Content Include="layui\images\face\25.gif" />
+    <Content Include="layui\images\face\26.gif" />
+    <Content Include="layui\images\face\27.gif" />
+    <Content Include="layui\images\face\28.gif" />
+    <Content Include="layui\images\face\29.gif" />
+    <Content Include="layui\images\face\3.gif" />
+    <Content Include="layui\images\face\30.gif" />
+    <Content Include="layui\images\face\31.gif" />
+    <Content Include="layui\images\face\32.gif" />
+    <Content Include="layui\images\face\33.gif" />
+    <Content Include="layui\images\face\34.gif" />
+    <Content Include="layui\images\face\35.gif" />
+    <Content Include="layui\images\face\36.gif" />
+    <Content Include="layui\images\face\37.gif" />
+    <Content Include="layui\images\face\38.gif" />
+    <Content Include="layui\images\face\39.gif" />
+    <Content Include="layui\images\face\4.gif" />
+    <Content Include="layui\images\face\40.gif" />
+    <Content Include="layui\images\face\41.gif" />
+    <Content Include="layui\images\face\42.gif" />
+    <Content Include="layui\images\face\43.gif" />
+    <Content Include="layui\images\face\44.gif" />
+    <Content Include="layui\images\face\45.gif" />
+    <Content Include="layui\images\face\46.gif" />
+    <Content Include="layui\images\face\47.gif" />
+    <Content Include="layui\images\face\48.gif" />
+    <Content Include="layui\images\face\49.gif" />
+    <Content Include="layui\images\face\5.gif" />
+    <Content Include="layui\images\face\50.gif" />
+    <Content Include="layui\images\face\51.gif" />
+    <Content Include="layui\images\face\52.gif" />
+    <Content Include="layui\images\face\53.gif" />
+    <Content Include="layui\images\face\54.gif" />
+    <Content Include="layui\images\face\55.gif" />
+    <Content Include="layui\images\face\56.gif" />
+    <Content Include="layui\images\face\57.gif" />
+    <Content Include="layui\images\face\58.gif" />
+    <Content Include="layui\images\face\59.gif" />
+    <Content Include="layui\images\face\6.gif" />
+    <Content Include="layui\images\face\60.gif" />
+    <Content Include="layui\images\face\61.gif" />
+    <Content Include="layui\images\face\62.gif" />
+    <Content Include="layui\images\face\63.gif" />
+    <Content Include="layui\images\face\64.gif" />
+    <Content Include="layui\images\face\65.gif" />
+    <Content Include="layui\images\face\66.gif" />
+    <Content Include="layui\images\face\67.gif" />
+    <Content Include="layui\images\face\68.gif" />
+    <Content Include="layui\images\face\69.gif" />
+    <Content Include="layui\images\face\7.gif" />
+    <Content Include="layui\images\face\70.gif" />
+    <Content Include="layui\images\face\71.gif" />
+    <Content Include="layui\images\face\8.gif" />
+    <Content Include="layui\images\face\9.gif" />
+    <Content Include="layui\layui.js" />
+    <Content Include="layui\lay\dest\layui.all.js" />
+    <Content Include="layui\lay\modules\code.js" />
+    <Content Include="layui\lay\modules\element.js" />
+    <Content Include="layui\lay\modules\flow.js" />
+    <Content Include="layui\lay\modules\form.js" />
+    <Content Include="layui\lay\modules\jquery.js" />
+    <Content Include="layui\lay\modules\laydate.js" />
+    <Content Include="layui\lay\modules\layedit.js" />
+    <Content Include="layui\lay\modules\layer.js" />
+    <Content Include="layui\lay\modules\laypage.js" />
+    <Content Include="layui\lay\modules\laytpl.js" />
+    <Content Include="layui\lay\modules\mobile.js" />
+    <Content Include="layui\lay\modules\tree.js" />
+    <Content Include="layui\lay\modules\upload.js" />
+    <Content Include="layui\lay\modules\util.js" />
+    <Content Include="Login.aspx" />
+    <Content Include="login.htm" />
+    <Content Include="logOut.aspx" />
+    <Content Include="main.html" />
+    <Content Include="MaterialSupportManager\js\List.js" />
+    <Content Include="MaterialSupportManager\List.aspx" />
+    <Content Include="Materials\BasicMaterialList.aspx" />
+    <Content Include="Materials\CustomerMaterialList1.aspx" />
+    <Content Include="Materials\ExportBasicMaterial.aspx" />
+    <Content Include="Materials\ExportCustomerMaterial.aspx" />
+    <Content Include="Materials\ExportOrderMaterial.aspx" />
+    <Content Include="Materials\ExportQuoteMaterial.aspx" />
+    <Content Include="Materials\ImportBasicMaterial.aspx" />
+    <Content Include="Materials\ImportCustomerMaterial.aspx" />
+    <Content Include="Materials\ImportCustomerMaterialInfo.aspx" />
+    <Content Include="Materials\ImportMaterial.aspx" />
+    <Content Include="Materials\ImportMaterialType.aspx" />
+    <Content Include="Materials\js\BasicMaterialList.js" />
+    <Content Include="Materials\js\CustomerMaterialList1.js" />
+    <Content Include="Materials\js\MachineFrameSmallMaterial.js" />
+    <Content Include="Materials\js\Material.js" />
+    <Content Include="Materials\js\MaterialCategoryList.js" />
+    <Content Include="Materials\js\MaterialType.js" />
+    <Content Include="Materials\js\OrderMaterialMapping.js" />
+    <Content Include="Materials\js\QuoteMaterialList.js" />
+    <Content Include="Materials\js\SetPrice.js" />
+    <Content Include="Materials\MachineFrameSmallMaterial.aspx" />
+    <Content Include="Materials\MaterialCategoryList.aspx" />
+    <Content Include="Materials\MaterialList.aspx" />
+    <Content Include="Materials\MaterialTypeList.aspx" />
+    <Content Include="Materials\OrderMaterialToBasicMaterial.aspx" />
+    <Content Include="Materials\QuoteMaterialList.aspx" />
+    <Content Include="Materials\SetPrice.aspx" />
+    <Content Include="menu.aspx" />
+    <Content Include="Menu1.aspx" />
+    <Content Include="Modules\Edit.aspx" />
+    <Content Include="Modules\js\module.js" />
+    <Content Include="Modules\js\SetAuthority.js" />
+    <Content Include="Modules\MenuImgList.aspx" />
+    <Content Include="Modules\SetAuthority.aspx" />
+    <Content Include="Modules\UpLoadImg.aspx" />
+    <Content Include="My97DatePicker\calendar.js" />
+    <Content Include="My97DatePicker\lang\en.js" />
+    <Content Include="My97DatePicker\lang\zh-cn.js" />
+    <Content Include="My97DatePicker\lang\zh-tw.js" />
+    <Content Include="My97DatePicker\skin\datePicker.gif" />
+    <Content Include="My97DatePicker\skin\default\datepicker.css" />
+    <Content Include="My97DatePicker\skin\default\img.gif" />
+    <Content Include="My97DatePicker\skin\WdatePicker.css" />
+    <Content Include="My97DatePicker\skin\whyGreen\bg.jpg" />
+    <Content Include="My97DatePicker\skin\whyGreen\datepicker.css" />
+    <Content Include="My97DatePicker\skin\whyGreen\img.gif" />
+    <Content Include="My97DatePicker\WdatePicker.js" />
+    <Content Include="My97DatePicker\开发包\lang\en.js" />
+    <Content Include="My97DatePicker\开发包\lang\zh-cn.js" />
+    <Content Include="My97DatePicker\开发包\lang\zh-tw.js" />
+    <Content Include="My97DatePicker\开发包\readme.txt" />
+    <Content Include="My97DatePicker\开发包\skin\datePicker.gif" />
+    <Content Include="My97DatePicker\开发包\skin\default\datepicker.css" />
+    <Content Include="My97DatePicker\开发包\skin\default\img.gif" />
+    <Content Include="My97DatePicker\开发包\skin\WdatePicker.css" />
+    <Content Include="My97DatePicker\开发包\skin\whyGreen\bg.jpg" />
+    <Content Include="My97DatePicker\开发包\skin\whyGreen\datepicker.css" />
+    <Content Include="My97DatePicker\开发包\skin\whyGreen\img.gif" />
+    <Content Include="Outsource\js\list.js" />
+    <Content Include="Outsource\js\priceList.js" />
+    <Content Include="Outsource\List.aspx" />
+    <Content Include="Outsource\PriceList.aspx" />
+    <Content Include="OutsourcingOrder\AssignOrder.aspx" />
+    <Content Include="OutsourcingOrder\Export.aspx" />
+    <Content Include="OutsourcingOrder\js\AssignOrder.js" />
+    <Content Include="OutsourcingOrder\js\export.js" />
+    <Content Include="PlaceInfo\List.aspx" />
+    <Content Include="PrintControl1\install_lodop.exe" />
+    <Content Include="PrintControl1\install_lodop32.exe" />
+    <Content Include="PrintControl1\install_lodop64.exe" />
+    <Content Include="PrintControl1\LodopFuncs.js" />
+    <Content Include="PrintControl1\LodopFuncs1.js" />
+    <Content Include="PrintControl\LodopFuncs.js" />
+    <Content Include="PrintControl\Print.js" />
+    <Content Include="PrintControl\smsx.cab" />
+    <Content Include="Quotation\CheckFiles.aspx" />
+    <Content Include="Quotation\Edit.aspx" />
+    <Content Include="Quotation\EditSupplement.aspx" />
+    <Content Include="Quotation\Import.aspx" />
+    <Content Include="Quotation\Invoice.aspx" />
+    <Content Include="Quotation\js\Edit.js" />
+    <Content Include="Quotation\js\list1.js" />
+    <Content Include="Quotation\List.aspx" />
+    <Content Include="Quotation\List1.aspx" />
+    <Content Include="Quotation\OrderPrice.aspx" />
+    <Content Include="Quotation\PriceList.aspx" />
+    <Content Include="Quotation\QuotationDetail.aspx" />
+    <Content Include="Quotation\UploadFiles.aspx" />
+    <Content Include="Regions\js\regions.js" />
+    <Content Include="Regions\List.aspx" />
+    <Content Include="Register.aspx" />
+    <Content Include="Role\js\role.js" />
+    <Content Include="Role\List.aspx" />
+    <Content Include="Scripts\common.js" />
+    <Content Include="Scripts\FormChecker.js" />
+    <Content Include="Scripts\jquery-1.11.1.js" />
+    <Content Include="Scripts\jquery-1.7.2.js" />
+    <Content Include="Scripts\jquery.pagination.js" />
+    <Content Include="Scripts\jquery.validate.js" />
+    <Content Include="Scripts\login.js" />
+    <Content Include="Scripts\menu.js" />
+    <Content Include="Scripts\place.js" />
+    <Content Include="Scripts\ProvinceCity.js" />
+    <Content Include="Statistics\ByOrderStatistics.aspx" />
+    <Content Include="Statistics\CheckMaterialOrderDetail.aspx" />
+    <Content Include="Statistics\CheckShops.aspx" />
+    <Content Include="Statistics\FreightDetail.aspx" />
+    <Content Include="Statistics\InstallPriceDetail.aspx" />
+    <Content Include="Statistics\js\OrderStatistics.js" />
+    <Content Include="Statistics\js\SubjectStatistics.js" />
+    <Content Include="Statistics\MaterialStatistics.aspx" />
+    <Content Include="Statistics\OrderStatistics.aspx" />
+    <Content Include="Statistics\PriceSubjectStatistic.aspx" />
+    <Content Include="Statistics\ShopOrderDetail.aspx" />
+    <Content Include="Statistics\SubjectStatistics.aspx" />
+    <Content Include="Styles\Site.css" />
+    <Content Include="Global.asax" />
+    <Content Include="Scripts\jquery-1.4.1-vsdoc.js" />
+    <Content Include="Scripts\jquery-1.4.1.js" />
+    <Content Include="Scripts\jquery-1.4.1.min.js" />
+    <Content Include="Subjects\AddGuidance.aspx" />
+    <Content Include="Subjects\AddSubject.aspx" />
+    <Content Include="Subjects\ADErrorCorrection\ErrorCorrection.aspx" />
+    <Content Include="Subjects\ADErrorCorrection\ErrorCorrectionApprove.aspx" />
+    <Content Include="Subjects\ADErrorCorrection\ErrorCorrectionApproveList.aspx" />
+    <Content Include="Subjects\ADErrorCorrection\js\errorcorrection.js" />
+    <Content Include="Subjects\ADErrorCorrection\js\errorCorrectionApprove.js" />
+    <Content Include="Subjects\ADErrorCorrection\SubjectList.aspx" />
+    <Content Include="Subjects\ADOrders\AddCheckOrderPlan.aspx" />
+    <Content Include="Subjects\ADOrders\AddSplitOrderPerShop.aspx" />
+    <Content Include="Subjects\ADOrders\AddSplitOrderPlan.aspx" />
+    <Content Include="Subjects\ADOrders\AddSplitOrderPlan1.aspx" />
+    <Content Include="Subjects\ADOrders\CheckOrder.aspx" />
+    <Content Include="Subjects\ADOrders\CheckOrderSuccess.aspx" />
+    <Content Include="Subjects\ADOrders\EditOrderDetails.aspx" />
+    <Content Include="Subjects\ADOrders\ExportEmptyFrameShop.aspx" />
+    <Content Include="Subjects\ADOrders\ImportCheckPlan.aspx" />
+    <Content Include="Subjects\ADOrders\ImportOrder.aspx" />
+    <Content Include="Subjects\ADOrders\ImportSplitPlanDetail.aspx" />
+    <Content Include="Subjects\ADOrders\loadUC.aspx" />
+    <Content Include="Subjects\ADOrders\SplitOrder.aspx" />
+    <Content Include="Subjects\ADOrders\SplitOrderSuccess.aspx" />
+    <Content Include="Subjects\Approve.aspx" />
+    <Content Include="Subjects\ApproveList.aspx" />
+    <Content Include="Subjects\CheckOrderDetail.aspx" />
+    <Content Include="Subjects\EmptyDateWarn.aspx" />
+    <Content Include="Subjects\ExportHelper.aspx" />
+    <Content Include="Subjects\ExportOrder.aspx" />
+    <Content Include="Subjects\ExportOrders.aspx" />
+    <Content Include="Subjects\GuidanceDetail.aspx" />
+    <Content Include="Subjects\GuidanceList.aspx" />
+    <Content Include="Subjects\HandMadeOrder\Add.aspx" />
+    <Content Include="Subjects\HandMadeOrder\Approve.aspx" />
+    <Content Include="Subjects\HandMadeOrder\CheckDetail.aspx" />
+    <Content Include="Subjects\HandMadeOrder\ImportOrder.aspx" />
+    <Content Include="Subjects\HandMadeOrder\List.aspx" />
+    <Content Include="Subjects\InstallManagement\CheckDetail.aspx" />
+    <Content Include="Subjects\InstallManagement\InstallConfirm.aspx" />
+    <Content Include="Subjects\InstallManagement\InstallList.aspx" />
+    <Content Include="Subjects\InstallPrice\Edit.aspx" />
+    <Content Include="Subjects\InstallPrice\EditPOSScale.aspx" />
+    <Content Include="Subjects\InstallPrice\EmptyWarn.aspx" />
+    <Content Include="Subjects\InstallPrice\js\edit.js" />
+    <Content Include="Subjects\InstallPrice\ShopDetail.aspx" />
+    <Content Include="Subjects\js\addCheckOrderPlan.js" />
+    <Content Include="Subjects\js\addSplitOrderPlan.js" />
+    <Content Include="Subjects\js\addSplitOrderPlan1.js" />
+    <Content Include="Subjects\js\addSubject.js" />
+    <Content Include="Subjects\js\approve.js" />
+    <Content Include="Subjects\js\checkOrder.js" />
+    <Content Include="Subjects\js\EditOrderDetails.js" />
+    <Content Include="Subjects\js\exportOrder.js" />
+    <Content Include="Subjects\js\ExportOrders.js" />
+    <Content Include="Subjects\js\importSplitPlanDetail.js" />
+    <Content Include="Subjects\js\OrderPlanCondition.js" />
+    <Content Include="Subjects\js\ImportOrder.js" />
+    <Content Include="Subjects\js\ShowOrderDetail.js" />
+    <Content Include="Subjects\js\splitOrder.js" />
+    <Content Include="Subjects\Material\Import.aspx" />
+    <Content Include="Subjects\Material\js\list.js" />
+    <Content Include="Subjects\Material\List.aspx" />
+    <Content Include="Subjects\Material\MaterialDetail.aspx" />
+    <Content Include="Subjects\ProductionApprove\Approve.aspx" />
+    <Content Include="Subjects\ProductionApprove\List.aspx" />
+    <Content Include="Subjects\Received\CheckDetail.aspx" />
+    <Content Include="Subjects\Received\ReceiveConfirm.aspx" />
+    <Content Include="Subjects\Received\SendConfirm.aspx" />
+    <Content Include="Subjects\Received\SendList.aspx" />
+    <Content Include="Subjects\SecondInstallFee\Add.aspx" />
+    <Content Include="Subjects\SecondInstallFee\Approve.aspx" />
+    <Content Include="Subjects\SecondInstallFee\CheckDetail.aspx" />
+    <Content Include="Subjects\SecondInstallFee\ImportOrder.aspx" />
+    <Content Include="Subjects\SecondInstallFee\List.aspx" />
+    <Content Include="Subjects\ShowOrderDetail.aspx" />
+    <Content Include="Subjects\ShowOrderDetailExport.aspx" />
+    <Content Include="Subjects\ShowSplitPlanList.aspx" />
+    <Content Include="Subjects\SubjectList.aspx" />
+    <Content Include="Subjects\SupplementByRegion\Add.aspx" />
+    <Content Include="Subjects\SupplementByRegion\Approve.aspx" />
+    <Content Include="Subjects\SupplementByRegion\ApproveList.aspx" />
+    <Content Include="Subjects\SupplementByRegion\CheckDetail.aspx" />
+    <Content Include="Subjects\SupplementByRegion\ImportOrder.aspx" />
+    <Content Include="Subjects\SupplementByRegion\List.aspx" />
+    <Content Include="Subjects\Supplement\Approve.aspx" />
+    <Content Include="Subjects\Supplement\ApproveList.aspx" />
+    <Content Include="Subjects\Supplement\CheckDetail.aspx" />
+    <Content Include="Subjects\Supplement\EditOrder.aspx" />
+    <Content Include="Subjects\Supplement\js\editorder.js" />
+    <Content Include="Subjects\Supplement\js\list.js" />
+    <Content Include="Subjects\Supplement\List.aspx" />
+    <Content Include="Subjects\UC\ADOriginalOrder.ascx" />
+    <Content Include="Subjects\UC\OrderDetailUC.ascx" />
+    <Content Include="Subjects\UC\ShowOrderDetail.ascx" />
+    <Content Include="Subjects\UploadGuidanceAttachment.aspx" />
+    <Content Include="TableSize\js\list.js" />
+    <Content Include="TableSize\List.aspx" />
+    <Content Include="Top.aspx" />
+    <Content Include="UpdateOrderPrice.aspx" />
+    <Content Include="uploadify\cancel.gif" />
+    <Content Include="uploadify\Change Log.txt" />
+    <Content Include="uploadify\jquery.uploadify.js" />
+    <Content Include="uploadify\jquery.uploadify.min.js" />
+    <Content Include="uploadify\license.txt" />
+    <Content Include="uploadify\uploadify-cancel.png" />
+    <Content Include="uploadify\uploadify.css" />
+    <Content Include="uploadify\uploadify.swf" />
+    <Content Include="uploadify\__MACOSX\._Change Log.txt" />
+    <Content Include="uploadify\__MACOSX\._uploadify.swf" />
+    <Content Include="TemplateFile\Users\Edit.aspx" />
+    <Content Include="TemplateFile\Users\js\Users.js" />
+    <Content Include="TemplateFile\Users\List.aspx" />
+    <Content Include="Users\Edit1.aspx" />
+    <Content Include="Users\js\Users.js" />
+    <Content Include="Users\List1.aspx" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="zTree_v3\api\apiCss\api.js" />
+    <Content Include="zTree_v3\api\apiCss\common.css" />
+    <Content Include="zTree_v3\api\apiCss\common_ie6.css" />
+    <Content Include="zTree_v3\api\apiCss\img\apiMenu.gif" />
+    <Content Include="zTree_v3\api\apiCss\img\apiMenu.png" />
+    <Content Include="zTree_v3\api\apiCss\img\background.jpg" />
+    <Content Include="zTree_v3\api\apiCss\img\chinese.png" />
+    <Content Include="zTree_v3\api\apiCss\img\close.png" />
+    <Content Include="zTree_v3\api\apiCss\img\contact-bg.png" />
+    <Content Include="zTree_v3\api\apiCss\img\english.png" />
+    <Content Include="zTree_v3\api\apiCss\img\header-bg.png" />
+    <Content Include="zTree_v3\api\apiCss\img\lightbulb.png" />
+    <Content Include="zTree_v3\api\apiCss\img\overlay_arrow.gif" />
+    <Content Include="zTree_v3\api\apiCss\img\overlay_arrow.png" />
+    <Content Include="zTree_v3\api\apiCss\img\overlay_bg.png" />
+    <Content Include="zTree_v3\api\apiCss\img\overlay_close_IE6.gif" />
+    <Content Include="zTree_v3\api\apiCss\img\zTreeStandard.gif" />
+    <Content Include="zTree_v3\api\apiCss\img\zTreeStandard.png" />
+    <Content Include="zTree_v3\api\apiCss\jquery-1.6.2.min.js" />
+    <Content Include="zTree_v3\api\apiCss\jquery.ztree.core-3.5.js" />
+    <Content Include="zTree_v3\api\apiCss\zTreeStyleForApi.css" />
+    <Content Include="zTree_v3\api\API_cn.html" />
+    <Content Include="zTree_v3\api\API_en.html" />
+    <Content Include="zTree_v3\api\cn\fn.zTree.destroy.html" />
+    <Content Include="zTree_v3\api\cn\fn.zTree.getZTreeObj.html" />
+    <Content Include="zTree_v3\api\cn\fn.zTree.init.html" />
+    <Content Include="zTree_v3\api\cn\fn.zTree._z.html" />
+    <Content Include="zTree_v3\api\cn\setting.async.autoParam.html" />
+    <Content Include="zTree_v3\api\cn\setting.async.contentType.html" />
+    <Content Include="zTree_v3\api\cn\setting.async.dataFilter.html" />
+    <Content Include="zTree_v3\api\cn\setting.async.dataType.html" />
+    <Content Include="zTree_v3\api\cn\setting.async.enable.html" />
+    <Content Include="zTree_v3\api\cn\setting.async.otherParam.html" />
+    <Content Include="zTree_v3\api\cn\setting.async.type.html" />
+    <Content Include="zTree_v3\api\cn\setting.async.url.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeAsync.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeCheck.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeClick.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeCollapse.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeDblClick.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeDrag.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeDragOpen.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeDrop.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeEditName.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeExpand.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeMouseDown.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeMouseUp.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeRemove.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeRename.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.beforeRightClick.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onAsyncError.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onAsyncSuccess.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onCheck.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onClick.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onCollapse.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onDblClick.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onDrag.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onDragMove.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onDrop.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onExpand.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onMouseDown.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onMouseUp.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onNodeCreated.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onRemove.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onRename.html" />
+    <Content Include="zTree_v3\api\cn\setting.callback.onRightClick.html" />
+    <Content Include="zTree_v3\api\cn\setting.check.autoCheckTrigger.html" />
+    <Content Include="zTree_v3\api\cn\setting.check.chkboxType.html" />
+    <Content Include="zTree_v3\api\cn\setting.check.chkDisabledInherit.html" />
+    <Content Include="zTree_v3\api\cn\setting.check.chkStyle.html" />
+    <Content Include="zTree_v3\api\cn\setting.check.enable.html" />
+    <Content Include="zTree_v3\api\cn\setting.check.nocheckInherit.html" />
+    <Content Include="zTree_v3\api\cn\setting.check.radioType.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.keep.leaf.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.keep.parent.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.key.checked.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.key.children.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.key.name.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.key.title.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.key.url.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.simpleData.enable.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.simpleData.idKey.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.simpleData.pIdKey.html" />
+    <Content Include="zTree_v3\api\cn\setting.data.simpleData.rootPId.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.autoExpandTrigger.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.autoOpenTime.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.borderMax.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.borderMin.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.inner.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.isCopy.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.isMove.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.maxShowNodeNum.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.minMoveSize.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.next.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.drag.prev.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.editNameSelectAll.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.enable.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.removeTitle.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.renameTitle.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.showRemoveBtn.html" />
+    <Content Include="zTree_v3\api\cn\setting.edit.showRenameBtn.html" />
+    <Content Include="zTree_v3\api\cn\setting.treeId.html" />
+    <Content Include="zTree_v3\api\cn\setting.treeObj.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.addDiyDom.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.addHoverDom.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.autoCancelSelected.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.dblClickExpand.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.expandSpeed.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.fontCss.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.nameIsHTML.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.removeHoverDom.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.selectedMulti.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.showIcon.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.showLine.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.showTitle.html" />
+    <Content Include="zTree_v3\api\cn\setting.view.txtSelectedEnable.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.checked.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.checkedOld.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.check_Child_State.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.check_Focus.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.children.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.chkDisabled.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.click.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.diy.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.editNameFlag.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.getCheckStatus.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.getNextNode.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.getParentNode.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.getPreNode.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.halfCheck.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.icon.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.iconClose.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.iconOpen.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.iconSkin.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.isAjaxing.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.isFirstNode.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.isHidden.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.isHover.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.isLastNode.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.isParent.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.level.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.name.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.nocheck.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.open.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.parentTId.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.target.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.tId.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.url.html" />
+    <Content Include="zTree_v3\api\cn\treeNode.zAsync.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.addNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.cancelEditName.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.cancelSelectedNode.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.checkAllNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.checkNode.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.copyNode.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.destroy.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.editName.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.expandAll.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.expandNode.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.getChangeCheckedNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.getCheckedNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.getNodeByParam.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.getNodeByTId.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.getNodeIndex.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.getNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.getNodesByFilter.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.getNodesByParam.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.getNodesByParamFuzzy.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.getSelectedNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.hideNode.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.hideNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.moveNode.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.reAsyncChildNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.refresh.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.removeChildNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.removeNode.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.selectNode.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.setChkDisabled.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.setEditable.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.setting.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.showNode.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.showNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.transformToArray.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.transformTozTreeNodes.html" />
+    <Content Include="zTree_v3\api\cn\zTreeObj.updateNode.html" />
+    <Content Include="zTree_v3\api\en\fn.zTree.destroy.html" />
+    <Content Include="zTree_v3\api\en\fn.zTree.getZTreeObj.html" />
+    <Content Include="zTree_v3\api\en\fn.zTree.init.html" />
+    <Content Include="zTree_v3\api\en\fn.zTree._z.html" />
+    <Content Include="zTree_v3\api\en\setting.async.autoParam.html" />
+    <Content Include="zTree_v3\api\en\setting.async.contentType.html" />
+    <Content Include="zTree_v3\api\en\setting.async.dataFilter.html" />
+    <Content Include="zTree_v3\api\en\setting.async.dataType.html" />
+    <Content Include="zTree_v3\api\en\setting.async.enable.html" />
+    <Content Include="zTree_v3\api\en\setting.async.otherParam.html" />
+    <Content Include="zTree_v3\api\en\setting.async.type.html" />
+    <Content Include="zTree_v3\api\en\setting.async.url.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeAsync.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeCheck.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeClick.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeCollapse.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeDblClick.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeDrag.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeDragOpen.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeDrop.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeEditName.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeExpand.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeMouseDown.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeMouseUp.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeRemove.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeRename.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.beforeRightClick.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onAsyncError.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onAsyncSuccess.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onCheck.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onClick.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onCollapse.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onDblClick.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onDrag.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onDragMove.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onDrop.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onExpand.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onMouseDown.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onMouseUp.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onNodeCreated.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onRemove.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onRename.html" />
+    <Content Include="zTree_v3\api\en\setting.callback.onRightClick.html" />
+    <Content Include="zTree_v3\api\en\setting.check.autoCheckTrigger.html" />
+    <Content Include="zTree_v3\api\en\setting.check.chkboxType.html" />
+    <Content Include="zTree_v3\api\en\setting.check.chkDisabledInherit.html" />
+    <Content Include="zTree_v3\api\en\setting.check.chkStyle.html" />
+    <Content Include="zTree_v3\api\en\setting.check.enable.html" />
+    <Content Include="zTree_v3\api\en\setting.check.nocheckInherit.html" />
+    <Content Include="zTree_v3\api\en\setting.check.radioType.html" />
+    <Content Include="zTree_v3\api\en\setting.data.keep.leaf.html" />
+    <Content Include="zTree_v3\api\en\setting.data.keep.parent.html" />
+    <Content Include="zTree_v3\api\en\setting.data.key.checked.html" />
+    <Content Include="zTree_v3\api\en\setting.data.key.children.html" />
+    <Content Include="zTree_v3\api\en\setting.data.key.name.html" />
+    <Content Include="zTree_v3\api\en\setting.data.key.title.html" />
+    <Content Include="zTree_v3\api\en\setting.data.key.url.html" />
+    <Content Include="zTree_v3\api\en\setting.data.simpleData.enable.html" />
+    <Content Include="zTree_v3\api\en\setting.data.simpleData.idKey.html" />
+    <Content Include="zTree_v3\api\en\setting.data.simpleData.pIdKey.html" />
+    <Content Include="zTree_v3\api\en\setting.data.simpleData.rootPId.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.autoExpandTrigger.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.autoOpenTime.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.borderMax.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.borderMin.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.inner.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.isCopy.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.isMove.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.maxShowNodeNum.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.minMoveSize.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.next.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.drag.prev.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.editNameSelectAll.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.enable.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.removeTitle.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.renameTitle.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.showRemoveBtn.html" />
+    <Content Include="zTree_v3\api\en\setting.edit.showRenameBtn.html" />
+    <Content Include="zTree_v3\api\en\setting.treeId.html" />
+    <Content Include="zTree_v3\api\en\setting.treeObj.html" />
+    <Content Include="zTree_v3\api\en\setting.view.addDiyDom.html" />
+    <Content Include="zTree_v3\api\en\setting.view.addHoverDom.html" />
+    <Content Include="zTree_v3\api\en\setting.view.autoCancelSelected.html" />
+    <Content Include="zTree_v3\api\en\setting.view.dblClickExpand.html" />
+    <Content Include="zTree_v3\api\en\setting.view.expandSpeed.html" />
+    <Content Include="zTree_v3\api\en\setting.view.fontCss.html" />
+    <Content Include="zTree_v3\api\en\setting.view.nameIsHTML.html" />
+    <Content Include="zTree_v3\api\en\setting.view.removeHoverDom.html" />
+    <Content Include="zTree_v3\api\en\setting.view.selectedMulti.html" />
+    <Content Include="zTree_v3\api\en\setting.view.showIcon.html" />
+    <Content Include="zTree_v3\api\en\setting.view.showLine.html" />
+    <Content Include="zTree_v3\api\en\setting.view.showTitle.html" />
+    <Content Include="zTree_v3\api\en\setting.view.txtSelectedEnable.html" />
+    <Content Include="zTree_v3\api\en\treeNode.checked.html" />
+    <Content Include="zTree_v3\api\en\treeNode.checkedOld.html" />
+    <Content Include="zTree_v3\api\en\treeNode.check_Child_State.html" />
+    <Content Include="zTree_v3\api\en\treeNode.check_Focus.html" />
+    <Content Include="zTree_v3\api\en\treeNode.children.html" />
+    <Content Include="zTree_v3\api\en\treeNode.chkDisabled.html" />
+    <Content Include="zTree_v3\api\en\treeNode.click.html" />
+    <Content Include="zTree_v3\api\en\treeNode.diy.html" />
+    <Content Include="zTree_v3\api\en\treeNode.editNameFlag.html" />
+    <Content Include="zTree_v3\api\en\treeNode.getCheckStatus.html" />
+    <Content Include="zTree_v3\api\en\treeNode.getNextNode.html" />
+    <Content Include="zTree_v3\api\en\treeNode.getParentNode.html" />
+    <Content Include="zTree_v3\api\en\treeNode.getPreNode.html" />
+    <Content Include="zTree_v3\api\en\treeNode.halfCheck.html" />
+    <Content Include="zTree_v3\api\en\treeNode.icon.html" />
+    <Content Include="zTree_v3\api\en\treeNode.iconClose.html" />
+    <Content Include="zTree_v3\api\en\treeNode.iconOpen.html" />
+    <Content Include="zTree_v3\api\en\treeNode.iconSkin.html" />
+    <Content Include="zTree_v3\api\en\treeNode.isAjaxing.html" />
+    <Content Include="zTree_v3\api\en\treeNode.isFirstNode.html" />
+    <Content Include="zTree_v3\api\en\treeNode.isHidden.html" />
+    <Content Include="zTree_v3\api\en\treeNode.isHover.html" />
+    <Content Include="zTree_v3\api\en\treeNode.isLastNode.html" />
+    <Content Include="zTree_v3\api\en\treeNode.isParent.html" />
+    <Content Include="zTree_v3\api\en\treeNode.level.html" />
+    <Content Include="zTree_v3\api\en\treeNode.name.html" />
+    <Content Include="zTree_v3\api\en\treeNode.nocheck.html" />
+    <Content Include="zTree_v3\api\en\treeNode.open.html" />
+    <Content Include="zTree_v3\api\en\treeNode.parentTId.html" />
+    <Content Include="zTree_v3\api\en\treeNode.target.html" />
+    <Content Include="zTree_v3\api\en\treeNode.tId.html" />
+    <Content Include="zTree_v3\api\en\treeNode.url.html" />
+    <Content Include="zTree_v3\api\en\treeNode.zAsync.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.addNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.cancelEditName.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.cancelSelectedNode.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.checkAllNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.checkNode.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.copyNode.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.destroy.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.editName.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.expandAll.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.expandNode.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.getChangeCheckedNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.getCheckedNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.getNodeByParam.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.getNodeByTId.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.getNodeIndex.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.getNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.getNodesByFilter.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.getNodesByParam.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.getNodesByParamFuzzy.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.getSelectedNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.hideNode.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.hideNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.moveNode.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.reAsyncChildNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.refresh.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.removeChildNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.removeNode.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.selectNode.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.setChkDisabled.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.setEditable.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.setting.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.showNode.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.showNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.transformToArray.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.transformTozTreeNodes.html" />
+    <Content Include="zTree_v3\api\en\zTreeObj.updateNode.html" />
+    <Content Include="zTree_v3\css\demo.css" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\diy\1_close.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\diy\1_open.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\diy\2.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\diy\3.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\diy\4.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\diy\5.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\diy\6.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\diy\7.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\diy\8.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\diy\9.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\line_conn.gif" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\loading.gif" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\zTreeStandard.gif" />
+    <Content Include="zTree_v3\css\zTreeStyle\img\zTreeStandard.png" />
+    <Content Include="zTree_v3\css\zTreeStyle\zTreeStyle.css" />
+    <Content Include="zTree_v3\demo\cn\bigdata\common.html" />
+    <Content Include="zTree_v3\demo\cn\bigdata\diy_async.html" />
+    <Content Include="zTree_v3\demo\cn\bigdata\page.html" />
+    <Content Include="zTree_v3\demo\cn\core\async.html" />
+    <Content Include="zTree_v3\demo\cn\core\async_fun.html" />
+    <Content Include="zTree_v3\demo\cn\core\click.html" />
+    <Content Include="zTree_v3\demo\cn\core\custom_font.html" />
+    <Content Include="zTree_v3\demo\cn\core\custom_icon.html" />
+    <Content Include="zTree_v3\demo\cn\core\custom_iconSkin.html" />
+    <Content Include="zTree_v3\demo\cn\core\expand.html" />
+    <Content Include="zTree_v3\demo\cn\core\noicon.html" />
+    <Content Include="zTree_v3\demo\cn\core\noline.html" />
+    <Content Include="zTree_v3\demo\cn\core\otherMouse.html" />
+    <Content Include="zTree_v3\demo\cn\core\searchNodes.html" />
+    <Content Include="zTree_v3\demo\cn\core\simpleData.html" />
+    <Content Include="zTree_v3\demo\cn\core\standardData.html" />
+    <Content Include="zTree_v3\demo\cn\core\update_fun.html" />
+    <Content Include="zTree_v3\demo\cn\core\url.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\checkbox.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\checkbox_chkDisabled.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\checkbox_count.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\checkbox_fun.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\checkbox_halfCheck.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\checkbox_nocheck.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\radio.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\radio_chkDisabled.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\radio_fun.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\radio_halfCheck.html" />
+    <Content Include="zTree_v3\demo\cn\excheck\radio_nocheck.html" />
+    <Content Include="zTree_v3\demo\cn\exedit\async_edit.html" />
+    <Content Include="zTree_v3\demo\cn\exedit\drag.html" />
+    <Content Include="zTree_v3\demo\cn\exedit\drag_fun.html" />
+    <Content Include="zTree_v3\demo\cn\exedit\drag_super.html" />
+    <Content Include="zTree_v3\demo\cn\exedit\edit.html" />
+    <Content Include="zTree_v3\demo\cn\exedit\edit_fun.html" />
+    <Content Include="zTree_v3\demo\cn\exedit\edit_super.html" />
+    <Content Include="zTree_v3\demo\cn\exedit\multiTree.html" />
+    <Content Include="zTree_v3\demo\cn\exhide\checkbox.html" />
+    <Content Include="zTree_v3\demo\cn\exhide\common.html" />
+    <Content Include="zTree_v3\demo\cn\exhide\radio.html" />
+    <Content Include="zTree_v3\demo\cn\index.html" />
+    <Content Include="zTree_v3\demo\cn\super\asyncForAll.html" />
+    <Content Include="zTree_v3\demo\cn\super\checkbox_radio.html" />
+    <Content Include="zTree_v3\demo\cn\super\diydom.html" />
+    <Content Include="zTree_v3\demo\cn\super\dragWithOther.html" />
+    <Content Include="zTree_v3\demo\cn\super\left_menu.html" />
+    <Content Include="zTree_v3\demo\cn\super\left_menuForOutLook.gif" />
+    <Content Include="zTree_v3\demo\cn\super\left_menuForOutLook.html" />
+    <Content Include="zTree_v3\demo\cn\super\left_menuForOutLook.png" />
+    <Content Include="zTree_v3\demo\cn\super\oneclick.html" />
+    <Content Include="zTree_v3\demo\cn\super\oneroot.html" />
+    <Content Include="zTree_v3\demo\cn\super\rightClickMenu.html" />
+    <Content Include="zTree_v3\demo\cn\super\select_menu.html" />
+    <Content Include="zTree_v3\demo\cn\super\select_menu_checkbox.html" />
+    <Content Include="zTree_v3\demo\cn\super\select_menu_radio.html" />
+    <Content Include="zTree_v3\demo\cn\super\singlepath.html" />
+    <Content Include="zTree_v3\demo\en\bigdata\common.html" />
+    <Content Include="zTree_v3\demo\en\bigdata\diy_async.html" />
+    <Content Include="zTree_v3\demo\en\bigdata\page.html" />
+    <Content Include="zTree_v3\demo\en\core\async.html" />
+    <Content Include="zTree_v3\demo\en\core\async_fun.html" />
+    <Content Include="zTree_v3\demo\en\core\click.html" />
+    <Content Include="zTree_v3\demo\en\core\custom_font.html" />
+    <Content Include="zTree_v3\demo\en\core\custom_icon.html" />
+    <Content Include="zTree_v3\demo\en\core\custom_iconSkin.html" />
+    <Content Include="zTree_v3\demo\en\core\expand.html" />
+    <Content Include="zTree_v3\demo\en\core\noicon.html" />
+    <Content Include="zTree_v3\demo\en\core\noline.html" />
+    <Content Include="zTree_v3\demo\en\core\otherMouse.html" />
+    <Content Include="zTree_v3\demo\en\core\searchNodes.html" />
+    <Content Include="zTree_v3\demo\en\core\simpleData.html" />
+    <Content Include="zTree_v3\demo\en\core\standardData.html" />
+    <Content Include="zTree_v3\demo\en\core\update_fun.html" />
+    <Content Include="zTree_v3\demo\en\core\url.html" />
+    <Content Include="zTree_v3\demo\en\excheck\checkbox.html" />
+    <Content Include="zTree_v3\demo\en\excheck\checkbox_chkDisabled.html" />
+    <Content Include="zTree_v3\demo\en\excheck\checkbox_count.html" />
+    <Content Include="zTree_v3\demo\en\excheck\checkbox_fun.html" />
+    <Content Include="zTree_v3\demo\en\excheck\checkbox_halfCheck.html" />
+    <Content Include="zTree_v3\demo\en\excheck\checkbox_nocheck.html" />
+    <Content Include="zTree_v3\demo\en\excheck\radio.html" />
+    <Content Include="zTree_v3\demo\en\excheck\radio_chkDisabled.html" />
+    <Content Include="zTree_v3\demo\en\excheck\radio_fun.html" />
+    <Content Include="zTree_v3\demo\en\excheck\radio_halfCheck.html" />
+    <Content Include="zTree_v3\demo\en\excheck\radio_nocheck.html" />
+    <Content Include="zTree_v3\demo\en\exedit\async_edit.html" />
+    <Content Include="zTree_v3\demo\en\exedit\drag.html" />
+    <Content Include="zTree_v3\demo\en\exedit\drag_fun.html" />
+    <Content Include="zTree_v3\demo\en\exedit\drag_super.html" />
+    <Content Include="zTree_v3\demo\en\exedit\edit.html" />
+    <Content Include="zTree_v3\demo\en\exedit\edit_fun.html" />
+    <Content Include="zTree_v3\demo\en\exedit\edit_super.html" />
+    <Content Include="zTree_v3\demo\en\exedit\multiTree.html" />
+    <Content Include="zTree_v3\demo\en\exhide\checkbox.html" />
+    <Content Include="zTree_v3\demo\en\exhide\common.html" />
+    <Content Include="zTree_v3\demo\en\exhide\radio.html" />
+    <Content Include="zTree_v3\demo\en\index.html" />
+    <Content Include="zTree_v3\demo\en\super\asyncForAll.html" />
+    <Content Include="zTree_v3\demo\en\super\checkbox_radio.html" />
+    <Content Include="zTree_v3\demo\en\super\diydom.html" />
+    <Content Include="zTree_v3\demo\en\super\dragWithOther.html" />
+    <Content Include="zTree_v3\demo\en\super\left_menu.html" />
+    <Content Include="zTree_v3\demo\en\super\left_menuForOutLook.gif" />
+    <Content Include="zTree_v3\demo\en\super\left_menuForOutLook.html" />
+    <Content Include="zTree_v3\demo\en\super\left_menuForOutLook.png" />
+    <Content Include="zTree_v3\demo\en\super\oneclick.html" />
+    <Content Include="zTree_v3\demo\en\super\oneroot.html" />
+    <Content Include="zTree_v3\demo\en\super\rightClickMenu.html" />
+    <Content Include="zTree_v3\demo\en\super\select_menu.html" />
+    <Content Include="zTree_v3\demo\en\super\select_menu_checkbox.html" />
+    <Content Include="zTree_v3\demo\en\super\select_menu_radio.html" />
+    <Content Include="zTree_v3\demo\en\super\singlepath.html" />
+    <Content Include="zTree_v3\js\jquery-1.4.4.min.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.all-3.5.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.all-3.5.min.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.core-3.5.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.core-3.5.min.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.excheck-3.5.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.excheck-3.5.min.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.exedit-3.5.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.exedit-3.5.min.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.exedit.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.exhide-3.5.js" />
+    <Content Include="zTree_v3\js\jquery.ztree.exhide-3.5.min.js" />
+    <Content Include="zTree_v3\log v3.x.txt" />
+    <Content Include="zTree_v3\QUI 框架介绍.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="11.aspx.cs">
+      <DependentUpon>11.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="11.aspx.designer.cs">
+      <DependentUpon>11.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="About.aspx.cs">
+      <DependentUpon>About.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="About.aspx.designer.cs">
+      <DependentUpon>About.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AccountCheck\SupplementList.aspx.cs">
+      <DependentUpon>SupplementList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AccountCheck\SupplementList.aspx.designer.cs">
+      <DependentUpon>SupplementList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\ChangePassword.aspx.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\ChangePassword.aspx.designer.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\ChangePasswordSuccess.aspx.cs">
+      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\ChangePasswordSuccess.aspx.designer.cs">
+      <DependentUpon>ChangePasswordSuccess.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Account\Register.aspx.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Account\Register.aspx.designer.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="BaseInfoManager\Handler\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="BaseInfoManager\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="BaseInfoManager\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Base\BasePage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CompanyManage\handler\List1.ashx.cs">
+      <DependentUpon>List1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="CompanyManage\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CompanyManage\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\ActivityList.aspx.cs">
+      <DependentUpon>ActivityList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\ActivityList.aspx.designer.cs">
+      <DependentUpon>ActivityList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\AddCustomer.aspx.cs">
+      <DependentUpon>AddCustomer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\AddCustomer.aspx.designer.cs">
+      <DependentUpon>AddCustomer.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\BasicMachineFrameList.aspx.cs">
+      <DependentUpon>BasicMachineFrameList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\BasicMachineFrameList.aspx.designer.cs">
+      <DependentUpon>BasicMachineFrameList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\CustomerList.aspx.cs">
+      <DependentUpon>CustomerList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\CustomerList.aspx.designer.cs">
+      <DependentUpon>CustomerList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\ERPHostManage.aspx.cs">
+      <DependentUpon>ERPHostManage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\ERPHostManage.aspx.designer.cs">
+      <DependentUpon>ERPHostManage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\ExportBasicMachineFrame.aspx.cs">
+      <DependentUpon>ExportBasicMachineFrame.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\ExportBasicMachineFrame.aspx.designer.cs">
+      <DependentUpon>ExportBasicMachineFrame.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\FrameBlackListManage.aspx.cs">
+      <DependentUpon>FrameBlackListManage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\FrameBlackListManage.aspx.designer.cs">
+      <DependentUpon>FrameBlackListManage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\ActivityList.ashx.cs">
+      <DependentUpon>ActivityList.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\AddCustomer.ashx.cs">
+      <DependentUpon>AddCustomer.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\BasicMachineFrameList.ashx.cs">
+      <DependentUpon>BasicMachineFrameList.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\CheckExportState.ashx.cs">
+      <DependentUpon>CheckExportState.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\ERPHostManage.ashx.cs">
+      <DependentUpon>ERPHostManage.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\FrameBlackListManage.ashx.cs">
+      <DependentUpon>FrameBlackListManage.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\InstallPriceList.ashx.cs">
+      <DependentUpon>InstallPriceList.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\MachineFrame.ashx.cs">
+      <DependentUpon>MachineFrame.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\POPBlackListManage.ashx.cs">
+      <DependentUpon>POPBlackListManage.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\POPList.ashx.cs">
+      <DependentUpon>POPList.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\Shops.ashx.cs">
+      <DependentUpon>Shops.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\Handler\SubjectCategoryList.ashx.cs">
+      <DependentUpon>SubjectCategoryList.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\HCPOPList.aspx.cs">
+      <DependentUpon>HCPOPList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\HCPOPList.aspx.designer.cs">
+      <DependentUpon>HCPOPList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\ImportHCPOP.aspx.cs">
+      <DependentUpon>ImportHCPOP.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\ImportHCPOP.aspx.designer.cs">
+      <DependentUpon>ImportHCPOP.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\ImportMachineFrame.aspx.cs">
+      <DependentUpon>ImportMachineFrame.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\ImportMachineFrame.aspx.designer.cs">
+      <DependentUpon>ImportMachineFrame.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\ImportShops.aspx.cs">
+      <DependentUpon>ImportShops.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\ImportShops.aspx.designer.cs">
+      <DependentUpon>ImportShops.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\InstallPriceList.aspx.cs">
+      <DependentUpon>InstallPriceList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\InstallPriceList.aspx.designer.cs">
+      <DependentUpon>InstallPriceList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\MachineFrameList.aspx.cs">
+      <DependentUpon>MachineFrameList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\MachineFrameList.aspx.designer.cs">
+      <DependentUpon>MachineFrameList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\OneShopMachineFrameList.aspx.cs">
+      <DependentUpon>OneShopMachineFrameList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\OneShopMachineFrameList.aspx.designer.cs">
+      <DependentUpon>OneShopMachineFrameList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\OneShopPOPList.aspx.cs">
+      <DependentUpon>OneShopPOPList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\OneShopPOPList.aspx.designer.cs">
+      <DependentUpon>OneShopPOPList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\POPBlackListManage.aspx.cs">
+      <DependentUpon>POPBlackListManage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\POPBlackListManage.aspx.designer.cs">
+      <DependentUpon>POPBlackListManage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\POPList.aspx.cs">
+      <DependentUpon>POPList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\POPList.aspx.designer.cs">
+      <DependentUpon>POPList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\ShopDetail.aspx.cs">
+      <DependentUpon>ShopDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\ShopDetail.aspx.designer.cs">
+      <DependentUpon>ShopDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\ShopList.aspx.cs">
+      <DependentUpon>ShopList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\ShopList.aspx.designer.cs">
+      <DependentUpon>ShopList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Customer\SubjectCategoryList.aspx.cs">
+      <DependentUpon>SubjectCategoryList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Customer\SubjectCategoryList.aspx.designer.cs">
+      <DependentUpon>SubjectCategoryList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="FileUploadUC\UpLoad.aspx.cs">
+      <DependentUpon>UpLoad.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FileUploadUC\UpLoad.aspx.designer.cs">
+      <DependentUpon>UpLoad.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="FileUploadUC\UpLoadUC.ascx.cs">
+      <DependentUpon>UpLoadUC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FileUploadUC\UpLoadUC.ascx.designer.cs">
+      <DependentUpon>UpLoadUC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="GetMatrerialPrice.aspx.cs">
+      <DependentUpon>GetMatrerialPrice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="GetMatrerialPrice.aspx.designer.cs">
+      <DependentUpon>GetMatrerialPrice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\CheckExportState.ashx.cs">
+      <DependentUpon>CheckExportState.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\CheckPromission.ashx.cs">
+      <DependentUpon>CheckPromission.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\Export.ashx.cs">
+      <DependentUpon>Export.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\GetCity.ashx.cs">
+      <DependentUpon>GetCity.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\MenusHandler.ashx.cs">
+      <DependentUpon>MenusHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\Files.ashx.cs">
+      <DependentUpon>Files.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Handler\Place.ashx.cs">
+      <DependentUpon>Place.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="importPlace.aspx.cs">
+      <DependentUpon>importPlace.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="importPlace.aspx.designer.cs">
+      <DependentUpon>importPlace.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="index.aspx.cs">
+      <DependentUpon>index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="index.aspx.designer.cs">
+      <DependentUpon>index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="logOut.aspx.cs">
+      <DependentUpon>logOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="logOut.aspx.designer.cs">
+      <DependentUpon>logOut.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="MaterialSupportManager\handler\List.ashx.cs">
+      <DependentUpon>List.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="MaterialSupportManager\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="MaterialSupportManager\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\BasicMaterialList.aspx.cs">
+      <DependentUpon>BasicMaterialList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\BasicMaterialList.aspx.designer.cs">
+      <DependentUpon>BasicMaterialList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\CustomerMaterialList1.aspx.cs">
+      <DependentUpon>CustomerMaterialList1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\CustomerMaterialList1.aspx.designer.cs">
+      <DependentUpon>CustomerMaterialList1.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\ExportBasicMaterial.aspx.cs">
+      <DependentUpon>ExportBasicMaterial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\ExportBasicMaterial.aspx.designer.cs">
+      <DependentUpon>ExportBasicMaterial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\ExportCustomerMaterial.aspx.cs">
+      <DependentUpon>ExportCustomerMaterial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\ExportCustomerMaterial.aspx.designer.cs">
+      <DependentUpon>ExportCustomerMaterial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\ExportOrderMaterial.aspx.cs">
+      <DependentUpon>ExportOrderMaterial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\ExportOrderMaterial.aspx.designer.cs">
+      <DependentUpon>ExportOrderMaterial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\ExportQuoteMaterial.aspx.cs">
+      <DependentUpon>ExportQuoteMaterial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\ExportQuoteMaterial.aspx.designer.cs">
+      <DependentUpon>ExportQuoteMaterial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\Handler\BasicMaterialList.ashx.cs">
+      <DependentUpon>BasicMaterialList.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\Handler\CustomerMaterialList1.ashx.cs">
+      <DependentUpon>CustomerMaterialList1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\Handler\MachineFrameSmallMaterial.ashx.cs">
+      <DependentUpon>MachineFrameSmallMaterial.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\Handler\Material.ashx.cs">
+      <DependentUpon>Material.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\Handler\MaterialCategory.ashx.cs">
+      <DependentUpon>MaterialCategory.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\Handler\MaterialType.ashx.cs">
+      <DependentUpon>MaterialType.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\Handler\OrderMaterialMapping.ashx.cs">
+      <DependentUpon>OrderMaterialMapping.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\Handler\QuoteMaterialList.ashx.cs">
+      <DependentUpon>QuoteMaterialList.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\Handler\SetPrice.ashx.cs">
+      <DependentUpon>SetPrice.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\ImportBasicMaterial.aspx.cs">
+      <DependentUpon>ImportBasicMaterial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\ImportBasicMaterial.aspx.designer.cs">
+      <DependentUpon>ImportBasicMaterial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\ImportCustomerMaterial.aspx.cs">
+      <DependentUpon>ImportCustomerMaterial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\ImportCustomerMaterial.aspx.designer.cs">
+      <DependentUpon>ImportCustomerMaterial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\ImportCustomerMaterialInfo.aspx.cs">
+      <DependentUpon>ImportCustomerMaterialInfo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\ImportCustomerMaterialInfo.aspx.designer.cs">
+      <DependentUpon>ImportCustomerMaterialInfo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\ImportMaterial.aspx.cs">
+      <DependentUpon>ImportMaterial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\ImportMaterial.aspx.designer.cs">
+      <DependentUpon>ImportMaterial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\ImportMaterialType.aspx.cs">
+      <DependentUpon>ImportMaterialType.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\ImportMaterialType.aspx.designer.cs">
+      <DependentUpon>ImportMaterialType.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\MachineFrameSmallMaterial.aspx.cs">
+      <DependentUpon>MachineFrameSmallMaterial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\MachineFrameSmallMaterial.aspx.designer.cs">
+      <DependentUpon>MachineFrameSmallMaterial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\MaterialCategoryList.aspx.cs">
+      <DependentUpon>MaterialCategoryList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\MaterialCategoryList.aspx.designer.cs">
+      <DependentUpon>MaterialCategoryList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\MaterialList.aspx.cs">
+      <DependentUpon>MaterialList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\MaterialList.aspx.designer.cs">
+      <DependentUpon>MaterialList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\MaterialTypeList.aspx.cs">
+      <DependentUpon>MaterialTypeList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\MaterialTypeList.aspx.designer.cs">
+      <DependentUpon>MaterialTypeList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\OrderMaterialToBasicMaterial.aspx.cs">
+      <DependentUpon>OrderMaterialToBasicMaterial.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\OrderMaterialToBasicMaterial.aspx.designer.cs">
+      <DependentUpon>OrderMaterialToBasicMaterial.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\QuoteMaterialList.aspx.cs">
+      <DependentUpon>QuoteMaterialList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\QuoteMaterialList.aspx.designer.cs">
+      <DependentUpon>QuoteMaterialList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Materials\SetPrice.aspx.cs">
+      <DependentUpon>SetPrice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Materials\SetPrice.aspx.designer.cs">
+      <DependentUpon>SetPrice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="menu.aspx.cs">
+      <DependentUpon>menu.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="menu.aspx.designer.cs">
+      <DependentUpon>menu.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Menu1.aspx.cs">
+      <DependentUpon>Menu1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Menu1.aspx.designer.cs">
+      <DependentUpon>Menu1.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Edit.aspx.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Edit.aspx.designer.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Handler\AuthorityHandler1.ashx.cs">
+      <DependentUpon>AuthorityHandler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Handler\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\MenuImgList.aspx.cs">
+      <DependentUpon>MenuImgList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\MenuImgList.aspx.designer.cs">
+      <DependentUpon>MenuImgList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\SetAuthority.aspx.cs">
+      <DependentUpon>SetAuthority.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\SetAuthority.aspx.designer.cs">
+      <DependentUpon>SetAuthority.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\UploadHandler.ashx.cs">
+      <DependentUpon>UploadHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\UpLoadImg.aspx.cs">
+      <DependentUpon>UpLoadImg.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\UpLoadImg.aspx.designer.cs">
+      <DependentUpon>UpLoadImg.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Outsource\handler\List.ashx.cs">
+      <DependentUpon>List.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Outsource\handler\PriceList.ashx.cs">
+      <DependentUpon>PriceList.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Outsource\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Outsource\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Outsource\PriceList.aspx.cs">
+      <DependentUpon>PriceList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Outsource\PriceList.aspx.designer.cs">
+      <DependentUpon>PriceList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\AssignOrder.aspx.cs">
+      <DependentUpon>AssignOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OutsourcingOrder\AssignOrder.aspx.designer.cs">
+      <DependentUpon>AssignOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\Export.aspx.cs">
+      <DependentUpon>Export.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OutsourcingOrder\Export.aspx.designer.cs">
+      <DependentUpon>Export.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\handler\AssignOrder.ashx.cs">
+      <DependentUpon>AssignOrder.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\handler\Export.ashx.cs">
+      <DependentUpon>Export.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="PlaceInfo\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PlaceInfo\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Quotation\CheckFiles.aspx.cs">
+      <DependentUpon>CheckFiles.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\CheckFiles.aspx.designer.cs">
+      <DependentUpon>CheckFiles.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\Edit.aspx.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\Edit.aspx.designer.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\EditSupplement.aspx.cs">
+      <DependentUpon>EditSupplement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\EditSupplement.aspx.designer.cs">
+      <DependentUpon>EditSupplement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\handler\Edit.ashx.cs">
+      <DependentUpon>Edit.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\handler\list1.ashx.cs">
+      <DependentUpon>list1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\Import.aspx.cs">
+      <DependentUpon>Import.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\Import.aspx.designer.cs">
+      <DependentUpon>Import.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\Invoice.aspx.cs">
+      <DependentUpon>Invoice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\Invoice.aspx.designer.cs">
+      <DependentUpon>Invoice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\List1.aspx.cs">
+      <DependentUpon>List1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\List1.aspx.designer.cs">
+      <DependentUpon>List1.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\OrderPrice.aspx.cs">
+      <DependentUpon>OrderPrice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\OrderPrice.aspx.designer.cs">
+      <DependentUpon>OrderPrice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\PriceList.aspx.cs">
+      <DependentUpon>PriceList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\PriceList.aspx.designer.cs">
+      <DependentUpon>PriceList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\QuotationDetail.aspx.cs">
+      <DependentUpon>QuotationDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\QuotationDetail.aspx.designer.cs">
+      <DependentUpon>QuotationDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Quotation\UploadFiles.aspx.cs">
+      <DependentUpon>UploadFiles.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Quotation\UploadFiles.aspx.designer.cs">
+      <DependentUpon>UploadFiles.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Regions\Handler\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Regions\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Regions\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Register.aspx.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Register.aspx.designer.cs">
+      <DependentUpon>Register.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Role\Handler\RoleHandler1.ashx.cs">
+      <DependentUpon>RoleHandler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Role\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Role\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Site.Master.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Site.Master.designer.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\ByOrderStatistics.aspx.cs">
+      <DependentUpon>ByOrderStatistics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\ByOrderStatistics.aspx.designer.cs">
+      <DependentUpon>ByOrderStatistics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\CheckMaterialOrderDetail.aspx.cs">
+      <DependentUpon>CheckMaterialOrderDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\CheckMaterialOrderDetail.aspx.designer.cs">
+      <DependentUpon>CheckMaterialOrderDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\CheckShops.aspx.cs">
+      <DependentUpon>CheckShops.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\CheckShops.aspx.designer.cs">
+      <DependentUpon>CheckShops.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\FreightDetail.aspx.cs">
+      <DependentUpon>FreightDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\FreightDetail.aspx.designer.cs">
+      <DependentUpon>FreightDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\handler\CheckExportDetail.ashx.cs">
+      <DependentUpon>CheckExportDetail.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\handler\CheckExportState.ashx.cs">
+      <DependentUpon>CheckExportState.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\handler\ExportDetail.ashx.cs">
+      <DependentUpon>ExportDetail.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\handler\SubjectStatistics.ashx.cs">
+      <DependentUpon>SubjectStatistics.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\InstallPriceDetail.aspx.cs">
+      <DependentUpon>InstallPriceDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\InstallPriceDetail.aspx.designer.cs">
+      <DependentUpon>InstallPriceDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\MaterialStatistics.aspx.cs">
+      <DependentUpon>MaterialStatistics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\MaterialStatistics.aspx.designer.cs">
+      <DependentUpon>MaterialStatistics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\OrderStatistics.aspx.cs">
+      <DependentUpon>OrderStatistics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\OrderStatistics.aspx.designer.cs">
+      <DependentUpon>OrderStatistics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\PriceSubjectStatistic.aspx.cs">
+      <DependentUpon>PriceSubjectStatistic.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\PriceSubjectStatistic.aspx.designer.cs">
+      <DependentUpon>PriceSubjectStatistic.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\ShopOrderDetail.aspx.cs">
+      <DependentUpon>ShopOrderDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\ShopOrderDetail.aspx.designer.cs">
+      <DependentUpon>ShopOrderDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\SubjectStatistics.aspx.cs">
+      <DependentUpon>SubjectStatistics.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\SubjectStatistics.aspx.designer.cs">
+      <DependentUpon>SubjectStatistics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\AddGuidance.aspx.cs">
+      <DependentUpon>AddGuidance.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\AddGuidance.aspx.designer.cs">
+      <DependentUpon>AddGuidance.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\AddSubject.aspx.cs">
+      <DependentUpon>AddSubject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\AddSubject.aspx.designer.cs">
+      <DependentUpon>AddSubject.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADErrorCorrection\ErrorCorrection.aspx.cs">
+      <DependentUpon>ErrorCorrection.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADErrorCorrection\ErrorCorrection.aspx.designer.cs">
+      <DependentUpon>ErrorCorrection.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADErrorCorrection\ErrorCorrectionApprove.aspx.cs">
+      <DependentUpon>ErrorCorrectionApprove.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADErrorCorrection\ErrorCorrectionApprove.aspx.designer.cs">
+      <DependentUpon>ErrorCorrectionApprove.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADErrorCorrection\ErrorCorrectionApproveList.aspx.cs">
+      <DependentUpon>ErrorCorrectionApproveList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADErrorCorrection\ErrorCorrectionApproveList.aspx.designer.cs">
+      <DependentUpon>ErrorCorrectionApproveList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADErrorCorrection\handler\ErrorCorrection.ashx.cs">
+      <DependentUpon>ErrorCorrection.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADErrorCorrection\handler\ErrorCorrectionApprove.ashx.cs">
+      <DependentUpon>ErrorCorrectionApprove.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADErrorCorrection\SubjectList.aspx.cs">
+      <DependentUpon>SubjectList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADErrorCorrection\SubjectList.aspx.designer.cs">
+      <DependentUpon>SubjectList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\AddCheckOrderPlan.aspx.cs">
+      <DependentUpon>AddCheckOrderPlan.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\AddCheckOrderPlan.aspx.designer.cs">
+      <DependentUpon>AddCheckOrderPlan.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\AddSplitOrderPerShop.aspx.cs">
+      <DependentUpon>AddSplitOrderPerShop.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\AddSplitOrderPerShop.aspx.designer.cs">
+      <DependentUpon>AddSplitOrderPerShop.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\AddSplitOrderPlan.aspx.cs">
+      <DependentUpon>AddSplitOrderPlan.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\AddSplitOrderPlan.aspx.designer.cs">
+      <DependentUpon>AddSplitOrderPlan.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\AddSplitOrderPlan1.aspx.cs">
+      <DependentUpon>AddSplitOrderPlan1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\AddSplitOrderPlan1.aspx.designer.cs">
+      <DependentUpon>AddSplitOrderPlan1.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\CheckOrder.aspx.cs">
+      <DependentUpon>CheckOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\CheckOrder.aspx.designer.cs">
+      <DependentUpon>CheckOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\CheckOrderSuccess.aspx.cs">
+      <DependentUpon>CheckOrderSuccess.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\CheckOrderSuccess.aspx.designer.cs">
+      <DependentUpon>CheckOrderSuccess.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\EditOrderDetails.aspx.cs">
+      <DependentUpon>EditOrderDetails.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\EditOrderDetails.aspx.designer.cs">
+      <DependentUpon>EditOrderDetails.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\ExportEmptyFrameShop.aspx.cs">
+      <DependentUpon>ExportEmptyFrameShop.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\ExportEmptyFrameShop.aspx.designer.cs">
+      <DependentUpon>ExportEmptyFrameShop.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\ImportCheckPlan.aspx.cs">
+      <DependentUpon>ImportCheckPlan.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\ImportCheckPlan.aspx.designer.cs">
+      <DependentUpon>ImportCheckPlan.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\ImportOrder.aspx.cs">
+      <DependentUpon>ImportOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\ImportOrder.aspx.designer.cs">
+      <DependentUpon>ImportOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\ImportSplitPlanDetail.aspx.cs">
+      <DependentUpon>ImportSplitPlanDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\ImportSplitPlanDetail.aspx.designer.cs">
+      <DependentUpon>ImportSplitPlanDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\loadUC.aspx.cs">
+      <DependentUpon>loadUC.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\loadUC.aspx.designer.cs">
+      <DependentUpon>loadUC.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\SplitOrder.aspx.cs">
+      <DependentUpon>SplitOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\SplitOrder.aspx.designer.cs">
+      <DependentUpon>SplitOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\SplitOrderSuccess.aspx.cs">
+      <DependentUpon>SplitOrderSuccess.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\SplitOrderSuccess.aspx.designer.cs">
+      <DependentUpon>SplitOrderSuccess.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Approve.aspx.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Approve.aspx.designer.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ApproveList.aspx.cs">
+      <DependentUpon>ApproveList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ApproveList.aspx.designer.cs">
+      <DependentUpon>ApproveList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\CheckOrderDetail.aspx.cs">
+      <DependentUpon>CheckOrderDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\CheckOrderDetail.aspx.designer.cs">
+      <DependentUpon>CheckOrderDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\EmptyDateWarn.aspx.cs">
+      <DependentUpon>EmptyDateWarn.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\EmptyDateWarn.aspx.designer.cs">
+      <DependentUpon>EmptyDateWarn.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ExportHelper.aspx.cs">
+      <DependentUpon>ExportHelper.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ExportHelper.aspx.designer.cs">
+      <DependentUpon>ExportHelper.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ExportOrder.aspx.cs">
+      <DependentUpon>ExportOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ExportOrder.aspx.designer.cs">
+      <DependentUpon>ExportOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ExportOrders.aspx.cs">
+      <DependentUpon>ExportOrders.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ExportOrders.aspx.designer.cs">
+      <DependentUpon>ExportOrders.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\GuidanceDetail.aspx.cs">
+      <DependentUpon>GuidanceDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\GuidanceDetail.aspx.designer.cs">
+      <DependentUpon>GuidanceDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\GuidanceList.aspx.cs">
+      <DependentUpon>GuidanceList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\GuidanceList.aspx.designer.cs">
+      <DependentUpon>GuidanceList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\AddGuidance.ashx.cs">
+      <DependentUpon>AddGuidance.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\CheckExport.ashx.cs">
+      <DependentUpon>CheckExport.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\CheckExport350.ashx.cs">
+      <DependentUpon>CheckExport350.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\CheckExportNew350.ashx.cs">
+      <DependentUpon>CheckExportNew350.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\CheckExportOutsourcing.ashx.cs">
+      <DependentUpon>CheckExportOutsourcing.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\CheckExportPHWBJ.ashx.cs">
+      <DependentUpon>CheckExportPHWBJ.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\CheckExportPHWOther.ashx.cs">
+      <DependentUpon>CheckExportPHWOther.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\CheckExportQuote350.ashx.cs">
+      <DependentUpon>CheckExportQuote350.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\CheckOrder.ashx.cs">
+      <DependentUpon>CheckOrder.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\EditOrderDetails.ashx.cs">
+      <DependentUpon>EditOrderDetails.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\ExportOrders.ashx.cs">
+      <DependentUpon>ExportOrders.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\Orders.ashx.cs">
+      <DependentUpon>Orders.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\SplitOrder.ashx.cs">
+      <DependentUpon>SplitOrder.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\SplitOrder1.ashx.cs">
+      <DependentUpon>SplitOrder1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Handler\GuidanceDetail.ashx.cs">
+      <DependentUpon>GuidanceDetail.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\HandMadeOrder\Add.aspx.cs">
+      <DependentUpon>Add.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\HandMadeOrder\Add.aspx.designer.cs">
+      <DependentUpon>Add.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\HandMadeOrder\Approve.aspx.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\HandMadeOrder\Approve.aspx.designer.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\HandMadeOrder\CheckDetail.aspx.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\HandMadeOrder\CheckDetail.aspx.designer.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\HandMadeOrder\ImportOrder.aspx.cs">
+      <DependentUpon>ImportOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\HandMadeOrder\ImportOrder.aspx.designer.cs">
+      <DependentUpon>ImportOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\HandMadeOrder\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\HandMadeOrder\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\InstallManagement\CheckDetail.aspx.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\InstallManagement\CheckDetail.aspx.designer.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\InstallManagement\InstallConfirm.aspx.cs">
+      <DependentUpon>InstallConfirm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\InstallManagement\InstallConfirm.aspx.designer.cs">
+      <DependentUpon>InstallConfirm.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\InstallManagement\InstallList.aspx.cs">
+      <DependentUpon>InstallList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\InstallManagement\InstallList.aspx.designer.cs">
+      <DependentUpon>InstallList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\InstallPrice\Edit.aspx.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\InstallPrice\Edit.aspx.designer.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\InstallPrice\EditPOSScale.aspx.cs">
+      <DependentUpon>EditPOSScale.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\InstallPrice\EditPOSScale.aspx.designer.cs">
+      <DependentUpon>EditPOSScale.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\InstallPrice\EmptyWarn.aspx.cs">
+      <DependentUpon>EmptyWarn.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\InstallPrice\EmptyWarn.aspx.designer.cs">
+      <DependentUpon>EmptyWarn.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\InstallPrice\handler\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\InstallPrice\ShopDetail.aspx.cs">
+      <DependentUpon>ShopDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\InstallPrice\ShopDetail.aspx.designer.cs">
+      <DependentUpon>ShopDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Material\handler\list.ashx.cs">
+      <DependentUpon>list.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Material\Import.aspx.cs">
+      <DependentUpon>Import.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Material\Import.aspx.designer.cs">
+      <DependentUpon>Import.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Material\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Material\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Material\MaterialDetail.aspx.cs">
+      <DependentUpon>MaterialDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Material\MaterialDetail.aspx.designer.cs">
+      <DependentUpon>MaterialDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ProductionApprove\Approve.aspx.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ProductionApprove\Approve.aspx.designer.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ProductionApprove\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ProductionApprove\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Received\CheckDetail.aspx.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Received\CheckDetail.aspx.designer.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Received\ReceiveConfirm.aspx.cs">
+      <DependentUpon>ReceiveConfirm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Received\ReceiveConfirm.aspx.designer.cs">
+      <DependentUpon>ReceiveConfirm.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Received\SendConfirm.aspx.cs">
+      <DependentUpon>SendConfirm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Received\SendConfirm.aspx.designer.cs">
+      <DependentUpon>SendConfirm.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Received\SendList.aspx.cs">
+      <DependentUpon>SendList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Received\SendList.aspx.designer.cs">
+      <DependentUpon>SendList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SecondInstallFee\Add.aspx.cs">
+      <DependentUpon>Add.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SecondInstallFee\Add.aspx.designer.cs">
+      <DependentUpon>Add.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SecondInstallFee\Approve.aspx.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SecondInstallFee\Approve.aspx.designer.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SecondInstallFee\CheckDetail.aspx.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SecondInstallFee\CheckDetail.aspx.designer.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SecondInstallFee\ImportOrder.aspx.cs">
+      <DependentUpon>ImportOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SecondInstallFee\ImportOrder.aspx.designer.cs">
+      <DependentUpon>ImportOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SecondInstallFee\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SecondInstallFee\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ShowOrderDetail.aspx.cs">
+      <DependentUpon>ShowOrderDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ShowOrderDetail.aspx.designer.cs">
+      <DependentUpon>ShowOrderDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ShowOrderDetailExport.aspx.cs">
+      <DependentUpon>ShowOrderDetailExport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ShowOrderDetailExport.aspx.designer.cs">
+      <DependentUpon>ShowOrderDetailExport.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ShowSplitPlanList.aspx.cs">
+      <DependentUpon>ShowSplitPlanList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ShowSplitPlanList.aspx.designer.cs">
+      <DependentUpon>ShowSplitPlanList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SubjectList.aspx.cs">
+      <DependentUpon>SubjectList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SubjectList.aspx.designer.cs">
+      <DependentUpon>SubjectList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\Add.aspx.cs">
+      <DependentUpon>Add.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\Add.aspx.designer.cs">
+      <DependentUpon>Add.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\Approve.aspx.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\Approve.aspx.designer.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\ApproveList.aspx.cs">
+      <DependentUpon>ApproveList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\ApproveList.aspx.designer.cs">
+      <DependentUpon>ApproveList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\CheckDetail.aspx.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\CheckDetail.aspx.designer.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\CheckExport.ashx.cs">
+      <DependentUpon>CheckExport.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\ImportOrder.aspx.cs">
+      <DependentUpon>ImportOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\ImportOrder.aspx.designer.cs">
+      <DependentUpon>ImportOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\SupplementByRegion\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Supplement\Approve.aspx.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Supplement\Approve.aspx.designer.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Supplement\ApproveList.aspx.cs">
+      <DependentUpon>ApproveList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Supplement\ApproveList.aspx.designer.cs">
+      <DependentUpon>ApproveList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Supplement\CheckDetail.aspx.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Supplement\CheckDetail.aspx.designer.cs">
+      <DependentUpon>CheckDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Supplement\EditOrder.aspx.cs">
+      <DependentUpon>EditOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Supplement\EditOrder.aspx.designer.cs">
+      <DependentUpon>EditOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Supplement\handler\EditOrder.ashx.cs">
+      <DependentUpon>EditOrder.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Supplement\handler\List.ashx.cs">
+      <DependentUpon>List.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\Supplement\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\Supplement\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\UC\ADOriginalOrder.ascx.cs">
+      <DependentUpon>ADOriginalOrder.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\UC\ADOriginalOrder.ascx.designer.cs">
+      <DependentUpon>ADOriginalOrder.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\UC\OrderDetailUC.ascx.cs">
+      <DependentUpon>OrderDetailUC.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\UC\OrderDetailUC.ascx.designer.cs">
+      <DependentUpon>OrderDetailUC.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\UC\ShowOrderDetail.ascx.cs">
+      <DependentUpon>ShowOrderDetail.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\UC\ShowOrderDetail.ascx.designer.cs">
+      <DependentUpon>ShowOrderDetail.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\UploadGuidanceAttachment.aspx.cs">
+      <DependentUpon>UploadGuidanceAttachment.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\UploadGuidanceAttachment.aspx.designer.cs">
+      <DependentUpon>UploadGuidanceAttachment.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="TableSize\handler\List.ashx.cs">
+      <DependentUpon>List.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="TableSize\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TableSize\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Top.aspx.cs">
+      <DependentUpon>Top.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Top.aspx.designer.cs">
+      <DependentUpon>Top.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="UpdateOrderPrice.aspx.cs">
+      <DependentUpon>UpdateOrderPrice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UpdateOrderPrice.aspx.designer.cs">
+      <DependentUpon>UpdateOrderPrice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="uploadify\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="TemplateFile\Users\Edit.aspx.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TemplateFile\Users\Edit.aspx.designer.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="TemplateFile\Users\Handler\UserHandler1.ashx.cs">
+      <DependentUpon>UserHandler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="TemplateFile\Users\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TemplateFile\Users\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Users\Edit1.aspx.cs">
+      <DependentUpon>Edit1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Users\Edit1.aspx.designer.cs">
+      <DependentUpon>Edit1.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Users\Handler\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Users\List1.aspx.cs">
+      <DependentUpon>List1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Users\List1.aspx.designer.cs">
+      <DependentUpon>List1.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="Modules\ModuleImg\" />
+    <Folder Include="PlaceInfo\handler\" />
+    <Folder Include="PlaceInfo\js\" />
+    <Folder Include="TemplateFile\TempFile\" />
+    <Folder Include="UploadFiles\ModuleImgs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Account\Web.config" />
+    <Content Include="Site.Master" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BaseInfoManager\Handler\Handler1.ashx" />
+    <None Include="bootstrap-3.3.2-dist\css\bootstrap-theme.css.map" />
+    <None Include="bootstrap-3.3.2-dist\css\bootstrap.css.map" />
+    <None Include="bootstrap-3.3.2-dist\fonts\glyphicons-halflings-regular.eot" />
+    <None Include="bootstrap-3.3.2-dist\fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="bootstrap-3.3.2-dist\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="bootstrap-3.3.2-dist\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="Customer\Handler\Handler1.ashx" />
+    <Content Include="Customer\Handler\AddCustomer.ashx" />
+    <Content Include="Customer\Handler\MachineFrame.ashx" />
+    <Content Include="Customer\Handler\Shops.ashx" />
+    <Content Include="Customer\Handler\POPList.ashx" />
+    <Content Include="Customer\Handler\ActivityList.ashx" />
+    <Content Include="Customer\Handler\SubjectCategoryList.ashx" />
+    <Content Include="Customer\Handler\CheckExportState.ashx" />
+    <Content Include="Customer\Handler\InstallPriceList.ashx" />
+    <Content Include="Customer\Handler\ERPHostManage.ashx" />
+    <Content Include="CompanyManage\handler\List1.ashx" />
+    <Content Include="Customer\Handler\POPBlackListManage.ashx" />
+    <Content Include="Customer\Handler\FrameBlackListManage.ashx" />
+    <Content Include="Customer\Handler\BasicMachineFrameList.ashx" />
+    <None Include="easyui1.4\demo\accordion\datagrid_data1.json" />
+    <None Include="easyui1.4\demo\combobox\combobox_data1.json" />
+    <None Include="easyui1.4\demo\combobox\combobox_data2.json" />
+    <None Include="easyui1.4\demo\combogrid\datagrid_data1.json" />
+    <None Include="easyui1.4\demo\combotree\tree_data1.json" />
+    <None Include="easyui1.4\demo\datagrid\datagrid_data1.json" />
+    <None Include="easyui1.4\demo\datagrid\datagrid_data2.json" />
+    <None Include="easyui1.4\demo\datagrid\products.json" />
+    <None Include="easyui1.4\demo\form\form_data1.json" />
+    <None Include="easyui1.4\demo\layout\datagrid_data1.json" />
+    <None Include="easyui1.4\demo\layout\propertygrid_data1.json" />
+    <None Include="easyui1.4\demo\layout\tree_data1.json" />
+    <None Include="easyui1.4\demo\propertygrid\propertygrid_data1.json" />
+    <None Include="easyui1.4\demo\tabs\tree_data1.json" />
+    <None Include="easyui1.4\demo\treegrid\treegrid_data1.json" />
+    <None Include="easyui1.4\demo\treegrid\treegrid_data2.json" />
+    <None Include="easyui1.4\demo\treegrid\treegrid_data3.json" />
+    <None Include="easyui1.4\demo\tree\tree_data1.json" />
+    <None Include="easyui1.4\demo\tree\tree_data2.json" />
+    <Content Include="Modules\Handler\Handler1.ashx" />
+    <Content Include="TemplateFile\Users\Handler\UserHandler1.ashx" />
+    <Content Include="Role\Handler\RoleHandler1.ashx" />
+    <Content Include="Modules\Handler\AuthorityHandler1.ashx" />
+    <Content Include="packages.config" />
+    <Content Include="Handler\MenusHandler.ashx" />
+    <Content Include="Handler\GetCity.ashx" />
+    <Content Include="Handler\Export.ashx" />
+    <Content Include="Handler\CheckExportState.ashx" />
+    <None Include="fancyBox\.gitattributes" />
+    <None Include="fancyBox\CHANGELOG.md" />
+    <None Include="fancyBox\demo\vssver2.scc" />
+    <None Include="fancyBox\lib\vssver2.scc" />
+    <None Include="fancyBox\README.md" />
+    <None Include="fancyBox\source\helpers\vssver2.scc" />
+    <None Include="fancyBox\source\vssver2.scc" />
+    <None Include="fancyBox\vssver2.scc" />
+    <Content Include="Handler\Place.ashx" />
+    <Content Include="Handler\Files.ashx" />
+    <Content Include="Materials\Handler\MaterialType.ashx" />
+    <Content Include="Materials\Handler\Material.ashx" />
+    <Content Include="Materials\Handler\SetPrice.ashx" />
+    <Content Include="Regions\Handler\Handler1.ashx" />
+    <Content Include="Subjects\Handler\SplitOrder.ashx" />
+    <Content Include="Subjects\Handler\CheckOrder.ashx" />
+    <Content Include="Subjects\Handler\Orders.ashx" />
+    <Content Include="Materials\Handler\MaterialCategory.ashx" />
+    <Content Include="Subjects\Handler\ExportOrders.ashx" />
+    <Content Include="Subjects\Handler\EditOrderDetails.ashx" />
+    <Content Include="Quotation\handler\Edit.ashx" />
+    <Content Include="Quotation\handler\list1.ashx" />
+    <Content Include="Subjects\Material\handler\list.ashx" />
+    <Content Include="Subjects\Handler\CheckExport.ashx" />
+    <Content Include="Subjects\Handler\CheckExport350.ashx" />
+    <Content Include="Subjects\Handler\SplitOrder1.ashx" />
+    <Content Include="Subjects\Supplement\handler\List.ashx" />
+    <Content Include="Subjects\Supplement\handler\EditOrder.ashx" />
+    <Content Include="Subjects\Handler\GuidanceDetail.ashx" />
+    <Content Include="Subjects\ADErrorCorrection\handler\ErrorCorrection.ashx" />
+    <Content Include="Materials\Handler\BasicMaterialList.ashx" />
+    <Content Include="Materials\Handler\CustomerMaterialList1.ashx" />
+    <Content Include="Subjects\Handler\CheckExportPHWBJ.ashx" />
+    <Content Include="Subjects\Handler\CheckExportPHWOther.ashx" />
+    <Content Include="Subjects\Handler\AddGuidance.ashx" />
+    <Content Include="Subjects\ADErrorCorrection\handler\ErrorCorrectionApprove.ashx" />
+    <Content Include="Statistics\handler\SubjectStatistics.ashx" />
+    <Content Include="Materials\Handler\OrderMaterialMapping.ashx" />
+    <Content Include="Statistics\handler\ExportDetail.ashx" />
+    <Content Include="Statistics\handler\CheckExportDetail.ashx" />
+    <Content Include="Materials\Handler\MachineFrameSmallMaterial.ashx" />
+    <Content Include="Statistics\handler\CheckExportState.ashx" />
+    <Content Include="MaterialSupportManager\handler\List.ashx" />
+    <Content Include="Handler\CheckPromission.ashx" />
+    <Content Include="OutsourcingOrder\handler\AssignOrder.ashx" />
+    <Content Include="OutsourcingOrder\handler\Export.ashx" />
+    <Content Include="Subjects\Handler\CheckExportOutsourcing.ashx" />
+    <Content Include="Outsource\handler\List.ashx" />
+    <Content Include="Outsource\handler\PriceList.ashx" />
+    <Content Include="Materials\Handler\QuoteMaterialList.ashx" />
+    <None Include="layui\font\iconfont.eot" />
+    <None Include="layui\font\iconfont.ttf" />
+    <None Include="layui\font\iconfont.woff" />
+    <Content Include="Subjects\InstallPrice\handler\Handler1.ashx" />
+    <Content Include="TableSize\handler\List.ashx" />
+    <Content Include="Modules\UploadHandler.ashx" />
+    <Content Include="Subjects\Handler\CheckExportQuote350.ashx" />
+    <Content Include="Subjects\SupplementByRegion\CheckExport.ashx" />
+    <Content Include="Subjects\Handler\CheckExportNew350.ashx" />
+    <None Include="TemplateFile\Export\350Template.xlsx" />
+    <None Include="TemplateFile\Export\350Template1.xlsx" />
+    <None Include="TemplateFile\Export\350模板.xlsx" />
+    <None Include="TemplateFile\Export\EmptyFrameShopTemplate.xlsx" />
+    <None Include="TemplateFile\Export\Export350Template.xlsx" />
+    <None Include="TemplateFile\Export\ExpressPriceTemplate.xlsx" />
+    <None Include="TemplateFile\Export\InstallPriceTemplate.xlsx" />
+    <None Include="TemplateFile\Export\MaterialOrderTemplate.xlsx" />
+    <None Include="TemplateFile\Export\phwTemplate.xlsx" />
+    <None Include="TemplateFile\Export\ShopTemplate.xlsx" />
+    <None Include="TemplateFile\Export\装箱单模板.xlsx" />
+    <None Include="TemplateFile\Import\350模板.xlsx" />
+    <None Include="TemplateFile\Import\ADOrderImpormTemplate.xlsx" />
+    <None Include="TemplateFile\Import\HandMadeOrderTemplate.xlsx" />
+    <None Include="TemplateFile\Import\RegionSupplementTemplate.xlsx" />
+    <None Include="TemplateFile\Import\ShopAndPOPImportTemplate.xlsx" />
+    <None Include="TemplateFile\Import\SISOrderTemplate.xlsx" />
+    <None Include="TemplateFile\Import\二次安装费明细模板.xlsx" />
+    <None Include="TemplateFile\Import\特殊店铺基础安装费.xlsx" />
+    <None Include="TemplateFile\Import\费用订单模板.xlsx" />
+    <None Include="TemplateFile\Import\ADOrderMaterialTemplate.xlsx" />
+    <None Include="TemplateFile\Import\CheckOrderPlanTemplate.xlsx" />
+    <None Include="TemplateFile\Import\CustomerMaterialTemplate.xlsx" />
+    <None Include="TemplateFile\Import\HCPOPTemplate.xlsx" />
+    <None Include="TemplateFile\Import\ImportQuotationsTemplate.xlsx" />
+    <None Include="TemplateFile\Import\MaterialTemplate.xlsx" />
+    <None Include="TemplateFile\Import\OrderMaterialTemplate.xlsx" />
+    <None Include="TemplateFile\Import\POPImportTemplate.xlsx" />
+    <None Include="TemplateFile\Import\ShopImportTemplate.xlsx" />
+    <None Include="TemplateFile\Import\SplitOrderPlanTemplate.xlsx" />
+    <None Include="TemplateFile\Import\SupplementDetailTemplate.xlsx" />
+    <None Include="TemplateFile\Import\店铺器架类型模板.xlsx" />
+    <None Include="TemplateFile\Export\项目费用统计明细.xlsx" />
+    <None Include="uploadify\check-exists.php" />
+    <Content Include="uploadify\Handler1.ashx" />
+    <None Include="uploadify\index.php" />
+    <None Include="uploadify\uploadify.php" />
+    <Content Include="Users\Handler\Handler1.ashx" />
+    <None Include="zTree_v3\.gitignore" />
+    <None Include="zTree_v3\demo\cn\asyncData\getNodes.php" />
+    <None Include="zTree_v3\demo\cn\asyncData\getNodesForBigData.php" />
+    <None Include="zTree_v3\demo\en\asyncData\getNodes.php" />
+    <None Include="zTree_v3\demo\en\asyncData\getNodesForBigData.php" />
+    <None Include="zTree_v3\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BLL\BLL.csproj">
+      <Project>{ABE1CFED-5AB0-4734-8BA1-1483B119A0EE}</Project>
+      <Name>BLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{050E6E28-3913-48F0-8BF9-B1C58258EB40}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DAL\DAL.csproj">
+      <Project>{09C3D40B-6BD4-41B4-B839-60FD576AF539}</Project>
+      <Name>DAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IDAL\IDAL.csproj">
+      <Project>{7C27A329-51C4-40AE-AE35-C960C21964B9}</Project>
+      <Name>IDAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Models\Models.csproj">
+      <Project>{1C4EFEAD-EA27-4226-B8EA-2B52AE80D73D}</Project>
+      <Name>Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SQLDA\SQLDAL.csproj">
+      <Project>{96A69453-25E3-435F-8BE4-6D6D6C49295B}</Project>
+      <Name>SQLDAL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>13614</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost/WebApp</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

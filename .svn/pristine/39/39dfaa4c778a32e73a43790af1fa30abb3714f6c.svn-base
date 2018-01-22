@@ -1,0 +1,390 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using DAL;
+using BLL;
+using Models;
+using Newtonsoft.Json;
+using System.Text;
+using Common;
+
+namespace WebApp.Subjects.ModifyOrder.handler
+{
+    /// <summary>
+    /// list 的摘要说明
+    /// </summary>
+    public class list : IHttpHandler
+    {
+        HttpContext context1;
+        public void ProcessRequest(HttpContext context)
+        {
+            context1 = context;
+            context.Response.ContentType = "text/plain";
+            string type = string.Empty;
+            string result = string.Empty;
+            if (context.Request.QueryString["type"] != null)
+            {
+                type = context.Request.QueryString["type"];
+            }
+            else if (context.Request.Form["type"] != null)
+            {
+                type = context.Request.Form["type"];
+            }
+
+            switch (type)
+            {
+                case "getList":
+                    result = GetOrderList();
+                    break;
+                case "deleteOrder":
+                    result = DeleteOrders();
+                    break;
+                case "recoverOrder":
+                    result = RecoverOrders();
+                    break;
+                case "checkShop":
+                    result = CheckShopNo();
+                    break;
+                case "edit":
+                    result = Edit();
+                    break;
+                case "getOrder":
+                    result = GetModel();
+                    break;
+                default:
+                    break;
+            }
+            context.Response.Write(result);
+        }
+
+        string GetOrderList()
+        {
+            string result = string.Empty;
+            int subjectId = 0;
+            int currPage = 1;
+            int pageSize = 0;
+            string shopNo = string.Empty;
+            string shopName = string.Empty;
+            if (context1.Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(context1.Request.QueryString["subjectId"]);
+            }
+            if (context1.Request.QueryString["currPage"] != null)
+            {
+                currPage = int.Parse(context1.Request.QueryString["currPage"]);
+            }
+            if (context1.Request.QueryString["pageSize"] != null)
+            {
+                pageSize = int.Parse(context1.Request.QueryString["pageSize"]);
+            }
+            if (context1.Request.QueryString["shopNo"] != null)
+            {
+                shopNo = context1.Request.QueryString["shopNo"];
+            }
+            var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                       join shop in CurrentContext.DbContext.Shop
+                       on order.ShopId equals shop.Id
+                       where order.SubjectId == subjectId
+                       select new { 
+                         order,
+                         shop
+                       }).ToList();
+            if (!string.IsNullOrWhiteSpace(shopNo))
+            {
+                list = list.Where(s=>s.shop.ShopNo.ToLower()==shopNo.ToLower()).ToList();
+            }
+            int recordCount = list.Count;
+            list = list.OrderBy(s => s.shop.Id).ThenBy(s => s.order.Sheet).Skip(pageSize * (currPage-1)).Take(pageSize).ToList();
+            StringBuilder json = new StringBuilder();
+            int index = 1;
+            list.ForEach(s => {
+                int rowIndex = (pageSize * (currPage - 1)) + index;
+                index++;
+                string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType??1).ToString());
+                int isDelete = s.order.IsDelete == true ? 1 : 0;
+                json.Append("{\"rowIndex\":\"" + rowIndex + "\",\"Id\":\"" + s.order.Id + "\",\"OrderType\":\"" + orderType + "\",\"MaterialSupport\":\"" + s.order.MaterialSupport + "\",\"POSScale\":\"" + s.order.POSScale + "\",\"ShopNo\":\"" + s.shop.ShopNo + "\",\"ShopName\":\"" + s.shop.ShopName + "\",\"Region\":\"" + s.shop.RegionName + "\",\"Province\":\"" + s.shop.ProvinceName + "\",\"City\":\"" + s.shop.CityName + "\",\"CityTier\":\"" + s.shop.CityTier + "\",\"IsInstall\":\"" + s.shop.IsInstall + "\",\"Channel\":\"" + s.shop.Channel + "\",\"Format\":\"" + s.shop.Format + "\",\"Sheet\":\"" + s.order.Sheet + "\",\"MachineFrame\":\"" + s.order.MachineFrame + "\",\"Gender\":\"" + s.order.Gender + "\",\"Quantity\":\"" + s.order.Quantity + "\",\"GraphicLength\":\"" + s.order.GraphicLength + "\",\"GraphicWidth\":\"" + s.order.GraphicWidth + "\",\"GraphicMaterial\":\"" + s.order.GraphicMaterial + "\",\"PositionDescription\":\"" + s.order.PositionDescription + "\",\"ChooseImg\":\"" + s.order.ChooseImg + "\",\"Remark\":\"" + s.order.Remark + "\",\"IsDelete\":\"" + isDelete + "\"},");
+            });
+            result = "{\"pageCount\":\"" + recordCount + "\",\"rows\":[" + json.ToString().TrimEnd(',') + "]}";
+            return result;
+        }
+
+        string DeleteOrders()
+        {
+            string result = "删除失败";
+            if (context1.Request.QueryString["ids"] != null)
+            {
+                string ids = context1.Request.QueryString["ids"];
+                if (!string.IsNullOrWhiteSpace(ids))
+                {
+                    List<int> idList = StringHelper.ToIntList(ids,',');
+                    try
+                    {
+                        FinalOrderDetailTempBLL orderBll = new FinalOrderDetailTempBLL();
+                        var orderList = orderBll.GetList(s => idList.Contains(s.Id));
+                        orderList.ForEach(s =>
+                        {
+                            s.IsDelete = true;
+                            s.DeleteDate = DateTime.Now;
+                            s.DeleteUserId = new BasePage().CurrentUser.UserId;
+                            orderBll.Update(s);
+                        });
+                        result = "ok";
+                    }
+                    catch (Exception ex)
+                    { 
+                       
+                    }
+                }
+            }
+            return result;
+        }
+
+        string RecoverOrders()
+        {
+            string result = "恢复失败";
+            if (context1.Request.QueryString["ids"] != null)
+            {
+                string ids = context1.Request.QueryString["ids"];
+                if (!string.IsNullOrWhiteSpace(ids))
+                {
+                    List<int> idList = StringHelper.ToIntList(ids, ',');
+                    try
+                    {
+                        FinalOrderDetailTempBLL orderBll = new FinalOrderDetailTempBLL();
+                        var orderList = orderBll.GetList(s => idList.Contains(s.Id));
+                        orderList.ForEach(s =>
+                        {
+                            s.IsDelete = false;
+                            orderBll.Update(s);
+                        });
+                        result = "ok";
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+            }
+            return result;
+        }
+
+        string GetModel()
+        {
+            string result = string.Empty;
+            int orderId = 0;
+            if (context1.Request.QueryString["orderId"] != null)
+            {
+                orderId = int.Parse(context1.Request.QueryString["orderId"]);
+            }
+            FinalOrderDetailTemp orderModel = new FinalOrderDetailTempBLL().GetModel(orderId);
+            if (orderModel != null)
+            {
+                StringBuilder json = new StringBuilder();
+                int materialCategoryId = 0;
+                if (!string.IsNullOrWhiteSpace(orderModel.GraphicMaterial))
+                {
+                    OrderMaterialMpping materialModel = new OrderMaterialMppingBLL().GetList(s => s.OrderMaterialName.ToLower() == orderModel.GraphicMaterial.ToLower()).FirstOrDefault();
+                    if (materialModel != null)
+                    {
+                        materialCategoryId = materialModel.BasicCategoryId ?? 0;
+                    }
+                }
+                json.Append("{\"Id\":\"" + orderId + "\",\"OrderType\":\""+(orderModel.OrderType??1)+"\",\"ShopNo\":\"" + orderModel.ShopNo + "\",\"Sheet\":\"" + orderModel.Sheet + "\",\"POSScale\":\"" + orderModel.POSScale + "\",\"MaterialSupport\":\"" + orderModel.MaterialSupport + "\",\"MachineFrame\":\"" + orderModel.MachineFrame + "\",\"PositionDescription\":\"" + orderModel.PositionDescription + "\",\"Gender\":\"" + orderModel.Gender + "\",\"Quantity\":\"" + orderModel.Quantity + "\",\"GraphicLength\":\"" + orderModel.GraphicLength + "\",\"GraphicWidth\":\"" + orderModel.GraphicWidth + "\",\"MaterialCategoryId\":\"" + materialCategoryId + "\",\"GraphicMaterial\":\"" + orderModel.GraphicMaterial + "\",\"ChooseImg\":\"" + orderModel.ChooseImg + "\",\"Remark\":\"" + orderModel.Remark + "\"}");
+                result = "["+json.ToString()+"]";
+            }
+            return result;
+        }
+
+        string CheckShopNo()
+        {
+            string result = string.Empty;
+            int subjectId = 0;
+            string shopNo = string.Empty;
+            if (context1.Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(context1.Request.QueryString["subjectId"]);
+            }
+            if (context1.Request.QueryString["shopNo"] != null)
+            {
+                shopNo = context1.Request.QueryString["shopNo"];
+            }
+            int guidanceId = 0;
+            SubjectBLL subjectBll = new SubjectBLL();
+            Subject subject = subjectBll.GetModel(subjectId);
+            List<int> subjectIdList = new List<int>();
+            if (subject != null)
+            {
+                guidanceId = subject.GuidanceId ?? 0;
+                subjectIdList = subjectBll.GetList(s => s.GuidanceId == guidanceId && (s.IsDelete==null || s.IsDelete==false)).Select(s=>s.Id).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(shopNo) && guidanceId>0)
+            {
+                Shop shop = new ShopBLL().GetList(s => s.ShopNo.ToLower() == shopNo.ToLower()).FirstOrDefault();
+                if (shop != null)
+                {
+                    int shopId = shop.Id;
+                    var orderList = new FinalOrderDetailTempBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0)).Select(s => new { s.MaterialSupport,s.POSScale }).ToList();
+                    if (orderList.Any())
+                    {
+                        string MaterialSupport = string.Empty;
+                        string POSScale = string.Empty;
+                        orderList.ForEach(s => {
+                            if (string.IsNullOrWhiteSpace(MaterialSupport) && !string.IsNullOrWhiteSpace(s.MaterialSupport))
+                                MaterialSupport = s.MaterialSupport.ToLower();
+                            if (string.IsNullOrWhiteSpace(POSScale) && !string.IsNullOrWhiteSpace(s.POSScale))
+                                POSScale = s.POSScale;
+                        });
+                        if (!string.IsNullOrWhiteSpace(MaterialSupport) || !string.IsNullOrWhiteSpace(POSScale))
+                            result = MaterialSupport + "|" + POSScale;
+                    }
+                }
+            }
+            return result;
+        }
+
+        string Edit()
+        {
+            string result = "ok";
+            string jsonStr = string.Empty;
+            if (context1.Request.Form["jsonStr"] != null)
+            {
+                jsonStr = context1.Request.Form["jsonStr"];
+            }
+            if (!string.IsNullOrWhiteSpace(jsonStr))
+            {
+                try
+                {
+                    FinalOrderDetailTemp orderModel = JsonConvert.DeserializeObject<FinalOrderDetailTemp>(jsonStr);
+                    if (orderModel != null)
+                    {
+                        FinalOrderDetailTempBLL orderBll = new FinalOrderDetailTempBLL();
+                        if (orderModel.Id > 0)
+                        {
+                            FinalOrderDetailTemp newOrderModel = orderBll.GetModel(orderModel.Id);
+                            if (newOrderModel != null)
+                            {
+                                newOrderModel.EditDate = DateTime.Now;
+                                newOrderModel.EditUserId = new BasePage().CurrentUser.UserId;
+                                decimal width = orderModel.GraphicWidth ?? 0;
+                                decimal length = orderModel.GraphicLength ?? 0;
+                                newOrderModel.Area = (width * length) / 1000000;
+                                newOrderModel.MaterialSupport = orderModel.MaterialSupport;
+                                newOrderModel.POSScale = orderModel.POSScale;
+                                newOrderModel.ChooseImg = orderModel.ChooseImg;
+                                newOrderModel.Gender = orderModel.Gender;
+                                newOrderModel.GraphicLength = length;
+                                newOrderModel.GraphicMaterial = orderModel.GraphicMaterial;
+                                newOrderModel.GraphicWidth = width;
+                                newOrderModel.MachineFrame = orderModel.MachineFrame;
+                                newOrderModel.OrderType = orderModel.OrderType;
+                                newOrderModel.PositionDescription = orderModel.PositionDescription;
+                                newOrderModel.POSScale = orderModel.POSScale;
+                                newOrderModel.InstallPricePOSScale = orderModel.POSScale;
+                                newOrderModel.Quantity = orderModel.Quantity;
+                                newOrderModel.Remark = orderModel.Remark;
+                                newOrderModel.Sheet = orderModel.Sheet;
+                                newOrderModel.SubjectId = orderModel.SubjectId;
+                                decimal unitPrice = 0;
+                                decimal totalPrice = 0;
+                                if (!string.IsNullOrWhiteSpace(orderModel.GraphicMaterial))
+                                {
+                                    POP pop = new POP();
+                                    pop.GraphicMaterial = orderModel.GraphicMaterial;
+                                    pop.GraphicLength = orderModel.GraphicLength;
+                                    pop.GraphicWidth = orderModel.GraphicWidth;
+                                    pop.Quantity = orderModel.Quantity;
+                                    unitPrice = new BasePage().GetMaterialUnitPrice(pop, out totalPrice);
+                                }
+                                newOrderModel.UnitPrice = unitPrice;
+                                newOrderModel.TotalPrice = totalPrice;
+
+                                orderBll.Update(newOrderModel);
+                            }
+                        }
+                        else
+                        {
+                            string shopNo = orderModel.ShopNo;
+                            Shop shopModel = new ShopBLL().GetList(s => s.ShopNo.ToLower() == shopNo.ToLower()).FirstOrDefault();
+                            if (shopModel != null)
+                            {
+                                //int shopId = shopModel.Id;
+                                FinalOrderDetailTemp newOrderModel = new FinalOrderDetailTemp();
+                                newOrderModel.AddDate = DateTime.Now;
+                                newOrderModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                decimal width = orderModel.GraphicWidth ?? 0;
+                                decimal length = orderModel.GraphicLength ?? 0;
+                                newOrderModel.Area = (width * length) / 1000000;
+                                newOrderModel.AgentCode = shopModel.AgentCode;
+                                newOrderModel.AgentName = shopModel.AgentName;
+                                newOrderModel.Channel = shopModel.Channel;
+                                newOrderModel.ChooseImg = orderModel.ChooseImg;
+                                newOrderModel.City = shopModel.CityName;
+                                newOrderModel.CityTier = shopModel.CityTier;
+                                newOrderModel.Contact = shopModel.Contact1;
+                                newOrderModel.Format = shopModel.Format;
+                                newOrderModel.Gender = orderModel.Gender;
+                                newOrderModel.GraphicLength = length;
+                                newOrderModel.GraphicMaterial = orderModel.GraphicMaterial;
+                                newOrderModel.GraphicWidth = width;
+                                newOrderModel.IsInstall = shopModel.IsInstall;
+                                newOrderModel.MachineFrame = orderModel.MachineFrame;
+                                newOrderModel.MaterialSupport = orderModel.MaterialSupport;
+                                newOrderModel.OrderType = orderModel.OrderType;
+                                newOrderModel.POPAddress = shopModel.POPAddress;
+                                newOrderModel.PositionDescription = orderModel.PositionDescription;
+                                newOrderModel.POSScale = orderModel.POSScale;
+                                newOrderModel.Province = shopModel.ProvinceName;
+                                newOrderModel.Quantity = orderModel.Quantity;
+                                newOrderModel.Region = shopModel.RegionName;
+                                newOrderModel.Remark = orderModel.Remark;
+                                newOrderModel.Sheet = orderModel.Sheet;
+                                newOrderModel.ShopId = shopModel.Id;
+                                newOrderModel.ShopName = shopModel.ShopName;
+                                newOrderModel.ShopNo = shopModel.ShopNo;
+                                newOrderModel.SubjectId = orderModel.SubjectId;
+                                newOrderModel.Tel = shopModel.Tel1;
+                                decimal unitPrice = 0;
+                                decimal totalPrice = 0;
+                                if (!string.IsNullOrWhiteSpace(orderModel.GraphicMaterial))
+                                {
+                                    POP pop = new POP();
+                                    pop.GraphicMaterial = orderModel.GraphicMaterial;
+                                    pop.GraphicLength = orderModel.GraphicLength;
+                                    pop.GraphicWidth = orderModel.GraphicWidth;
+                                    pop.Quantity = orderModel.Quantity;
+                                    unitPrice = new BasePage().GetMaterialUnitPrice(pop, out totalPrice);
+                                }
+                                newOrderModel.UnitPrice = unitPrice;
+                                newOrderModel.TotalPrice = totalPrice;
+                                orderBll.Add(newOrderModel);
+
+                            }
+                            else
+                            {
+                                result = "提交失败：店铺不存在";
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result = "提交失败：" + ex.Message;
+                }
+            }
+            else
+            {
+                result = "提交失败！";
+            }
+            return result;
+        }
+
+        public bool IsReusable
+        {
+            get
+            {
+                return false;
+            }
+        }
+    }
+}

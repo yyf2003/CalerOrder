@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{ABE1CFED-5AB0-4734-8BA1-1483B119A0EE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BLL</RootNamespace>
+    <AssemblyName>BLL</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AsyncCtpLibrary, Version=1.0.4107.18181, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\AsyncCTP.0.3\lib\net40\AsyncCtpLibrary.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\WebApp\DLL\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccountCheckSupplementBLL.cs" />
+    <Compile Include="ADInvoiceBLL.cs" />
+    <Compile Include="ADOrderActivityBLL.cs" />
+    <Compile Include="ADOrderErrorCorrectionBLL.cs" />
+    <Compile Include="ADSubjectCategoryBLL.cs" />
+    <Compile Include="ADSubjectPriceBLL.cs" />
+    <Compile Include="ApproveInfoBLL.cs" />
+    <Compile Include="AttachmentBLL.cs" />
+    <Compile Include="BaseBLL.cs" />
+    <Compile Include="BaseCategoryBLL.cs" />
+    <Compile Include="BaseDataChangeLogBLL.cs" />
+    <Compile Include="BasicMachineFrameBLL.cs" />
+    <Compile Include="BasicMaterialBLL.cs" />
+    <Compile Include="BasicMaterialSupportBLL.cs" />
+    <Compile Include="CheckOrderBLL.cs" />
+    <Compile Include="CheckOrderPlanDetailBLL.cs" />
+    <Compile Include="CheckOrderResultBLL.cs" />
+    <Compile Include="CityInOrderPlanBLL.cs" />
+    <Compile Include="CompanyBLL.cs" />
+    <Compile Include="CompanyInRegionBLL.cs" />
+    <Compile Include="CompanyTypeBLL.cs" />
+    <Compile Include="CustomerBLL.cs" />
+    <Compile Include="CustomerMaterialDetailBLL.cs" />
+    <Compile Include="CustomerMaterialInfoBLL.cs" />
+    <Compile Include="CustomerMaterialPriceItemBLL.cs" />
+    <Compile Include="ErpHostBLL.cs" />
+    <Compile Include="FinalOrderDetailBLL.cs" />
+    <Compile Include="FinalOrderDetailTempBLL.cs" />
+    <Compile Include="HandMadeOrderDetailBLL.cs" />
+    <Compile Include="HCOrderDetailBLL.cs" />
+    <Compile Include="HCPOPBLL.cs" />
+    <Compile Include="InstallBLL.cs" />
+    <Compile Include="InstallPriceConfigBLL.cs" />
+    <Compile Include="InstallPriceDetailBLL.cs" />
+    <Compile Include="InstallPriceShopInfoBLL.cs" />
+    <Compile Include="ListOrderDetailBLL.cs" />
+    <Compile Include="MachineFrameBlackListBLL.cs" />
+    <Compile Include="MachineFrameBLL.cs" />
+    <Compile Include="MaterialBLL.cs" />
+    <Compile Include="MaterialBrandBLL.cs" />
+    <Compile Include="MaterialCategoryBLL.cs" />
+    <Compile Include="MaterialPriceBLL.cs" />
+    <Compile Include="MaterialTypeBLL.cs" />
+    <Compile Include="MergeOriginalOrderBLL.cs" />
+    <Compile Include="ModuleBLL.cs" />
+    <Compile Include="ModuleMenuImgBLL.cs" />
+    <Compile Include="NewMaterialSupportBLL.cs" />
+    <Compile Include="NewShopMachineFrameBLL.cs" />
+    <Compile Include="OrderChangeApplicationBLL.cs" />
+    <Compile Include="OrderChangeApplicationDetailBLL.cs" />
+    <Compile Include="OrderMaterialBLL.cs" />
+    <Compile Include="OrderMaterialItemBLL.cs" />
+    <Compile Include="OrderMaterialMppingBLL.cs" />
+    <Compile Include="OrderPlanBLL.cs" />
+    <Compile Include="OutsourceInfoBLL.cs" />
+    <Compile Include="OutsourceMaterialPriceBLL.cs" />
+    <Compile Include="PlaceBLL.cs" />
+    <Compile Include="POPBlackListBLL.cs" />
+    <Compile Include="POPBLL.cs" />
+    <Compile Include="POPChangeDetailBLL.cs" />
+    <Compile Include="POPOrderDetailBLL.cs" />
+    <Compile Include="PositionBLL.cs" />
+    <Compile Include="POSScaleInfoBLL.cs" />
+    <Compile Include="PriceOrderDetailBLL.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProvinceInOrderPlanBLL.cs" />
+    <Compile Include="ProvinceInRegionBLL.cs" />
+    <Compile Include="QuotationAccountBLL.cs" />
+    <Compile Include="QuotationBlongsBLL.cs" />
+    <Compile Include="QuotationCategoryBLL.cs" />
+    <Compile Include="QuotationClassificationBLL.cs" />
+    <Compile Include="QuotationsBLL.cs" />
+    <Compile Include="QuotationTaxRateBLL.cs" />
+    <Compile Include="QuoteMaterialBLL.cs" />
+    <Compile Include="RegionBLL.cs" />
+    <Compile Include="RegionOrderDetailBLL.cs" />
+    <Compile Include="RegionSupplementBLL.cs" />
+    <Compile Include="RegionSupplementDetailBLL.cs" />
+    <Compile Include="RoleBLL.cs" />
+    <Compile Include="RoleInModuleBLL.cs" />
+    <Compile Include="SecondInstallFeeDetailBLL.cs" />
+    <Compile Include="SendBLL.cs" />
+    <Compile Include="SendERPResultBLL.cs" />
+    <Compile Include="ShopBLL.cs" />
+    <Compile Include="ShopChangeDetailBLL.cs" />
+    <Compile Include="ShopMachineFrameBLL.cs" />
+    <Compile Include="ShopMachineFrameChangeDetailBLL.cs" />
+    <Compile Include="SmallMaterialBLL.cs" />
+    <Compile Include="SmallMaterialMappingBLL.cs" />
+    <Compile Include="SplitOrderDetailPerShopBLL.cs" />
+    <Compile Include="SplitOrderPlanDetailBLL.cs" />
+    <Compile Include="SubjectBLL.cs" />
+    <Compile Include="SubjectGuidanceBLL.cs" />
+    <Compile Include="SubjectTypeBLL.cs" />
+    <Compile Include="SupplementDetailBLL.cs" />
+    <Compile Include="SupplementItemBLL.cs" />
+    <Compile Include="SupplementOrderDetailBLL.cs" />
+    <Compile Include="TableSizeBLL.cs" />
+    <Compile Include="UnitInfoBLL.cs" />
+    <Compile Include="UserBLL.cs" />
+    <Compile Include="UserInActivityBLL.cs" />
+    <Compile Include="UserInCustomerBLL.cs" />
+    <Compile Include="UserInRegionBLL.cs" />
+    <Compile Include="UserInRoleBLL.cs" />
+    <Compile Include="UserLevelBLL.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{050E6E28-3913-48F0-8BF9-B1C58258EB40}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DAL\DAL.csproj">
+      <Project>{09C3D40B-6BD4-41B4-B839-60FD576AF539}</Project>
+      <Name>DAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FactoryClass\FactoryClass.csproj">
+      <Project>{25021749-9A1C-4038-8A5F-8120BAEC54B9}</Project>
+      <Name>FactoryClass</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IDAL\IDAL.csproj">
+      <Project>{7C27A329-51C4-40AE-AE35-C960C21964B9}</Project>
+      <Name>IDAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Models\Models.csproj">
+      <Project>{1C4EFEAD-EA27-4226-B8EA-2B52AE80D73D}</Project>
+      <Name>Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SQLDA\SQLDAL.csproj">
+      <Project>{96A69453-25E3-435F-8BE4-6D6D6C49295B}</Project>
+      <Name>SQLDAL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

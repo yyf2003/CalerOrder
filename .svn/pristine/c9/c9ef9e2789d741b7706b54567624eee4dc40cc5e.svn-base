@@ -1,0 +1,980 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Models;
+using System.Web.Security;
+using Common;
+using BLL;
+using System.Web.UI.WebControls;
+using Newtonsoft.Json;
+using System.Web.UI;
+using System.Text;
+using DAL;
+
+namespace WebApp
+{
+    public class BasePage : System.Web.UI.Page
+    {
+        public LoginUser CurrentUser
+        {
+            get
+            {
+                LoginUser user = null;
+                if (User.Identity.IsAuthenticated)
+                {
+                    FormsIdentity identity = (FormsIdentity)User.Identity;
+                    FormsAuthenticationTicket ticket = identity.Ticket;
+                    string userData = ticket.UserData;
+                    //user = (LoginUser)SerializeObject.BinaryToObj(userData);
+                    user = JsonConvert.DeserializeObject<LoginUser>(userData);
+                }
+
+                return user;
+            }
+        }
+
+        public string PreviousUrl {
+            get {
+                string url = string.Empty;
+                if (ViewState["PreviousUrl"] != null)
+                    url = ViewState["PreviousUrl"].ToString();
+                return url;
+            }
+            set {
+                if (ViewState["PreviousUrl"] == null && HttpContext.Current.Request.UrlReferrer != null)
+                {
+                    ViewState["PreviousUrl"] = HttpContext.Current.Request.UrlReferrer.PathAndQuery;
+                }
+            }
+        }
+
+        public List<Company> MySonCompanyList
+        {
+            get
+            {
+                List<Company> list = new CompanyBLL().GetSonCompalyList(CurrentUser.CompanyId);
+                return list;
+            }
+        }
+
+        public GridView gv { get; set; }
+
+        public void LoadRegion(ref DropDownList ddl,int? customerId=null)
+        {
+            ddl.Items.Clear();
+            var list = new RegionBLL().GetList(s => s.Id > 0);
+            if (customerId != null && customerId > 0)
+            {
+                list = list.Where(s => s.CustomerId == customerId).ToList();
+            }
+            ddl.DataSource = list;
+            ddl.DataTextField = "RegionName";
+            ddl.DataValueField = "RegionName";
+            ddl.DataBind();
+            ddl.Items.Insert(0, new ListItem("--请选择--", "0"));
+        }
+
+        public void LoadProvince(ref DropDownList ddl)
+        {
+            ddl.Items.Clear();
+            var list = new PlaceBLL().GetList(s => s.ParentID == 0);
+            ddl.DataSource = list;
+            ddl.DataTextField = "PlaceName";
+            ddl.DataValueField = "ID";
+            ddl.DataBind();
+            ddl.Items.Insert(0, new ListItem("--请选择--", "0"));
+        }
+
+        /// <summary>
+        /// 用户负责区域
+        /// </summary>
+        public List<string> GetResponsibleRegion
+        {
+            get
+            {
+                List<string> list = new List<string>();
+                var model = new UserInRegionBLL().GetList(s => s.UserId == CurrentUser.UserId && s.RoleId == CurrentUser.RoleId).FirstOrDefault();
+                if (model != null && !string.IsNullOrWhiteSpace(model.RegionId))
+                {
+                    List<int> regionIdLst = StringHelper.ToIntList(model.RegionId, ',');
+                    list = new RegionBLL().GetList(s => regionIdLst.Contains(s.Id)).Select(s => s.RegionName).Distinct().ToList();
+
+                }
+                return list;
+            }
+
+        }
+
+       
+
+        /// <summary>
+        /// 设置gridview的权限
+        /// </summary>
+        /// <param name="gv"></param>
+        public void SetPromission(GridView gv, params object[] btns)
+        {
+            string url = Request.FilePath;
+            int moduleId = 0;
+            var module = new ModuleBLL().GetList(s => s.Url == url).FirstOrDefault();
+            if (module != null)
+                moduleId = module.Id;
+            int roleId = CurrentUser.RoleId;
+            var promission = new RoleInModuleBLL().GetList(s => s.RoleId == roleId && s.ModuleId == moduleId).FirstOrDefault();
+            if (promission != null)
+            {
+                string[] promissionStr = promission.OperatePermission.Split('|');
+                foreach (string s in promissionStr)
+                {
+                    if (!string.IsNullOrEmpty(s))
+                    {
+                        if (s == "add")
+                        {
+                            //btnAdd.Visible = true;
+                            //if (btnImport != null)
+                            //    btnImport.Visible = true;
+                            if (btns.Length > 0)
+                            {
+                                foreach (Button btn in btns)
+                                {
+                                    if(btn.ID.IndexOf("Add")!=-1)
+                                       btn.Visible = true;
+                                }
+                            }
+                        }
+                        if (s == "edit")
+                        {
+
+                            for (int i = 0; i < gv.Columns.Count; i++)
+                            {
+                                if (gv.Columns[i].HeaderText.Contains("编辑") || gv.Columns[i].HeaderText.Contains("修改") || gv.Columns[i].HeaderText == "审批" || (gv.Columns[i].HeaderText.IndexOf("上传") != -1) || (gv.Columns[i].HeaderText.IndexOf("安装费") != -1))
+                                {
+                                    gv.Columns[i].Visible = true;
+                                }
+                            }
+                        }
+                        if (s == "delete")
+                        {
+
+                            for (int i = 0; i < gv.Columns.Count; i++)
+                            {
+                                if (gv.Columns[i].HeaderText == "删除" || gv.Columns[i].HeaderText == "操作")
+                                {
+                                    gv.Columns[i].Visible = true
+                                        ;
+                                }
+                            }
+                        }
+                        if (s == "export")
+                        {
+                            if (btns.Length > 0)
+                            {
+                                foreach (Button btn in btns)
+                                {
+                                    if (btn.ID.IndexOf("Export") != -1)
+                                        btn.Visible = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public string GetPromissionStr(string pageUrl=null)
+        { 
+            string url =!string.IsNullOrWhiteSpace(pageUrl)?pageUrl: Request.FilePath;
+            int moduleId = 0;
+            ModuleBLL moduleBll = new ModuleBLL();
+            var module = moduleBll.GetList(s => s.Url == url).FirstOrDefault();
+            if (module != null)
+            {
+                moduleId = module.Id;
+            }
+                
+            int roleId = CurrentUser.RoleId;
+            var promission = new RoleInModuleBLL().GetList(s => s.RoleId == roleId && s.ModuleId == moduleId).FirstOrDefault();
+            if (promission != null)
+            {
+                return promission.OperatePermission;
+            }
+            else
+                return "";
+        }
+
+
+        /// <summary>
+        /// 开放编辑/删除权限
+        /// </summary>
+        /// <param name="gv"></param>
+        public void SetOPeratePromission(ref GridView gv)
+        {
+            for (int i = 0; i < gv.Columns.Count; i++)
+            {
+                if (gv.Columns[i].HeaderText.Contains("编辑") || gv.Columns[i].HeaderText.Contains("修改") || gv.Columns[i].HeaderText == "审批" || (gv.Columns[i].HeaderText.IndexOf("上传") != -1))
+                {
+                    gv.Columns[i].Visible = true;
+                }
+            }
+            for (int i = 0; i < gv.Columns.Count; i++)
+            {
+                if (gv.Columns[i].HeaderText == "删除" || gv.Columns[i].HeaderText == "操作")
+                {
+                    gv.Columns[i].Visible = true
+                        ;
+                }
+            }
+        }
+
+
+        public void ExportExcel(string fileName)
+        {
+
+        }
+
+        /// <summary>
+        /// 绑定客户
+        /// </summary>
+        /// <param name="ddl"></param>
+        protected void BindCustomerList(ref DropDownList ddl)
+        {
+            List<Models.Customer> cusotmerList = GetMyCustomerList();
+            if (cusotmerList.Any())
+            {
+                ddl.DataSource = cusotmerList;
+                ddl.DataTextField = "CustomerName";
+                ddl.DataValueField = "Id";
+                ddl.DataBind();
+            }
+            ddl.Items.Insert(0, new ListItem("--请选择--", "0"));
+        }
+
+        protected void BindCustomerList(ref CheckBoxList cbl)
+        {
+            List<Models.Customer> cusotmerList = GetMyCustomerList();
+            cbl.Items.Clear();
+            if (cusotmerList.Any())
+            {
+                cbl.DataSource = cusotmerList;
+                cbl.DataTextField = "CustomerName";
+                cbl.DataValueField = "Id";
+                cbl.DataBind();
+            }
+
+        }
+
+        public List<Models.Customer> GetMyCustomerList()
+        {
+            List<Models.Customer> cusotmerList = new CustomerBLL().GetList(s => s.IsDelete == null || s.IsDelete == false);
+            //客服
+            if (CurrentUser.RoleId == 2)
+            {
+                var myCustomerList = new UserInCustomerBLL().GetList(s => s.UserId == CurrentUser.UserId).Select(s => s.CustomerId);
+                cusotmerList = cusotmerList.Where(s => myCustomerList.Contains(s.Id)).ToList();
+            }
+            else
+            {
+                //如果是其他角色，先检查有没有负责的客户，
+                var myCustomerList = new UserInCustomerBLL().GetList(s => s.UserId == CurrentUser.UserId).Select(s => s.CustomerId);
+                if (myCustomerList.Any())
+                {
+                    cusotmerList = cusotmerList.Where(s => myCustomerList.Contains(s.Id)).ToList();
+                }
+
+            }
+            return cusotmerList;
+        }
+
+
+        protected void BindMyCustomerList(ref DropDownList ddlCustomer)
+        {
+            if (CurrentUser != null && CurrentUser.Customers != null && CurrentUser.Customers.Any())
+            {
+                ddlCustomer.DataSource = CurrentUser.Customers;
+                ddlCustomer.DataTextField = "CustomerName";
+                ddlCustomer.DataValueField = "CustomerId";
+                ddlCustomer.DataBind();
+            }
+            ddlCustomer.Items.Insert(0, new ListItem("--请选择--", "0"));
+
+
+        }
+
+        protected void BindMyCustomerList(DropDownList ddlCustomer)
+        {
+            if (CurrentUser != null && CurrentUser.Customers != null && CurrentUser.Customers.Any())
+            {
+                ddlCustomer.DataSource = CurrentUser.Customers;
+                ddlCustomer.DataTextField = "CustomerName";
+                ddlCustomer.DataValueField = "CustomerId";
+                ddlCustomer.DataBind();
+            }
+            else
+                ddlCustomer.Items.Insert(0, new ListItem("--请选择--", "0"));
+
+
+        }
+
+        protected void BindMyCustomerList(ref CheckBoxList cbl)
+        {
+            cbl.Items.Clear();
+            if (CurrentUser != null && CurrentUser.Customers != null && CurrentUser.Customers.Any())
+            {
+                cbl.DataSource = CurrentUser.Customers;
+                cbl.DataTextField = "CustomerName";
+                cbl.DataValueField = "CustomerId";
+                cbl.DataBind();
+            }
+
+
+        }
+
+        protected void BindCustomerList(DropDownList ddl)
+        {
+            List<Models.Customer> cusotmerList = GetMyCustomerList();
+            if (cusotmerList.Any())
+            {
+                ddl.DataSource = cusotmerList;
+                ddl.DataTextField = "CustomerName";
+                ddl.DataValueField = "Id";
+                ddl.DataBind();
+            }
+            else
+                ddl.Items.Insert(0, new ListItem("--请选择--", "0"));
+        }
+
+        /// <summary>
+        /// 获取不同客户的区域信息
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <param name="ddl"></param>
+        protected void BindRegionByCustomer(int customerId, ref DropDownList ddl)
+        {
+            ddl.Items.Clear();
+            var list = new RegionBLL().GetList(s => s.CustomerId == customerId && (s.IsDelete == null || s.IsDelete == false));
+            if (list.Any())
+            {
+                ddl.DataSource = list;
+                ddl.DataTextField = "RegionName";
+                ddl.DataValueField = "Id";
+                ddl.DataBind();
+            }
+            ddl.Items.Insert(0, new ListItem("--请选择--", "0"));
+        }
+
+        protected void BindRegionByCustomer(int customerId, ref CheckBoxList cbl)
+        {
+            cbl.Items.Clear();
+            var list = new RegionBLL().GetList(s => s.CustomerId == customerId && (s.IsDelete == null || s.IsDelete == false));
+            if (list.Any())
+            {
+                cbl.DataSource = list;
+                cbl.DataTextField = "RegionName";
+                cbl.DataValueField = "Id";
+                cbl.DataBind();
+
+            }
+
+        }
+
+        protected void BindRegionByCustomer1(int customerId, ref CheckBoxList cbl)
+        {
+            cbl.Items.Clear();
+            var list = new RegionBLL().GetList(s => s.CustomerId == customerId && (s.IsDelete == null || s.IsDelete == false));
+            if (GetResponsibleRegion.Any())
+            {
+                list = list.Where(s => GetResponsibleRegion.Contains(s.RegionName)).ToList();
+            }
+            if (list.Any())
+            {
+
+                foreach (var item in list)
+                {
+                    ListItem li = new ListItem();
+                    li.Value = item.RegionName;
+                    li.Text = item.RegionName + "&nbsp;";
+                    cbl.Items.Add(li);
+                }
+
+            }
+
+        }
+
+        /// <summary>
+        /// 初始化查询框的值
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="container"></param>
+        protected void SetSearchVal(string url, Panel container)
+        {
+            if (!string.IsNullOrWhiteSpace(url))
+            {
+                string[] arr = url.Split('&');
+                foreach (string s in arr)
+                {
+                    if (!string.IsNullOrWhiteSpace(s))
+                    {
+                        string key = s.Split('=')[0];
+                        string val = s.Split('=')[1];
+                        if (!string.IsNullOrWhiteSpace(val))
+                            SetControlVal(container, key, val);
+                    }
+                }
+            }
+        }
+
+
+        void SetControlVal(System.Web.UI.Control container, string key, string val)
+        {
+            foreach (Control control in container.Controls)
+            {
+                if (control.ID == key)
+                {
+                    if (control.GetType().Name == "DropDownList" && val != "0")
+                    {
+                        DropDownList ddl = (DropDownList)control;
+                        if (ddl.Items.Count > 0)
+                            ddl.SelectedValue = val;
+                    }
+                    if (control.GetType().Name == "TextBox")
+                    {
+                        ((TextBox)control).Text = val;
+                    }
+                }
+            }
+        }
+
+
+        public void Alert(string msg, string url = null)
+        {
+            System.Text.StringBuilder script = new System.Text.StringBuilder();
+            string jump = string.Empty;
+            if (!string.IsNullOrWhiteSpace(url))
+            {
+                jump = "window.location='" + url + "';";
+            }
+            script.AppendFormat("<script>alert('{0}');{1}</script>", msg, jump);
+            ClientScript.RegisterClientScriptBlock(GetType(), "al", script.ToString());
+        }
+
+        public void LayAlert(string msg)
+        {
+            System.Text.StringBuilder script = new System.Text.StringBuilder();
+            string jump = string.Empty;
+
+            script.AppendFormat("<script>layer.confirm('{0}')</script>", msg);
+            ClientScript.RegisterClientScriptBlock(GetType(), "al", script.ToString());
+        }
+
+        public void ExcuteJs(string fun, string msg = null)
+        {
+            string js = "<script>" + fun + "();</script>";
+            if (!string.IsNullOrWhiteSpace(msg))
+            {
+                js = "<script>" + fun + "(" + msg + ");</script>";
+            }
+            ClientScript.RegisterClientScriptBlock(GetType(), "al", js);
+        }
+
+
+        protected string GetAttachList(string fileCode, int subjectId)
+        {
+            AttachmentBLL attachBll = new AttachmentBLL();
+            var list = attachBll.GetList(s => s.FileCode == fileCode && s.SubjectId == subjectId && (s.IsDelete == null || s.IsDelete == false));
+            if (list.Any())
+            {
+                StringBuilder attach = new StringBuilder();
+                list.ForEach(s =>
+                {
+                    string exten = s.FilePath.Substring(s.FilePath.LastIndexOf('.') + 1);
+                    string src = GetSrcString(exten, s.FileType);
+                    string path = s.FilePath.Replace("..//", "//");
+
+                    if (src == "" && s.SmallImgUrl == "")
+                    {
+                        src = "/Image/UpLoadFileType/Others.png";
+
+
+                    }
+
+                    if (src == "")//图片
+                    {
+
+                        src = s.SmallImgUrl.Replace("..//", "//");
+
+                        attach.Append("<div style='width:130px;float:left;height:120px;'><a href='" + path + "' class='showimg' data-fancybox-group='" + fileCode + "'  style='border:0px;'><img style='border:0px;' src='" + src + "' width='100px' height='80px' /></a><br/>");
+                    }
+                    else//非图片
+                    {
+                        src = src.Replace("..//", "//");
+                        attach.Append("<div style='width:130px;float:left; height:120px;'><img src='" + src + "' width='100px' height='80px' /><br/>");
+                    }
+                    string downLoadUrl = " ../Handler/Files.ashx?id=" + s.Id + "&type=download";
+
+                    attach.Append("<table width='100%' cellpadding='0' cellspacing='0'><tr><td style='text-align:left;width:50px; height:30px;font-size:12px;border:0px;'><a href='" + downLoadUrl + "' rel='" + s.Title + "' title='" + s.Title + "'>" + (s.Title) + "</a></td></tr></table>");
+                    attach.Append("</div>");
+                });
+                return attach.ToString();
+            }
+            else
+                return "";
+        }
+
+        string GetSrcString(string type, string fileType)
+        {
+            string src = "";
+            switch (type)
+            {
+                case "xls":
+                case "xlsx":
+                    src = "/image/UpLoadFileType/EXCEL.png";
+                    break;
+                case "docx":
+                case "doc":
+                    src = "/image/UpLoadFileType/WORD.png";
+                    break;
+                case "pptx":
+                case "pptm":
+                case "ppsx":
+                case "ppsm":
+                case "pps":
+                case "ppt":
+                    src = "/image/UpLoadFileType/PPT.png";
+                    break;
+                case "rar":
+                case "zip":
+                    src = "/Image/UpLoadFileType/yasuo.png";
+                    break;
+            }
+
+            return src;
+        }
+
+        /// <summary>
+        /// 统计订单pop的价格和面积
+        /// </summary>
+        /// <param name="orderList"></param>
+        /// <param name="popPrice"></param>
+        /// <param name="popArea"></param>
+        //public void StatisticPOPPrice(IEnumerable<FinalOrderDetailTemp> orderList, out decimal popPrice, out decimal popArea)
+        //{
+        //    popPrice = 0;
+        //    popArea = 0;
+        //    if (orderList.Any())
+        //    {
+        //        decimal totalPrice = 0;
+        //        decimal totalArea = 0;
+        //        string unitName = string.Empty;
+        //        orderList.ToList().ForEach(s =>
+        //        {
+        //            decimal newPOPArea = 0;
+        //            if (s.GraphicLength != null && s.GraphicWidth != null)
+        //            {
+        //                newPOPArea = ((s.GraphicLength ?? 0) * (s.GraphicWidth ?? 0)) / 1000000;
+        //            }
+        //            if (!string.IsNullOrWhiteSpace(s.GraphicMaterial))
+        //            {
+        //                unitName = string.Empty;
+        //                decimal defaultUnitPrice = GetMaterialPrice(s.GraphicMaterial, out unitName);//这个是材质数据库单价（会变更）
+        //                defaultUnitPrice = s.UnitPrice ?? 0;//取下订单时候的单价
+        //                if (s.GraphicMaterial.IndexOf("挂轴") != -1)
+        //                {
+        //                    string material0 = s.GraphicMaterial.Replace("+挂轴", "").Replace("+上挂轴", "").Replace("+下挂轴", "");
+        //                    decimal unitPrice0 = GetMaterialPrice(material0, out unitName);
+        //                    decimal unitPrice1 = GetMaterialPrice("挂轴", out unitName);
+        //                    decimal popPrice0 = newPOPArea * unitPrice0 * (s.Quantity ?? 1);
+        //                    decimal popPrice1 = (s.GraphicWidth ?? 0) / 1000 * 2 * unitPrice1 * (s.Quantity ?? 1);
+        //                    if (s.GraphicMaterial.IndexOf("上挂轴") != -1 || s.GraphicMaterial.IndexOf("下挂轴") != -1)
+        //                    {
+        //                        popPrice1 = (s.GraphicWidth ?? 0) / 1000  * unitPrice1 * (s.Quantity ?? 1);
+        //                    }
+        //                    totalPrice += (popPrice0 + popPrice1);
+        //                    totalArea += newPOPArea * (s.Quantity ?? 1);
+        //                }
+        //                else
+        //                {
+        //                    //if (s.UnitPrice != null && s.UnitPrice > 0)
+        //                    //{
+
+        //                    //    if (unitName == "个")
+        //                    //    {
+        //                    //        totalPrice += (s.UnitPrice ?? 0) * (s.Quantity ?? 1);
+        //                    //    }
+        //                    //    else
+        //                    //    {
+        //                    //        totalArea += (s.Area ?? 0) * (s.Quantity ?? 1);
+        //                    //        totalPrice += (s.Area ?? 0) * (s.UnitPrice ?? 0) * (s.Quantity ?? 1);
+        //                    //    }
+        //                    //}
+        //                    //else
+        //                    //{
+                                
+
+        //                    //}
+        //                    if (unitName == "个")
+        //                    {
+        //                        totalPrice += defaultUnitPrice * (s.Quantity ?? 1);
+        //                    }
+        //                    else
+        //                    {
+        //                        totalArea += newPOPArea * (s.Quantity ?? 1);
+        //                        totalPrice += newPOPArea * defaultUnitPrice * (s.Quantity ?? 1);
+        //                    }
+
+        //                }
+
+
+        //            }
+        //        });
+        //        popPrice = totalPrice;
+        //        popArea = totalArea;
+        //    }
+        //}
+
+
+        /// <summary>
+        /// 统计订单pop的价格和面积
+        /// </summary>
+        /// <param name="orderList"></param>
+        /// <param name="popPrice"></param>
+        /// <param name="popArea"></param>
+        public void StatisticPOPTotalPrice(IEnumerable<FinalOrderDetailTemp> orderList, out decimal totalPrice, out decimal totalArea)
+        {
+            totalPrice = 0;
+            totalArea = 0;
+            
+            if (orderList.Any())
+            {
+                decimal price = 0;
+                decimal area = 0;
+                orderList.ToList().ForEach(s => {
+                    price += (s.TotalPrice ?? 0);
+                    decimal width = s.GraphicWidth ?? 0;
+                    decimal length = s.GraphicLength ?? 0;
+                    string GraphicMaterial = s.GraphicMaterial;
+                    if (GraphicMaterial.Contains("挂轴"))
+                    {
+                        
+                        if (GraphicMaterial.Contains("+挂轴") || GraphicMaterial.Contains("+上挂轴") || GraphicMaterial.Contains("+下挂轴"))
+                        {
+                            area += ((width * length) / 1000000) * (s.Quantity ?? 1);
+                            if (GraphicMaterial.Contains("+挂轴"))
+                                area += (width / 1000) * 2 * (s.Quantity ?? 1);
+                            else
+                                area += (width / 1000) * (s.Quantity ?? 1);
+                        }
+                        else
+                        {
+                            area += (width / 1000) * 2 * (s.Quantity ?? 1);
+                        }
+
+                    }
+                    else
+                    {
+                        area += ((width * length) / 1000000) * (s.Quantity ?? 1);
+                    }
+                });
+                totalPrice = price;
+                totalArea = area;
+            }
+            
+        }
+
+
+        /// <summary>
+        /// 获取材质价格和单位
+        /// </summary>
+        Dictionary<string, Dictionary<decimal, string>> priceDic = new Dictionary<string, Dictionary<decimal, string>>();
+        public decimal GetMaterialPrice(int priceItemId, string materialName, out string unitName)
+        {
+            unitName = string.Empty;
+            decimal price = 0;
+            if (!string.IsNullOrWhiteSpace(materialName))
+            {
+                if (priceDic.Keys.Contains(materialName.ToLower()))
+                {
+                    Dictionary<decimal, string> dic = priceDic[materialName.ToLower()];
+                    int index = 0;
+                    foreach (KeyValuePair<decimal, string> item in dic)
+                    {
+                        if (index == 0)
+                        {
+                            unitName = item.Value;
+                            price = item.Key;
+                        }
+                    }
+                }
+                else
+                {
+                    string name = materialName.Replace("—", "-").Replace("（", "(").Replace("）", ")").ToLower();
+
+                    //var model = (from orderMaterial in CurrentContext.DbContext.OrderMaterialMpping
+                    //             join customerMaterial in CurrentContext.DbContext.CustomerMaterialInfo
+                    //             on orderMaterial.CustomerMaterialId equals customerMaterial.Id
+                    //             join basicM in CurrentContext.DbContext.BasicMaterial
+                    //             on customerMaterial.BasicMaterialId equals basicM.Id
+                    //             join unit in CurrentContext.DbContext.UnitInfo
+                    //             on basicM.UnitId equals unit.Id
+                    //             where orderMaterial.OrderMaterialName.ToLower() == name
+                    //             select new
+                    //             {
+                    //                 customerMaterial.Price,
+                    //                 unit.UnitName
+                    //             }).FirstOrDefault();
+
+                    var model = (from orderMaterial in CurrentContext.DbContext.OrderMaterialMpping
+                                 join customerMaterial in CurrentContext.DbContext.CustomerMaterialInfo
+                                 on orderMaterial.BasicMaterialId equals customerMaterial.BasicMaterialId
+                                 join basicM in CurrentContext.DbContext.BasicMaterial
+                                 on customerMaterial.BasicMaterialId equals basicM.Id
+                                 join unit in CurrentContext.DbContext.UnitInfo
+                                 on basicM.UnitId equals unit.Id
+                                 where orderMaterial.OrderMaterialName.ToLower() == name
+                                 && customerMaterial.PriceItemId == priceItemId
+                                 select new
+                                 {
+                                     customerMaterial.Price,
+                                     unit.UnitName
+                                 }).FirstOrDefault();
+                    
+
+                    if (model != null)
+                    {
+                        price = model.Price ?? 0;
+                        unitName = model.UnitName;
+                        Dictionary<decimal, string> dic = new Dictionary<decimal, string>();
+                        dic.Add(price, unitName);
+                        priceDic.Add(materialName.ToLower(), dic);
+
+                    }
+                }
+            }
+            return price;
+        }
+
+
+
+
+        /// <summary>
+        /// 获取那些没参加拆单的pop的材质单价
+        /// </summary>
+        /// <param name="materialName"></param>
+        /// <returns></returns>
+        /// 
+        CustomerMaterialInfoBLL materialBll = new CustomerMaterialInfoBLL();
+        Dictionary<string, decimal> mpriceDic = new Dictionary<string, decimal>();
+        public decimal GetMaterialPrice(string materialName)
+        {
+            decimal price = 0;
+            if (!string.IsNullOrWhiteSpace(materialName))
+            {
+                if (mpriceDic.Keys.Contains(materialName.ToLower()))
+                {
+                    price = mpriceDic[materialName.ToLower()];
+                }
+                else
+                {
+                    string name = materialName.Replace("—", "-").Replace("（", "(").Replace("）", ")").ToLower();
+                    //var model = materialBll.GetList(s => s.MaterialName.ToLower() == name).FirstOrDefault();
+                    var model = (from orderMaterial in CurrentContext.DbContext.OrderMaterialMpping
+                                 join customerMaterial in CurrentContext.DbContext.CustomerMaterialInfo
+                                 on orderMaterial.CustomerMaterialId equals customerMaterial.Id
+                                 where orderMaterial.OrderMaterialName.ToLower() == name
+                                 select new
+                                 {
+                                     customerMaterial.Price
+                                 }).FirstOrDefault();
+                    if (model != null)
+                    {
+                        price = model.Price ?? 0;
+                        mpriceDic.Add(materialName.ToLower(), price);
+                    }
+                }
+            }
+            return price;
+        }
+
+        /// <summary>
+        /// 获取材质单价，并计算总价格
+        /// </summary>
+        /// <param name="materialName"></param>
+        /// <param name="totalPrice"></param>
+        /// <returns></returns>
+        public decimal GetMaterialUnitPrice(POP pop, out decimal totalPrice)
+        {
+            decimal unitPrice = 0;
+            totalPrice = 0;
+            if (pop != null)
+            {
+                decimal width = pop.GraphicWidth ?? 0;
+                decimal length = pop.GraphicLength ?? 0;
+                int quantity = pop.Quantity ?? 1;
+                string materialName = pop.GraphicMaterial;
+                if (!string.IsNullOrWhiteSpace(materialName))
+                {
+                    materialName = materialName.Replace("—", "-").Replace("（", "(").Replace("）", ")").ToLower();
+                    string unitName = string.Empty;
+                    if (materialName.Contains("挂轴"))
+                    {
+                        if (materialName.Contains("+挂轴") || materialName.Contains("+上挂轴") || materialName.Contains("+下挂轴"))
+                        {
+                            decimal unitPrice1 = GetMaterialPrice(pop.PriceItemId, "挂轴", out unitName);
+                            string newMaterial = materialName.Substring(0, materialName.LastIndexOf('+'));
+                            unitPrice = GetMaterialPrice(pop.PriceItemId, newMaterial, out unitName);
+                            decimal totalPrice0 = 0;
+                            if (unitName == "个")
+                            {
+                                totalPrice0 = quantity * unitPrice;
+                            }
+                            else
+                            {
+                                totalPrice0 = ((width * length) / 1000000) * quantity * unitPrice;
+                            }
+                            decimal totalPrice1 = (width / 1000) * 2 * quantity * unitPrice1;
+                            if (materialName.Contains("+上挂轴") || materialName.Contains("+下挂轴"))
+                            {
+                                totalPrice1 = (width / 1000) * quantity * unitPrice1;
+                            }
+                            totalPrice = totalPrice0 + totalPrice1;
+                        }
+                        else
+                        {
+                            unitPrice = GetMaterialPrice(pop.PriceItemId, materialName, out unitName);
+                            totalPrice = (width / 1000) * 2 * quantity * unitPrice;
+                        }
+                    }
+                    else
+                    {
+                        unitPrice = GetMaterialPrice(pop.PriceItemId, materialName, out unitName);
+                        if (unitName == "个")
+                        {
+                            totalPrice = quantity * unitPrice;
+                        }
+                        else
+                            totalPrice = ((width * length) / 1000000) * quantity * unitPrice;
+                    }
+                }
+            }
+            return unitPrice;
+
+        }
+
+
+        /// <summary>
+        /// 按照物料级别获取安装费
+        /// </summary>
+        /// <param name="MaterialSupport"></param>
+        /// <returns></returns>
+        /// 
+        //List<InstallPriceConfig> installConfigList = new List<InstallPriceConfig>();
+        List<NewMaterialSupport> installConfigList = new List<NewMaterialSupport>();
+        /// <summary>
+        /// 基本安装费
+        /// </summary>
+        /// <param name="MaterialSupport"></param>
+        /// <returns></returns>
+        public decimal GetBasicInstallPrice(string MaterialSupport)
+        {
+            decimal BasicInstallPrice = 0;
+            if (string.IsNullOrWhiteSpace(MaterialSupport))
+            {
+                MaterialSupport = "Basic";
+            }
+            if (!installConfigList.Any())
+            {
+                LoadMaterialSupportInstallPrice();
+            }
+            var price = installConfigList.Where(s => s.NewMaterialSupportName.ToLower().Contains(MaterialSupport.ToLower())).FirstOrDefault();
+            if (price != null)
+            {
+                BasicInstallPrice = price.BasicInstallPrice;
+            }
+            else
+            {
+                var price1 = installConfigList.Where(s => s.NewMaterialSupportName.ToLower().Contains("others")).FirstOrDefault();
+                if (price1 != null)
+                {
+                    BasicInstallPrice = price1.BasicInstallPrice;
+                }
+            }
+            return BasicInstallPrice;
+        }
+
+        /// <summary>
+        /// 橱窗安装费
+        /// </summary>
+        /// <param name="MaterialSupport"></param>
+        /// <returns></returns>
+        public decimal GetWindowInstallPrice(string MaterialSupport)
+        {
+            if (string.IsNullOrWhiteSpace(MaterialSupport))
+                MaterialSupport = "Basic";
+            decimal WindowInstallPrice = 0;
+            if (!installConfigList.Any())
+            {
+                LoadMaterialSupportInstallPrice();
+            }
+            var price = installConfigList.Where(s => s.NewMaterialSupportName.ToLower().Contains(MaterialSupport.ToLower())).FirstOrDefault();
+            if (price != null)
+            {
+                WindowInstallPrice = price.WindowInstallPrice;
+            }
+            else
+            {
+                var price1 = installConfigList.Where(s => s.NewMaterialSupportName.ToLower().Contains("others")).FirstOrDefault();
+                if (price1 != null)
+                {
+                    WindowInstallPrice = price1.WindowInstallPrice;
+                }
+            }
+            return WindowInstallPrice;
+        }
+
+        void LoadMaterialSupportInstallPrice()
+        {
+            installConfigList.Clear();
+            var list = (from ms in CurrentContext.DbContext.NewMaterialSupport
+                       join basic in CurrentContext.DbContext.BasicMaterialSupport
+                       on ms.BasicMaterialSupportId equals basic.Id
+                       join price in CurrentContext.DbContext.InstallPriceConfig
+                       on basic.Id equals price.BasicMaterialSupportId
+                       select new {
+                           ms,
+                           price
+                       }).ToList();
+            if (list.Any())
+            {
+                list.ForEach(s => {
+                    NewMaterialSupport model = new NewMaterialSupport();
+                    model.BasicInstallPrice = s.price.BasicInstallPrice??0;
+                    model.NewMaterialSupportName = s.ms.NewMaterialSupportName;
+                    model.WindowInstallPrice = s.price.WindowInstallPrice ?? 0;
+                    installConfigList.Add(model);
+                });
+            }
+        }
+
+        /// <summary>
+        /// 检查器架是否存在
+        /// </summary>
+        /// <param name="shopId"></param>
+        /// <param name="sheet"></param>
+        /// <param name="machineFrameName"></param>
+        /// <returns></returns>
+        protected bool CheckShopMachineFrame(int shopId, string sheet,string machineFrameName)
+        {
+            var list = new ShopMachineFrameBLL().GetList(s => s.ShopId == shopId && s.PositionName.ToLower() == sheet.ToLower() && s.MachineFrame.ToLower() == machineFrameName.ToLower());
+            return list.Any();
+        }
+
+        public string CreateSubjectNo()
+        {
+            System.Text.StringBuilder code = new System.Text.StringBuilder();
+            DateTime date = DateTime.Now;
+            code.Append(date.Year).Append(date.Month.ToString().PadLeft(2, '0')).Append(date.Day.ToString().PadLeft(2, '0')).Append(date.Hour.ToString().PadLeft(2, '0')).Append(date.Minute.ToString().PadLeft(2, '0')).Append(date.Second.ToString().PadLeft(2, '0'));
+            return code.ToString();
+        }
+
+        
+    }
+}

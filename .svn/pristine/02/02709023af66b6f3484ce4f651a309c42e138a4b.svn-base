@@ -1,0 +1,129 @@
+﻿<?xml version="1.0"?>
+<!--
+  有关如何配置 ASP.NET 应用程序的详细信息，请访问
+  http://go.microsoft.com/fwlink/?LinkId=169433
+  -->
+<configuration>
+    
+	<configSections>
+		<!-- For more information on Entity Framework configuration, visit http://go.microsoft.com/fwlink/?LinkID=237468 -->
+		<section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false"/>
+		<!-- For more information on Entity Framework configuration, visit http://go.microsoft.com/fwlink/?LinkID=237468 --></configSections>
+	<connectionStrings>
+		<add name="ApplicationServices" connectionString="data source=.\SQLEXPRESS;Integrated Security=SSPI;AttachDBFilename=|DataDirectory|\aspnetdb.mdf;User Instance=true" providerName="System.Data.SqlClient"/>
+		
+    <!--服务器-->
+    <add name="KalerOrderDBEntities1" connectionString="metadata=res://*/Model1.csdl|res://*/Model1.ssdl|res://*/Model1.msl;provider=System.Data.SqlClient;provider connection string=&quot;server=218.246.34.156,9988;database=CalerDBTest;user id=sa;password=ZYHYSQLSERVERDATA**O0;Connect Timeout=3600;Application Name=EntityFramework&quot;" providerName="System.Data.EntityClient"/>
+    <!--本地-->
+    <add name="KalerOrderDBEntities" connectionString="metadata=res://*/Model1.csdl|res://*/Model1.ssdl|res://*/Model1.msl;provider=System.Data.SqlClient;provider connection string=&quot;Data Source=.;Initial Catalog=KalerOrderDB;Integrated Security=True;MultipleActiveResultSets=True;Application Name=EntityFramework&quot;" providerName="System.Data.EntityClient"/>
+    
+    <add name="ExcelFilePath" connectionString="Provider=Microsoft.Ace.OleDb.12.0;data source='ExcelPath';Extended Properties='Excel 12.0; HDR=YES; IMEX=1'"/>
+	</connectionStrings>
+	<appSettings>
+    <!--服务器-->
+		<add key="SqlConnStr1" value="server=218.246.34.156,9988;database=CalerDBTest;uid=sa;pwd=ZYHYSQLSERVERDATA**O0;Connect Timeout=3600;Asynchronous Processing=true"/>
+    <!--本地-->
+    <add key="SqlConnStr" value="Data Source=.;Initial Catalog=KalerOrderDB;Integrated Security=True;MultipleActiveResultSets=True"/>
+		<add key="ExportTemplate" value="/TemplateFile/Export/fileName.xlsx"/>
+		<add key="ImportTemplate" value="/TemplateFile/Import/fileName.xlsx"/>
+		<add key="SQLDAL" value="SQLDAL"/>
+    <!--上传图片格式-->
+    <add key="UpLoadImgType" value="jpg|jpeg|gif|png|bmp|tga|tif|ico"/>
+    <!--导入订单List模板表头必需存在列-->
+    <add key="ListSheetRequireColumns" value="POSCode|店铺编号|店铺名称|区域|Region|省份|城市|店铺规模大小|物料支持|物料支持级别|角落类型"/>
+    <!--导入订单List模板表头必需存在列数量-->
+    <add key="ListSheetRequireColumnsCount" value="8"/>
+    
+    <!--特殊用户可以导出，导出店铺类型 value=UserId|Format#UserId|Format-->
+    <add key="CanExportUser" value="2|Kids,Infant"/>
+	</appSettings>
+    <!--设置事物超时时间-->
+    <system.transactions>
+        <defaultSettings timeout="00:05:00" />
+    </system.transactions>
+	<system.web>
+		<customErrors mode="Off"/>
+		<sessionState mode="InProc" timeout="60"/>
+		<compilation debug="true" targetFramework="4.0">
+			<assemblies>
+				<add assembly="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089"/>
+				<add assembly="System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B03F5F7F11D50A3A"/></assemblies></compilation>
+		<authentication mode="Forms">
+			<forms cookieless="UseCookies" name="ParkerCookie" loginUrl="~/login.htm" timeout="60" slidingExpiration="true"/>
+		</authentication>
+		<authorization>
+			<deny users="?"/>
+		</authorization>
+		<membership>
+			<providers>
+				<clear/>
+				<add name="AspNetSqlMembershipProvider" type="System.Web.Security.SqlMembershipProvider" connectionStringName="ApplicationServices" enablePasswordRetrieval="false" enablePasswordReset="true" requiresQuestionAndAnswer="false" requiresUniqueEmail="false" maxInvalidPasswordAttempts="5" minRequiredPasswordLength="6" minRequiredNonalphanumericCharacters="0" passwordAttemptWindow="10" applicationName="/"/>
+			</providers>
+		</membership>
+		<profile>
+			<providers>
+				<clear/>
+				<add name="AspNetSqlProfileProvider" type="System.Web.Profile.SqlProfileProvider" connectionStringName="ApplicationServices" applicationName="/"/>
+			</providers>
+		</profile>
+		<roleManager enabled="false">
+			<providers>
+				<clear/>
+				<add name="AspNetSqlRoleProvider" type="System.Web.Security.SqlRoleProvider" connectionStringName="ApplicationServices" applicationName="/"/>
+				<add name="AspNetWindowsTokenRoleProvider" type="System.Web.Security.WindowsTokenRoleProvider" applicationName="/"/>
+			</providers>
+		</roleManager>
+        <httpRuntime maxRequestLength="1024000" useFullyQualifiedRedirectUrl="true" executionTimeout="180" requestValidationMode="2.0" />
+	</system.web>
+	<location path="css">
+		<system.web>
+			<authorization>
+				<allow users="*"/>
+			</authorization>
+		</system.web>
+	</location>
+  <location path="layui">
+    <system.web>
+      <authorization>
+        <allow users="*"/>
+      </authorization>
+    </system.web>
+  </location>
+  <location path="Scripts">
+    <system.web>
+      <authorization>
+        <allow users="*"/>
+      </authorization>
+    </system.web>
+  </location>
+	<location path="Login.aspx">
+		<system.web>
+			<authorization>
+				<allow users="*"/>
+			</authorization>
+		</system.web>
+	</location>
+  <location path="Register.aspx">
+    <system.web>
+      <authorization>
+        <allow users="*"/>
+      </authorization>
+    </system.web>
+  </location>
+	<location path="image">
+		<system.web>
+			<authorization>
+				<allow users="*"/>
+			</authorization>
+		</system.web>
+	</location>
+	<system.webServer>
+		<modules runAllManagedModulesForAllRequests="true"/>
+	</system.webServer>
+	<entityFramework>
+		<defaultConnectionFactory type="System.Data.Entity.Infrastructure.SqlConnectionFactory, EntityFramework"/>
+		<providers>
+			<provider invariantName="System.Data.SqlClient" type="System.Data.Entity.SqlServer.SqlProviderServices, EntityFramework.SqlServer"/>
+		</providers>
+	</entityFramework>
+</configuration>

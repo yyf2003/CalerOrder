@@ -1,0 +1,422 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using DAL;
+using Models;
+using Common;
+
+namespace WebApp.Statistics
+{
+    public partial class MaterialStatistics : BasePage
+    {
+        int shopId;
+        int subjectId;
+        //是否查询
+        string isSearch = string.Empty;
+        string region = string.Empty;
+        string province = string.Empty;
+        string city = string.Empty;
+        string guidanceIds = string.Empty;
+        string subjectIds = string.Empty;
+        string status = string.Empty;
+        int subjectChannel = 0;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["shopId"] != null)
+            {
+                shopId = int.Parse(Request.QueryString["shopId"]);
+            }
+            if (Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(Request.QueryString["subjectId"]);
+            }
+            if (Request.QueryString["isSearch"] != null)
+            {
+                isSearch = Request.QueryString["isSearch"];
+            }
+            if (Request.QueryString["regions"] != null)
+            {
+                region = Request.QueryString["regions"];
+            }
+            if (Request.QueryString["provinces"] != null)
+            {
+                province = Request.QueryString["provinces"];
+            }
+            if (Request.QueryString["citys"] != null)
+            {
+                city = Request.QueryString["citys"];
+            }
+            if (Request.QueryString["guidanceIds"] != null)
+            {
+                guidanceIds = Request.QueryString["guidanceIds"];
+            }
+
+            if (Request.QueryString["subjectIds"] != null)
+            {
+                subjectIds = Request.QueryString["subjectIds"];
+            }
+            if (Request.QueryString["status"] != null)
+            {
+                status = Request.QueryString["status"];
+            }
+            if (Request.QueryString["subjectChannel"] != null)
+            {
+                subjectChannel = int.Parse(Request.QueryString["subjectChannel"].ToString());
+            }
+            if (!IsPostBack)
+            {
+                BindData();
+            }
+        }
+
+        void BindData()
+        {
+            List<FinalOrderDetailTemp> list = new List<FinalOrderDetailTemp>();
+            if (subjectId > 0)
+                list = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId && (s.IsDelete == null || s.IsDelete == false) && ((s.OrderType == 1 && s.GraphicLength != null && s.GraphicLength > 0 && s.GraphicWidth != null && s.GraphicWidth > 0) || (s.OrderType == 2)));
+            else
+            {
+                List<int> guidanceList = new List<int>();
+                List<int> subjectList = new List<int>();
+                if (!string.IsNullOrWhiteSpace(guidanceIds))
+                {
+                    guidanceList = StringHelper.ToIntList(guidanceIds, ',');
+                }
+                if (!string.IsNullOrWhiteSpace(subjectIds))
+                {
+                    subjectList = StringHelper.ToIntList(subjectIds, ',');
+
+                }
+                var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                 join subject in CurrentContext.DbContext.Subject
+                                 on order.SubjectId equals subject.Id
+                                 join shop in CurrentContext.DbContext.Shop
+                                 on order.ShopId equals shop.Id
+                                 where (guidanceList.Any() ? guidanceList.Contains(subject.GuidanceId ?? 0) : 1 == 1)
+                                 && (subjectList.Any() ? subjectList.Contains(subject.Id) : 1 == 1)
+                                 && (subject.IsDelete == null || subject.IsDelete == false)
+                                 && subject.ApproveState == 1
+                                 && (order.IsDelete == null || order.IsDelete == false)
+                                 && ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || (order.OrderType == 2))
+                                 //&& (shop.Status == null || shop.Status == "" || shop.Status == "正常")
+                                 select new
+                                 {
+                                     order,
+                                     shop
+                                 }).ToList();
+                //list = new FinalOrderDetailTempBLL().GetList(s => guidanceList.Contains(s.SubjectId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && ((s.OrderType == 1 && s.GraphicLength != null && s.GraphicLength > 0 && s.GraphicWidth != null && s.GraphicWidth > 0) || (s.OrderType == 2)));
+                //if (!string.IsNullOrWhiteSpace(subjectIds))
+                //{
+
+                //    list = list.Where(s => subjectList.Contains(s.SubjectId ?? 0)).ToList();
+                //}
+                if (subjectChannel == 1)
+                {
+                    //上海系统单
+                    orderList = orderList.Where(s => s.order.RegionSupplementId == null).ToList();
+                }
+                else if (subjectChannel == 2)
+                {
+                    //分区订单
+                    orderList = orderList.Where(s => s.order.RegionSupplementId != null && s.order.RegionSupplementId > 0).ToList();
+                }
+                if (!string.IsNullOrWhiteSpace(status))
+                {
+                    if (status == "0")
+                    {
+                        orderList = orderList.Where(s => s.shop.Status == null || s.shop.Status == "" || s.shop.Status == "正常").ToList();
+                    }
+                    else if (status == "1")
+                    {
+                        orderList = orderList.Where(s => s.shop.Status != null && s.shop.Status.Contains("闭")).ToList();
+                    }
+                }
+                list = orderList.Select(s => s.order).ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(isSearch) && isSearch == "1")
+            {
+
+
+                List<string> regionList1 = new List<string>();
+                List<string> provinceList1 = new List<string>();
+                List<string> cityList1 = new List<string>();
+                if (!string.IsNullOrWhiteSpace(region))
+                {
+                    regionList1 = StringHelper.ToStringList(region, ',', LowerUpperEnum.ToLower);
+                }
+                else
+                {
+                    GetResponsibleRegion.ForEach(s =>
+                    {
+                        regionList1.Add(s.ToLower());
+                    });
+
+                }
+                if (regionList1.Any())
+                {
+
+                    var list1 = (from order in list
+                                 join shop in CurrentContext.DbContext.Shop
+                                 on order.ShopId equals shop.Id
+                                 where regionList1.Contains(shop.RegionName.ToLower())
+                                 select new { order, shop }).ToList();
+                    if (!string.IsNullOrWhiteSpace(province))
+                    {
+                        provinceList1 = StringHelper.ToStringList(province, ',');
+                        if (provinceList1.Any())
+                        {
+                            list1 = list1.Where(s => provinceList1.Contains(s.shop.ProvinceName)).ToList();
+                            if (!string.IsNullOrWhiteSpace(city))
+                            {
+                                cityList1 = StringHelper.ToStringList(city, ',');
+                                if (cityList1.Any())
+                                    list1 = list1.Where(s => provinceList1.Contains(s.shop.ProvinceName) && cityList1.Contains(s.shop.CityName)).ToList();
+                            }
+                        }
+
+                    }
+                    list = list1.Select(s => s.order).ToList();
+
+                }
+
+            }
+            if (shopId > 0)
+            {
+                list = list.Where(s => s.ShopId == shopId).ToList();
+            }
+            List<MaterialClass> materialList = new List<MaterialClass>();
+            #region 旧的，不用了
+            //if (list.Any())
+            //{
+
+            //    list.ForEach(s =>
+            //    {
+            //        string unitName = string.Empty;
+            //        decimal price = 0;
+            //        decimal newPOPArea = 0;
+            //        if (s.GraphicLength != null && s.GraphicWidth != null)
+            //        {
+            //            newPOPArea = ((s.GraphicLength ?? 0) * (s.GraphicWidth ?? 0)) / 1000000;
+            //        }
+            //        if (!string.IsNullOrWhiteSpace(s.GraphicMaterial))
+            //        {
+            //            price = GetMaterialPrice(s.GraphicMaterial, out unitName);
+            //            if (s.GraphicMaterial.IndexOf("挂轴") != -1)
+            //            {
+            //                MaterialClass mc = new MaterialClass();
+
+            //                mc.Length = s.GraphicLength ?? 0;
+            //                mc.Quantity = s.Quantity ?? 1;
+            //                mc.UnitPrice = s.UnitPrice ?? 0;
+            //                mc.Width = s.GraphicWidth ?? 0;
+            //                mc.MaterialName = s.GraphicMaterial.Replace("+挂轴", "").Replace("+上挂轴", "").Replace("+下挂轴", "");
+            //                price = GetMaterialPrice(mc.MaterialName, out unitName);
+            //                mc.UnitPrice = price;
+            //                if (unitName == "个")
+            //                {
+            //                    mc.Area = -1;
+
+            //                }
+            //                else
+            //                    mc.Area = newPOPArea * (s.Quantity ?? 1);
+            //                materialList.Add(mc);
+            //                mc = new MaterialClass();
+
+            //                mc.Area = ((s.GraphicWidth ?? 0) / 1000) * 2 * (s.Quantity ?? 1);
+            //                if (s.GraphicMaterial.IndexOf("上挂轴") != -1 || s.GraphicMaterial.IndexOf("下挂轴") != -1)
+            //                {
+            //                    mc.Area = ((s.GraphicWidth ?? 0) / 1000) * (s.Quantity ?? 1);
+            //                }
+            //                mc.Length = s.GraphicLength ?? 0;
+            //                mc.Quantity = s.Quantity ?? 1;
+            //                mc.UnitPrice = s.UnitPrice ?? 0;
+            //                mc.Width = s.GraphicWidth ?? 0;
+            //                mc.MaterialName = "挂轴";
+            //                mc.UnitPrice = GetMaterialPrice(mc.MaterialName, out unitName);
+            //                if (s.GraphicMaterial.IndexOf("上挂轴") != -1)
+            //                {
+            //                    mc.MaterialName = "上挂轴";
+            //                }
+            //                if (s.GraphicMaterial.IndexOf("下挂轴") != -1)
+            //                {
+            //                    mc.MaterialName = "下挂轴";
+            //                }
+            //                materialList.Add(mc);
+            //            }
+            //            else
+            //            {
+
+            //                MaterialClass mc = new MaterialClass();
+            //                mc.Area = newPOPArea * (s.Quantity ?? 1);
+            //                mc.Length = s.GraphicLength ?? 0;
+            //                mc.Quantity = s.Quantity ?? 1;
+            //                mc.MaterialName = s.GraphicMaterial;
+            //                mc.Width = s.GraphicWidth ?? 0;
+
+            //                mc.UnitPrice = price;
+            //                if (unitName == "个")
+            //                {
+            //                    mc.Area = -1;
+
+            //                }
+
+            //                materialList.Add(mc);
+            //            }
+            //        }
+            //    });
+            //}
+
+            //var list0 = (from material in materialList
+            //             group material by new
+            //             {
+            //                 material.MaterialName,
+            //                 material.UnitPrice
+            //             } into g
+            //             select new
+            //             {
+            //                 GraphicMaterial = g.Key.MaterialName,
+            //                 UnitPrice = g.Key.UnitPrice,
+            //                 Area = g.Sum(s => s.Area > 0 ? s.Area : 0),
+            //                 Count = g.Sum(s => s.Area == -1 ? s.Quantity : 0),
+
+            //                 Price = g.Sum(s => s.MaterialName.Contains("挂轴") ? (s.Area * g.Key.UnitPrice) : (s.Area == -1 ? (g.Key.UnitPrice * s.Quantity) : (s.Area * g.Key.UnitPrice)))
+
+            //             }).ToList();
+            //gvPrice.DataSource = list0;
+            //gvPrice.DataBind();
+            #endregion
+
+            //新的统计方法
+            if (list.Any())
+            {
+                list.ForEach(s =>
+                {
+                    if (!string.IsNullOrWhiteSpace(s.GraphicMaterial))
+                    {
+                        MaterialClass mc = new MaterialClass();
+                        decimal width = s.GraphicWidth ?? 0;
+                        decimal length = s.GraphicLength ?? 0;
+                        mc.Area = (width * length) / 1000000*(s.Quantity??1);
+                        mc.MaterialName = s.GraphicMaterial;
+                        mc.Quantity = s.Quantity ?? 1;
+                        mc.UnitPrice = s.UnitPrice ?? 0;
+                        mc.TotalPrice = s.TotalPrice ?? 0;
+                        materialList.Add(mc);
+                    }
+                });
+            }
+            var list0 = (from material in materialList
+                         group material by new
+                         {
+                             material.MaterialName,
+                             material.UnitPrice
+                         } into g
+                         select new
+                         {
+                             GraphicMaterial = g.Key.MaterialName,
+                             UnitPrice = g.Key.UnitPrice,
+                             Area = g.Sum(s => s.Area > 0 ? s.Area : 0),
+                             Count = g.Sum(s => s.Quantity),
+                             Price = g.Sum(s => s.TotalPrice)
+
+                         }).ToList();
+            gvPrice.DataSource = list0;
+            gvPrice.DataBind();
+        }
+        decimal totalArea = 0;
+        decimal totalPrice = 0;
+        protected void gvPrice_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemIndex != -1)
+            {
+                object item = e.Item.DataItem;
+                if (item != null)
+                {
+                    object areaObj = item.GetType().GetProperty("Area").GetValue(item, null);
+                    decimal area = areaObj != null ? decimal.Parse(areaObj.ToString()) : 0;
+                    object priceObj = item.GetType().GetProperty("Price").GetValue(item, null);
+                    decimal price = priceObj != null ? decimal.Parse(priceObj.ToString()) : 0;
+
+                    ((Label)e.Item.FindControl("labArea")).Text = area.ToString();
+                    ((Label)e.Item.FindControl("labPrice")).Text = price > 0 ? Math.Round(price, 2).ToString() : "0";
+
+                    totalArea += area;
+                    totalPrice += price;
+
+                }
+            }
+            if (e.Item.ItemType == ListItemType.Footer)
+            {
+                ((Label)e.Item.FindControl("labTotalArea")).Text = Math.Round(totalArea, 2).ToString();
+                ((Label)e.Item.FindControl("labTotalPrice")).Text = Math.Round(totalPrice, 2).ToString();
+            }
+        }
+
+        /// <summary>
+        /// 获取材质价格和单位
+        /// </summary>
+        Dictionary<string, Dictionary<decimal, string>> priceDic = new Dictionary<string, Dictionary<decimal, string>>();
+        decimal GetMaterialPrice(string materialName, out string unitName)
+        {
+            unitName = string.Empty;
+            decimal price = 0;
+            if (priceDic.Keys.Contains(materialName.ToLower()))
+            {
+                Dictionary<decimal, string> dic = priceDic[materialName.ToLower()];
+                int index = 0;
+                foreach (KeyValuePair<decimal, string> item in dic)
+                {
+                    if (index == 0)
+                    {
+                        unitName = item.Value;
+                        price = item.Key;
+                    }
+                }
+            }
+            else
+            {
+                string name = materialName.Replace("—", "-").Replace("（", "(").Replace("）", ")").ToLower();
+                //var model = materialBll.GetList(s => s.MaterialName.ToLower() == name).FirstOrDefault();
+                var model = (from orderMaterial in CurrentContext.DbContext.OrderMaterialMpping
+                             join customerMaterial in CurrentContext.DbContext.CustomerMaterialInfo
+                             on orderMaterial.CustomerMaterialId equals customerMaterial.Id
+                             join basicM in CurrentContext.DbContext.BasicMaterial
+                             on customerMaterial.BasicMaterialId equals basicM.Id
+                             join unit in CurrentContext.DbContext.UnitInfo
+                             on basicM.UnitId equals unit.Id
+                             where orderMaterial.OrderMaterialName.ToLower() == name
+                             select new
+                             {
+                                 customerMaterial.Price,
+                                 unit.UnitName
+                             }).FirstOrDefault();
+                if (model != null)
+                {
+                    price = model.Price ?? 0;
+                    unitName = model.UnitName;
+                    Dictionary<decimal, string> dic = new Dictionary<decimal, string>();
+                    dic.Add(price, unitName);
+                    priceDic.Add(materialName.ToLower(), dic);
+
+                }
+            }
+            return price;
+        }
+    }
+
+    public class MaterialClass
+    {
+        public string MaterialName { get; set; }
+        public decimal Width { get; set; }
+        public decimal Length { get; set; }
+        public decimal Area { get; set; }
+        public int Quantity { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal TotalPrice { get; set; }
+    }
+}

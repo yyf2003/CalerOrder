@@ -1,0 +1,145 @@
+﻿
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data;
+using System.Collections;
+using System.Reflection;
+using System.ComponentModel;
+
+
+namespace Common
+{
+    public class CommonMethod
+    {
+        /// <summary>
+        /// 将错误信息生成table导出
+        /// </summary>
+        /// <param name="dcc"></param>
+        /// <returns></returns>
+        public static DataTable CreateErrorTB(DataColumnCollection dcc,string colName=null)
+        {
+            DataTable dt1 = new DataTable();
+            DataColumn[] dc = new DataColumn[dcc.Count];
+            DataColumn dc1;
+            for (int i = 0; i < dcc.Count; i++)
+            {
+                dc1 = new DataColumn(dcc[i].ColumnName, Type.GetType("System.String"));
+                dc[i] = dc1;
+            }
+            dt1.Columns.AddRange(dc);
+            colName = !string.IsNullOrWhiteSpace(colName) ? colName : "错误信息";
+            if (!dt1.Columns.Contains(colName))
+            {
+                dt1.Columns.Add(new DataColumn(colName, Type.GetType("System.String")));
+            }
+            return dt1;
+        }
+
+
+        public static DataTable CreateTB(DataColumnCollection dcc)
+        {
+            DataTable dt1 = new DataTable();
+            DataColumn[] dc = new DataColumn[dcc.Count];
+            DataColumn dc1;
+            for (int i = 0; i < dcc.Count; i++)
+            {
+                dc1 = new DataColumn(dcc[i].ColumnName, Type.GetType("System.String"));
+                dc[i] = dc1;
+            }
+            dt1.Columns.AddRange(dc);
+           
+            return dt1;
+        }
+
+        public static DataTable ToDataTable(IEnumerable list)
+        {
+            //创建属性的集合  
+            List<PropertyInfo> pList = new List<PropertyInfo>();
+            //获得反射的入口  
+            Type type = list.AsQueryable().ElementType;
+            DataTable dt = new DataTable();
+            //把所有的public属性加入到集合 并添加DataTable的列  
+            Array.ForEach<PropertyInfo>(type.GetProperties(), p => { pList.Add(p); dt.Columns.Add(p.Name, p.PropertyType); });
+            foreach (var item in list)
+            {
+                //创建一个DataRow实例  
+                DataRow row = dt.NewRow();
+                //给row 赋值  
+                pList.ForEach(p => row[p.Name] = p.GetValue(item, null));
+                //加入到DataTable  
+                dt.Rows.Add(row);
+            }
+            return dt;
+        }
+
+
+        /// <summary>
+        /// 获取枚举的名称
+        /// </summary>
+        /// <typeparam name="T">类型</typeparam>
+        /// <param name="vaule">vaule</param>
+        /// <returns></returns>
+        public static string GeEnumName<T>(string vaule)
+        {
+            string strName = string.Empty;
+            foreach (int myCode in Enum.GetValues(typeof(T)))
+            {
+                if (vaule == myCode.ToString())
+                {
+                    strName = Enum.GetName(typeof(T), myCode);
+                    break;
+                }
+            }
+            return strName;
+        }
+        /// <summary>
+        /// 获取枚举属性
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string GetEnumDescription<T>(string value)
+        {
+            string description = string.Empty;
+            foreach (int myCode in Enum.GetValues(typeof(T)))
+            {
+                if (value == myCode.ToString())
+                {
+                    string name = Enum.GetName(typeof(T), myCode);
+                    if (name != null)
+                    {
+                        FieldInfo field = typeof(T).GetField(name);
+                        if (field != null)
+                        {
+                            DescriptionAttribute attr = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute), false) as DescriptionAttribute;
+                            description = attr != null ? attr.Description : "";
+                        }
+                    }
+                }
+            }
+            return description;
+        }
+
+        public static List<EnumEntity> GetEnumList<T>()
+        {
+            List<EnumEntity> list = new List<EnumEntity>();
+            foreach (var ele in Enum.GetValues(typeof(T)))
+            {
+                EnumEntity entity = new EnumEntity();
+                object[] objArr = ele.GetType().GetField(ele.ToString()).GetCustomAttributes(typeof(DescriptionAttribute), true);
+                if (objArr != null && objArr.Length > 0)
+                {
+                    DescriptionAttribute da = objArr[0] as DescriptionAttribute;
+                    entity.Desction = da.Description;
+                }
+                entity.Value = Convert.ToInt32(ele);
+                entity.Name = ele.ToString();
+                list.Add(entity);  
+            }
+            return list;
+        }
+
+    }
+}

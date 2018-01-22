@@ -1,0 +1,129 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using DAL;
+using Models;
+using Common;
+
+namespace WebApp.Subjects.SupplementByRegion
+{
+    public partial class Add : BasePage
+    {
+        int subjectId;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(Request.QueryString["subjectId"]);
+            }
+            if (!IsPostBack)
+            {
+                BindMyCustomerList(ref ddlCustomer);
+                BindData();
+            }
+        }
+
+        void BindData()
+        {
+            if (subjectId > 0)
+            {
+                Subject model = new SubjectBLL().GetModel(subjectId);
+                if (model != null)
+                {
+                    if (model.CustomerId != null)
+                    {
+                        ddlCustomer.SelectedValue = model.CustomerId.ToString();
+                        BindRegion();
+                    }
+                    rblRegion.SelectedValue = model.SupplementRegion;
+                    txtSubjectName.Text = model.SubjectName;
+                    txtRemark.Text = model.Remark;
+                }
+            }
+
+        }
+
+        void BindRegion()
+        {
+            int customerId = int.Parse(ddlCustomer.SelectedValue);
+            if (customerId > 0)
+            {
+                List<string> myRegions = GetResponsibleRegion;
+                if (!myRegions.Any())
+                {
+                    myRegions = new RegionBLL().GetList(s => s.CustomerId == customerId).Select(s=>s.RegionName).Distinct().ToList();
+                }
+                if (myRegions.Any())
+                {
+                    myRegions.ForEach(s =>
+                    {
+                        ListItem li = new ListItem();
+                        li.Value = s;
+                        li.Text = s + "&nbsp;&nbsp;";
+                        rblRegion.Items.Add(li);
+                    });
+                }
+            }
+        }
+
+        protected void btnNext_Click(object sender, EventArgs e)
+        {
+            string itemName = txtSubjectName.Text.Trim();
+            string remark = txtRemark.Text.Trim();
+            //RegionSupplementBLL bll = new RegionSupplementBLL();
+            //RegionSupplement model;
+            SubjectBLL bll = new SubjectBLL();
+            Subject model;
+            bool isNew = true;
+            if (subjectId > 0)
+            {
+                model = bll.GetModel(subjectId);
+                if(model!=null)
+                {
+                    isNew = false;
+                    model.SubjectName = itemName;
+                    model.SupplementRegion = rblRegion.SelectedValue;
+                    model.Remark = remark;
+                    bll.Update(model);
+                    
+                }
+                
+            }
+            if (isNew)
+            {
+                model = new Subject();
+                model.SubjectNo = CreateSubjectNo();
+                model.CustomerId = int.Parse(ddlCustomer.SelectedValue);
+                model.AddDate = DateTime.Now;
+                model.AddUserId = CurrentUser.UserId;
+                model.SubjectName = itemName;
+                model.Remark = remark;
+                model.Status = 1;
+                model.ApproveState = 0;
+                model.SubjectType = (int)SubjectTypeEnum.分区补单;
+                model.CompanyId = CurrentUser.CompanyId;
+                model.SupplementRegion = rblRegion.SelectedValue;
+                bll.Add(model);
+                subjectId = model.Id;
+            }
+            Response.Redirect("ImportOrder.aspx?subjectId=" + subjectId);
+        }
+
+        string CreateSubjectNo()
+        {
+            System.Text.StringBuilder code = new System.Text.StringBuilder();
+            DateTime date = DateTime.Now;
+            code.Append(date.Year).Append(date.Month.ToString().PadLeft(2, '0')).Append(date.Day.ToString().PadLeft(2, '0')).Append(date.Hour.ToString().PadLeft(2, '0')).Append(date.Minute.ToString().PadLeft(2, '0')).Append(date.Second.ToString().PadLeft(2, '0'));
+            return code.ToString();
+        }
+
+        protected void ddlCustomer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            BindRegion();
+        }
+    }
+}

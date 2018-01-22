@@ -1,0 +1,97 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using DAL;
+
+namespace WebApp.OrderChangeManage
+{
+    public partial class ApplicationList : BasePage
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                BindData();
+            }
+        }
+
+        void BindData()
+        {
+            var list = (from application in CurrentContext.DbContext.OrderChangeApplication
+                       join guidance in CurrentContext.DbContext.SubjectGuidance
+                       on application.SubjectGuidanceId equals guidance.ItemId
+                       join user in CurrentContext.DbContext.UserInfo
+                       on application.AddUserId equals user.UserId
+                       select new {
+                           application.Id,
+                           application.AddDate,
+                           user.RealName,
+                           guidance.ItemName,
+                           application.AddUserId,
+                           application.FinancialApproveState,
+                           application.ManagerApperoveState
+                       }).ToList();
+            if (CurrentUser.RoleId == 2)
+            {
+                list = list.Where(s=>s.AddUserId==CurrentUser.UserId).ToList();
+            }
+            AspNetPager1.RecordCount = list.Count;
+            this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
+            gv.DataSource = list.OrderByDescending(s => s.AddDate).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            gv.DataBind();
+            SetPromission(gv);
+        }
+
+        protected void AspNetPager1_PageChanged(object sender, EventArgs e)
+        {
+            BindData();
+        }
+
+        protected void gv_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            int id = int.Parse(e.CommandArgument.ToString());
+            if (e.CommandName == "EditItem")
+            {
+                Response.Redirect("AddNewApplication.aspx?Id="+id,false);
+            }
+        }
+
+        protected void gv_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowIndex != -1)
+            {
+                object item = e.Row.DataItem;
+                if (item != null)
+                {
+                    bool isPassApprove = false;
+                    object managerApperoveStateObj = item.GetType().GetProperty("ManagerApperoveState").GetValue(item, null);
+                    int managerApperoveState = managerApperoveStateObj != null ? int.Parse(managerApperoveStateObj.ToString()) : 0;
+                    object financialApproveStateObj = item.GetType().GetProperty("FinancialApproveState").GetValue(item, null);
+                    int financialApproveState = financialApproveStateObj != null ? int.Parse(financialApproveStateObj.ToString()) : 0;
+                    isPassApprove = (managerApperoveState == 1 && financialApproveState == 1);
+                    LinkButton lbEdit = (LinkButton)e.Row.FindControl("lbEdit");
+                    LinkButton lbDelete = (LinkButton)e.Row.FindControl("lbDelete");
+                    if (isPassApprove)
+                    {
+                        lbEdit.CommandName = "";
+                        lbEdit.Enabled = false;
+                        lbEdit.Style.Add("color", "#ccc");
+
+                        lbDelete.Enabled = false;
+                        lbDelete.CommandName = "";
+                        lbDelete.Style.Add("color", "#ccc");
+                    }
+                    else
+                    {
+                        lbDelete.Attributes.Add("OnClick", "return confirm('确定删除吗？')");
+                        
+                    }
+                }
+            }
+        }
+    }
+}

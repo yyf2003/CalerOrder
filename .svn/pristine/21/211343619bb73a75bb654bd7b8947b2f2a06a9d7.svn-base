@@ -1,0 +1,320 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using DAL;
+using Common;
+using BLL;
+using System.Transactions;
+using Models;
+using NPOI.SS.UserModel;
+using System.Configuration;
+using System.IO;
+using System.Text;
+
+namespace WebApp.Subjects.RegionSubject
+{
+    public partial class Approve : BasePage
+    {
+        int subjectId;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(Request.QueryString["subjectId"]);
+            }
+            if (!IsPostBack)
+            {
+                BindSubject();
+                BindData();
+            }
+        }
+
+        void BindSubject()
+        {
+            var model = (from subject in CurrentContext.DbContext.Subject
+                         join customer in CurrentContext.DbContext.Customer
+                         on subject.CustomerId equals customer.Id
+                         join user in CurrentContext.DbContext.UserInfo
+                         on subject.AddUserId equals user.UserId
+                         where subject.Id == subjectId
+                         select new
+                         {
+                             subject,
+                             customer.CustomerName,
+                             user.RealName
+
+                         }).FirstOrDefault();
+            if (model != null)
+            {
+                labSubjectNo.Text = model.subject.SubjectNo;
+                labSubjectName.Text = model.subject.SubjectName;
+                labAddUserName.Text = model.RealName;
+                labCustomerName.Text = model.CustomerName;
+                int subjectType = model.subject.SubjectType ??1;
+                hfSubjectType.Value = subjectType.ToString();
+                labSubjectType.Text = CommonMethod.GeEnumName<SubjectTypeEnum>(subjectType.ToString());
+                labRegion.Text = model.subject.SupplementRegion;
+            }
+        }
+
+        void BindData()
+        {
+            List<Order350Model> orderList = new List<Order350Model>();
+            
+                var list = (from order in CurrentContext.DbContext.RegionOrderDetail
+                            join shop in CurrentContext.DbContext.Shop
+                            on order.ShopId equals shop.Id
+                            join subject in CurrentContext.DbContext.Subject
+                            on order.HandMakeSubjectId equals subject.Id
+                            where order.SubjectId == subjectId
+                            && order.IsSubmit == 1 && (order.ApproveState == null || order.ApproveState == 0)
+                            select new
+                            {
+                                shop,
+                                order,
+                                subject.SubjectName
+                            }).OrderBy(s=>s.shop.Id).ToList();
+
+                if (list.Any())
+                {
+                    list.ForEach(s =>
+                    {
+                        Order350Model model = new Order350Model();
+                        model.SubjectName = s.SubjectName;
+                        model.ChooseImg = s.order.ChooseImg;
+
+                        model.OrderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
+                        model.Region = s.shop.RegionName;
+                        model.City = s.shop.CityName;
+                        model.County = s.shop.AreaName;
+                        model.CityTier = s.shop.CityTier;
+                        model.Format = s.shop.Format;
+                        model.Gender = s.order.Gender;
+                        model.GraphicLength = s.order.GraphicLength != null ? double.Parse(s.order.GraphicLength.ToString()) : 0;
+                        model.GraphicMaterial = s.order.GraphicMaterial;
+                        model.GraphicWidth = s.order.GraphicWidth != null ? double.Parse(s.order.GraphicWidth.ToString()) : 0; ;
+                        model.POPAddress = s.shop.POPAddress;
+                        model.PositionDescription = s.order.PositionDescription;
+                        model.Province = s.shop.ProvinceName;
+                        model.Quantity = s.order.Quantity != null ? double.Parse(s.order.Quantity.ToString()) : 1;
+                        model.Sheet = s.order.Sheet;
+                        model.GraphicNo = s.order.GraphicNo;
+                        model.ShopName = s.shop.ShopName;
+                        model.ShopNo = s.shop.ShopNo;
+                        model.OtherRemark = s.order.Remark;
+                        model.POSScale = s.order.POSScale;
+                        model.MaterialSupport = s.order.MaterialSupport;
+                        orderList.Add(model);
+                    });
+                }
+
+            //物料
+            var materialList = (from order in CurrentContext.DbContext.OrderMaterial
+                                join shop in CurrentContext.DbContext.Shop
+                                on order.ShopId equals shop.Id
+                                join subject in CurrentContext.DbContext.Subject
+                                on order.SubjectId equals subject.Id
+                                where order.RegionSupplementId == subjectId
+                                select new
+                                {
+                                    shop,
+                                    order,
+                                    subject.SubjectName
+                                }).ToList();
+
+            if (materialList.Any())
+            {
+                materialList.ForEach(s =>
+                {
+                    Order350Model model = new Order350Model();
+                    //model.ChooseImg = s.order.ChooseImg;
+                    StringBuilder size = new StringBuilder();
+                    if (s.order.MaterialLength != null && s.order.MaterialLength > 0 && s.order.MaterialWidth != null && s.order.MaterialWidth > 0)
+                    {
+                        size.AppendFormat("({0}*{1}", s.order.MaterialLength, s.order.MaterialWidth);
+                        if (s.order.MaterialHigh != null && s.order.MaterialHigh > 0)
+                            size.AppendFormat("*{0}", s.order.MaterialHigh);
+                        size.Append(")");
+                    }
+                    model.OrderType = "物料";
+                    model.Region = s.shop.RegionName;
+                    model.City = s.shop.CityName;
+                    model.County = s.shop.AreaName;
+                    model.CityTier = s.shop.CityTier;
+                    model.Format = s.shop.Format;
+                    model.POPAddress = s.shop.POPAddress;
+                    model.Province = s.shop.ProvinceName;
+                    model.Quantity = s.order.MaterialCount != null ? double.Parse(s.order.MaterialCount.ToString()) : 1;
+                    model.Sheet = s.order.Sheet;
+                    model.PositionDescription = s.order.MaterialName + size.ToString();
+                    model.ShopName = s.shop.ShopName;
+                    model.ShopNo = s.shop.ShopNo;
+                    model.OtherRemark = s.order.Remark;
+                    model.SubjectName = s.SubjectName;
+                    orderList.Add(model);
+                });
+            }
+
+
+
+
+
+            AspNetPager1.RecordCount = orderList.Count;
+            this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
+            orderListRepeater.DataSource = orderList.OrderBy(s => s.ShopId).ThenBy(s=>s.OrderType).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            orderListRepeater.DataBind();
+
+        }
+
+
+        protected void AspNetPager1_PageChanged(object sender, EventArgs e)
+        {
+            BindData();
+        }
+
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            int result = int.Parse(rblApproveResult.SelectedValue);
+            string remark = txtRemark.Text.Trim();
+            SubjectBLL subjectBll = new SubjectBLL();
+            bool isApproveOk = false;
+            string msg = string.Empty;
+            //int subjectType = 1;
+            using (TransactionScope tran = new TransactionScope())
+            {
+                try
+                {
+                    Models.Subject model = subjectBll.GetModel(subjectId);
+                    if (model != null)
+                    {
+                        var list = from order in CurrentContext.DbContext.RegionOrderDetail
+                                   join shop in CurrentContext.DbContext.Shop
+                                   on order.ShopId equals shop.Id
+                                   where order.SubjectId == subjectId
+                                   && order.IsSubmit == 1 
+                                   && order.ApproveState!=1
+                                   select new
+                                   {
+                                       order,
+                                       shop
+                                   };
+
+                        if (list.Any())
+                        {
+
+
+
+                            FinalOrderDetailTempBLL finalOrderTempBll = new FinalOrderDetailTempBLL();
+                            //finalOrderTempBll.Delete(s => s.RegionSupplementId == subjectId);
+                            FinalOrderDetailTemp finalOrderTempModel;
+                            RegionOrderDetailBLL orderBll = new RegionOrderDetailBLL();
+                            RegionOrderDetail orderModel;
+                            list.ToList().ForEach(o =>
+                            {
+                                orderModel = o.order;
+                                orderModel.ApproveState = result;
+                                orderModel.ApproveDate = DateTime.Now;
+                                orderBll.Update(orderModel);
+
+                                if (result == 1)
+                                {
+                                    finalOrderTempModel = new FinalOrderDetailTemp();
+
+                                    finalOrderTempModel.AgentCode = o.shop.AgentCode;
+                                    finalOrderTempModel.AgentName = o.shop.AgentName;
+                                    finalOrderTempModel.BusinessModel = o.shop.BusinessModel;
+                                    finalOrderTempModel.Channel = o.shop.Channel;
+                                    finalOrderTempModel.City = o.shop.CityName;
+                                    finalOrderTempModel.CityTier = o.shop.CityTier;
+                                    finalOrderTempModel.Contact = o.shop.Contact1;
+                                    finalOrderTempModel.Format = o.shop.Format;
+                                    finalOrderTempModel.Gender = o.order.Gender;
+                                    finalOrderTempModel.GraphicNo = o.order.GraphicNo;
+                                    finalOrderTempModel.IsInstall = o.shop.IsInstall;
+                                    finalOrderTempModel.LocationType = o.shop.LocationType;
+                                    finalOrderTempModel.MaterialSupport = o.order.MaterialSupport;
+                                    finalOrderTempModel.OrderType = o.order.OrderType;
+                                    finalOrderTempModel.POPAddress = o.shop.POPAddress;
+                                    finalOrderTempModel.POSScale = !string.IsNullOrWhiteSpace(o.order.POSScale) ? o.order.POSScale : o.shop.POSScale;
+                                    finalOrderTempModel.InstallPricePOSScale = finalOrderTempModel.POSScale;
+                                    finalOrderTempModel.InstallPriceMaterialSupport = finalOrderTempModel.MaterialSupport;
+                                    if (!string.IsNullOrWhiteSpace(o.shop.Format) && (o.shop.Format.ToLower().Contains("kids") || o.shop.Format.ToLower().Contains("infant")))
+                                        finalOrderTempModel.InstallPriceMaterialSupport = "Others";
+                                    finalOrderTempModel.Province = o.shop.ProvinceName;
+                                    finalOrderTempModel.Quantity = o.order.Quantity;
+                                    finalOrderTempModel.Region = o.shop.RegionName;
+                                    finalOrderTempModel.ChooseImg = o.order.ChooseImg;
+                                    finalOrderTempModel.Remark = o.order.Remark;
+                                    //finalOrderTempModel.Remark = "分区补单";
+                                    finalOrderTempModel.Sheet = o.order.Sheet;
+                                    finalOrderTempModel.ShopId = o.shop.Id;
+                                    finalOrderTempModel.ShopName = o.shop.ShopName;
+                                    finalOrderTempModel.ShopNo = o.shop.ShopNo;
+                                    //finalOrderTempModel.SubjectId = model.HandMakeSubjectId;
+                                    finalOrderTempModel.SubjectId = o.order.HandMakeSubjectId;//上海创建项目的ID;
+                                    finalOrderTempModel.Tel = o.shop.Tel1;
+                                    finalOrderTempModel.MachineFrame = o.order.MachineFrame;
+                                    //finalOrderTempModel.LevelNum = o.order.LevelNum;
+                                    decimal width = o.order.GraphicWidth ?? 0;
+                                    decimal length = o.order.GraphicLength ?? 0;
+                                    finalOrderTempModel.GraphicLength = length;
+                                    finalOrderTempModel.GraphicMaterial = o.order.GraphicMaterial;
+                                    finalOrderTempModel.GraphicWidth = width;
+                                    //finalOrderTempModel.UnitPrice = GetMaterialPrice(o.order.GraphicMaterial);
+                                    finalOrderTempModel.PositionDescription = o.order.PositionDescription;
+                                    finalOrderTempModel.Area = (width * length) / 1000000;
+                                    finalOrderTempModel.InstallPositionDescription = o.order.PositionDescription;
+                                    finalOrderTempModel.RegionSupplementId = subjectId;
+                                    //finalOrderTempModel.IsHC = true;
+                                    decimal unitPrice = 0;
+                                    decimal totalPrice = 0;
+                                    if (!string.IsNullOrWhiteSpace(o.order.GraphicMaterial))
+                                    {
+                                        POP pop = new POP();
+                                        pop.GraphicMaterial = o.order.GraphicMaterial;
+                                        pop.GraphicLength = o.order.GraphicLength;
+                                        pop.GraphicWidth = o.order.GraphicWidth;
+                                        pop.Quantity = o.order.Quantity;
+                                        unitPrice = GetMaterialUnitPrice(pop, out totalPrice);
+                                    }
+                                    finalOrderTempModel.UnitPrice = unitPrice;
+                                    finalOrderTempModel.TotalPrice = totalPrice;
+
+
+                                    finalOrderTempBll.Add(finalOrderTempModel);
+                                }
+                            });
+
+                        }
+
+                        model.ApproveState = result;
+                        model.ApproveUserId = CurrentUser.UserId;
+                        subjectBll.Update(model);
+                        ApproveInfo approveModel = new ApproveInfo() { AddDate = DateTime.Now, AddUserId = CurrentUser.UserId, Remark = txtRemark.Text.Trim(), Result = result, SubjectId = subjectId };
+                        new ApproveInfoBLL().Add(approveModel);
+                        tran.Complete();
+                        isApproveOk = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    msg = ex.Message;
+                }
+            }
+            if (isApproveOk)
+            {
+                //if (subjectType!=2)
+                //Sent();
+                Alert("审批成功！", "ApproveList.aspx");
+            }
+            else
+                Alert("审批失败：" + msg);
+        }
+
+
+
+    }
+}

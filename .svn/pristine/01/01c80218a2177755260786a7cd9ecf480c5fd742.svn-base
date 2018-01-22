@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Complex Layout - jQuery EasyUI Demo</title>
+	<link rel="stylesheet" type="text/css" href="../../themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../../themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../demo.css">
+	<script type="text/javascript" src="../../jquery.min.js"></script>
+	<script type="text/javascript" src="../../jquery.easyui.min.js"></script>
+</head>
+<body>
+	<h2>Complex Layout</h2>
+	<p>This sample shows how to create a complex layout.</p>
+	
+	<div class="easyui-layout" style="width:700px;height:350px;">
+		<div data-options="region:'north'" style="height:50px"></div>
+		
+		
+		<div data-options="region:'west',split:true" title="West" style="width:100px;">
+			<div class="easyui-accordion" data-options="fit:true,border:false">
+				<div title="Title1" style="padding:10px;">
+					content1
+				</div>
+				<div title="Title2" data-options="selected:true" style="padding:10px;">
+					content2
+				</div>
+				<div title="Title3" style="padding:10px">
+					content3
+				</div>
+			</div>
+		</div>
+		<div data-options="region:'center'">
+			<div class="easyui-tabs" data-options="fit:true,border:false,plain:true">
+				
+			</div>
+		</div>
+	</div>
+</body>
+</html>

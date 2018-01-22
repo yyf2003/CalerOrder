@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using Models;
+
+namespace WebApp.Subjects.RegionSubject
+{
+    public partial class AddOrderDetail : BasePage
+    {
+        public int SubjectId = 0;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["subjectId"] != null)
+            {
+                SubjectId = int.Parse(Request.QueryString["subjectId"]);
+            }
+        }
+
+        /// <summary>
+        /// 提交
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            SubjectBLL subjectBll = new SubjectBLL();
+            Subject model = subjectBll.GetModel(SubjectId);
+            if (model != null)
+            {
+                RegionOrderDetailBLL orderBll=new RegionOrderDetailBLL();
+                RegionOrderDetail orderModel;
+                var orderList = orderBll.GetList(s => s.SubjectId == SubjectId && (s.IsSubmit==null || s.IsSubmit==0));
+                if (orderList.Any())
+                {
+                    orderList.ForEach(s => {
+                        orderModel = s;
+                        orderModel.IsSubmit = 1;
+                        orderBll.Update(orderModel);
+                    });
+
+                    model.Status = 4;
+                    //if (model.ApproveState == 2)
+                    model.ApproveState = 0;
+                    subjectBll.Update(model);
+                }
+                
+
+
+                Alert("提交成功","List.aspx");
+            }
+            else
+                Alert("提交失败！");
+        }
+    }
+}

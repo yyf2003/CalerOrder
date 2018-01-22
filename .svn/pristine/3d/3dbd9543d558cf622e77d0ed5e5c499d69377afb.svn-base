@@ -1,0 +1,335 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Text;
+using BLL;
+using DAL;
+using Models;
+using Common;
+
+namespace WebApp.OutsourcingOrder.handler
+{
+    /// <summary>
+    /// AssignOrder 的摘要说明
+    /// </summary>
+    public class AssignOrder : IHttpHandler
+    {
+        HttpContext context1;
+        public void ProcessRequest(HttpContext context)
+        {
+            context1 = context;
+            context.Response.ContentType = "text/plain";
+            string type = string.Empty;
+            string result = string.Empty;
+            if (context.Request.QueryString["type"] != null)
+            {
+                type = context.Request.QueryString["type"];
+            }
+            else if (context.Request.Form["type"] != null)
+            {
+                type = context.Request.Form["type"];
+            }
+            switch (type)
+            {
+                case "GetOutsourcing":
+                    result = GetOutsourcing();
+                    break;
+                case "update":
+                    result = update();
+                    break;
+                case "clean":
+                    result = cleanOutsorcing();
+                    break;
+                default:
+                    break;
+            }
+            context.Response.Write(result);
+        }
+
+        string GetOutsourcing()
+        {
+            string r = string.Empty;
+            List<int> provinceIdList = new List<int>();
+            if (context1.Request.QueryString["region"] != null)
+            {
+                string regions = string.Empty;
+                regions = context1.Request.QueryString["region"];
+                int customerId = 0;
+                if (context1.Request.QueryString["customerId"] != null)
+                {
+                    customerId = int.Parse(context1.Request.QueryString["customerId"]);
+                }
+                List<string> regionList = StringHelper.ToStringList(regions, ',', LowerUpperEnum.ToLower);
+                provinceIdList = (from pir in CurrentContext.DbContext.ProvinceInRegion
+                                  join region in CurrentContext.DbContext.Region
+                                  on pir.RegionId equals region.Id
+                                  where regionList.Contains(region.RegionName.ToLower())
+                                  && region.CustomerId == customerId
+                                  select pir.ProvinceId ?? 0).Distinct().ToList();
+
+            }
+            var companyList = new CompanyBLL().GetList(s => s.TypeId == (int)CompanyTypeEnum.Outsource && (s.IsDelete==null || s.IsDelete==false) && (provinceIdList.Any() ? (provinceIdList.Contains(s.ProvinceId ?? 0)) : 1 == 1)).OrderBy(s => s.ProvinceId).ToList();
+            if (companyList.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                companyList.ForEach(s =>
+                {
+                    json.Append("{\"Id\":\"" + s.Id + "\",\"CompanyName\":\"" + s.CompanyName + "\"},");
+                });
+                r = "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            return r;
+        }
+
+        string update()
+        {
+            string result = "提交失败";
+            string subjectIds = string.Empty;
+            string regions = string.Empty;
+            string provinces = string.Empty;
+            string cities = string.Empty;
+            string orderIds = string.Empty;
+            int companyId = 0;
+            if (context1.Request.Form["subjectids"] != null)
+            {
+                subjectIds = context1.Request.Form["subjectids"];
+            }
+            if (context1.Request.Form["regions"] != null)
+            {
+                regions = context1.Request.Form["regions"];
+            }
+            if (context1.Request.Form["province"] != null)
+            {
+                provinces = context1.Request.Form["province"];
+            }
+            if (context1.Request.Form["city"] != null)
+            {
+                cities = context1.Request.Form["city"];
+            }
+            if (context1.Request.Form["orderIds"] != null)
+            {
+                orderIds = context1.Request.Form["orderIds"];
+            }
+            if (context1.Request.Form["companyId"] != null)
+            {
+                companyId = int.Parse(context1.Request.Form["companyId"]);
+            }
+            if (!string.IsNullOrWhiteSpace(subjectIds) && companyId > 0)
+            {
+                List<int> subjectIdList = StringHelper.ToIntList(subjectIds, ',');
+                var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                 join shop in CurrentContext.DbContext.Shop
+                                 on order.ShopId equals shop.Id
+                                 join pop1 in CurrentContext.DbContext.POP
+                                 on new { order.ShopId, order.GraphicNo, order.Sheet } equals new { pop1.ShopId, pop1.GraphicNo, pop1.Sheet } into popTemp
+                                 from pop in popTemp.DefaultIfEmpty()
+                                 where subjectIdList.Contains(order.SubjectId ?? 0)
+                                 && ((order.OrderType != null && order.OrderType == 1 && order.GraphicWidth != null && order.GraphicWidth != 0 && order.GraphicLength != null && order.GraphicLength != 0) || (order.OrderType != null && order.OrderType == 2))
+                                 && (pop != null ? (pop.IsValid == null || pop.IsValid == true) : 1 == 1)
+                                 && (order.IsDelete == null || order.IsDelete == false)
+                                 select new
+                                 {
+                                     order,
+                                     shop
+                                 }).ToList();
+                if (!string.IsNullOrWhiteSpace(regions))
+                {
+                    List<string> regionList = StringHelper.ToStringList(regions, ',');
+                    orderList = orderList.Where(s => regionList.Contains(s.shop.RegionName)).ToList();
+                }
+                if (!string.IsNullOrWhiteSpace(provinces))
+                {
+                    List<string> provinceList = StringHelper.ToStringList(provinces, ',');
+                    orderList = orderList.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();
+                }
+                if (!string.IsNullOrWhiteSpace(cities))
+                {
+                    List<string> cityList = StringHelper.ToStringList(cities, ',');
+                    orderList = orderList.Where(s => cityList.Contains(s.shop.CityName)).ToList();
+                }
+                if (!string.IsNullOrWhiteSpace(orderIds))
+                {
+                    List<int> orderIdList = StringHelper.ToIntList(orderIds, ',');
+                    orderList = orderList.Where(s => orderIdList.Contains(s.order.Id)).ToList();
+                }
+                if (orderList.Any())
+                {
+                    FinalOrderDetailTemp orderModel;
+                    FinalOrderDetailTempBLL bll = new FinalOrderDetailTempBLL();
+                    StringBuilder materialMsg = new StringBuilder();
+                    int successNum = 0;
+                    orderList.ForEach(s =>
+                    {
+                        decimal materialPrice = 0;
+                        if(!string.IsNullOrWhiteSpace(s.order.GraphicMaterial))
+                            materialPrice=GetMaterialPrice(s.order.GraphicMaterial,companyId);
+                        if (materialPrice == -1)
+                        {
+                            materialMsg.Append(s.order.GraphicMaterial+",");
+                        }
+                        else
+                        {
+                            orderModel = new FinalOrderDetailTemp();
+                            orderModel = s.order;
+                            orderModel.CompanyId = companyId;
+                            orderModel.OutsourcePrice = materialPrice;
+                            bll.Update(orderModel);
+                            successNum++;
+                        }
+                        
+                    });
+                    if (materialMsg.Length > 0)
+                    {
+                        if (successNum>0)
+                            result = "部分提交失败，以下材质没提交报价：" + materialMsg.ToString().TrimEnd(',');
+                        else
+                            result = "提交失败，以下材质没提交报价：" + materialMsg.ToString().TrimEnd(',');
+                    }
+                    else
+                       result = "ok";
+                }
+
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 清除已分配的外协
+        /// </summary>
+        /// <returns></returns>
+        string cleanOutsorcing()
+        {
+            string result = "清空失败";
+            string subjectIds = string.Empty;
+            string regions = string.Empty;
+            string provinces = string.Empty;
+            string cities = string.Empty;
+            string orderIds = string.Empty;
+            
+            if (context1.Request.Form["subjectids"] != null)
+            {
+                subjectIds = context1.Request.Form["subjectids"];
+            }
+            if (context1.Request.Form["regions"] != null)
+            {
+                regions = context1.Request.Form["regions"];
+            }
+            if (context1.Request.Form["province"] != null)
+            {
+                provinces = context1.Request.Form["province"];
+            }
+            if (context1.Request.Form["city"] != null)
+            {
+                cities = context1.Request.Form["city"];
+            }
+            if (context1.Request.Form["orderIds"] != null)
+            {
+                orderIds = context1.Request.Form["orderIds"];
+            }
+            
+            if (!string.IsNullOrWhiteSpace(subjectIds))
+            {
+                List<int> subjectIdList = StringHelper.ToIntList(subjectIds, ',');
+                var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                 join shop in CurrentContext.DbContext.Shop
+                                 on order.ShopId equals shop.Id
+                                 join pop1 in CurrentContext.DbContext.POP
+                                 on new { order.ShopId, order.GraphicNo, order.Sheet } equals new { pop1.ShopId, pop1.GraphicNo, pop1.Sheet } into popTemp
+                                 from pop in popTemp.DefaultIfEmpty()
+                                 where subjectIdList.Contains(order.SubjectId ?? 0)
+                                 && ((order.OrderType != null && order.OrderType == 1 && order.GraphicWidth != null && order.GraphicWidth != 0 && order.GraphicLength != null && order.GraphicLength != 0) || (order.OrderType != null && order.OrderType == 2))
+                                 && (pop != null ? (pop.IsValid == null || pop.IsValid == true) : 1 == 1)
+                                 && (order.IsDelete == null || order.IsDelete == false)
+                                 select new
+                                 {
+                                     order,
+                                     shop
+                                 }).ToList();
+                if (!string.IsNullOrWhiteSpace(regions))
+                {
+                    List<string> regionList = StringHelper.ToStringList(regions, ',');
+                    orderList = orderList.Where(s => regionList.Contains(s.shop.RegionName)).ToList();
+                }
+                if (!string.IsNullOrWhiteSpace(provinces))
+                {
+                    List<string> provinceList = StringHelper.ToStringList(provinces, ',');
+                    orderList = orderList.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();
+                }
+                if (!string.IsNullOrWhiteSpace(cities))
+                {
+                    List<string> cityList = StringHelper.ToStringList(cities, ',');
+                    orderList = orderList.Where(s => cityList.Contains(s.shop.CityName)).ToList();
+                }
+                if (!string.IsNullOrWhiteSpace(orderIds))
+                {
+                    List<int> orderIdList = StringHelper.ToIntList(orderIds, ',');
+                    orderList = orderList.Where(s => orderIdList.Contains(s.order.Id)).ToList();
+                }
+                if (orderList.Any())
+                {
+                    FinalOrderDetailTemp orderModel;
+                    FinalOrderDetailTempBLL bll = new FinalOrderDetailTempBLL();
+                    orderList.ForEach(s =>
+                    {
+
+                        orderModel = new FinalOrderDetailTemp();
+                        orderModel = s.order;
+                        orderModel.OutsourcePrice = null;
+                        orderModel.CompanyId = 0;
+                        bll.Update(orderModel);
+
+                    });
+                    result = "ok";
+                }
+
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 获取外协材质报价
+        /// </summary>
+        /// <param name="materialName"></param>
+        /// <returns></returns>
+        Dictionary<string, decimal> dic = new Dictionary<string, decimal>();
+        OutsourceMaterialPriceBLL outsourcePriceBll = new OutsourceMaterialPriceBLL();
+        decimal GetMaterialPrice(string materialName,int companyId)
+        {
+            decimal price = 0;
+            try
+            {
+                if (dic.Keys.Contains(materialName.ToLower()))
+                {
+                    price = dic[materialName.ToLower()];
+                }
+                else
+                {
+                    int basicMaterialId = (from mpping in CurrentContext.DbContext.OrderMaterialMpping
+                                           join customerMaterial in CurrentContext.DbContext.CustomerMaterialInfo
+                                           on mpping.CustomerMaterialId equals customerMaterial.Id
+                                           where mpping.OrderMaterialName.ToLower() == materialName.ToLower()
+                                           select customerMaterial.BasicMaterialId
+                                           ).FirstOrDefault() ?? 0;
+                    price = outsourcePriceBll.GetList(s => s.BasicMaterialId == basicMaterialId && s.OutsourceId == companyId).Select(s => s.Price).FirstOrDefault() ?? -1;
+                    dic.Add(materialName.ToLower(), price);
+                }
+            }
+            catch
+            {
+                price = -1;
+            }
+            return price;
+        }
+
+        public bool IsReusable
+        {
+            get
+            {
+                return false;
+            }
+        }
+    }
+}

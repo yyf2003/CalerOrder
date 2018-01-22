@@ -1,0 +1,248 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using Models;
+using Common;
+using System.Text;
+
+namespace WebApp.Subjects
+{
+    public partial class AddGuidance : BasePage
+    {
+        int id;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["itemId"] != null)
+            {
+                id = int.Parse(Request.QueryString["itemId"]);
+            }
+            if (!IsPostBack)
+            {
+                BindMyCustomerList(ref ddlCustomer);
+                BindActivityType();
+            }
+            BindData();
+        }
+
+        void BindActivityType()
+        {
+            var list = new ADOrderActivityBLL().GetList(s => s.ActivityId > 0);
+            if (list.Any())
+            {
+                rblActivityType.DataSource = list;
+                rblActivityType.DataTextField = "ActivityName";
+                rblActivityType.DataValueField = "ActivityId";
+                rblActivityType.DataBind();
+            }
+            //ddlActivityType.Items.Insert(0, new ListItem("--请选择--", "0"));
+        }
+
+
+        SubjectGuidanceBLL bll = new SubjectGuidanceBLL();
+        SubjectTypeBLL subjectTypeBll = new SubjectTypeBLL();
+        void BindData()
+        {
+            SubjectGuidance model = bll.GetModel(id);
+            bool flag = false;
+            StringBuilder divStr = new StringBuilder();
+            if (model != null)
+            {
+                if (!IsPostBack)
+                {
+                    ddlCustomer.SelectedValue = model.CustomerId != null ? model.CustomerId.ToString() : "";
+                    rblActivityType.SelectedValue = model.ActivityTypeId != null ? model.ActivityTypeId.ToString() : "0";
+                    txtItemName.Text = model.ItemName;
+                    txtSubjectNames.Text = model.SubjectNames;
+                    if (model.BeginDate != null)
+                        txtBeginDate.Text = DateTime.Parse(model.BeginDate.ToString()).ToShortDateString();
+                    if (model.EndDate != null)
+                        txtEndDate.Text = DateTime.Parse(model.EndDate.ToString()).ToShortDateString();
+                    txtRemark.Text = model.Remark;
+                }
+                var typeList = subjectTypeBll.GetList(s => s.GuidanceId == id && (s.IsDelete == false || s.IsDelete == null));
+                if (typeList.Any())
+                {
+
+                    typeList.ForEach(s =>
+                    {
+                        divStr.AppendFormat("<input type='text' data-typeid='{0}' name='txtTypeName' value='{1}'/><span name='deletetype' style='color:red;cursor:pointer;'>×</span>", s.Id, s.SubjectTypeName);
+                    });
+
+                    flag = true;
+                }
+            }
+            if (!flag)
+            {
+
+                for (int i = 0; i < 8; i++)
+                {
+                    divStr.Append("<input type='text' data-typeid='0' name='txtTypeName' value=''/><span name='deletetype' style='color:red;cursor:pointer;'>×</span>");
+                }
+            }
+            divStr.Append("<span style=''><a id='btnAdd' style='float: left;margin-left:-5px;margin-top:-2px;' class='easyui-linkbutton' plain='true' icon='icon-add'></a></span>");
+            typeContainer.InnerHtml = divStr.ToString();
+
+        }
+
+
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            string ItemName = txtItemName.Text.Trim();
+            string BeginDate = txtBeginDate.Text;
+            string EndDate = txtEndDate.Text;
+            string SubjectNames = txtSubjectNames.Text;
+            string Remark = txtRemark.Text.Trim();
+
+            bool canSave = false;
+            if (id > 0)
+            {
+                canSave = !CheckItemName(ItemName, id);
+            }
+            else
+                canSave = !CheckItemName(ItemName, null);
+            if (canSave)
+            {
+                try
+                {
+                    SubjectGuidance model = new SubjectGuidance();
+                    bool isUpDate = false;
+                    if (id > 0)
+                    {
+                        model = bll.GetModel(id);
+                        if (model != null)
+                            isUpDate = true;
+                        else
+                            model = new SubjectGuidance();
+                    }
+                    if (!string.IsNullOrWhiteSpace(BeginDate))
+                        model.BeginDate = DateTime.Parse(BeginDate);
+                    if (!string.IsNullOrWhiteSpace(EndDate))
+                        model.EndDate = DateTime.Parse(EndDate);
+                    model.ItemName = ItemName;
+                    model.Remark = Remark;
+                    model.CustomerId = int.Parse(ddlCustomer.SelectedValue);
+                    if (rblActivityType.SelectedValue != null)
+                        model.ActivityTypeId = int.Parse(rblActivityType.SelectedValue);
+                    model.SubjectNames = SubjectNames;
+                    if (isUpDate)
+                        bll.Update(model);
+                    else
+                    {
+                        model.AddDate = DateTime.Now;
+                        model.AddUserId = CurrentUser.UserId;
+                        bll.Add(model);
+                    }
+                    if (hfSubjectType.Value != "")
+                    {
+                        string[] arr = hfSubjectType.Value.Split('|');
+                        foreach (string s in arr)
+                        {
+                            if (!string.IsNullOrWhiteSpace(s))
+                            {
+                                int typeId = int.Parse(s.Split(':')[0]);
+                                string typeName = s.Split(':')[1];
+                                if (typeId > 0)
+                                {
+                                    SubjectType stModel = subjectTypeBll.GetModel(typeId);
+                                    if (stModel != null)
+                                    {
+                                        stModel.SubjectTypeName = typeName;
+                                        subjectTypeBll.Update(stModel);
+                                    }
+                                }
+                                else
+                                {
+                                    SubjectType stModel = new SubjectType() { GuidanceId = model.ItemId, SubjectTypeName = typeName };
+                                    subjectTypeBll.Add(stModel);
+                                }
+                            }
+                        }
+                    }
+                    //Upload(model.ItemId);
+                    Alert("提交成功！", "GuidanceList.aspx");
+                }
+                catch (Exception ex)
+                {
+                    Alert("提交失败！");
+                }
+            }
+            else
+            {
+                Alert("该活动名称已存在！");
+            }
+
+        }
+
+        bool CheckItemName(string name, int? id)
+        {
+            var list = bll.GetList(s => s.ItemName.ToLower() == name.ToLower() && (id != null ? (s.ItemId != id) : (1 == 1)));
+            return list.Any();
+
+        }
+
+        //void Upload(int itemId)
+        //{
+        //    AttachmentBLL attachBll=new AttachmentBLL();
+        //    Attachment attachModel;
+        //    if (FileUpload1.HasFile)
+        //    {
+
+        //        attachModel = new Attachment();
+        //        attachModel.AddDate = DateTime.Now;
+        //        attachModel.AddUserId = CurrentUser.UserId;
+        //        attachModel.FileCode = ((int)FileCodeEnum.OriginalOrder).ToString();
+        //        attachModel.FileType = FileTypeEnum.Files.ToString();
+        //        attachModel.IsDelete = false;
+        //        attachModel.SubjectId = itemId;
+        //        OperateFile.UpFiles(FileUpload1.PostedFile, ref attachModel);
+        //        attachBll.Add(attachModel);
+        //    }
+        //    if (FileUpload2.HasFile)
+        //    {
+
+        //        attachModel = new Attachment();
+        //        attachModel.AddDate = DateTime.Now;
+        //        attachModel.AddUserId = CurrentUser.UserId;
+        //        attachModel.FileCode = ((int)FileCodeEnum.SubjectGuidanceAttach).ToString();
+
+        //        attachModel.FileType = FileTypeEnum.Files.ToString();
+        //        attachModel.IsDelete = false;
+        //        attachModel.SubjectId = itemId;
+        //        OperateFile.UpFiles(FileUpload2.PostedFile, ref attachModel);
+        //        attachBll.Add(attachModel);
+        //    }
+        //    if (FileUpload3.HasFile)
+        //    {
+
+        //        attachModel = new Attachment();
+        //        attachModel.AddDate = DateTime.Now;
+        //        attachModel.AddUserId = CurrentUser.UserId;
+        //        attachModel.FileCode = ((int)FileCodeEnum.SubjectGuidanceAttach).ToString();
+
+        //        attachModel.FileType = FileTypeEnum.Files.ToString();
+        //        attachModel.IsDelete = false;
+        //        attachModel.SubjectId = itemId;
+        //        OperateFile.UpFiles(FileUpload3.PostedFile, ref attachModel);
+        //        attachBll.Add(attachModel);
+        //    }
+        //    if (FileUpload4.HasFile)
+        //    {
+
+        //        attachModel = new Attachment();
+        //        attachModel.AddDate = DateTime.Now;
+        //        attachModel.AddUserId = CurrentUser.UserId;
+        //        attachModel.FileCode = ((int)FileCodeEnum.SubjectGuidanceAttach).ToString();
+
+        //        attachModel.FileType = FileTypeEnum.Files.ToString();
+        //        attachModel.IsDelete = false;
+        //        attachModel.SubjectId = itemId;
+        //        OperateFile.UpFiles(FileUpload4.PostedFile, ref attachModel);
+        //        attachBll.Add(attachModel);
+        //    }
+        //}
+    }
+}

@@ -1,0 +1,4 @@
+﻿
+$(function () {
+    CheckPrimission(url, null, $("#btnAdd"),null, null, null, null);
+})

@@ -1,0 +1,344 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Transactions;
+using System.Web;
+using BLL;
+using DAL;
+using Common;
+using Models;
+using Newtonsoft.Json;
+
+namespace WebApp.Customer.Handler
+{
+    /// <summary>
+    /// MachineFrame 的摘要说明
+    /// </summary>
+    public class MachineFrame : IHttpHandler
+    {
+        ShopMachineFrameBLL frameBll = new ShopMachineFrameBLL();
+        public void ProcessRequest(HttpContext context)
+        {
+            string type = string.Empty;
+            string result = string.Empty;
+            context.Response.ContentType = "text/plain";
+            if (context.Request.QueryString["type"] != null)
+            {
+                type = context.Request.QueryString["type"];
+            }
+            switch (type)
+            {
+                case "getModel":
+                    int id = int.Parse(context.Request.QueryString["frameId"]);
+                    result = GetModel(id);
+                    break;
+                case "edit":
+                    string opType = context.Request.QueryString["optype"];
+                    string jsonStr = context.Request.QueryString["jsonString"];
+                    if (!string.IsNullOrWhiteSpace(jsonStr))
+                    {
+                        jsonStr = HttpUtility.UrlDecode(jsonStr);
+                    }
+                    result=AddMachineFrame(jsonStr, opType);
+                    break;
+                case "getHCPOP":
+                    int shopId = 0;
+                    string frameName = string.Empty;
+                    string gender = string.Empty;
+                    if (context.Request.QueryString["shopId"] != null)
+                    {
+                        shopId = int.Parse(context.Request.QueryString["shopId"]);
+                    }
+                    if (context.Request.QueryString["frameName"] != null)
+                    {
+                        frameName = context.Request.QueryString["frameName"];
+                    }
+                    if (context.Request.QueryString["gender"] != null)
+                    {
+                        gender = context.Request.QueryString["gender"];
+                    }
+                    result = GetHCPOP(shopId, frameName, gender);
+                    break;
+                case "getSheetList":
+                    result = GetSheetList();
+                    break;
+                case "getCornerType":
+                    string sheet0 = string.Empty;
+                    if (context.Request.QueryString["sheet"] != null)
+                        sheet0 = context.Request.QueryString["sheet"];
+                    result = GetCornerTypeList(sheet0);
+                    break;
+                case "getFrameList":
+                    string sheet = string.Empty;
+                    string cornerType = string.Empty;
+                    if (context.Request.QueryString["sheet"] != null)
+                        sheet = context.Request.QueryString["sheet"];
+                    if (context.Request.QueryString["cornerType"] != null)
+                        cornerType = context.Request.QueryString["cornerType"];
+                    result = GetFrameNameList(sheet, cornerType);
+                    break;
+                default:
+                    break;
+            }
+            context.Response.Write(result);
+        }
+
+        string GetModel(int id)
+        {
+            var model = (from frame in CurrentContext.DbContext.ShopMachineFrame
+                        join shop in CurrentContext.DbContext.Shop
+                        on frame.ShopId equals shop.Id
+                        where frame.Id==id
+                        select new { 
+                           frame,
+                           shop.ShopNo
+                        }).FirstOrDefault();
+            if (model != null)
+            {
+                StringBuilder json = new StringBuilder();
+                string IsValid = (model.frame.IsValid ?? true) ? "1" : "0";
+                json.Append("{\"Id\":\"" + id + "\",\"POSCode\":\"" + model.ShopNo + "\",\"PositionName\":\"" + model.frame.PositionName + "\",\"MachineFrame\":\"" + model.frame.MachineFrame + "\",\"Gender\":\"" + model.frame.Gender + "\",\"Count\":\"" + model.frame.Count + "\",\"CornerType\":\"" + model.frame.CornerType + "\",\"LevelNum\":\"" + model.frame.LevelNum + "\",\"IsValid\":\"" + IsValid + "\"}");
+                return "["+json.ToString()+"]";
+            }
+            else
+                return "";
+        }
+
+        string AddMachineFrame(string jsonStr, string opType)
+        {
+            string result = "提交失败！";
+            if (!string.IsNullOrEmpty(jsonStr))
+            {
+                using (TransactionScope tran = new TransactionScope())
+                {
+                    try
+                    {
+                        ShopMachineFrame model = JsonConvert.DeserializeObject<ShopMachineFrame>(jsonStr);
+                        if (model != null)
+                        {
+
+                            int shopId = 0;
+                            if (!GetShopId(model.POSCode, out shopId))
+                            {
+                                result = "该店不存在或者已删除！";
+                            }
+                            else
+                            {
+                                ShopMachineFrameBLL bll = new ShopMachineFrameBLL();
+                                BaseDataChangeLogBLL changeLogBll = new BaseDataChangeLogBLL();
+                                ShopMachineFrameChangeDetailBLL changeDetailBll = new ShopMachineFrameChangeDetailBLL();
+                                model.ShopId = shopId;
+                                if (CheckFrame(model))
+                                {
+                                    result = "exist";
+
+                                }
+                                else
+                                {
+
+                                    if (opType == "add")
+                                    {
+
+                                        bll.Add(model);
+                                        //添加变更日志
+                                        BaseDataChangeLog logModel = new BaseDataChangeLog();
+                                        logModel.AddDate = DateTime.Now;
+                                        logModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                        logModel.ItemType = (int)BaseDataChangeItemEnum.ShopMachineFrame;
+                                        logModel.ChangeType = (int)DataChangeTypeEnum.Add;
+                                        logModel.ShopId = shopId;
+                                        changeLogBll.Add(logModel);
+
+                                        //添加变更明细
+                                        ShopMachineFrameChangeDetail changeDetailModel = new ShopMachineFrameChangeDetail();
+                                        changeDetailModel.CornerType = model.CornerType;
+                                        changeDetailModel.Count = model.Count;
+                                        changeDetailModel.Gender = model.Gender;
+                                        changeDetailModel.LevelNum = model.LevelNum;
+                                        changeDetailModel.LogId = logModel.Id;
+                                        changeDetailModel.MachineFrame = model.MachineFrame;
+                                        changeDetailModel.PositionName = model.PositionName;
+                                        changeDetailModel.Remark = "新增";
+                                        changeDetailModel.ShopId = model.ShopId;
+                                        changeDetailModel.AddDate = DateTime.Now;
+                                        changeDetailModel.IsValid = model.IsValid;
+                                        changeDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                        changeDetailBll.Add(changeDetailModel);
+                                    }
+                                    else
+                                    {
+
+                                        ShopMachineFrame oldModel = bll.GetModel(model.Id);
+
+
+                                        bll.Update(model);
+
+
+                                        BaseDataChangeLog logModel = new BaseDataChangeLog();
+                                        logModel.AddDate = DateTime.Now;
+                                        logModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                        logModel.ItemType = (int)BaseDataChangeItemEnum.ShopMachineFrame;
+                                        logModel.ChangeType = (int)DataChangeTypeEnum.Edit;
+                                        logModel.ShopId = shopId;
+                                        changeLogBll.Add(logModel);
+
+                                        ShopMachineFrameChangeDetail changeDetailModel = new ShopMachineFrameChangeDetail();
+                                        changeDetailModel.CornerType = oldModel.CornerType;
+                                        changeDetailModel.Count = oldModel.Count;
+                                        changeDetailModel.Gender = oldModel.Gender;
+                                        changeDetailModel.LevelNum = oldModel.LevelNum;
+                                        changeDetailModel.LogId = logModel.Id;
+                                        changeDetailModel.MachineFrame = oldModel.MachineFrame;
+                                        changeDetailModel.PositionName = oldModel.PositionName;
+                                        changeDetailModel.Remark = "修改前";
+                                        changeDetailModel.ShopId = oldModel.ShopId;
+                                        changeDetailModel.AddDate = DateTime.Now;
+                                        changeDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                        changeDetailModel.IsValid = oldModel.IsValid;
+                                        changeDetailBll.Add(changeDetailModel);
+
+                                        changeDetailModel = new ShopMachineFrameChangeDetail();
+                                        changeDetailModel.CornerType = model.CornerType;
+                                        changeDetailModel.Count = model.Count;
+                                        changeDetailModel.Gender = model.Gender;
+                                        changeDetailModel.LevelNum = model.LevelNum;
+                                        changeDetailModel.LogId = logModel.Id;
+                                        changeDetailModel.MachineFrame = model.MachineFrame;
+                                        changeDetailModel.PositionName = model.PositionName;
+                                        changeDetailModel.Remark = "修改后";
+                                        changeDetailModel.ShopId = model.ShopId;
+                                        changeDetailModel.AddDate = DateTime.Now.AddSeconds(1);
+                                        changeDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                        changeDetailModel.IsValid = model.IsValid;
+                                        changeDetailBll.Add(changeDetailModel);
+
+                                    }
+
+                                    result = "ok";
+                                }
+
+                            }
+
+                        }
+                        tran.Complete();
+                    }
+                    catch (Exception ex)
+                    {
+                        result = ex.Message;
+                    }
+
+                }
+                
+            }
+            return result;
+        }
+
+        bool GetShopId(string shopNo, out int shopId)
+        {
+            shopId = 0;
+            if (!string.IsNullOrWhiteSpace(shopNo))
+            {
+                var shopModel = new ShopBLL().GetList(s => s.ShopNo.ToLower() == shopNo.ToLower() && (s.IsDelete == null || s.IsDelete == false)).FirstOrDefault();
+                if (shopModel != null)
+                {
+                    shopId = shopModel.Id;
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+
+        bool CheckFrame(ShopMachineFrame model)
+        {
+            ShopMachineFrameBLL bll = new ShopMachineFrameBLL();
+            var list = bll.GetList(s=>s.ShopId==model.ShopId && s.PositionName==model.PositionName && s.MachineFrame==model.MachineFrame && s.Gender==model.Gender && s.CornerType==model.CornerType && (model.Id>0?(s.Id!=model.Id):1==1));
+            return list.Any();
+        }
+
+
+        string GetHCPOP(int shopId, string frameName,string gender)
+        {
+            StringBuilder json = new StringBuilder();
+            var list = new HCPOPBLL().GetList(s => s.ShopId == shopId && s.MachineFrame == frameName && s.MachineFrameGender == gender);
+            if (list.Any())
+            {
+                list.ForEach(s => {
+                    json.Append("{\"MachineFrame\":\"" + s.MachineFrame + "\",\"MachineFrameGender\":\"" + s.MachineFrameGender + "\",\"POP\":\"" + s.POP + "\",\"GraphicWidth\":\"" + s.GraphicWidth + "\",\"GraphicLength\":\"" + s.GraphicLength + "\",\"Count\":\"" + s.Count + "\"},");
+                });
+                return "["+json.ToString().TrimEnd(',')+"]";
+            }
+            return "";
+        }
+
+
+        string GetSheetList()
+        {
+            string result = string.Empty;
+            var list = new BasicMachineFrameBLL().GetList(s=>s.Id>0).Select(s=>s.Sheet).Distinct().OrderBy(s=>s).ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s => {
+                    json.Append("{\"Sheet\":\"" + s + "\"},");
+                });
+                result = "["+json.ToString().TrimEnd(',')+"]";
+            }
+            return result;
+        }
+
+        string GetCornerTypeList(string sheet)
+        {
+            List<string> list = new BasicMachineFrameBLL().GetList(s => s.Sheet == sheet).Select(s => s.CornerType).Distinct().OrderBy(s => s).ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s =>
+                {
+                    if (!string.IsNullOrWhiteSpace(s))
+                    {
+                        json.Append("{\"CornerType\":\"" + s + "\"},");
+                    }
+                });
+                return "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            else
+                return "";
+        }
+
+        string GetFrameNameList(string sheet,string cornerType)
+        {
+            List<BasicMachineFrame> frameList = new BasicMachineFrameBLL().GetList(s => s.Sheet == sheet);
+            if (!string.IsNullOrWhiteSpace(cornerType))
+            {
+                frameList = frameList.Where(s => s.CornerType == cornerType).ToList();
+            }
+            //else
+            //{
+            //    frameList = frameList.Where(s => s.CornerType == null || s.CornerType == "").ToList();
+            //}
+            List<string> list = frameList.Select(s => s.MachineFrame).Distinct().OrderBy(s => s).ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s => {
+                    json.Append("{\"FrameName\":\""+s+"\"},");
+                });
+                return "["+json.ToString().TrimEnd(',')+"]";
+            }
+            else
+                return "";
+        }
+
+        public bool IsReusable
+        {
+            get
+            {
+                return false;
+            }
+        }
+    }
+}

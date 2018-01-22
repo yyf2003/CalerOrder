@@ -1,0 +1,85 @@
+﻿
+function urlCodeStr(str) {
+    return escape(str).replace(/\+/g, '%2B');
+}
+
+function CheckPrimission(url, view, add, edit, dele,recover, separator) {
+    $.ajax({
+        type: "get",
+        url: '/Handler/CheckPromission.ashx?url=' + url,
+        success: function (data) {
+            
+            if (data != "") {
+                var arr = data.split('|');
+                var count = 0;
+                $.each(arr, function (key, val) {
+                    if (val == "view") {
+                        if (view) {
+                            $(view).show();
+                            count++;
+                        }
+                    }
+                    if (val == "add") {
+                        if (add) {
+                            $(add).show();
+                            count++;
+                        }
+                    }
+                    if (val == "edit") {
+                        if (edit) {
+                            $(edit).show();
+                            count++;
+                        }
+
+                    }
+                    if (val == "delete") {
+                        if (dele) {
+                            $(dele).show();
+                            count++;
+                        }
+                        if (recover) {
+                            $(recover).show();
+
+                        }
+                    }
+
+                })
+                if (count > 0) {
+                    if (separator) {
+                        $(separator).show();
+
+                    }
+
+                }
+            }
+        }
+    })
+}
+
+//写cookie
+function setCookie(name, value) {
+    var Days = 30;
+    var exp = new Date();
+    exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+    document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+}
+
+//读取cookies 
+function getCookie(name) {
+    var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+
+    if (arr = document.cookie.match(reg))
+
+        return unescape(arr[2]);
+    else
+        return null;
+}
+
+//删除cookies 
+function delCookie(name) {
+    var exp = new Date();
+    exp.setTime(exp.getTime() - 1);
+    var cval = getCookie(name);
+    if (cval != null)
+        document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+} 

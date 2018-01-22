@@ -1,0 +1,157 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.ComponentModel;
+
+namespace Common
+{
+    public class EnumClass
+    {
+    }
+    public enum CategoryTypeEnum
+    {
+        /// <summary>
+        /// 权限操作类型
+        /// </summary>
+        OperateType = 1,
+        /// <summary>
+        /// 店铺类型
+        /// </summary>
+        ShopCategory,
+    }
+
+    public enum FileTypeEnum
+    {
+        Image,
+        Files,
+        PPT,
+        PDF,
+        Word,
+        Excel,
+        ZIP,
+        RAR
+
+    }
+
+
+    public enum FileCodeEnum
+    {
+        /// <summary>
+        /// 项目报价单
+        /// </summary>
+        SubjectQuotation = 1,
+        /// <summary>
+        /// 原始订单
+        /// </summary>
+        OriginalOrder=2,
+        /// <summary>
+        /// 活动指引附件
+        /// </summary>
+        SubjectGuidanceAttach=3,
+        /// <summary>
+        /// 发货单
+        /// </summary>
+        SendInvoice=4,
+        /// <summary>
+        /// 签收单
+        /// </summary>
+        ReceiveInvoice=5,
+        /// <summary>
+        /// 安装前照片
+        /// </summary>
+        BeforeInstallImg=6,
+        /// <summary>
+        /// 安装后照片
+        /// </summary>
+        AfterInstallImg=7,
+    }
+
+    public enum TableLevelEnum
+    {
+        第一展桌 = 1,
+        第二展桌,
+        第三展桌,
+        第四展桌,
+        第五展桌
+    }
+
+    public enum LevelNumEnum
+    {
+        首选 = 1,
+        次选,
+        三选
+    }
+
+    public enum LowerUpperEnum
+    { 
+        ToLower=1,
+        ToUpper,
+    }
+
+    public enum SubjectTypeEnum
+    {
+        [Description("上海订单")]
+        POP订单=1,
+        [Description("上海订单")]
+        新开店安装费,
+        [Description("上海订单1")]
+        补单,
+        [Description("上海订单1")]
+        二次安装费,
+        /// <summary>
+        /// 手工单，不需要拆单
+        /// </summary>
+        [Description("上海订单")]
+        手工订单,
+        [Description("分区订单")]
+        分区补单,
+        [Description("分区订单")]
+        HC订单,
+        [Description("分区订单")]
+        新开店订单,
+        [Description("上海订单")]
+        运费,
+       
+    }
+
+    /// <summary>
+    /// 下单区域
+    /// </summary>
+    public enum OrderChannelEnum
+    {
+
+        上海订单 = 1,
+        分区订单,
+    }
+
+    public enum UserLevelEnum {
+        总部=1,
+        分区,
+        省级,
+        市级,
+        县级
+    }
+
+    public enum CompanyTypeEnum
+    {
+        [Description("总公司")]
+        ParentCompany=1,
+        [Description("分公司")]
+        BranchCompany=2,
+        [Description("外协")]
+        Outsource=3
+    }
+
+    public enum OrderTypeEnum { 
+        POP=1,
+        道具,
+        物料,
+    }
+}
+
+public class EnumEntity {
+    public int Value { get; set; }
+    public string Name { get; set; }
+    public string Desction { get; set; }
+}

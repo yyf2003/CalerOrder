@@ -1,0 +1,6 @@
+﻿
+
+function getMonth() {
+   
+    $("#txtGuidanceMonth").blur();
+} 

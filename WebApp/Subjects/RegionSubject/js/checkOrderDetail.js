@@ -1,0 +1,158 @@
+﻿
+$(function () {
+    GetOrderList();
+    GetMaterialList();
+    $("#spanExportPOPOrder").click(function () {
+        $("#btnExportPOPOrder").click();
+    })
+
+    $("#spanEdit").click(function () {
+        $("#btnEdit").click();
+    })
+
+    $("#btnSearch").click(function () {
+        $("#loadingImg").show();
+        GetOrderList();
+    })
+})
+
+function GetOrderList() {
+    var shopno = $.trim($("#txtShopNo").val());
+    var shopname = $.trim($("#txtShopName").val());
+    $.ajax({
+        type: "get",
+        url: "handler/CheckOrderDetail.ashx",
+        data: { type: 'getList', subjectId: subjectId, shopNo: shopno, shopName: shopname },
+        success: function (data) {
+
+            if (data != "") {
+                var json = eval(data);
+
+                if (json.length > 0) {
+                    var tr = "";
+                    var index = 0;
+                    for (var i in json) {
+
+                        tr += "<tr>";
+                        tr += "<td>" + (++index) + "</td>";
+                        if (json[i].IsApprove == 0)
+                            tr += "<td style='color:red;'>未审批</td>";
+                        else {
+                            if (json[i].IsApprove == 1) {
+                                tr += "<td style='color:green;'>审批通过</td>";
+                            }
+                            else {
+                                tr += "<td style='color:red;'>审批不通过</td>";
+                            }
+
+                        }
+                        tr += "<td>" + json[i].OrderTypeName + "</td>";
+                        tr += "<td>" + json[i].SubjectName + "</td>";
+                        tr += "<td>" + json[i].ShopNo + "</td>";
+                        tr += "<td>" + json[i].ShopName + "</td>";
+                        tr += "<td>" + json[i].RegionName + "</td>";
+                        tr += "<td>" + json[i].ProvinceName + "</td>";
+                        tr += "<td>" + json[i].CityName + "</td>";
+                        tr += "<td>" + json[i].Format + "</td>";
+                        tr += "<td>" + json[i].MaterialSupport + "</td>";
+                        tr += "<td>" + json[i].POSScale + "</td>";
+                        if (json[i].OrderType > 3) {
+                            tr += "<td></td>";
+                            tr += "<td></td>";
+                            tr += "<td></td>";
+                            tr += "<td>" + json[i].Quantity + "</td>";
+                            tr += "<td>" + json[i].ReceivePrice + "</td>";
+                            tr += "<td>" + json[i].PayPrice + "</td>";
+                            tr += "<td></td>";
+                            tr += "<td></td>";
+                            tr += "<td></td>";
+                            tr += "<td></td>";
+                            tr += "<td></td>";
+                        }
+                        else {
+                            tr += "<td>" + json[i].Sheet + "</td>";
+                            tr += "<td>" + json[i].GraphicNo + "</td>";
+                            tr += "<td>" + json[i].Gender + "</td>";
+                            tr += "<td>" + json[i].Quantity + "</td>";
+                            tr += "<td></td>";
+                            tr += "<td></td>";
+                            tr += "<td>" + json[i].GraphicWidth + "</td>";
+                            tr += "<td>" + json[i].GraphicLength + "</td>";
+                            tr += "<td>" + json[i].GraphicMaterial + "</td>";
+                            tr += "<td>" + json[i].PositionDescription + "</td>";
+                            tr += "<td>" + json[i].ChooseImg + "</td>";
+                        }
+                        tr += "<td>" + json[i].Remark + "</td>";
+                        tr += "<td>" + json[i].AddDate + "</td>";
+                        tr += "</tr>";
+                    }
+                    $("#tbodyOrderData").html(tr).show();
+                    $("#tbodyOrderEmpty").hide();
+                }
+            }
+            else {
+                $("#tbodyOrderData").hide();
+                $("#tbodyOrderEmpty").show();
+            }
+        },
+        complete: function () {
+            $("#loadingImg").hide();
+        }
+    })
+}
+
+function GetMaterialList() {
+    $.ajax({
+        type: "get",
+        url: "handler/AddOrderDetail.ashx",
+        data: { type: 'getMaterialList', subjectId: subjectId },
+        success: function (data) {
+
+            if (data != "") {
+                var json = eval(data);
+                var index = 0;
+                if (json.length > 0) {
+                    var tr = "";
+                    for (var i in json) {
+                        tr += "<tr>";
+                        tr += "<td>" + (++index) + "</td>";
+                        tr += "<td>" + json[i].ShopNo + "</td>";
+                        tr += "<td>" + json[i].ShopName + "</td>";
+                        tr += "<td>" + json[i].RegionName + "</td>";
+                        tr += "<td>" + json[i].ProvinceName + "</td>";
+                        tr += "<td>" + json[i].CityName + "</td>";
+                        tr += "<td>" + json[i].Sheet + "</td>";
+                        tr += "<td>" + json[i].MaterialName + "</td>";
+                        tr += "<td>" + json[i].MaterialCount + "</td>";
+                        tr += "<td>" + json[i].MaterialLength + "</td>";
+                        tr += "<td>" + json[i].MaterialWidth + "</td>";
+                        tr += "<td>" + json[i].MaterialHigh + "</td>";
+                        tr += "<td>" + json[i].Price + "</td>";
+                        tr += "<td>" + json[i].Remark + "</td>";
+
+                        tr += "</tr>";
+                    }
+                    $("#tbodyMaterialData").html(tr).show();
+                    $("#tbodyMaterialEmpty").hide();
+                }
+            }
+            else {
+                $("#tbodyMaterialData").hide();
+                $("#tbodyMaterialEmpty").show();
+            }
+        }
+    })
+}
+
+function checkPOP() {
+    var trCount = $("#tbodyOrderData tr").length;
+    if (trCount == 0) {
+        layer.msg('没有数据');
+        return false;
+    }
+    return true;
+}
+
+function ConfirmDelete() {
+    return confirm("确认删除吗？");
+}

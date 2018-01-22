@@ -1,0 +1,91 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="index.aspx.cs" Inherits="WebApp.index" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <link href="CSS/global.css" rel="stylesheet" type="text/css" />
+    <link href="CSS/tab.css" rel="stylesheet" type="text/css" />
+    <script src="Scripts/jquery-1.4.1.js" type="text/javascript"></script>
+    <link href="bootstrap-3.3.2-dist/css/bootstrap.css" rel="stylesheet" type="text/css" />
+    <script src="bootstrap-3.3.2-dist/js/bootstrap.js" type="text/javascript"></script>
+    <style type="text/css">
+       ul
+       {
+        list-style:none;
+        
+       }
+       ul li{ float:left; margin-right:50px; margin-bottom:50px;}
+       #homeNav{ margin:0px;}
+       #homeNav li{margin-right:5px; margin-bottom:0px; font-weight:bold;}
+       .badge1
+       {
+        position:absolute;
+       	height:22px;
+       	width:22px;
+       	padding-top:3px;
+       	color:white;
+       	background-color:red;
+        margin-top:-78px;
+       	margin-left:50px;
+       	font-weight:bold;
+       	/*
+       	opacity:0.7;
+       	filter:alpha(opacity=70);
+       	-moz-opacity:0.7;  
+        -khtml-opacity: 0.7;  
+        */
+        text-align:center;
+        border-radius: 18px;
+        font-size:11px;
+       	}
+       	 
+    </style>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div class="main_right" style="width: 100%;height:100%;">
+        <div style=" height:30px; margin-left:5px; line-height:30px; color:Black; font-size:15px;">
+            
+         
+         <ul id="homeNav">
+            <li><img src="image/home.png" /></li>
+            <li>首页</li>
+         </ul>
+        </div>
+        <div class="main_right_tab">
+            <div style="background: url(../image/nav_01.gif) repeat-x top; border: 1px solid #CCC; height: 60px;">
+                <div class="main_right_tab_01_img">
+                    <img src="image/user.jpg" width="40" height="40" /></div>
+                <div class="main_right_tab_01_p" style=" font-size:13px; vertical-align:top;">
+                    <div style="padding-top: 2px; padding-left: 15px;">
+                        <a href="/Users/Edit1.aspx" target="ifrContext" title="修改个人信息"><asp:Label ID="labUserName" runat="server" Text="" ForeColor="Blue"></asp:Label></a>您好！欢迎您登陆！
+                     </div>
+                    <div style="padding-top: 5px; padding-left: 15px;">
+                        当前时间:
+                        <span id="time"></span>
+                        </div>
+                </div>
+            </div>
+            <div class="main_right_nav" style="font-size: 12px;">
+                <asp:Label ID="labMenu" runat="server" Text=""></asp:Label>
+            </div>
+            
+        </div>
+    </div>
+    </form>
+</body>
+</html>
+<script type="text/javascript">
+    $(function () {
+        getTime();
+        setInterval(getTime, 1000);
+    })
+
+    function getTime() {
+        var t = new Date().toLocaleString();
+        $("#time").html(t);
+    }
+
+</script>

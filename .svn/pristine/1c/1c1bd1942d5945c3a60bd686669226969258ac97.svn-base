@@ -1,0 +1,436 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using BLL;
+using DAL;
+using Models;
+using Newtonsoft.Json;
+using System.Text;
+using Common;
+
+namespace WebApp.Subjects.RegionSubject.handler
+{
+    /// <summary>
+    /// AddOrderDetail 的摘要说明
+    /// </summary>
+    public class AddOrderDetail : IHttpHandler
+    {
+        HttpContext context1;
+        public void ProcessRequest(HttpContext context)
+        {
+            context1 = context;
+            context.Response.ContentType = "text/plain";
+            string type = string.Empty;
+            string result = string.Empty;
+            if (context.Request.QueryString["type"] != null)
+            {
+                type = context.Request.QueryString["type"];
+            }
+            else if (context.Request.Form["type"] != null)
+            {
+                type = context.Request.Form["type"];
+            }
+            switch (type)
+            {
+                case "getList":
+                    result = GetOrderList();
+                    break;
+                case "getMaterialList":
+                    result = GetMaterialList();
+                    break;
+                case "getPOP":
+                    result = GetPOPList();
+                    break;
+                case "addOrder":
+                    result = AddOrder();
+                    break;
+                case "deleteOrder":
+                    result = DeleteOrder();
+                    break;
+                case "deleteMaterail":
+                    result = DeleteMaterial();
+                    break;
+                case "getCustomerMaterail":
+                    result = GetCustomerMaterial();
+                    break;
+                case "getSheetList":
+                    result = GetSheetList();
+                    break;
+                default:
+                    break;
+            }
+            context.Response.Write(result);
+        }
+
+        string GetOrderList()
+        {
+            string result = string.Empty;
+            int subjectId = 0;
+            if (context1.Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(context1.Request.QueryString["subjectId"]);
+            }
+            var list = (from order in CurrentContext.DbContext.RegionOrderDetail
+                        join shop in CurrentContext.DbContext.Shop
+                        on order.ShopId equals shop.Id
+                        join subject in CurrentContext.DbContext.Subject
+                        on order.HandMakeSubjectId equals subject.Id into subjectTemp
+                        from subject1 in subjectTemp.DefaultIfEmpty()
+                        where order.SubjectId == subjectId
+                        select new
+                        {
+                            order,
+                            shop,
+                           //SubjectName=subject1!=null ? subject1.SubjectName:""
+                           subject1.SubjectName
+                        }).OrderBy(s=>s.order.ApproveState).ThenByDescending(s=>s.order.AddDate).ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s =>
+                {
+                    int orderType = s.order.OrderType ?? 1;
+                    string type = orderType == 1 ? "POP" : "道具";
+                    string addDate = string.Empty;
+                    if (s.order.AddDate != null)
+                        addDate = s.order.AddDate.ToString();
+                    json.Append("{\"Id\":\"" + s.order.Id + "\",\"OrderType\":\"" + type + "\",\"SubjectName\":\"" + s.SubjectName + "\",\"ShopId\":\"" + s.order.ShopId + "\",\"ShopNo\":\"" + s.shop.ShopNo + "\",\"ShopName\":\"" + s.shop.ShopName + "\",\"RegionName\":\"" + s.shop.RegionName + "\",\"ProvinceName\":\"" + s.shop.ProvinceName + "\",\"CityName\":\"" + s.shop.CityName + "\",\"MaterialSupport\":\"" + s.order.MaterialSupport + "\",\"POSScale\":\"" + s.order.POSScale + "\",\"Channel\":\"" + s.shop.Channel + "\",\"Format\":\"" + s.shop.Format + "\",\"Sheet\":\"" + s.order.Sheet + "\",\"GraphicNo\":\"" + s.order.GraphicNo + "\",\"Gender\":\"" + s.order.Gender + "\",\"Quantity\":\"" + s.order.Quantity + "\",\"GraphicWidth\":\"" + s.order.GraphicWidth + "\",\"GraphicLength\":\"" + s.order.GraphicLength + "\",\"GraphicMaterial\":\"" + s.order.GraphicMaterial + "\",\"PositionDescription\":\"" + s.order.PositionDescription + "\",\"ChooseImg\":\"" + s.order.ChooseImg + "\",\"Remark\":\"" + s.order.Remark + "\",\"IsApprove\":\"" + (s.order.ApproveState ?? 0) + "\",\"AddDate\":\"" + addDate + "\"},");
+
+                });
+                result = "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            return result;
+        }
+
+
+        string GetPOPList()
+        {
+            string result = string.Empty;
+            string shopNo = string.Empty;
+            int subjectId = 0;
+            if (context1.Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(context1.Request.QueryString["subjectId"]);
+            }
+            if (context1.Request.QueryString["shopNo"] != null)
+            {
+                shopNo = context1.Request.QueryString["shopNo"];
+            }
+            if (!string.IsNullOrWhiteSpace(shopNo))
+            {
+                var shopModel = new ShopBLL().GetList(s => s.ShopNo.ToLower() == shopNo.ToLower()).FirstOrDefault();
+                if (shopModel != null)
+                {
+                    bool isHc = false;
+                    if (!string.IsNullOrWhiteSpace(shopModel.Format))
+                    { 
+                        string format=shopModel.Format.ToUpper();
+                        if (format.Contains("HC") || format.Contains("HOMECOURT") || format.Contains("HOMECORE"))
+                        {
+                            isHc = true;
+                        }
+                    }
+                    if (isHc)
+                    {
+                        int shopId = shopModel.Id;
+                        string materialSupport = shopModel.MaterialSupport;
+                        string posScale = shopModel.POSScale;
+                        var popList = new POPBLL().GetList(s => s.ShopId == shopId);
+                        if (popList.Any())
+                        {
+                            StringBuilder popJson = new StringBuilder();
+                            StringBuilder subjectJson = new StringBuilder();
+                            popList.ForEach(s =>
+                            {
+                                popJson.Append("{\"Id\":\"" + s.Id + "\",\"ShopId\":\"" + s.ShopId + "\",\"Sheet\":\"" + s.Sheet + "\",\"GraphicNo\":\"" + s.GraphicNo + "\",\"Gender\":\"" + s.Gender + "\",\"Quantity\":\"" + s.Quantity + "\",\"GraphicWidth\":\"" + s.GraphicWidth + "\",\"GraphicLength\":\"" + s.GraphicLength + "\",\"GraphicMaterial\":\"" + s.GraphicMaterial + "\",\"PositionDescription\":\"" + s.PositionDescription + "\",\"Remark\":\"" + s.Remark + "\",\"MaterialSupport\":\"" + materialSupport + "\",\"POSScale\":\"" + posScale + "\"},");
+
+                            });
+                            result = "[" + popJson.ToString().TrimEnd(',') + "]";
+                            SubjectBLL subjectBll = new SubjectBLL();
+                            Subject subjectModel = subjectBll.GetModel(subjectId);
+                            if (subjectModel != null)
+                            {
+                                //var subjectList = subjectBll.GetList(s=>s.GuidanceId==subjectModel.GuidanceId && s.ApproveState==1 && (s.IsDelete==null || s.IsDelete==false) && (s.SubjectType??1)==(int)SubjectTypeEnum.POP订单);
+                                List<string> regionList = new List<string>();
+                                if (!string.IsNullOrWhiteSpace(subjectModel.SupplementRegion))
+                                {
+                                    regionList = StringHelper.ToStringList(subjectModel.SupplementRegion, ',', LowerUpperEnum.ToLower);
+
+                                }
+                                var subjectList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                                   join shop in CurrentContext.DbContext.Shop
+                                                   on order.ShopId equals shop.Id
+                                                   join subject in CurrentContext.DbContext.Subject
+                                                   on order.SubjectId equals subject.Id
+                                                   where subject.GuidanceId == subjectModel.GuidanceId
+                                                   && subject.ApproveState == 1
+                                                   && (subject.IsDelete == null || subject.IsDelete == false)
+                                                   && (subject.SubjectType ?? 1) == (int)SubjectTypeEnum.POP订单
+                                                   && (regionList.Any() ? (regionList.Contains(shop.RegionName.ToLower())) : 1 == 1)
+                                                   select subject).Distinct().OrderBy(s => s.Id).ToList();
+                                if (subjectList.Any())
+                                {
+                                    subjectList.ForEach(s =>
+                                    {
+                                        subjectJson.Append("{\"SubjectId\":\"" + s.Id + "\",\"SubjectName\":\"" + s.SubjectName + "\"},");
+                                    });
+                                    result += "|[" + subjectJson.ToString().TrimEnd(',') + "]";
+                                }
+
+
+                            }
+                        }
+                    }
+                    else
+                        result = "error|该店铺不是HC店";
+                }
+                else
+                    result = "error|店铺不存在";
+            }
+            return result;
+        }
+
+        string GetMaterialList()
+        {
+            string result = string.Empty;
+            int subjectId = 0;
+            if (context1.Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(context1.Request.QueryString["subjectId"]);
+            }
+            var list = (from material in CurrentContext.DbContext.OrderMaterial
+                       join shop in CurrentContext.DbContext.Shop
+                       on material.ShopId equals shop.Id
+                       where material.SubjectId == subjectId
+                       select new { 
+                          shop,
+                          material
+                       }).ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s =>
+                {
+                    json.Append("{\"Id\":\"" + s.material.MaterialId + "\",\"ShopId\":\"" + s.material.ShopId + "\",\"ShopNo\":\"" + s.shop.ShopNo + "\",\"ShopName\":\"" + s.shop.ShopName + "\",\"RegionName\":\"" + s.shop.RegionName + "\",\"ProvinceName\":\"" + s.shop.ProvinceName + "\",\"CityName\":\"" + s.shop.CityName + "\",\"Sheet\":\"" + s.material.Sheet + "\",\"MaterialName\":\"" + s.material.MaterialName + "\",\"MaterialCount\":\"" + s.material.MaterialCount + "\",\"MaterialLength\":\"" + s.material.MaterialLength + "\",\"MaterialWidth\":\"" + s.material.MaterialWidth + "\",\"MaterialHigh\":\"" + s.material.MaterialHigh + "\",\"Price\":\"" + s.material.Price + "\",\"Remark\":\"" + s.material.Remark + "\"},");
+
+                });
+                result = "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            return result;
+
+        }
+
+        string AddOrder()
+        {
+            string result = "ok";
+            string jsonStr = string.Empty;
+            if (context1.Request.Form["jsonStr"] != null)
+            {
+                jsonStr = context1.Request.Form["jsonStr"];
+                //jsonStr = HttpUtility.UrlDecode(jsonStr);
+                if (!string.IsNullOrWhiteSpace(jsonStr))
+                {
+                    jsonStr = jsonStr.Replace("+", "%2B");
+                    jsonStr = HttpUtility.UrlDecode(jsonStr);
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(jsonStr))
+            {
+                try
+                {
+                    List<RegionOrderDetail> orderList = JsonConvert.DeserializeObject<List<RegionOrderDetail>>(jsonStr);
+                    if (orderList.Any())
+                    {
+                        //POPBLL popBll = new POPBLL();
+                        //POP popModel;
+                        RegionOrderDetailBLL orderBll = new RegionOrderDetailBLL();
+                        RegionOrderDetail orderModel;
+                        int shopId = orderList[0].ShopId ?? 0;
+                        int subjectId = orderList[0].SubjectId ?? 0;
+                        //orderBll.Delete(s => s.SubjectId == subjectId && s.ShopId == shopId);
+                        StringBuilder msg = new StringBuilder();
+                        int successNum = 0;
+                        orderList.ForEach(s =>
+                        {
+                            bool canSave = true;
+                            if (s.OrderType == 1)
+                            {
+                                canSave = CheckMaterial(s.GraphicMaterial);
+                            }
+                            if (canSave)
+                            {
+                                orderModel = new RegionOrderDetail();
+                                orderModel.OrderType = s.OrderType;
+                                orderModel.AddDate = DateTime.Now;
+                                orderModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                orderModel.CornerType = s.CornerType;
+                                orderModel.Gender = s.Gender;
+                                orderModel.GraphicLength = s.GraphicLength;
+                                orderModel.GraphicMaterial = s.GraphicMaterial;
+                                orderModel.GraphicNo = s.GraphicNo;
+                                orderModel.GraphicWidth = s.GraphicWidth;
+                                orderModel.MaterialSupport = s.MaterialSupport;
+                                orderModel.PositionDescription = s.PositionDescription;
+                                orderModel.POSScale = s.POSScale;
+                                orderModel.Quantity = s.Quantity;
+                                orderModel.Remark = s.Remark;
+                                orderModel.Sheet = s.Sheet;
+                                orderModel.ShopId = s.ShopId;
+                                orderModel.SubjectId = s.SubjectId;
+                                orderModel.HandMakeSubjectId = s.HandMakeSubjectId;
+                                orderModel.ChooseImg = s.ChooseImg;
+                                orderBll.Add(orderModel);
+                                successNum++;
+                            }
+                            else
+                            {
+                                msg.Append(s.GraphicMaterial+"，");
+                            }
+                        });
+                        if (msg.Length > 0)
+                        {
+                            if (successNum > 0)
+                            {
+                                result = "部分POP提交失败：以下材质不正确："+msg.ToString();
+                            }
+                            else
+                                result = "提交失败：以下材质不正确：" + msg.ToString();
+                            result += "请先更新基础数据库再提交！";
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result = "提交失败："+ex.Message;
+                }
+            }
+            return result;
+        }
+
+        string DeleteOrder()
+        {
+            string result = "ok";
+            string ids = string.Empty;
+            if (context1.Request.QueryString["ids"] != null)
+            {
+                ids = context1.Request.QueryString["ids"];
+                List<int> idList = StringHelper.ToIntList(ids,',');
+                if (idList.Any())
+                {
+                    try
+                    {
+                        new RegionOrderDetailBLL().Delete(s => idList.Contains(s.Id));
+                    }
+                    catch (Exception ex)
+                    {
+                        result = "删除失败：" + ex.Message;
+                    }
+                }
+            }
+            return result;
+        }
+
+
+        string DeleteMaterial()
+        {
+            string result = "ok";
+            string ids = string.Empty;
+            if (context1.Request.QueryString["ids"] != null)
+            {
+                ids = context1.Request.QueryString["ids"];
+                List<int> idList = StringHelper.ToIntList(ids,',');
+                if (idList.Any())
+                {
+                    try
+                    {
+                        new OrderMaterialBLL().Delete(s => idList.Contains(s.MaterialId));
+                    }
+                    catch (Exception ex)
+                    {
+                        result = "删除失败：" + ex.Message;
+                    }
+                }
+            }
+            return result;
+        }
+
+        string GetCustomerMaterial()
+        {
+            string result = string.Empty;
+            int subjectId = 0;
+            if (context1.Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(context1.Request.QueryString["subjectId"]);
+            }
+            Subject subjectModel = new SubjectBLL().GetModel(subjectId);
+            if (subjectModel != null)
+            {
+                int customerId = subjectModel.CustomerId ?? 0;
+                //var list = new CustomerMaterialInfoBLL().GetList(s => s.CustomerId == customerId).OrderBy(s=>s.BasicCategoryId).ToList();
+                var list = (from cm in CurrentContext.DbContext.CustomerMaterialInfo
+                            join bm in CurrentContext.DbContext.BasicMaterial
+                            on cm.BasicMaterialId equals bm.Id
+                            where cm.CustomerId == customerId
+                            select bm).ToList();
+
+                if (list.Any())
+                {
+                    StringBuilder json = new StringBuilder();
+                    list.ForEach(s => {
+                        json.Append("{\"MaterialName\":\""+s.MaterialName+"\"},");
+                    });
+                    result = "["+json.ToString().TrimEnd(',')+"]";
+                }
+            }
+            return result;
+        }
+
+        string GetSheetList()
+        {
+            var list = (from pop in CurrentContext.DbContext.POP
+                        join shop in CurrentContext.DbContext.Shop
+                        on pop.ShopId equals shop.Id
+                        where shop.Format.ToLower().Contains("hc")
+                        select pop.Sheet).Distinct().OrderBy(s => s).ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s => {
+                    json.Append("{\"SheetName\":\""+s+"\"},");
+                });
+                return "["+json.ToString().TrimEnd(',')+"]";
+            }
+            else
+                return "";
+        }
+
+        List<string> materialList = new List<string>();
+        bool CheckMaterial(string materialName)
+        {
+            bool flag = true;
+            materialName = materialName.Trim().ToLower();
+            if (materialList.Contains(materialName))
+            {
+                flag = true;
+            }
+            else
+            {
+                OrderMaterialMpping materialModel = new OrderMaterialMppingBLL().GetList(s => s.OrderMaterialName.ToLower() == materialName).FirstOrDefault();
+                if (materialModel != null)
+                    materialList.Add(materialName);
+                else
+                    flag = false;
+            }
+            return flag;
+        }
+
+        public bool IsReusable
+        {
+            get
+            {
+                return false;
+            }
+        }
+    }
+}

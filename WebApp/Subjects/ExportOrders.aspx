@@ -1,0 +1,498 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ExportOrders.aspx.cs" Inherits="WebApp.Subjects.ExportOrders" %>
+
+<%@ Register Assembly="AspNetPager" Namespace="Wuqi.Webdiyer" TagPrefix="webdiyer" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <link href="../CSS/Systen_style.css" rel="stylesheet" type="text/css" />
+    <link href="../easyui1.4/themes/bootstrap/easyui.css" rel="stylesheet" />
+    <link href="../easyui1.4/themes/bootstrap/layout.css" rel="stylesheet" />
+    <link href="../easyui1.4/themes/icon.css" rel="stylesheet" />
+    <script src="../Scripts/jquery-1.7.2.js" type="text/javascript"></script>
+    <script src="../easyui1.4/jquery.easyui.min.js" type="text/javascript"></script>
+    <script src="../My97DatePicker/WdatePicker.js" type="text/javascript"></script>
+    <script src="../Scripts/jquery.pagination.js" type="text/javascript"></script>
+    <link href="../CSS/pagination.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+        var userId = '<%=userId %>';
+        function GetCityData() {
+            return $("#hfCityData").val();
+
+        }
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div class="nav_title">
+        <a href="/index.aspx">
+            <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" /></a><p
+                class="nav_table_p">
+                订单导出
+            </p>
+    </div>
+    <div class="tr">
+        >>选择项目</div>
+    <table class="table">
+        <tr class="tr_bai">
+            <td>
+                客户
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <asp:DropDownList ID="ddlCustomer" runat="server">
+                </asp:DropDownList>
+                <span style="color: Red;">*</span>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                活动时间
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <%-- <div style=" margin-left:5px;">
+                <asp:TextBox ID="txtBeginDate" runat="server" MaxLength="15" onclick="WdatePicker()"
+                    ContentEditable="false"></asp:TextBox>
+                —
+                <asp:TextBox ID="txtEndDate" runat="server" MaxLength="15" onclick="WdatePicker()"
+                    ContentEditable="false"></asp:TextBox>
+                &nbsp;
+                <input type="button" id="btnSearchSubject" value="查询" class="easyui-linkbutton"
+                    style="width: 65px; height: 26px;" />
+                <img id="imgLoading1" style="display:none;" src='../image/WaitImg/loadingA.gif' />
+                </div>
+                <div>
+                  <table style=" width:100%;">
+                    <tr>
+                       <td style=" width:80px; text-align:center;">显示时间：</td>
+                       <td style=" width:200px; text-align:left;">
+                           <asp:Label ID="labBeginDate" runat="server" Text=""></asp:Label>
+                           —
+                           <asp:Label ID="labEndDate" runat="server" Text=""></asp:Label>
+                       </td>
+                       <td>
+                         <span id="spanUp" style="margin-left:10px;cursor:pointer; color:Blue;">上一个月</span>
+                         <span id="spanDown" style=" margin-left:20px; cursor:pointer; color:Blue;">下一个月</span>
+                       </td>
+                    </tr>
+                  </table>
+                </div>--%>
+                <asp:TextBox ID="txtMonth" runat="server" CssClass="Wdate" onfocus="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM',isShowClear:false,readOnly:true,onpicked:getMonth})"
+                    Style="width: 80px;"></asp:TextBox>
+                <span id="spanUp" style="margin-left: 10px; cursor: pointer; color: Blue;">上一个月</span>
+                <span id="spanDown" style="margin-left: 20px; cursor: pointer; color: Blue;">下一个月</span>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td>
+                项目
+            </td>
+            <td style="padding-left: 0px; height: 80px; vertical-align: top;">
+                <table style="width: 100%;">
+                    <tr class="tr_hui">
+                        <td style="width: 80px;">
+                            活动名称：
+                        </td>
+                        <td style="text-align: left;">
+                            <img id="loadGuidanceImg" style="display: none;" src="../image/WaitImg/loadingA.gif" />
+                            <div id="guidanceDiv">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="trType" style="display: none;">
+                        <td>
+                            区 域：
+                        </td>
+                        <td style="text-align: left;">
+                            <div id="regionDiv">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="trType" style="display: none;">
+                        <td>
+                            活动类型：
+                        </td>
+                        <td style="text-align: left;">
+                            <div id="activityDiv">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="trType" style="display: none;">
+                        <td>
+                            项目分类：
+                        </td>
+                        <td style="text-align: left;">
+                            <div id="typeDiv">
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <img id="loadSubjectImg" style="display: none;" src="../image/WaitImg/loadingA.gif" />
+                <div class="trType" style="width: 80%; margin: 5px; text-align: left; display: none;">
+                    <input type="checkbox" id="cbALL" /><span style="color: Blue;">全选</span>
+                </div>
+                <div id="projectsDiv" style="width: 80%; margin: 5px; text-align: left;">
+                </div>
+            </td>
+        </tr>
+        <%--<tr class="tr_bai">
+            <td>
+                物料信息
+            </td>
+            <td style="text-align: left; padding-left: 5px; height: 80px; vertical-align: top;">
+                
+                <div id="MaterialsDiv" style="width: 80%; margin: 5px;">
+                   
+                </div>
+            </td>
+        </tr>--%>
+    </table>
+    <div class="tr">
+        >>条件</div>
+    <table class="table">
+        <%--<tr class="tr_bai">
+            <td style="width: 120px;">
+                区域
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <div id="regionLoadImg" class="loadingImg" style="display:none;">
+                    <img src="../image/WaitImg/loadingA.gif" />
+                </div>
+                <div  id="RegionDiv1" class="contentDiv">
+                </div>
+            </td>
+        </tr>--%>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                省份
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <div id="provinceLoadImg" class="loadingImg" style="display: none;">
+                    <img src="../image/WaitImg/loadingA.gif" />
+                </div>
+                <div id="ProvinceDiv" class="contentDiv" style="width: 90%;">
+                </div>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                城市
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <div id="cityLoadImg" class="loadingImg" style="display: none;">
+                    <img src="../image/WaitImg/loadingA.gif" />
+                </div>
+                <div id="cbAllDiv" style="display: none;">
+                    <input type="checkbox" id="cbAllCity" />全选
+                    <hr style="width: 50px;" />
+                </div>
+                <div id="CityDiv" class="contentDiv" style="width: 90%;">
+                </div>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                分区客服
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <div id="csLoadImg" class="loadingImg" style="display: none;">
+                    <img src="../image/WaitImg/loadingA.gif" />
+                </div>
+                <div id="CustomerServiceNameDiv" class="contentDiv" style="width: 90%;">
+                </div>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                安装级别
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <div id="installLoadImg" class="loadingImg" style="display: none;">
+                    <img src="../image/WaitImg/loadingA.gif" />
+                </div>
+                <div id="IsInstallDiv" class="contentDiv" style="width: 90%;">
+                </div>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                材质类型
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <div id="mcLoadImg" class="loadingImg" style="display: none;">
+                    <img src="../image/WaitImg/loadingA.gif" />
+                </div>
+                <div id="MaterialCategoryDiv" class="contentDiv" style="width: 90%;">
+                </div>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                材质名称
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <asp:CheckBoxList ID="cblMaterial" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                    <asp:ListItem Value="软膜">软膜&nbsp;&nbsp;&nbsp;</asp:ListItem>
+                    <asp:ListItem Value="非软膜">非软膜&nbsp;&nbsp;&nbsp;</asp:ListItem>
+                </asp:CheckBoxList>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                店铺类型
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <asp:CheckBoxList ID="cblExportType" runat="server" RepeatDirection="Horizontal"
+                    RepeatLayout="Flow">
+                    <asp:ListItem Value="nohc">非HC订单&nbsp;</asp:ListItem>
+                    <asp:ListItem Value="hc">HC订单&nbsp;</asp:ListItem>
+                </asp:CheckBoxList>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                店铺编号
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <asp:TextBox ID="txtExportShopNo" runat="server" Style="width: 400px;"></asp:TextBox>（逗号分隔）
+                <asp:CheckBox ID="cbNotInclude" runat="server" />不包含
+            </td>
+        </tr>
+        <tr class="tr_bai" style="display: none;">
+            <td colspan="2" style="height: 30px;">
+                <div style="width: 80px; float: right;">
+                    <input type="button" value="查 询" id="btnSearch" class="easyui-linkbutton" style="width: 65px;
+                        height: 26px; margin-right: 10px; display: none;" />
+                </div>
+            </td>
+        </tr>
+    </table>
+    <br />
+    <asp:Panel ID="Panel2" runat="server">
+        <table class="table">
+            <tr class="tr_bai">
+                <td style="font-weight: bold;width: 120px;">
+                    订单导出
+                </td>
+                <td style="text-align: left; padding-left: 5px; width: 400px;">
+                    <input type="button" value="导出订单" id="btnExport" class="easyui-linkbutton" style="width: 65px;
+                        height: 26px; margin-left: 10px; display: none;" />
+                    <img id="downloading1" src="../image/WaitImg/loadingA.gif" style="display: none;" />
+                    <input type="button" value="350总表(非空)" id="btnExport350" class="easyui-linkbutton"
+                        style="width: 100px; height: 26px; margin-left: 10px; display: none" />
+                    <img id="Img1" src="../image/WaitImg/loadingA.gif" style="display: none;" />
+                    <input type="button" value="系统订单" id="btnExportNew350" class="easyui-linkbutton"
+                        style="width: 100px; height: 26px; margin-left: 10px;" />
+                    <img id="downloading2" src="../image/WaitImg/loadingA.gif" style="display: none;" />
+                    <input type="button" value="350总表(含空)" id="btnExport350WithEmpty" class="easyui-linkbutton"
+                        style="width: 100px; height: 26px; margin-left: 10px; display: none;" />
+                    <img id="downloading33" src="../image/WaitImg/loadingA.gif" style="display: none;" />
+                    <input type="button" value="报价订单" id="btnExportQuote350" class="easyui-linkbutton"
+                        style="width: 100px; height: 26px; margin-left: 20px;" />
+                    <img id="Img3" src="../image/WaitImg/loadingA.gif" style="display: none;" />
+                    <input type="button" value="装箱单" id="btnExportPackingList" class="easyui-linkbutton"
+                        style="width: 100px; height: 26px; margin-left: 10px; display: none;" />
+                    <img id="Img4" src="../image/WaitImg/loadingA.gif" style="display: none;" />
+                </td>
+                <td style="width: 120px; font-weight: bold;">
+                    导出喷绘王模板
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <input type="button" value="北京订单" id="btnPHWbj" class="easyui-linkbutton" style="width: 65px;
+                        height: 26px; margin-left: 10px;" />
+                    <img id="downloading3" src="../image/WaitImg/loadingA.gif" style="display: none;" />
+                    <input type="button" value="外协订单" id="btnPHWwx" class="easyui-linkbutton" style="width: 80px;
+                        height: 26px; margin-left: 10px;" />
+                    <img id="downloading4" src="../image/WaitImg/loadingA.gif" style="display: none;" />
+                </td>
+            </tr>
+        </table>
+    </asp:Panel>
+    <br />
+    <div>
+        <table class="table">
+            <tr class="tr_hui">
+                <td style="width: 120px;">
+                    订单总数量
+                </td>
+                <td style="text-align: left; padding-left: 5px; width: 200px;">
+                    <asp:Label ID="labOrderCount" runat="server" Text="0"></asp:Label>
+                </td>
+                <td style="width: 120px;">
+                    店铺数量
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labShopCount" runat="server" Text="0"></asp:Label>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <%-- <div class="tr"> >>订单明细</div>--%>
+    <div style="overflow: auto; display: none;">
+        <table id="noData" class="table" style="display: ;">
+            <tr class="tr_bai">
+                <td style="text-align: center; height: 50px;">
+                    --无可显示的信息--
+                </td>
+            </tr>
+        </table>
+        <div id="divload" style="display: none; text-align: center;">
+            <img src="../image/WaitImg/loading1.gif" />
+        </div>
+        <table id="popListTB" class="table" style="display: none; width: 1800px;">
+            <thead>
+                <tr class="tr_hui">
+                    <td style="width: 40px;">
+                        序号
+                    </td>
+                    <td style="width: 50px;">
+                        订单类型
+                    </td>
+                    <td>
+                        店铺编号
+                    </td>
+                    <td>
+                        店铺名称
+                    </td>
+                    <td>
+                        区域
+                    </td>
+                    <td>
+                        省份
+                    </td>
+                    <td>
+                        城市
+                    </td>
+                    <td>
+                        城市级别
+                    </td>
+                    <td>
+                        店铺类型
+                    </td>
+                    <td>
+                        物料支持
+                    </td>
+                    <td>
+                        店铺规模大小
+                    </td>
+                    <%--<td>
+                        POP编号
+                    </td>
+                    <td>
+                        POP名称
+                    </td>
+                    <td>
+                        POP类型
+                    </td>--%>
+                    <td>
+                        位置
+                    </td>
+                    <td>
+                        级别
+                    </td>
+                    <td>
+                        性别
+                    </td>
+                    <td>
+                        数量
+                    </td>
+                    <td>
+                        器架类型
+                    </td>
+                    <td>
+                        位置描述
+                    </td>
+                    <td>
+                        POP宽(mm)
+                    </td>
+                    <td>
+                        POP高(mm)
+                    </td>
+                    <td>
+                        面积(M2)
+                    </td>
+                    <td>
+                        POP材质
+                    </td>
+                    <%--<td>
+                        位置宽(mm)
+                    </td>
+                    <td>
+                        位置高(mm)
+                    </td>
+                    <td>
+                        位置深(mm)
+                    </td>
+                    <td>
+                        位置规模
+                    </td>
+                    <td>
+                        样式
+                    </td>
+                    <td>
+                        角落类型
+                    </td>
+                    <td>
+                        系列
+                    </td>
+                    <td>
+                        是否标准规格
+                    </td>
+                    <td>
+                        是否格栅
+                    </td>
+                    <td>
+                        是否框架
+                    </td>
+                    <td>
+                        单/双面
+                    </td>
+                    <td>
+                        是否有玻璃
+                    </td>
+                    <td>
+                        背景
+                    </td>
+                    <td>
+                        格栅横向数量
+                    </td>
+                    <td>
+                        格栅纵向数量
+                    </td>
+                    <td>
+                        平台长(mm)
+                    </td>
+                    <td>
+                        平台宽(mm)
+                    </td>
+                    <td>
+                        平台高(mm)
+                    </td>
+                    <td>
+                        设备类别
+                    </td>--%>
+                    <td>
+                        选图
+                    </td>
+                    <%--<td>
+                            备注
+                        </td>--%>
+                </tr>
+            </thead>
+            <tbody id="listBody">
+            </tbody>
+        </table>
+    </div>
+    <div id="Pagination" class="sabrosus" style="display: none;">
+    </div>
+    <br />
+    <div style="display: none;">
+        <iframe id="exportFrame" name="exportFrame" src=""></iframe>
+    </div>
+    <asp:HiddenField ID="hfCityData" runat="server" />
+    </form>
+</body>
+</html>
+<link href="../layer/skin/default/layer.css" rel="stylesheet" type="text/css" />
+<script src="../layer/layer.js" type="text/javascript"></script>
+<script src="../Scripts/common.js" type="text/javascript"></script>
+<script src="js/ExportOrders.js" type="text/javascript"></script>

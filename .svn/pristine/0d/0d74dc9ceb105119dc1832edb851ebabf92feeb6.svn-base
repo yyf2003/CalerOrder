@@ -1,0 +1,183 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using Models;
+using DAL;
+using Common;
+
+namespace WebApp.Customer
+{
+    public partial class OneShopPOPList : BasePage
+    {
+        public int shopId;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["shopId"] != null)
+            {
+                shopId = int.Parse(Request.QueryString["shopId"]);
+            }
+            if (!IsPostBack)
+            {
+                string promissionStr = GetPromissionStr();
+                if (!string.IsNullOrWhiteSpace(promissionStr))
+                {
+                    hfPromission.Value = promissionStr;
+                }
+                BindShop();
+                BindData();
+                BindSheet();
+            }
+        }
+
+        void BindShop()
+        {
+            Shop shopModel = new ShopBLL().GetModel(shopId);
+            if (shopModel != null)
+            {
+                hfShopNo.Value = shopModel.ShopNo;
+               
+            }
+        }
+
+        
+        List<POP> popList = new List<POP>();
+        void BindSheet()
+        {
+            
+            List<string> sheetList = new List<string>();
+            popList.ForEach(s =>
+            {
+                if (!string.IsNullOrWhiteSpace(s.Sheet) && !sheetList.Contains(s.Sheet))
+                {
+                    sheetList.Add(s.Sheet);
+                }
+            });
+            if (sheetList.Any())
+            {
+                sheetList.ForEach(s => {
+                    ListItem li = new ListItem();
+                    li.Text = s;
+                    li.Value = s;
+                    cblSheet.Items.Add(li);
+                });
+            }
+        }
+
+        void BindData()
+        {
+            //var list = new POPBLL().GetList(s => s.ShopId == shopId);
+            var list = (from pop in CurrentContext.DbContext.POP
+                       join shop in CurrentContext.DbContext.Shop
+                       on pop.ShopId equals shop.Id
+                       where pop.ShopId == shopId
+                       select new {
+                          pop.Id,
+                          pop,
+                          shop
+                       }).ToList();
+            popList = list.Select(s=>s.pop).ToList();
+            if (!string.IsNullOrWhiteSpace(txtPOPNo.Text))
+            {
+                list = list.Where(s => s.pop.GraphicNo == txtPOPNo.Text.Trim()).ToList();
+            }
+            
+            List<string> sheet = new List<string>();
+            foreach (ListItem li in cblSheet.Items)
+            {
+                if (li.Selected)
+                    sheet.Add(li.Value);
+            }
+            if (sheet.Any())
+            {
+                list = list.Where(s => sheet.Contains(s.pop.Sheet)).ToList();
+            }
+            //AspNetPager1.RecordCount = list.Count;
+            //this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
+            
+            //gv.DataSource = list.OrderBy(s => s.Id).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            gv.DataSource = list.OrderBy(s => s.pop.Sheet).ToList();
+            gv.DataBind();
+        }
+
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            BindData();
+        }
+
+        protected void AspNetPager1_PageChanged(object sender, EventArgs e)
+        {
+            BindData();
+        }
+
+        protected void btnDeletePOP_Click(object sender, EventArgs e)
+        {
+            List<int> popList = new List<int>();
+            foreach (GridViewRow grv in gv.Rows)
+            {
+                CheckBox cbOne = (CheckBox)grv.FindControl("cbOne");
+                if (cbOne.Checked)
+                {
+                    int popId = int.Parse(gv.DataKeys[grv.RowIndex].Value.ToString());
+                    popList.Add(popId);
+
+                    
+
+                    
+
+
+                }
+            }
+            if (popList.Any())
+            {
+                BaseDataChangeLog logModel = new BaseDataChangeLog();
+                logModel.AddDate = DateTime.Now;
+                logModel.AddUserId = new BasePage().CurrentUser.UserId;
+                logModel.ItemType = (int)BaseDataChangeItemEnum.POP;
+                logModel.ChangeType = (int)DataChangeTypeEnum.Delete;
+                logModel.ShopId = shopId;
+                new BaseDataChangeLogBLL().Add(logModel);
+
+                POPBLL popBll = new POPBLL();
+                POPChangeDetailBLL changeDetailBll = new POPChangeDetailBLL();
+                POPChangeDetail changeDetailModel;
+                var list = popBll.GetList(s => popList.Contains(s.Id));
+                if (list.Any())
+                {
+                    list.ForEach(s => {
+                        changeDetailModel = new POPChangeDetail();
+                        changeDetailModel.AddDate = DateTime.Now;
+                        changeDetailModel.AddUserId = CurrentUser.UserId;
+                        changeDetailModel.Category = s.Category;
+                        changeDetailModel.ChangeType = "删除";
+                        changeDetailModel.CornerType = s.CornerType;
+                        changeDetailModel.Gender = s.Gender;
+                        changeDetailModel.GraphicLength = s.GraphicLength;
+                        changeDetailModel.GraphicMaterial = s.GraphicMaterial;
+                        changeDetailModel.GraphicNo = s.GraphicNo;
+                        changeDetailModel.GraphicWidth = s.GraphicWidth;
+                        changeDetailModel.IsValid = s.IsValid;
+                        changeDetailModel.OOHInstallPrice = s.OOHInstallPrice;
+                        changeDetailModel.PositionDescription = s.PositionDescription;
+                        changeDetailModel.Quantity = s.Quantity;
+                        changeDetailModel.Remark = s.Remark;
+                        changeDetailModel.Sheet = s.Sheet;
+                        changeDetailModel.ShopId = s.ShopId;
+                        changeDetailModel.WindowDeep = s.WindowDeep;
+                        changeDetailModel.WindowHigh = s.WindowHigh;
+                        changeDetailModel.WindowSize = s.WindowSize;
+                        changeDetailModel.WindowWide = s.WindowWide;
+                        changeDetailModel.LogId = logModel.Id;
+                        changeDetailBll.Add(changeDetailModel);
+                        popBll.Delete(s);
+                    });
+                }
+                
+                BindData();
+            }
+        }
+    }
+}

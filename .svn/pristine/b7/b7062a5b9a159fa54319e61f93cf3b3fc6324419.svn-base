@@ -1,0 +1,490 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="MachineFrameList.aspx.cs" Inherits="WebApp.Customer.MachineFrameList" %>
+
+<%@ Register Assembly="AspNetPager" Namespace="Wuqi.Webdiyer" TagPrefix="webdiyer" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <link href="../CSS/Systen_style.css" rel="stylesheet" type="text/css" />
+    <link href="../easyui1.4/themes/bootstrap/easyui.css" rel="stylesheet" />
+    <link href="../easyui1.4/themes/bootstrap/layout.css" rel="stylesheet" />
+    <link href="../fancyBox/source/jquery.fancybox.css" rel="stylesheet" type="text/css" />
+    <link href="../easyui1.4/themes/icon.css" rel="stylesheet" />
+    <script src="../easyui1.4/jquery.min.js"></script>
+    <script src="../easyui1.4/jquery.easyui.min.js"></script>
+    <script type="text/javascript">
+        function FinishImport() {
+            $("#hfIsFinishImport").val("1");
+        }
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <asp:ScriptManager ID="ScriptManager1" runat="server">
+    </asp:ScriptManager>
+    <div class="nav_title">
+        <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" /><p
+            class="nav_table_p">
+            店铺器架信息
+        </p>
+    </div>
+    <div class="tr">
+        >>搜索
+    </div>
+    <div>
+        <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+           <ContentTemplate>
+           
+           
+     <table class="table">
+            
+            <tr class="tr_bai">
+                <td style="width: 150px;">
+                    客户名称
+                </td>
+                <td colspan="3" style=" text-align: left; padding-left: 5px;">
+                    <asp:DropDownList ID="ddlCustomer" runat="server" AutoPostBack="true" 
+                        onselectedindexchanged="ddlCustomer_SelectedIndexChanged">
+                    </asp:DropDownList>
+                </td>
+                
+            </tr>
+           
+            <tr class="tr_bai">
+                <td>
+                    区域
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    <div id="loadRegion" class="loading" style="display: none;">
+                       <img src="../image/WaitImg/loadingA.gif" />
+                    </div>
+                    <asp:CheckBoxList ID="cblRegion" runat="server" RepeatDirection="Horizontal" 
+                        RepeatLayout="Flow" onselectedindexchanged="cblRegion_SelectedIndexChanged" AutoPostBack="true">
+                    </asp:CheckBoxList>
+                    
+                </td>
+                
+            </tr>
+            <tr class="tr_bai">
+              <td>
+                    省份
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                   <div id="loadProvince" class="loading" style="display: none;">
+                       <img src="../image/WaitImg/loadingA.gif" />
+                    </div>
+                    <asp:CheckBoxList ID="cblProvince" runat="server" RepeatDirection="Horizontal" RepeatColumns="8"
+                        RepeatLayout="Flow" onselectedindexchanged="cblProvince_SelectedIndexChanged" AutoPostBack="true">
+                    </asp:CheckBoxList>
+                   
+                </td>
+            </tr>
+            <tr class="tr_bai">
+                <td>
+                    Channel
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    <div id="loadChannel" class="loading" style="display: none;">
+                       <img src="../image/WaitImg/loadingA.gif" />
+                    </div>
+                    <asp:CheckBoxList ID="cblChannel" runat="server" RepeatDirection="Horizontal"  AutoPostBack="true"
+                        RepeatLayout="Flow" 
+                        onselectedindexchanged="cblChannel_SelectedIndexChanged">
+                    </asp:CheckBoxList>
+                </td>
+               
+            </tr>
+            <tr class="tr_bai">
+                <td>
+                    Format
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    <div id="loadFormat" class="loading" style="display: none;">
+                       <img src="../image/WaitImg/loadingA.gif" />
+                    </div>
+                    <asp:CheckBoxList ID="cblFormat" runat="server" RepeatDirection="Horizontal" 
+                        RepeatLayout="Flow" RepeatColumns="8"  AutoPostBack="true"
+                         onselectedindexchanged="cblFormat_SelectedIndexChanged"
+                        >
+                    </asp:CheckBoxList>
+                </td>
+               
+            </tr>
+            <tr class="tr_bai">
+                <td>
+                    POP位置
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    <div id="loadSheet" class="loading" style="display: none;">
+                       <img src="../image/WaitImg/loadingA.gif" />
+                    </div>
+                    <asp:CheckBoxList ID="cblSheet" runat="server" RepeatDirection="Horizontal"  AutoPostBack="true"
+                        RepeatLayout="Flow" onselectedindexchanged="cblSheet_SelectedIndexChanged">
+                    </asp:CheckBoxList>
+                </td>
+               
+            </tr>
+            <tr class="tr_bai">
+                <td>
+                    角落类型
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    <div id="loadCornerType" class="loading" style="display: none;">
+                       <img src="../image/WaitImg/loadingA.gif" />
+                    </div>
+                    <asp:CheckBoxList ID="cblCornerType" runat="server" 
+                        RepeatDirection="Horizontal"  AutoPostBack="true"
+                        RepeatLayout="Flow" 
+                        onselectedindexchanged="cblCornerType_SelectedIndexChanged">
+                    </asp:CheckBoxList>
+                </td>
+               
+            </tr>
+            <tr class="tr_bai">
+                <td>
+                    器架名称
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                   <div id="loadFrame" class="loading" style="display: none;">
+                       <img src="../image/WaitImg/loadingA.gif" />
+                    </div>
+                   <asp:CheckBoxList ID="cblFrame" runat="server"  RepeatColumns="10" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                    </asp:CheckBoxList>
+                </td>
+               
+            </tr>
+            <tr class="tr_bai">
+                <td>
+                    店铺编号
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtShopNo" runat="server"></asp:TextBox>
+                </td>
+                <td>
+                    店铺名称
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                   <asp:TextBox ID="txtShopName" runat="server"></asp:TextBox>
+                </td>
+            </tr>
+            <tr class="tr_bai">
+                <td colspan="4" style="padding-right: 10px; text-align: right; height: 30px;">
+                    
+                       
+                </td>
+            </tr>
+        </table>
+        </ContentTemplate>
+        </asp:UpdatePanel>
+        <div style="text-align: right; padding-right: 25px; margin-top: 8px;">
+           <asp:Button ID="btnSearch" runat="server" Text="查 询" 
+                        onclick="btnSearch_Click" OnClientClick="return loadSearch()" class="easyui-linkbutton" style="width: 65px; height:26px;"/>
+                        <img id="loadingSearch" style="display: none;" src="../image/WaitImg/loadingA.gif" />
+                        &nbsp;&nbsp;
+                        <%--<asp:Button ID="btnAdd" runat="server" Text="添 加" OnClientClick="return false" Visible="false" class="easyui-linkbutton"
+                        Style="width: 65px; height: 26px;" />&nbsp;&nbsp;
+                    <asp:Button ID="btnImport" runat="server" Text="批量导入" 
+                        OnClientClick="return false" Visible="false"  class="easyui-linkbutton"
+                        Style="width: 65px; height: 26px;"  />
+                        &nbsp;&nbsp;
+                    <asp:Button ID="btnExportShop" runat="server" Text="导出器架"  class="easyui-linkbutton"
+                        Style="width: 65px; height: 26px;" onclick="btnExportShop_Click" OnClientClick="return loading()"/>
+                        <img id="loadingImg" style="display: none;" src="../image/WaitImg/loadingA.gif" />--%>
+                       
+        </div>
+    </div>
+     <br />
+    <div class="tr">
+        >>信息列表
+    </div>
+    <div>
+        <asp:GridView ID="gv" runat="server" AutoGenerateColumns="false" CellPadding="0"
+            CssClass="table" BorderWidth="0" HeaderStyle-BorderStyle="None" 
+            EmptyDataText="--无符合条件的信息--" onrowdatabound="gv_RowDataBound" 
+            onrowcommand="gv_RowCommand">
+            <Columns>
+                <asp:TemplateField HeaderText="序号" HeaderStyle-Width="50px" HeaderStyle-BorderColor="#dce0e9">
+                    <ItemTemplate>
+                        <%# (AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize + Container.DataItemIndex + 1%>
+                    </ItemTemplate>
+                    <HeaderStyle Width="50px"></HeaderStyle>
+                </asp:TemplateField>
+               
+            <asp:BoundField DataField="shop.ShopNo" HeaderText="店铺编码" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="shop.ShopName" HeaderText="店铺名称" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="shop.RegionName" HeaderText="区域" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="shop.ProvinceName" HeaderText="省份" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="shop.CityName" HeaderText="城市" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="shop.Channel" HeaderText="Channel" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="shop.Format" HeaderText="Format" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="frame.PositionName" HeaderText="位置" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="frame.MachineFrame" HeaderText="器架名称" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="frame.Gender" HeaderText="性别" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="frame.Count" HeaderText="数量" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="frame.CornerType" HeaderText="角落类型" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:BoundField DataField="frame.LevelNum" HeaderText="级别" HeaderStyle-BorderColor="#dce0e9"/>
+            <asp:TemplateField HeaderText="HC器架明细"  HeaderStyle-BorderColor="#dce0e9" HeaderStyle-Width="80px">
+                <ItemTemplate>
+                    <asp:Label ID="labCheckHCPOP" runat="server" Text="Label" data-shopid='<%#Eval("frame.ShopId") %>' onclick="checkHCPOP(this)" style="color: blue; cursor: pointer;">查看</asp:Label>
+                    <%--<asp:LinkButton ID="lbCheckHCPOP" runat="server">查看</asp:LinkButton>--%>
+                    <%--<span id="spanHCPOP" runat="server" data-shopid='<%#Eval("frame.ShopId") %>' onclick="checkHCPOP(this)" style="color: blue; cursor: pointer;">查看</span>--%>
+                </ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="编辑" Visible="false"  HeaderStyle-BorderColor="#dce0e9" HeaderStyle-Width="60px">
+                <ItemTemplate>
+                    
+                    <span data-frameid='<%#Eval("frame.Id") %>' onclick="editItme(this)" style="color: blue;
+                        cursor: pointer;">编辑</span>
+                </ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="操作" Visible="false" HeaderStyle-BorderColor="#dce0e9" HeaderStyle-Width="60px">
+               <ItemTemplate>
+                  <asp:LinkButton ID="lbDelete" runat="server" CommandArgument='<%#Eval("frame.Id") %>' CommandName="DeleteItem" OnClientClick="return confirm('确定删除吗？')">删除</asp:LinkButton>
+               </ItemTemplate>
+            </asp:TemplateField>
+            </Columns>
+            <AlternatingRowStyle CssClass="tr_bai" />
+            <HeaderStyle CssClass="tr_hui" />
+            <RowStyle CssClass="tr_bai" />
+            <SelectedRowStyle CssClass="tr_hui" />
+            <EmptyDataRowStyle CssClass="tr_bai" />
+        </asp:GridView>
+    </div>
+    <br />
+    <div style="text-align: center;">
+        <webdiyer:AspNetPager ID="AspNetPager1" runat="server" PageSize="20" CssClass="paginator"
+            CurrentPageButtonClass="cpb" AlwaysShow="True" FirstPageText="首页" LastPageText="尾页"
+            NextPageText="下一页" PrevPageText="上一页" ShowCustomInfoSection="Left" ShowInputBox="Never"
+            CustomInfoTextAlign="Left" LayoutType="Table" 
+            onpagechanged="AspNetPager1_PageChanged">
+        </webdiyer:AspNetPager>
+    </div>
+    <asp:HiddenField ID="hfIsFinishImport" runat="server" />
+
+
+
+
+
+
+
+
+
+
+
+
+     <div id="editDiv" title="编辑" style="display: none;">
+        <table style="width: 400px; text-align: center;">
+            <tr>
+                <td style="width: 100px; height: 30px;">
+                    店铺编号
+                </td>
+                <td  style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtPOSCode" runat="server" MaxLength="50"></asp:TextBox>
+                </td>
+                
+            </tr>
+            <tr>
+                <td style="width: 100px; height: 30px;">
+                    POP位置
+                </td>
+                <td style="text-align: left;padding-left: 5px;">
+                    <select id="selSheet">
+                        <option value="0">--请选择--</option>
+                        <option value="鞋墙">鞋墙</option>
+                        <option value="服装墙">服装墙</option>
+                        <option value="陈列桌">陈列桌</option>
+                        <option value="中岛">中岛</option>
+                        <option value="收银台">收银台</option>
+                        <option value="SMU">SMU</option>
+                        <option value="橱窗">橱窗</option>
+                        <option value="OOH">OOH</option>
+                    </select>
+                    <span style="color: Red;">*</span>
+                </td>
+                
+            </tr>
+            <tr>
+                <td style="width: 100px; height: 30px;">
+                    器架名称
+                </td>
+                <td  style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtFrameName" runat="server" MaxLength="50"></asp:TextBox>
+                </td>
+                
+            </tr>
+            <tr>
+                <td style="width: 100px; height: 30px;">
+                    角落类型
+                </td>
+                <td  style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtCornerType" runat="server" MaxLength="50"></asp:TextBox>
+                </td>
+                
+            </tr>
+            <tr>
+                <td style="width: 100px; height: 30px;">
+                    性别
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                   
+                    <input type="radio" name="tblSex" value="男"/>男
+                    <input type="radio" name="tblSex" value="女"/>女
+                    <input type="radio" name="tblSex" value="男女不限"/>男女不限
+                    <input type="radio" name="tblSex" value="男女混合"/>男女混合
+                    <input type="radio" name="tblSex" value=""/>无
+                </td>
+               
+            </tr>
+           <tr>
+                <td style="width: 100px; height: 30px;">
+                    数量
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                   <asp:TextBox ID="txtNum" runat="server" MaxLength="10"></asp:TextBox>
+                  
+                </td>
+               
+            </tr>
+           <tr>
+                <td style="width: 100px; height: 30px;">
+                    级别
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                   <asp:TextBox ID="txtLevelNum" runat="server" MaxLength="2" style=" width:80px;"></asp:TextBox>
+                </td>
+               
+            </tr>
+         
+        </table>
+    </div>
+     
+     <div id="HCPOPDiv" title="HC器架信息" style="display: none;">
+         <table class="table" id="HCPOPTb">
+            <thead>
+              <tr class=" tr_hui">
+               <td style=" width:50px;">序号</td>
+               <td>器架名称</td>
+               <td>性别</td>
+               <td>小器架名称</td>
+               <td>宽</td>
+               <td>高</td>
+               <td>数量</td>
+            </tr>
+            </thead>
+            <tbody id="HCPOPTbBody">
+            </tbody>
+         </table>
+     </div>
+
+
+
+
+    </form>
+</body>
+</html>
+
+<script src="js/MachineFrame.js" type="text/javascript"></script>
+<script src="/Scripts/jquery-1.7.2.js" type="text/javascript"></script>
+<script src="/fancyBox/source/jquery.fancybox.js" type="text/javascript"></script>
+<script src="/fancyBox/source/jquery.fancybox.pack.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+    Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender, e) {
+        var eleId = e.get_postBackElement().id;
+
+        if (eleId.indexOf("ddlCustomer") != -1) {
+            $("#loadRegion").show();
+            $("#loadProvince").show();
+            $("#loadChannel").show();
+            $("#loadFormat").show();
+            $("#loadSheet").show();
+            $("#loadCornerType").show();
+            $("#loadFrame").show();
+        }
+        if (eleId.indexOf("cblRegion") != -1) {
+            $("#loadProvince").show();
+            $("#loadChannel").show();
+            $("#loadFormat").show();
+            $("#loadSheet").show();
+            $("#loadCornerType").show();
+            $("#loadFrame").show();
+        }
+        if (eleId.indexOf("cblProvince") != -1) {
+            $("#loadChannel").show();
+            $("#loadFormat").show();
+            $("#loadSheet").show();
+            $("#loadCornerType").show();
+            $("#loadFrame").show();
+        }
+        if (eleId.indexOf("cblChannel") != -1) {
+            $("#loadFormat").show();
+            $("#loadSheet").show();
+            $("#loadCornerType").show();
+            $("#loadFrame").show();
+        }
+        if (eleId.indexOf("cblFormat") != -1) {
+            $("#loadSheet").show();
+            $("#loadCornerType").show();
+            $("#loadFrame").show();
+        }
+
+        if (eleId.indexOf("cblSheet") != -1) {
+            $("#loadCornerType").show();
+            $("#loadFrame").show();
+        }
+
+        if (eleId.indexOf("cblCornerType") != -1) {
+            $("#loadFrame").show();
+        }
+    })
+
+    Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
+
+        $(".loading").hide();
+//        $("#loadRegion").hide();
+//        $("#loadProvince").hide();
+//        $("#loadChannel").hide();
+//        $("#loadFormat").hide();
+//        $("#loadSheet").hide();
+//        $("#loadCornerType").hide();
+//        $("#loadFrame").hide();
+
+    })
+
+
+
+
+
+    //解决jquery库的冲突，很重要！
+    var $j = jQuery.noConflict();
+
+    $j(function () {
+        $j("#btnImport").on("click", function () {
+            var customerId = $j("#ddlCustomer").val() || "0";
+            if (customerId == "0") {
+                alert("请选择客户");
+                return false;
+
+            }
+            var url = "ImportMachineFrame.aspx?customerId=" + customerId;
+            $j("#hfIsFinishImport").val("");
+            $j.fancybox({
+                href: url,
+                type: 'iframe',
+                padding: 5,
+                width: "90%",
+                afterClose: function () {
+                    if ($j("#hfIsFinishImport").val() == "1") {
+                        $j("#btnSearch").click();
+                    }
+                }
+            })
+        })
+    })
+
+
+
+    
+</script>

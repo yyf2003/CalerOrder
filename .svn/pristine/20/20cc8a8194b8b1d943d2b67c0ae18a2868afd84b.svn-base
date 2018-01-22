@@ -1,0 +1,290 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AssignOrder.aspx.cs" Inherits="WebApp.OutsourcingOrder.AssignOrder" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <link href="../CSS/Systen_style.css" rel="stylesheet" type="text/css" />
+    <link href="../easyui1.4/themes/bootstrap/easyui.css" rel="stylesheet" />
+    <link href="../easyui1.4/themes/bootstrap/layout.css" rel="stylesheet" />
+    <link href="../easyui1.4/themes/icon.css" rel="stylesheet" />
+    <script src="../Scripts/jquery-1.7.2.js" type="text/javascript"></script>
+    <script src="../easyui1.4/jquery.easyui.min.js" type="text/javascript"></script>
+    <script src="../My97DatePicker/WdatePicker.js" type="text/javascript"></script>
+    <script src="../Scripts/jquery.pagination.js" type="text/javascript"></script>
+    <link href="../CSS/pagination.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div class="nav_title">
+        <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" /><p
+            class="nav_table_p">
+            外协分单
+        </p>
+    </div>
+      <div class="tr">
+        >>选择项目</div>
+    <table class="table">
+        <tr class="tr_bai">
+            <td>
+                客户
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <asp:DropDownList ID="ddlCustomer" runat="server">
+                </asp:DropDownList>
+                <span style="color:Red;">*</span>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                时间
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <asp:TextBox ID="txtBeginDate" runat="server" MaxLength="15" onclick="WdatePicker()"
+                    ContentEditable="false"></asp:TextBox>
+                —
+                <asp:TextBox ID="txtEndDate" runat="server" MaxLength="15" onclick="WdatePicker()"
+                    ContentEditable="false"></asp:TextBox>
+                &nbsp;
+                <input type="button" id="btnSearchSubject" value="查  询" class="easyui-linkbutton"
+                    style="width: 65px; height: 26px;" />
+                <img id="imgLoading1" style="display:none;" src='../image/WaitImg/loadingA.gif' />
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td>
+                项目
+            </td>
+            <td style="padding-left: 0px; height: 80px; vertical-align: top;">
+                <table style=" width:100%;">
+                  <tr class="tr_hui">
+                    <td style=" width:80px;">
+                       活动名称：
+                    </td>
+                    <td  style=" text-align:left;">
+                       
+                       <div id="guidanceDiv">
+                       </div>
+                    </td>
+                  </tr>
+                  <tr class="trType" style=" display:none;">
+                    <td>活动类型：</td>
+                    <td style=" text-align:left;">
+                      <div id="activityDiv"></div>
+                    </td>
+                    
+                  </tr>
+                  <tr class="trType" style=" display:none;">
+                    <td>项目分类：</td>
+                    <td style="  text-align:left;">
+                      <div id="typeDiv"></div>
+                    </td>
+                  </tr>
+                </table>
+              
+                 <div class="trType" style="width: 80%; margin: 5px;text-align:left;display:none;">
+                    <input type="checkbox" id="cbALL" /><span style="color: Blue;">全选</span>
+                </div>
+                <div id="projectsDiv" style="width: 80%; margin: 5px; text-align:left;">
+                </div>
+            </td>
+        </tr>
+       
+    </table>
+    <div class="tr">
+        >>条件</div>
+    <table class="table">
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                区域
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <div id="RegionDiv">
+                </div>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                省份
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <div id="ProvinceDiv" style="width: 90%;">
+                </div>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                城市
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <div id="cbAllDiv" style="display:none;">
+                   <input type="checkbox" id="cbAllCity"/>全选
+                </div>
+                <div id="CityDiv" style="width: 90%;">
+                </div>
+            </td>
+        </tr>
+        
+        <tr class="tr_bai">
+           <td colspan="2" style=" height:30px;">
+           <div style=" width:80px; float:right;">
+                <input type="button" value="查 询" id="btnSearch" class="easyui-linkbutton" style="width: 65px;
+                    height: 26px; margin-right:10px;" />
+               
+                
+                </div>
+           </td>
+        </tr>
+    </table>
+    <br />
+   
+    
+    <div>
+      <table class="table">
+        <tr class="tr_hui">
+          <td style=" width:80px;">店铺数量</td>
+          <td style=" text-align:left; padding-left:5px;">
+              <asp:Label ID="labShopCount" runat="server" Text="0"></asp:Label>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="tr">
+        >>订单明细</div>
+    <div style="overflow: auto;">
+    <div id="divClean" style=" margin-bottom:2px; display:none;">
+       <input type="button" value="清 空" id="btnClean" class="easyui-linkbutton" style="width: 65px;
+                    height: 26px; margin-left:8px;" />
+                    <img id="imgClean1" style="display:none;" src='../image/WaitImg/loadingA.gif' />
+       <input type="button" value="清空全部" id="btnCleanAll" class="easyui-linkbutton" style="width: 65px;
+                    height: 26px; margin-left:20px;" />
+                    <img id="imgClean2" style="display:none;" src='../image/WaitImg/loadingA.gif' />
+    </div>
+        <table id="noData" class="table" style="display: ;">
+            <tr class="tr_bai">
+                <td style="text-align: center; height: 50px;">
+                    --无可显示的信息--
+                </td>
+            </tr>
+        </table>
+        <div id="divload" style="display: none; text-align: center;">
+            <img src="../image/WaitImg/loading1.gif" />
+        </div>
+        <table id="popListTB" class="table" style="display: none; width:1500px;">
+            <thead>
+                <tr class="tr_hui">
+                    <td style="width: 40px;">
+                        序号
+                    </td>
+                    <td style="width: 30px;">
+                        <input type="checkbox" id="cbAll1"/>
+                    </td>
+                    <td>
+                        外协名称
+                    </td>
+                    <td style="width: 50px;">
+                        订单类型
+                    </td>
+                    <td>
+                        店铺编号
+                    </td>
+                    <td>
+                        店铺名称
+                    </td>
+                    <td>
+                        区域
+                    </td>
+                    <td>
+                        省份
+                    </td>
+                    <td>
+                        城市
+                    </td>
+                    <td>
+                        城市级别
+                    </td>
+                    <td>
+                        店铺类型
+                    </td>
+                    <td>
+                        物料支持
+                    </td>
+                    <td>
+                        店铺规模大小
+                    </td>
+                    <td>
+                        位置
+                    </td>
+                    <td>
+                        级别
+                    </td>
+                    <td>
+                        性别
+                    </td>
+                    <td>
+                        数量
+                    </td>
+                    <td>
+                        器架类型
+                    </td>
+                    <td>
+                        位置描述
+                    </td>
+                    <td>
+                        POP宽(mm)
+                    </td>
+                    <td>
+                        POP高(mm)
+                    </td>
+                    <td>
+                        面积(M2)
+                    </td>
+                    <td>
+                        POP材质
+                    </td>
+                    <td>
+                        选图
+                    </td>
+                    
+                </tr>
+            </thead>
+            <tbody id="listBody">
+            </tbody>
+        </table>
+        
+    </div>
+    <div id="Pagination" class="sabrosus" style="display: none;">
+    </div>
+    <table class="table" style=" margin-top:20px;">
+      <tr>
+         <td style=" width:120px;">请选择外协：</td>
+         <td style=" text-align:left; padding-left:5px;">
+           <select id="seleCompany">
+              <option value="0">--请选择--</option>
+           </select>
+           <input type="button" value="分 配" id="btnSubmit" class="easyui-linkbutton" style="width: 65px;
+                    height: 26px; margin-left:20px;" />
+           <img id="imgSubmit1" style="display:none;" src='../image/WaitImg/loadingA.gif' />
+           <input type="button" value="全部分配" id="btnSubmitAll" class="easyui-linkbutton" style="width: 65px;
+                    height: 26px; margin-left:15px;" />
+           <img id="imgSubmit2" style="display:none;" src='../image/WaitImg/loadingA.gif' />
+         </td>
+      </tr>
+    </table>
+     <table id="MsgTB" style=" display:none; margin-top:10px;">
+            <tr class="tr_bai">
+                <td style="width: 120px; height: 50px;">
+                </td>
+                <td class="nav_table_tdleft" style="vertical-align: top;">
+                    <asp:Label ID="labTips" runat="server" Text="" Style="color: red; font-size: 14px;"></asp:Label>
+                </td>
+            </tr>
+        </table>
+    <asp:HiddenField ID="hfCityData" runat="server" />
+    <p style=" margin-bottom:100px;"></p>
+    </form>
+</body>
+</html>
+
+<script src="js/AssignOrder.js" type="text/javascript"></script>

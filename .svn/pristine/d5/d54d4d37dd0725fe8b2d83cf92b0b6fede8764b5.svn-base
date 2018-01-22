@@ -1,0 +1,84 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using DAL;
+using Models;
+
+namespace WebApp.Subjects.HandMadeOrder
+{
+    public partial class CheckDetail : BasePage
+    {
+        int subjectId;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(Request.QueryString["subjectId"]);
+            }
+            if (!IsPostBack)
+            {
+                BindSubject();
+                BindData();
+            }
+        }
+
+        void BindSubject()
+        {
+            var subjectModel = (from subject in CurrentContext.DbContext.Subject
+                                join customer in CurrentContext.DbContext.Customer
+                                on subject.CustomerId equals customer.Id
+                                join user1 in CurrentContext.DbContext.UserInfo
+                                on subject.ApproveUserId equals user1.UserId into userTemp
+                                from user in userTemp.DefaultIfEmpty()
+                                where subject.Id == subjectId
+                                select new
+                                {
+                                    subject,
+                                    customer.CustomerName,
+                                    ApproveUserName = user != null ? user.UserName : ""
+                                }).FirstOrDefault();
+            if (subjectModel != null)
+            {
+                labSubjectNo.Text = subjectModel.subject.SubjectNo;
+                labSubjectName.Text = subjectModel.subject.SubjectName;
+                
+                labBeginDate.Text = subjectModel.subject.BeginDate != null ? DateTime.Parse(subjectModel.subject.BeginDate.ToString()).ToShortDateString() : "";
+                labEndDate.Text = subjectModel.subject.EndDate != null ? DateTime.Parse(subjectModel.subject.EndDate.ToString()).ToShortDateString() : "";
+                labContact.Text = subjectModel.subject.Contact;
+                labTel.Text = subjectModel.subject.Tel;
+                labCustomerName.Text = subjectModel.CustomerName;
+                
+                labRemark.Text = subjectModel.subject.Remark;
+               
+
+            }
+        }
+
+        void BindData()
+        {
+            var list = (from order in CurrentContext.DbContext.HandMadeOrderDetail
+                        join shop in CurrentContext.DbContext.Shop
+                        on order.ShopId equals shop.Id
+                        where order.SubjectId == subjectId
+                        select new
+                        {
+                            order,
+                            shop
+                        }).ToList();
+            
+            AspNetPager1.RecordCount = list.Count;
+            this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
+            orderList.DataSource = list.OrderBy(s => s.order.Id).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            orderList.DataBind();
+        }
+
+        protected void AspNetPager1_PageChanged(object sender, EventArgs e)
+        {
+            BindData();
+        }
+    }
+}

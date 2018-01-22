@@ -1,0 +1,442 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using DAL;
+using Common;
+
+namespace WebApp.Subjects
+{
+    public partial class SubjectList : BasePage
+    {
+      
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            
+            if (!IsPostBack)
+            {
+                BindCustomerList(ref ddlCustomer);
+                //ddlCustomer.Items.Insert(0, new ListItem("--请选择--","0"));
+                BindSubjectCategory();
+                BindData();
+            }
+        }
+
+        void BindData()
+        {
+            List<int> curstomerList = new List<int>();
+            List<int> companyList = MySonCompanyList.Select(s=>s.Id).ToList();
+            foreach (ListItem item in ddlCustomer.Items)
+            { 
+                int id=int.Parse(item.Value);
+                if (!curstomerList.Contains(id))
+                    curstomerList.Add(id);
+            }
+            var list = (from subject in CurrentContext.DbContext.Subject
+                       join customer in CurrentContext.DbContext.Customer
+                       on subject.CustomerId equals customer.Id
+                       join user in CurrentContext.DbContext.UserInfo
+                       on subject.AddUserId equals user.UserId
+                       join guidance1 in CurrentContext.DbContext.SubjectGuidance
+                       on subject.GuidanceId equals guidance1.ItemId into temp1
+                       from guidance in temp1.DefaultIfEmpty()
+                       join subjectType1 in CurrentContext.DbContext.SubjectType
+                       on subject.SubjectTypeId equals subjectType1.Id into temp2
+                       from subjectType in temp2.DefaultIfEmpty()
+                       //join activityType1 in CurrentContext.DbContext.ADOrderActivity
+                       //on subject.ActivityId equals activityType1.ActivityId into temp3
+                       //from activityType in temp3.DefaultIfEmpty()
+
+                       join subjectCategory1 in CurrentContext.DbContext.ADSubjectCategory
+                       on subject.SubjectCategoryId equals subjectCategory1.Id into subjectCategoryTemp
+                        from subjectCategory in subjectCategoryTemp.DefaultIfEmpty()
+                       //where (subject.IsDelete == null || subject.IsDelete == false) && (curstomerList.Any() ? (curstomerList.Contains(subject.CustomerId ?? 0)) : 1 == 1) && companyList.Contains(subject.CompanyId??0)
+                        where (subject.IsDelete == null || subject.IsDelete == false) && (curstomerList.Any() ? (curstomerList.Contains(subject.CustomerId ?? 0)) : 1 == 1)
+                       
+                        select new {
+                           subject.Id,
+                           subject.AddDate,
+                           subject.AddUserId,
+                           subject.ApproveState,
+                           subject.ApproveUserId,
+                           subject.BeginDate,
+                           subject.Contact,
+                           subject.EndDate,
+                           subject.IsDelete,
+                           subject.OutSubjectName,
+                           subject.Remark,
+                           subject.Status,
+                           subject.SubjectName,
+                           subject.SubjectNo,
+                           subject.Tel,
+                           subject.CustomerId,
+                           customer.CustomerName,
+                           user.RealName,
+                           guidance.ItemName,
+                           subjectType.SubjectTypeName,
+                           subjectCategory.CategoryName,
+                           subject.GuidanceId,
+                           subject.SubjectTypeId,
+                           subject.SubjectCategoryId,
+                           subject.SubjectType
+                       }).ToList();
+            if (CurrentUser.RoleId == 2)
+            {
+                list = list.Where(s=>s.AddUserId==CurrentUser.UserId).ToList();
+            }
+            if (ddlCustomer.SelectedValue != "0")
+            {
+                int cid = int.Parse(ddlCustomer.SelectedValue);
+                list = list.Where(s => s.CustomerId == cid).ToList();
+            }
+            List<int> guidanceIdList = new List<int>();
+            foreach (ListItem li in cblGuidance.Items)
+            {
+                if (li.Selected)
+                    guidanceIdList.Add(int.Parse(li.Value));
+            }
+            List<int> subjectTypeList = new List<int>();
+            foreach (ListItem li in cblSubjectType.Items)
+            {
+                if (li.Selected)
+                    subjectTypeList.Add(int.Parse(li.Value));
+            }
+            List<int> subjectCagetgoryList = new List<int>();
+            foreach (ListItem li in cblSubjectCategory.Items)
+            {
+                if (li.Selected)
+                    subjectCagetgoryList.Add(int.Parse(li.Value));
+            }
+            if (guidanceIdList.Any())
+            {
+                list = list.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0)).ToList();
+            }
+            if (subjectTypeList.Any())
+            {
+                list = list.Where(s => subjectTypeList.Contains(s.SubjectTypeId ?? 0)).ToList();
+            }
+            if (subjectCagetgoryList.Any())
+            {
+                list = list.Where(s => subjectCagetgoryList.Contains(s.SubjectCategoryId ?? 0)).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(txtSubjectName.Text))
+            {
+                list = list.Where(s => s.SubjectName.Contains(txtSubjectName.Text)).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(txtSubjectNo.Text))
+            {
+                list = list.Where(s => s.SubjectNo.Contains(txtSubjectNo.Text)).ToList();
+            }
+            
+            AspNetPager1.RecordCount = list.Count;
+            this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
+            gv.DataSource = list.OrderByDescending(s => s.Id).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            gv.DataBind();
+            
+            SetPromission(gv,new object[]{btnAdd});
+        }
+
+        protected void gv_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow || e.Row.RowType == DataControlRowType.Separator)
+            {
+                object item = e.Row.DataItem;
+                if (item != null)
+                {
+                    object subjectTypeObj = item.GetType().GetProperty("SubjectType").GetValue(item, null);
+                    int subjectType = subjectTypeObj != null ? int.Parse(subjectTypeObj.ToString()) : 1;
+                    object statusObj = item.GetType().GetProperty("Status").GetValue(item, null);
+                    int status=statusObj!=null?int.Parse(statusObj.ToString()):0;
+                    Label labSubjectType = (Label)e.Row.FindControl("labSubjectType");
+                    //labSubjectType.Text = subjectType == 1 ? "POP订单" : subjectType == 2 ? "费用订单" : subjectType == 3?"补单":subjectType == 4?"二次安装费":"";
+                    labSubjectType.Text = CommonMethod.GeEnumName<SubjectTypeEnum>(subjectType.ToString());
+                    Label labStatus = (Label)e.Row.FindControl("labStatus");
+                    
+                  
+                    //LinkButton lbExport = (LinkButton)e.Row.FindControl("lbExport");
+                    LinkButton lbEditOrder = (LinkButton)e.Row.FindControl("lbEditOrder");
+                    LinkButton lbEdit = (LinkButton)e.Row.FindControl("lbEdit");
+
+
+                    object subjectNameObj = item.GetType().GetProperty("SubjectName").GetValue(item, null);
+                    string subjectName = subjectNameObj != null ? subjectNameObj.ToString() : "";
+
+                    object remarkObj = item.GetType().GetProperty("Remark").GetValue(item, null);
+                    string remark = remarkObj != null ? remarkObj.ToString() : "";
+
+                    Label labSubjectName = (Label)e.Row.FindControl("labSubjectName");
+                    if (subjectName.Contains("补单") && !string.IsNullOrWhiteSpace(remark))
+                    {
+                        subjectName += "(" + remark + ")";
+                    }
+                    labSubjectName.Text = subjectName;
+
+                    string statusMsg = string.Empty;
+                    switch (status)
+                    { 
+                        case 1:
+                            statusMsg = "<span style='color:red;'>待下单</span>";
+                            //lbEdit.CommandName = "EditItem";
+                            break;
+                        case 2:
+                            statusMsg = "<span style='color:blue;'>待拆单</span>";
+                            //lbEdit.CommandName = "EditItem";
+                            break;
+                        case 3:
+                            statusMsg = "<span style='color:red;'>待提交</span>";
+                            //lbEdit.CommandName = "EditItem";
+                            break;
+                        case 4:
+                            statusMsg = "<span style='color:green;'>提交完成</span>";
+                            
+                            break;
+                    }
+                    labStatus.Text = statusMsg;
+
+                    object approveObj = item.GetType().GetProperty("ApproveState").GetValue(item, null);
+                    int approve = approveObj != null ? int.Parse(approveObj.ToString()) : 0;
+                    
+                    Label labApprove = (Label)e.Row.FindControl("labApprove");
+                    LinkButton lbDelete = (LinkButton)e.Row.FindControl("lbDelete");
+                    lbEditOrder.CommandName = "EditOrder";
+                    lbEditOrder.Enabled = true;
+                    lbEditOrder.Style.Add("color", "blue");
+
+                    lbEdit.CommandName = "EditItem";
+                    lbEdit.Enabled = true;
+                    lbEdit.Style.Add("color", "blue");
+
+                    string approveMsg = string.Empty;
+                    switch (approve)
+                    {
+                        case 0:
+                            approveMsg = "<span style='color:blue;'>待审批</span>";
+                            if (status < 4)
+                            {
+                                approveMsg = "--";
+                            }
+                            //lbDelete.Attributes.Add("OnClick", "return confirm('确定删除吗？')");
+                           
+                            break;
+                        case 1:
+                            approveMsg = "<span style='color:green;'>审批通过</span>";
+                            //if (CurrentUser.RoleId != 1)
+                            //{
+                            //    lbDelete.Enabled = false;
+                            //    lbDelete.CommandName = "";
+                            //    lbDelete.Style.Add("color", "#ccc");
+                            //    lbDelete.Attributes.Remove("OnClick");
+                            //}
+                            
+                            //lbEditOrder.Enabled = false;
+                            //lbEditOrder.CommandName = "";
+                            //lbEditOrder.Style.Add("color", "#ccc");
+
+                            //lbEdit.CommandName = "";
+                            //lbEdit.Enabled = false;
+                            //lbEdit.Style.Add("color", "#ccc");
+                            
+                            break;
+                        case 2:
+                            approveMsg = "<span style='color:red;'>审批不通过</span>";
+                            //lbDelete.Attributes.Add("OnClick", "return confirm('确定删除吗？')");
+                            
+                            break;
+                        default:
+                            approveMsg = "--";
+                            break;
+                    }
+                    if (subjectType != 1)
+                    {
+                        lbEditOrder.Enabled = false;
+                        lbEditOrder.CommandName = "";
+                        lbEditOrder.Style.Add("color", "#ccc");
+                    }
+                    labApprove.Text = approveMsg;
+                }
+            }
+        }
+
+        protected void gv_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            int id = int.Parse(e.CommandArgument.ToString());
+            
+            if (e.CommandName == "EditItem")
+            {
+                var model = new SubjectBLL().GetModel(id);
+                int subjectType = 1;
+                if (model != null)
+                {
+                    subjectType = model.SubjectType ?? 1;
+                }
+                if (subjectType == 4)
+                {
+                    Response.Redirect(string.Format("/Subjects/SecondInstallFee/Add.aspx?subjectId={0}", id), false);
+                }
+                else if (subjectType == 3)
+                {
+                    Response.Redirect(string.Format("/Subjects/HandMadeOrder/Add.aspx?subjectId={0}", id), false);
+                }
+                else
+                    Response.Redirect(string.Format("AddSubject.aspx?subjectId={0}", id), false);
+
+            }
+            if (e.CommandName == "Check")
+            {
+                string url = string.Format("ShowOrderDetail.aspx?subjectId={0}", id);
+                var model = new SubjectBLL().GetModel(id);
+                if (model != null && model.SubjectType != null && model.SubjectType == (int)SubjectTypeEnum.分区补单)
+                {
+                    url = string.Format("SupplementByRegion/CheckDetail.aspx?subjectId={0}", id);
+                }
+                //if (model != null && model.IsHandMade == 1)
+                //    Response.Redirect(string.Format("/Subjects/HandMadeOrder/CheckDetail.aspx?subjectId={0}", id), false);
+                //else
+                //   Response.Redirect(string.Format("CheckOrderDetail.aspx?subjectId={0}", id), false);
+
+                Response.Redirect(url, false);
+            }
+            if (e.CommandName == "DeleteItem")
+            {
+                SubjectBLL subjectBll = new SubjectBLL();
+                Models.Subject model = subjectBll.GetModel(id);
+                if (model != null)
+                {
+                    model.IsDelete = true;
+                    subjectBll.Update(model);
+                    BindData();
+                }
+            }
+            if (e.CommandName == "Export")
+            {
+                Response.Redirect(string.Format("ExportOrder.aspx?subjectId={0}", id), false);
+            }
+            if (e.CommandName == "EditOrder")
+            {
+                Response.Redirect(string.Format("ADOrders/EditOrderDetails.aspx?subjectId={0}", id), false);
+            }
+        }
+
+        protected void AspNetPager1_PageChanged(object sender, EventArgs e)
+        {
+            BindData();
+        }
+
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            AspNetPager1.CurrentPageIndex = 1;
+            BindData();
+        }
+
+        protected void ddlCustomer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            BindGuidance();
+        }
+
+        protected void btnSearchSubject_Click(object sender, EventArgs e)
+        {
+            BindGuidance();
+        }
+
+        protected void cblGuidance_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            BindSubjectType();
+            
+        }
+
+       
+
+        void BindGuidance()
+        {
+            cblGuidance.Items.Clear();
+            int customerId = int.Parse(ddlCustomer.SelectedValue);
+            var list = new SubjectGuidanceBLL().GetList(s => s.CustomerId == customerId);
+            if (!string.IsNullOrWhiteSpace(txtBeginDate.Text))
+            {
+                DateTime begin = DateTime.Parse(txtBeginDate.Text.Trim());
+                list = list.Where(s => s.AddDate >= begin).ToList();
+                if (!string.IsNullOrWhiteSpace(txtEndDate.Text))
+                {
+                    DateTime end = DateTime.Parse(txtEndDate.Text.Trim()).AddDays(1);
+                    list = list.Where(s => s.AddDate < end).ToList();
+                }
+            }
+            else
+            {
+                DateTime date = DateTime.Now;
+                DateTime newDate = new DateTime(date.Year, date.Month, 1);
+                DateTime beginDate = newDate.AddMonths(-1);
+                DateTime endDate = newDate.AddMonths(2);
+                list = new SubjectGuidanceBLL().GetList(s => s.BeginDate >= beginDate && s.BeginDate < endDate);
+            }
+            if (CurrentUser.RoleId == 2)
+            {
+                var subjectList = new SubjectBLL().GetList(s => s.AddUserId == CurrentUser.UserId && s.GuidanceId != null && s.GuidanceId > 0  && (s.IsDelete == null || s.IsDelete == false));
+                List<int> guidanceIdList = subjectList.Select(s => s.GuidanceId ?? 0).Distinct().ToList();
+                list = list.Where(s => guidanceIdList.Contains(s.ItemId)).ToList();
+            }
+            if (list.Any())
+            {
+                list.ForEach(s => {
+                    ListItem li = new ListItem();
+                    li.Text = s.ItemName + "&nbsp;";
+                    li.Value = s.ItemId.ToString();
+                    cblGuidance.Items.Add(li);
+                });
+                //ListItem li1 = new ListItem();
+                //li1.Text ="其他";
+                //li1.Value = "0";
+                //cblGuidance.Items.Add(li1);
+            }
+        }
+
+        void BindSubjectType()
+        {
+            cblSubjectType.Items.Clear();
+            List<int> guidanceIdList = new List<int>();
+            foreach (ListItem li in cblGuidance.Items)
+            {
+                if (li.Selected)
+                {
+                    guidanceIdList.Add(int.Parse(li.Value));
+                }
+            }
+            var typeList = new SubjectTypeBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId) && (s.IsDelete == false || s.IsDelete == null));
+            if (typeList.Any())
+            {
+                
+                typeList.ForEach(s =>
+                {
+                    ListItem li = new ListItem();
+                    li.Value = s.Id.ToString();
+                    li.Text = s.SubjectTypeName+"&nbsp;";
+                    cblSubjectType.Items.Add(li);
+                });
+            }
+        }
+
+        void BindSubjectCategory()
+        {
+            cblSubjectCategory.Items.Clear();
+            var List = new ADSubjectCategoryBLL().GetList(s => s.Id > 0);
+            if (List.Any())
+            {
+                List.ForEach(s =>
+                {
+                    ListItem li = new ListItem();
+                    li.Value = s.Id.ToString();
+                    li.Text = s.CategoryName+"&nbsp;";
+                    cblSubjectCategory.Items.Add(li);
+                });
+            }
+        }
+
+        protected void btnAdd_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("AddSubject.aspx",false);
+        }
+    }
+}

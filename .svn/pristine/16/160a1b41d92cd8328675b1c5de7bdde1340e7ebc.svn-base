@@ -1,0 +1,87 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using Models;
+using DAL;
+
+namespace WebApp.Customer
+{
+    public partial class OneShopMachineFrameList : BasePage
+    {
+        int shopId;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["shopId"] != null)
+            {
+                shopId = int.Parse(Request.QueryString["shopId"]);
+            }
+            if (!IsPostBack)
+            {
+                string promissionStr = GetPromissionStr();
+                if (!string.IsNullOrWhiteSpace(promissionStr))
+                {
+                    hfPromission.Value = promissionStr;
+                }
+                Shop model = new ShopBLL().GetModel(shopId);
+                if (model != null)
+                {
+                    hfShopNo.Value = model.ShopNo;
+                }
+                BindData();
+            }
+
+        }
+
+
+
+        void BindData()
+        {
+            var list = (from frame in CurrentContext.DbContext.ShopMachineFrame
+                        join shop in CurrentContext.DbContext.Shop
+                        on frame.ShopId equals shop.Id
+                        where frame.ShopId == shopId
+                        select new
+                        {
+                            FrameId=frame.Id,
+                            frame,
+                            frame.ShopId,
+                            frame.MachineFrame,
+                            frame.Gender,
+                            shop
+                        }).ToList();
+            
+            
+            gv.DataSource = list.OrderBy(s => s.frame.PositionName).ToList();
+            gv.DataBind();
+            
+        }
+
+        protected void btnDelete_Click(object sender, EventArgs e)
+        {
+            List<int> frameList = new List<int>();
+            foreach (GridViewRow grv in gv.Rows)
+            {
+                CheckBox cbOne = (CheckBox)grv.FindControl("cbOne");
+                if (cbOne.Checked)
+                {
+                    int frameId = int.Parse(gv.DataKeys[grv.RowIndex].Value.ToString());
+                    frameList.Add(frameId);
+                }
+            }
+            if (frameList.Any())
+            {
+                new ShopMachineFrameBLL().Delete(s => frameList.Contains(s.Id));
+                BindData();
+            }
+        }
+
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            BindData();
+        }
+    }
+}

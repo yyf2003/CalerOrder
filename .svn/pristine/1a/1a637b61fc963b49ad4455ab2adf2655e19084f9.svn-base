@@ -1,0 +1,130 @@
+﻿$(function () {
+
+    //权限判断
+    if ($("#hfPromission").val() != "") {
+        var arr = $("#hfPromission").val().split('|');
+        var count = 0;
+        $.each(arr, function (key, val) {
+            if (val == "add") {
+                $("#btnAddFrame").show();
+                count++;
+            }
+            if (val == "edit") {
+                $("#btnEditFrame").show();
+                count++;
+            }
+            if (val == "delete") {
+                $("#btnDeleteFrame").show();
+                count++;
+            }
+
+        })
+        if (count > 0)
+            $("#toolbar").show();
+    }
+
+    $("input[name$='cbAll']").change(function () {
+        var checked = this.checked;
+        $("input[name$='cbOne']").each(function () {
+            this.checked = checked;
+        })
+    })
+
+    $("#selSheet").on("change", function () {
+        GetFrameList();
+    })
+
+    $("#txtFrameName").on("click", function () {
+        showFrameList();
+    })
+
+   
+
+    $("#ddlFrameMenu").delegate("li", "click", function () {
+
+        $("#txtFrameName").val($(this).html());
+
+    })
+})
+
+function addFrame() {
+    ClearVal();
+    var shopNo = $("#hfShopNo").val();
+    $("#txtPOSCode").val(shopNo);
+    frame.add("add");
+}
+
+function editFrame() {
+    var selectCount = 0;
+    selectCount = $("input[name$='cbOne']:checked").length;
+    if (selectCount == 0) {
+        alert("请选择要编辑的器架");
+        return false;
+    }
+    else if (selectCount > 1) {
+        alert("只能选择一条");
+        return false;
+    }
+    else {
+        var frameId = $("input[name$='cbOne']:checked:first").next("input").val() || 0;
+        editItme(null, frameId);
+
+    }
+
+
+
+}
+
+function deleteFrame() {
+    var selectCount = 0;
+    selectCount = $("input[name$='cbOne']:checked").length;
+    
+    if (selectCount == 0) {
+        alert("请选择要删除的器架");
+        return false;
+    }
+    else {
+        if (confirm("确定删除吗？")) {
+            $("#btnSubmitDelete").click();
+        }
+    }
+}
+
+function GetFrameList() {
+    var sheet = $("#selSheet").val();
+    $("#ddlFrameMenu").html("");
+    $.ajax({
+        type: "get",
+        url: "Handler/MachineFrame.ashx?type=getFrameList&sheet=" + sheet,
+        success: function (data) {
+            
+            if (data != "") {
+                var json = eval(data);
+                var li = "";
+                for (var i = 0; i < json.length; i++) {
+                    li += "<li>" + json[i].FrameName + "</li>";
+                }
+                $("#ddlFrameMenu").append(li);
+            }
+        }
+    })
+}
+
+function showFrameList() {
+
+    $("#divFrameList").css({ left: 0 + "px", top: 20 + "px" }).slideDown("fast");
+    $("body").bind("mousedown", onBodyDown);
+
+}
+
+function hideMenu() {
+    $("#divFrameList").fadeOut("fast");
+    $("body").unbind("mousedown", onBodyDown);
+}
+
+function onBodyDown(event) {
+    if (!(event.target.id == "txtFrameName" || event.target.id == "divFrameList" || $(event.target).parents("#divFrameList").length > 0)) {
+        hideMenu();
+    }
+
+}

@@ -1,0 +1,17 @@
+﻿.divhide
+{
+    display: none;
+}
+
+.tr_big
+{
+    background: url(../image/TR_bei.gif) repeat-x;
+    border-top: #d7d9e0 solid 1px;
+    height: 26px;
+    line-height: 26px;
+    color: #010204;
+    font: italic bold 12px/20px;
+    text-align: left;
+    font-weight: 900;
+    cursor: pointer;
+}

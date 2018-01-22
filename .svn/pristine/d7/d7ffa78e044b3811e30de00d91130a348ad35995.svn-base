@@ -1,0 +1,62 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.OleDb;
+using System.Linq;
+using System.Text;
+using BLL;
+using Common;
+using Models;
+
+namespace WebApp
+{
+    public partial class importPlace : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["ok"] != null)
+                Label1.Text = "导入完成";
+        }
+
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            if (FileUpload1.HasFile)
+            {
+                string path = OperateFile.UpLoadFile(FileUpload1.PostedFile);
+                if (path != "")
+                {
+                    string ExcelConnStr = ConfigurationManager.ConnectionStrings["ExcelFilePath"].ToString();
+                    OleDbConnection conn;
+                    OleDbDataAdapter da;
+                    DataSet ds = null;
+                    path = Server.MapPath(path);
+                    ExcelConnStr = ExcelConnStr.Replace("ExcelPath", path);
+                    conn = new OleDbConnection(ExcelConnStr);
+                    conn.Open();
+                    string sql = "select * from [Sheet1$]";
+                    da = new OleDbDataAdapter(sql, conn);
+                    ds = new DataSet();
+                    da.Fill(ds);
+                    da.Dispose();
+                    PlaceBLL placeBll = new PlaceBLL();
+                    Place model;
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                    {
+                        int id =int.Parse(dr["Id"].ToString().Trim());
+                        string placeName = dr["PlaceName"].ToString().Trim();
+                        int ParentId = int.Parse(dr["ParentId"].ToString());
+                        //string AreaSort = dr["AreaSort"].ToString();
+                        //int AreaDeep = int.Parse(dr["AreaDeep"].ToString());
+                        string AreaRegion = dr["Region"].ToString();
+                        model = new Place() { ID = id,AreaRegion = AreaRegion, ParentID = ParentId, PlaceName = placeName };
+                        placeBll.Insert(model);
+                    }
+                    conn.Dispose();
+                    conn.Close();
+                    Response.Redirect("importPlace.aspx?ok=1", false);
+                }
+            }
+        }
+    }
+}

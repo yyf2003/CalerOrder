@@ -1,0 +1,54 @@
+ul,li{
+	list-style:none;}
+a {
+	color: #3d77b4;
+	text-decoration: none;
+}
+img{ border:none;}
+.clear{
+	clear:both;
+	height:0;
+	font-size:0;
+	line-height:0;
+	overflow:hidden;}
+#page_dialog{
+	background:url(../Image/tanchuang/bei.gif) no-repeat top;
+	width:220px;
+	height:140px;
+	float:right;
+	position:absolute;
+	top:415px;
+	right:0
+	}
+#page_dialog_pleft{
+	float:left;
+	margin-left:8px;
+	line-height:32px;
+	width:70px;
+	display:block;
+	}
+#page_dialog_pleft img{ float:left;}
+#page_dialog_pleft span{
+	font-family:'微软雅黑';
+	font-size:16px;
+	font-weight:400;
+	color:#FFF;
+	float:left;}
+#page_dialog_pright{
+	float:right;
+	margin-right:8px;
+	}
+#page_dialog_nav{
+	width:200px;}
+.page_dialog_ul{
+	margin-top:20px;
+	padding-left:35px; 
+	}
+.page_dialog_ul li{
+	line-height:26px;}
+.page_dialog_ul li a{
+	color:#969da2;
+	font-family:'微软雅黑';
+	font-weight:bold;}
+.page_dialog_ul li a span{
+	color:#ff6501;}

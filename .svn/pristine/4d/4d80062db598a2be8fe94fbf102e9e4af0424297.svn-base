@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using Common;
+
+namespace WebApp.Subjects
+{
+    public partial class ExportOrders : BasePage
+    {
+        public int userId = 0;
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            userId = CurrentUser.UserId;
+            if (!IsPostBack)
+            {
+                //BindMyCustomerList(ref ddlCustomer);
+                BindCustomerList(ref ddlCustomer);
+
+                //if (CurrentUser.RoleId == 5)
+                //{
+                //    SearchTypeTr.Visible = true;
+                //    rblSearchType.SelectedValue = "1";
+                //}
+            }
+        }
+
+        
+    }
+}

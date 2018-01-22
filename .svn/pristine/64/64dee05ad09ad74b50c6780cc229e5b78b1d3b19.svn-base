@@ -1,0 +1,148 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using BLL;
+using Models;
+using System.Text;
+using BLL;
+using DAL;
+using Models;
+using System.Web.SessionState;
+
+namespace WebApp.Subjects.InstallPrice.handler
+{
+    /// <summary>
+    /// Handler1 的摘要说明
+    /// </summary>
+    public class Handler1 : IHttpHandler,IRequiresSessionState
+    {
+        HttpContext context1;
+        public void ProcessRequest(HttpContext context)
+        {
+            context1 = context;
+            context.Response.ContentType = "text/plain";
+            string type = string.Empty;
+            string result = string.Empty;
+            if (context.Request.QueryString["type"] != null)
+            {
+                type = context.Request.QueryString["type"];
+            }
+            switch (type)
+            { 
+                case "getPOSScale":
+                    result = GetPOSScale();
+                    break;
+                case "checkEmpty":
+                    int guidanceId = 0;
+                    if (context.Request.QueryString["guidanceId"] != null)
+                    {
+                        guidanceId = int.Parse(context.Request.QueryString["guidanceId"]);
+                    }
+                    result=CheckEmptyData(guidanceId);
+                    break;
+            }
+
+            
+            context.Response.Write(result);
+        }
+
+        string GetPOSScale()
+        {
+            string r = string.Empty;
+            List<string> list = new POSScaleInfoBLL().GetList(s => 1 == 1).Select(s => s.POSScaleName).Distinct().ToList();
+
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s =>
+                {
+                    json.Append("{\"POSScale\":\"" + s + "\"},");
+                });
+                r = "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            return r;
+        }
+
+        string CheckEmptyData(int guidanceId)
+        {
+            string result = "ok";
+            if (guidanceId>0)
+            {
+                
+                var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                            join subject in CurrentContext.DbContext.Subject
+                            on order.SubjectId equals subject.Id
+                            join shop in CurrentContext.DbContext.Shop
+                            on order.ShopId equals shop.Id
+                            where subject.GuidanceId == guidanceId
+                            && shop.IsInstall !=null && shop.IsInstall == "Y"
+                            //&& (shop.Format != null && shop.Format != "" && (!shop.Format.ToLower().Contains("kids") || shop.Format.ToLower().Contains("infant")))
+                            && ((shop.Format != null && shop.Format != "") ? (!shop.Format.ToLower().Contains("kids") && !shop.Format.ToLower().Contains("infant")) : 1 == 1)
+                            && ((order.InstallPricePOSScale == null || order.InstallPricePOSScale == "") || (order.InstallPriceMaterialSupport == null || order.InstallPriceMaterialSupport == ""))   
+                            select new
+                            {
+                                order,
+                                shop
+                            }).ToList();
+                
+                if (list.Any())
+                {
+                    result = "empty";
+                    List<Shop> shopList = new List<Shop>();
+                    Shop shopModel;
+                    List<int> shopIdList = new List<int>();
+                    list.ForEach(s =>
+                    {
+                        if (!shopIdList.Contains(s.shop.Id))
+                        {
+                            shopModel = new Shop();
+                            shopModel = s.shop;
+                            if (string.IsNullOrWhiteSpace(shopModel.POSScale) && !string.IsNullOrWhiteSpace(s.order.InstallPricePOSScale))
+                            {
+                                shopModel.POSScale = s.order.InstallPricePOSScale;
+                            }
+                            if (string.IsNullOrWhiteSpace(shopModel.MaterialSupport) && !string.IsNullOrWhiteSpace(s.order.InstallPriceMaterialSupport))
+                            {
+                                shopModel.MaterialSupport = s.order.InstallPriceMaterialSupport;
+                            }
+                            shopList.Add(shopModel);
+                            shopIdList.Add(s.shop.Id);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < shopList.Count; i++)
+                            {
+                                if (shopList[i].Id == s.shop.Id)
+                                {
+                                    if (string.IsNullOrWhiteSpace(shopList[i].POSScale) && !string.IsNullOrWhiteSpace(s.order.InstallPricePOSScale))
+                                    {
+                                        shopList[i].POSScale = s.order.InstallPricePOSScale;
+                                    }
+                                    if (string.IsNullOrWhiteSpace(shopList[i].MaterialSupport) && !string.IsNullOrWhiteSpace(s.order.InstallPriceMaterialSupport))
+                                    {
+                                        shopList[i].MaterialSupport = s.order.InstallPriceMaterialSupport;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    context1.Session["emptyOrder"] = shopList;
+                }
+                else
+                {
+                    context1.Session["emptyOrder"] = null;
+                }
+            }
+            return result;
+        }
+
+        public bool IsReusable
+        {
+            get
+            {
+                return false;
+            }
+        }
+    }
+}

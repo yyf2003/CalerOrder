@@ -1,0 +1,318 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using BLL;
+using Models;
+using Common;
+using DAL;
+
+namespace WebApp.Subjects.SecondInstallFee
+{
+    public partial class Add : BasePage
+    {
+        int subjectId = 0;
+        SubjectBLL subjectBll = new SubjectBLL();
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(Request.QueryString["subjectId"]);
+            }
+            if (!IsPostBack)
+            {
+                PreviousUrl = "";
+                BindGuidanceList();
+                BindData();
+            }
+        }
+
+        void BindData()
+        {
+            if (subjectId > 0)
+            {
+                labTitel.Text = "编辑项目-二次安装费";
+                Subject subjectModel = new SubjectBLL().GetModel(subjectId);
+                if (subjectModel != null)
+                {
+                    ddlGuidance.SelectedValue = subjectModel.GuidanceId.ToString();
+                    ddlGuidance.Enabled = false;
+                    BindRegion();
+                    txtSubjectName.Text = subjectModel.SubjectName;
+                    ddlRegion.SelectedValue = subjectModel.Region;
+                    if (subjectModel.SecondInstallPrice != null)
+                        txtPrice.Text = subjectModel.SecondInstallPrice.ToString();
+                    txtRemark.Text = subjectModel.Remark;
+                }
+            }
+        }
+
+        void BindGuidanceList()
+        {
+            var list = (from guidance in CurrentContext.DbContext.SubjectGuidance
+                        join subject in CurrentContext.DbContext.Subject
+                        on guidance.ItemId equals subject.GuidanceId
+                        where (subject.IsDelete == null || subject.IsDelete == false)
+                        && subject.ApproveState == 1
+                        select
+                        guidance
+                        ).Distinct().ToList();
+            if (subjectId == 0)
+            {
+                string begin = txtBegin.Text.Trim();
+                string end = txtEnd.Text.Trim();
+                if (!string.IsNullOrWhiteSpace(begin) && StringHelper.IsDateTime(begin))
+                {
+                    DateTime beginDate = DateTime.Parse(begin);
+                    list = list.Where(s => s.BeginDate >= beginDate).ToList();
+                    if (!string.IsNullOrWhiteSpace(end) && StringHelper.IsDateTime(end))
+                    {
+                        DateTime endDate = DateTime.Parse(end).AddDays(1);
+                        list = list.Where(s => s.BeginDate < endDate).ToList();
+                    }
+                }
+                else
+                {
+
+                    DateTime date = DateTime.Now;
+                    DateTime newDate = new DateTime(date.Year, date.Month, 1);
+                    DateTime beginDate = newDate.AddMonths(-1);
+                    DateTime endDate = newDate.AddMonths(2);
+                    list = new SubjectGuidanceBLL().GetList(s => s.BeginDate >= beginDate && s.BeginDate < endDate);
+                }
+            }
+            if (CurrentUser.RoleId == 2)
+            {
+                var subjectList = new SubjectBLL().GetList(s => s.AddUserId == CurrentUser.UserId && s.GuidanceId != null && s.GuidanceId > 0 && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false) && s.SubjectType == 1);
+                List<int> guidanceIdList = subjectList.Select(s => s.GuidanceId ?? 0).Distinct().ToList();
+                list = list.Where(s => guidanceIdList.Contains(s.ItemId)).ToList();
+            }
+            if (list.Any())
+            {
+                ddlGuidance.DataSource = list.OrderByDescending(s => s.ItemId).ToList();
+                ddlGuidance.DataTextField = "ItemName";
+                ddlGuidance.DataValueField = "ItemId";
+                ddlGuidance.DataBind();
+                ddlGuidance.Items.Insert(0, new ListItem("请选择", "0"));
+
+            }
+
+        }
+
+        void BindRegion()
+        {
+            int guidanceId = int.Parse(ddlGuidance.SelectedValue);
+            SubjectGuidance model = new SubjectGuidanceBLL().GetModel(guidanceId);
+            if (model != null)
+            {
+                int customerId = model.CustomerId ?? 0;
+                hfCustomerId.Value = customerId.ToString();
+                LoadRegion(ref ddlRegion, customerId);
+            }
+        }
+
+
+        //void BindSubjects()
+        //{
+
+        //    int guidanceId = int.Parse(ddlGuidance.SelectedValue);
+        //    guidanceId = guidanceId == 0 ? -1 : guidanceId;
+        //    var list = subjectBll.GetList(s => s.GuidanceId == guidanceId && s.SubjectType==1 && s.ApproveState==1 && (s.IsDelete == false || s.IsDelete == null));
+        //    if (CurrentUser.RoleId == 2)
+        //    {
+        //        list = list.Where(s => s.AddUserId == CurrentUser.UserId).ToList();
+        //    }
+        //    ddlSubject.DataSource = list;
+        //    ddlSubject.DataTextField = "SubjectName";
+        //    ddlSubject.DataValueField = "Id";
+        //    ddlSubject.DataBind();
+        //    ddlSubject.Items.Insert(0, new ListItem("请选择", "0"));
+
+
+
+        //}
+
+
+        //protected void ddlGuidance_SelectedIndexChanged(object sender, EventArgs e)
+        //{
+        //    BindSubjects();
+        //}
+
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            Save();
+            Alert("提交成功！", "List.aspx");
+        }
+
+        protected void btnNext_Click(object sender, EventArgs e)
+        {
+            Save();
+            Response.Redirect("ImportOrder.aspx?subjectId=" + subjectId, false);
+        }
+
+        string CreateSubjectNo()
+        {
+            System.Text.StringBuilder code = new System.Text.StringBuilder();
+            DateTime date = DateTime.Now;
+            code.Append(date.Year).Append(date.Month.ToString().PadLeft(2, '0')).Append(date.Day.ToString().PadLeft(2, '0')).Append(date.Hour.ToString().PadLeft(2, '0')).Append(date.Minute.ToString().PadLeft(2, '0')).Append(date.Second.ToString().PadLeft(2, '0'));
+            return code.ToString();
+        }
+
+        //protected void ddlSubject_SelectedIndexChanged(object sender, EventArgs e)
+        //{
+        //    ChangeSubject();
+        //}
+
+        //void ChangeSubject()
+        //{
+        //    int subjectId1 = int.Parse(ddlSubject.SelectedValue);
+        //    var list = subjectBll.GetList(s => s.SubjectType == 4 && s.OriginalSubjectId == subjectId1);
+        //    int count = list.Count + 2;
+        //    labSubName.Text = "-" + count + "次安装费";
+
+        //    var regionList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+        //                      join shop in CurrentContext.DbContext.Shop
+        //                      on order.ShopId equals shop.Id
+        //                      where order.SubjectId == subjectId1
+        //                      select shop.RegionName).Distinct().ToList();
+        //    if (regionList.Any())
+        //    {
+        //        regionList.ForEach(s =>
+        //        {
+        //            if (!string.IsNullOrWhiteSpace(s))
+        //            {
+        //                ListItem li = new ListItem();
+        //                li.Value = s;
+        //                li.Text = s;
+        //                ddlRegion.Items.Add(li);
+        //            }
+        //        });
+        //    }
+        //}
+
+
+        void Save()
+        {
+            string price = txtPrice.Text;
+            if (subjectId > 0)
+            {
+                //编辑
+                Subject model = subjectBll.GetModel(subjectId);
+                //if (model != null)
+                //{
+                //    int newSubjectId = int.Parse(ddlSubject.SelectedValue);
+                //    if (newSubjectId > 0)
+                //    {
+                //        Subject newModel = subjectBll.GetModel(newSubjectId);
+                //        if (newModel != null)
+                //        {
+
+                //            //model.SubjectName = newModel.SubjectName + "-2次安装费";
+                //            //model.HandMakeSubjectId = newModel.Id;
+                //            model.Remark = txtRemark.Text.Trim();
+                //            if (ddlRegion.SelectedValue!="0")
+                //            model.Region = ddlRegion.SelectedValue;
+                //            model.SecondInstallPrice = StringHelper.IsDecimal(price);
+                //            subjectBll.Update(model);
+
+                //        }
+                //        else
+                //        {
+                //            Alert("提交失败");
+                //            return;
+                //        }
+                //    }
+                //    else
+                //    {
+                //        Alert("请选择项目名称");
+                //        return;
+                //    }
+                model.Remark = txtRemark.Text.Trim();
+                model.SubjectName = txtSubjectName.Text.Trim();
+                if (ddlRegion.SelectedValue != "0")
+                    model.Region = ddlRegion.SelectedValue;
+                model.SecondInstallPrice = StringHelper.IsDecimal(price);
+                subjectBll.Update(model);
+
+            }
+            else
+            {
+                //新添加
+                //int newSubjectId = int.Parse(ddlSubject.SelectedValue);
+                //if (newSubjectId > 0)
+                //{
+                //    Subject newModel = subjectBll.GetModel(newSubjectId);
+                //    if (newModel != null)
+                //    {
+                //        newModel.SubjectType = 4;//二次安装费用订单
+                //        newModel.ApproveDate = null;
+                //        newModel.ApproveRemark = "";
+                //        newModel.ApproveState = 0;
+                //        newModel.ApproveUserId = 0;
+                //        newModel.Status = 4;
+                //        newModel.SubjectName = newModel.SubjectName + "-" + labSubName.Text;
+                //        newModel.SubjectNo = CreateSubjectNo();
+                //        newModel.OriginalSubjectId = newModel.Id;
+                //        newModel.Remark = txtRemark.Text.Trim();
+                //        newModel.SecondInstallPrice = StringHelper.IsDecimal(price);
+                //        newModel.AddDate = DateTime.Now;
+                //        newModel.AddUserId = CurrentUser.UserId;
+                //        if (ddlRegion.SelectedValue != "0")
+                //            newModel.Region = ddlRegion.SelectedValue;
+                //        subjectBll.Add(newModel);
+
+                //    }
+                //    else
+                //    {
+                //        Alert("提交失败");
+                //        return;
+                //    }
+                //}
+                //else
+                //{
+                //    Alert("请选择项目名称");
+                //    return;
+                //}
+                Subject newModel = new Subject();
+                newModel.SubjectType = 4;//二次安装费用订单
+                newModel.ApproveDate = null;
+                newModel.ApproveRemark = "";
+                newModel.ApproveState = 0;
+                newModel.ApproveUserId = 0;
+                newModel.Status = 4;
+                newModel.SubjectName = txtSubjectName.Text.Trim();
+                newModel.SubjectNo = CreateSubjectNo();
+                //newModel.OriginalSubjectId = newModel.Id;
+                newModel.Remark = txtRemark.Text.Trim();
+                newModel.SecondInstallPrice = StringHelper.IsDecimal(price);
+                newModel.AddDate = DateTime.Now;
+                newModel.AddUserId = CurrentUser.UserId;
+                if (ddlRegion.SelectedValue != "0")
+                    newModel.Region = ddlRegion.SelectedValue;
+                newModel.CompanyId = CurrentUser.CompanyId;
+                newModel.CustomerId = int.Parse(hfCustomerId.Value);
+                newModel.GuidanceId = int.Parse(ddlGuidance.SelectedValue);
+                newModel.IsDelete = false;
+                subjectBll.Add(newModel);
+                subjectId = newModel.Id;
+            }
+        }
+
+        protected void ddlGuidance_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            BindRegion();
+        }
+
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            BindGuidanceList();
+        }
+
+        protected void btnGoBack_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(PreviousUrl,false);
+        }
+    }
+}

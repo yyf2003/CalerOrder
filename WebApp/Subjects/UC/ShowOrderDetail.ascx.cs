@@ -1,0 +1,250 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Web.UI.WebControls;
+using BLL;
+using Common;
+using DAL;
+
+namespace WebApp.Subjects.UC
+{
+    public partial class ShowOrderDetail : System.Web.UI.UserControl
+    {
+        public int subjectId;
+        Dictionary<int, string> dic = new Dictionary<int, string>();
+        Dictionary<int, string> approveStateDic = new Dictionary<int, string>(); 
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            dic.Add(1, "导入订单");
+            dic.Add(2, "历史数据下单");
+            dic.Add(3, "数据库生成订单");
+            dic.Add(4, "零单");
+            approveStateDic.Add(0, "待审批");
+            approveStateDic.Add(1, "审批通过");
+            approveStateDic.Add(2, "审批不通过");
+            
+            if (Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(Request.QueryString["subjectId"]);
+            }
+            if (!IsPostBack)
+            {
+                BindSubject();
+                BindFinalOrder();
+                hfSubjectId.Value = subjectId.ToString();
+            }
+            GetApproveInfo();
+        }
+        void BindSubject()
+        {
+            var subjectModel = (from subject in CurrentContext.DbContext.Subject
+                                join customer in CurrentContext.DbContext.Customer
+                                on subject.CustomerId equals customer.Id
+                                join user in CurrentContext.DbContext.UserInfo
+                                on subject.AddUserId equals user.UserId
+                               
+                                where subject.Id == subjectId
+                                select new
+                                {
+                                    subject,
+                                    customer.CustomerName,
+                                    AddUserName = user.UserName
+                                }).FirstOrDefault();
+            if (subjectModel != null)
+            {
+                labSubjectNo.Text = subjectModel.subject.SubjectNo;
+                labSubjectName.Text = subjectModel.subject.SubjectName;
+                labOutSubjectName.Text = subjectModel.subject.OutSubjectName;
+                labBeginDate.Text = subjectModel.subject.BeginDate != null ? DateTime.Parse(subjectModel.subject.BeginDate.ToString()).ToShortDateString() : "";
+                labEndDate.Text = subjectModel.subject.EndDate != null ? DateTime.Parse(subjectModel.subject.EndDate.ToString()).ToShortDateString() : "";
+                labAddUserName.Text = subjectModel.AddUserName;
+                labCustomerName.Text = subjectModel.CustomerName;
+                int subjectType=subjectModel.subject.SubjectType ?? 1;
+                labSubjectType.Text = CommonMethod.GetEnumDescription<SubjectTypeEnum>(subjectType.ToString());
+                labRemark.Text = subjectModel.subject.Remark;
+                hfCustomerId.Value = subjectModel.subject.CustomerId != null ? subjectModel.subject.CustomerId.ToString() : "0";
+                hfPlanIds.Value = subjectModel.subject.SplitPlanIds;
+                if (subjectType == 1)
+                {
+                    var regionList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                      join shop in CurrentContext.DbContext.Shop
+                                      on order.ShopId equals shop.Id
+                                      where order.SubjectId == subjectId
+                                      select shop.RegionName).Distinct().ToList();
+                    if (regionList.Any())
+                    {
+                        regionList.ForEach(s =>
+                        {
+                            ListItem li = new ListItem();
+                            li.Text = s + "&nbsp;";
+                            li.Value = s;
+                            cblRegion.Items.Add(li);
+                        });
+                    }
+                }
+                else
+                {
+                    Panel_PlanInfo.Visible = false;
+                }
+                
+            }
+        }
+
+        void BindFinalOrder()
+        {
+
+
+            var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                       join pop1 in CurrentContext.DbContext.POP
+                       on new { order.ShopId, order.GraphicNo,order.Sheet } equals new { pop1.ShopId, pop1.GraphicNo,pop1.Sheet } into popTemp
+                       from pop in popTemp.DefaultIfEmpty()
+                       join shop in CurrentContext.DbContext.Shop
+                       on order.ShopId equals shop.Id
+                       where order.SubjectId == subjectId
+                       && (order.IsDelete == null || order.IsDelete==false)
+                       && (order.RegionSupplementId == null || order.RegionSupplementId == 0)
+                       select new
+                       {
+                           order,
+                           Sheet=order.Sheet,
+                           LevelNum=order.LevelNum,
+                           shop,
+                           pop
+                       }).ToList();
+            if (!string.IsNullOrWhiteSpace(txtShopNo.Text.Trim()))
+            {
+                list = list.Where(s => s.order.ShopNo.ToLower() == txtShopNo.Text.Trim().ToLower()).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(txtShopName.Text.Trim()))
+            {
+                list = list.Where(s => s.order.ShopName.Contains(txtShopNo.Text.Trim())).ToList();
+            }
+            List<string> regionList = new List<string>();
+            foreach (ListItem li in cblRegion.Items)
+            {
+                if (li.Selected)
+                {
+                    regionList.Add(li.Value.ToLower());
+                }
+            }
+            if (regionList.Any())
+            {
+                list = list.Where(s => regionList.Contains(s.shop.RegionName.ToLower())).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(txtKeyWord.Text.Trim()))
+            {
+                string keyWord = txtKeyWord.Text.Trim().ToLower();
+                list = list.Where(s => s.order.Sheet.ToLower().Contains(keyWord) || (s.order.PositionDescription.ToLower().Contains(keyWord)) || (s.order.GraphicMaterial.ToLower().Contains(keyWord)) || (s.order.MachineFrame.ToLower().Contains(keyWord))).ToList();
+            }
+            AspNetPager1.RecordCount = list.Count;
+            this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
+            gvPOP.DataSource = list.OrderBy(s => s.order.ShopId).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            gvPOP.DataBind();
+
+            lbExport.Visible = list.Any();
+            var list0 = list.Where(s => (s.order.GraphicLength != null && s.order.GraphicLength >0) || (s.pop != null && (s.pop.GraphicLength != null || s.pop.GraphicLength>0))).ToList();
+            if(!list0.Any())
+            {
+                lbExport1.Visible = false;
+                Label1.Visible = false;
+            }
+            
+        }
+
+        protected void lbExport_Click(object sender, EventArgs e)
+        {
+            
+            DataSet ds = new FinalOrderDetailTempBLL().GetOrderList(subjectId.ToString(),"","false");
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                string fileName = labSubjectName.Text + "-POP订单数据";
+                OperateFile.ExportExcel(ds.Tables[0], fileName);
+
+            }
+            
+        }
+
+        protected void lbExport1_Click(object sender, EventArgs e)
+        {
+            DataSet ds = new FinalOrderDetailTempBLL().GetOrderList(subjectId.ToString(),"", "true");
+            if (ds != null && ds.Tables[0].Rows.Count > 0)
+            {
+                string fileName = labSubjectName.Text + "-最终订单";
+                OperateFile.ExportExcel(ds.Tables[0], fileName);
+
+            }
+            
+        }
+
+
+        protected void AspNetPager1_PageChanged(object sender, EventArgs e)
+        {
+            BindFinalOrder();
+        }
+
+        void GetApproveInfo()
+        {
+            var list = (from approve in CurrentContext.DbContext.ApproveInfo
+                       join user in CurrentContext.DbContext.UserInfo
+                       on approve.AddUserId equals user.UserId
+                       where approve.SubjectId==subjectId
+                       select new { 
+                          approve,
+                          user.UserName,
+                       }).ToList();
+            if (list.Any())
+            {
+                StringBuilder tb = new StringBuilder();
+                list.ForEach(s => {
+                    int approveState = s.approve.Result ?? 0;
+                    tb.Append("<table class=\"table\" style=\"margin-bottom:6px;\">");
+                    tb.AppendFormat("<tr class=\"tr_hui\"><td style=\"width: 100px;\">审批时间</td><td style=\"text-align: left; padding-left: 5px;\">{0}</td></tr>", s.approve.AddDate);
+                    tb.AppendFormat("<tr class=\"tr_bai\"><td>审批结果</td><td style=\"text-align: left; padding-left: 5px;\">{0}</td></tr>", approveStateDic[approveState]);
+                    tb.AppendFormat("<tr class=\"tr_bai\"><td>审批人</td><td style=\"text-align: left; padding-left: 5px;\">{0}</td></tr>", s.UserName);
+                    tb.AppendFormat("<tr class=\"tr_bai\"><td>审批意见</td><td style=\"text-align: left; padding-left: 5px;height: 60px;\">{0}</td></tr>", s.approve.Remark);
+                    tb.Append("</table>");
+
+
+                });
+                approveInfoDiv.InnerHtml = tb.ToString();
+                Panel1.Visible = true;
+            }
+        }
+
+        protected void gvPOP_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemIndex != -1)
+            {
+                object item = e.Item.DataItem;
+                if (item != null)
+                {
+                    object objLevel = item.GetType().GetProperty("LevelNum").GetValue(item, null);
+                    object objSheet = item.GetType().GetProperty("Sheet").GetValue(item, null);
+                    //if (objSheet != null && objSheet.ToString().Contains("桌"))
+                    //{
+                    //    string level = objLevel != null ? objLevel.ToString() : "1";
+                    //    ((Label)e.Item.FindControl("labLevel")).Text = CommonMethod.GeEnumName<TableLevelEnum>(level);
+                    //}
+                    if (objLevel != null)
+                    {
+                        ((Label)e.Item.FindControl("labLevel")).Text = CommonMethod.GeEnumName<LevelNumEnum>(objLevel.ToString());
+                    }
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// 查询
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            AspNetPager1.CurrentPageIndex = 1;
+            BindFinalOrder();
+        }
+    }
+}
