@@ -28,3 +28,4 @@ _ReSharper*/
 *.vssscc
 Web.config
 $tf*/
+/WebApp/Web.config

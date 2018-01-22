@@ -11,6 +11,7 @@
     <script type="text/javascript">
         function LoginFail() {
             alert("登陆失败：账号或密码错误！");
+
         }
 
         
@@ -21,7 +22,7 @@
     <div>
         <div class="main-login">
             <div class="login-logo">
-                卡乐POP订单管理系统
+                卡乐POP订单管理系统-dddd
             </div>
             <div class="login-content">
                 <div class="login-info">
