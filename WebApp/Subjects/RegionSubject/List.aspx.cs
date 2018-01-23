@@ -8,6 +8,7 @@ using BLL;
 using Models;
 using DAL;
 using Common;
+using System.Transactions;
 
 
 namespace WebApp.Subjects.RegionSubject
@@ -259,9 +260,81 @@ namespace WebApp.Subjects.RegionSubject
                 Models.Subject model = subjectBll.GetModel(id);
                 if (model != null)
                 {
-                    model.IsDelete = true;
-                    subjectBll.Update(model);
-                    BindData();
+                    using (TransactionScope tran = new TransactionScope())
+                    {
+                        try
+                        {
+                            model.IsDelete = true;
+                            subjectBll.Update(model);
+                            BindData();
+
+                            FinalOrderDetailTempBLL finalOrderBll = new FinalOrderDetailTempBLL();
+                            OutsourceOrderDetailBLL outsourceOrderBll = new OutsourceOrderDetailBLL();
+                            List<int> shopIdList = new List<int>();
+                            if (model.SubjectType == (int)SubjectTypeEnum.HC订单 || model.SubjectType == (int)SubjectTypeEnum.分区补单)
+                            {
+                                var list0 = finalOrderBll.GetList(s => s.RegionSupplementId == id && (s.IsDelete == null || s.IsDelete == false));
+                                if (list0.Any())
+                                {
+                                    shopIdList = list0.Select(s => s.ShopId ?? 0).ToList();
+                                    list0.ForEach(s =>
+                                    {
+                                        s.DeleteDate = DateTime.Now;
+                                        s.DeleteUserId = CurrentUser.UserId;
+                                        s.IsDelete = true;
+                                        finalOrderBll.Update(s);
+                                    });
+                                    //删除外协订单
+                                    outsourceOrderBll.Delete(s=>s.RegionSupplementId==id);
+                                }
+                            }
+                            else
+                            {
+                                var list0 = finalOrderBll.GetList(s => s.SubjectId == id && (s.IsDelete == null || s.IsDelete == false));
+                                if (list0.Any())
+                                {
+                                    shopIdList = list0.Select(s => s.ShopId ?? 0).ToList();
+                                    list0.ForEach(s =>
+                                    {
+                                        s.DeleteDate = DateTime.Now;
+                                        s.DeleteUserId = CurrentUser.UserId;
+                                        s.IsDelete = true;
+                                        finalOrderBll.Update(s);
+                                    });
+                                    //删除外协订单
+                                    outsourceOrderBll.Delete(s => s.SubjectId == id);
+                                }
+                            }
+                            //更新项目变更申请
+                            if (applicationDetailId > 0)
+                            {
+                                OrderChangeApplicationDetailBLL changeApplicationDetailBll = new OrderChangeApplicationDetailBLL();
+                                OrderChangeApplicationDetail changeModel = changeApplicationDetailBll.GetModel(applicationDetailId);
+                                if (changeModel != null)
+                                {
+                                    changeModel.State = 2;
+                                    changeModel.FinishUserId = CurrentUser.UserId;
+                                    changeModel.FinishDate = DateTime.Now;
+                                    changeApplicationDetailBll.Update(changeModel);
+                                }
+                            }
+                            //重新计算外协安装费
+                            if (shopIdList.Any() && model.SubjectType != (int)SubjectTypeEnum.二次安装 && model.SubjectType != (int)SubjectTypeEnum.费用订单)
+                            {
+                                SubjectGuidance guianceModel = new SubjectGuidanceBLL().GetModel(model.GuidanceId ?? 0);
+                                if (guianceModel != null && guianceModel.ActivityTypeId != (int)GuidanceTypeEnum.Others)
+                                {
+                                    if ((guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guianceModel.HasInstallFees ?? true)) || (guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion))
+                                        ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);
+                                }
+
+                            }
+                            tran.Complete();
+                        }
+                        catch (Exception ex)
+                        { }
+                    }
+                    
 
                 }
             }

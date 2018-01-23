@@ -486,7 +486,7 @@ namespace WebApp.Subjects
                                 if (model.SubjectType == (int)SubjectTypeEnum.HC订单 || model.SubjectType == (int)SubjectTypeEnum.分区补单)
                                 {
 
-                                    var list0 = totalOrderList.Where(s => s.RegionSupplementId == id).ToList();
+                                    var list0 = orderBll.GetList(s => s.RegionSupplementId == id);
                                     if (list0.Any())
                                     {
                                         shopIdList = list0.Select(s => s.ShopId ?? 0).Distinct().ToList();
