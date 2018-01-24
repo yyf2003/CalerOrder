@@ -136,39 +136,39 @@ namespace WebApp.Subjects.PriceOrder
                             int orderTypeIndex = 0;
                             bool canSave = true;
                             if (cols.Contains("费用类型"))
-                                orderType = dr["费用类型"].ToString().Trim();
+                                orderType = StringHelper.ReplaceSpecialChar(dr["费用类型"].ToString().Trim());
 
                             if (cols.Contains("店铺编号"))
-                                shopNo = dr["店铺编号"].ToString().Trim();
+                                shopNo = StringHelper.ReplaceSpecialChar(dr["店铺编号"].ToString().Trim());
                             else if (cols.Contains("POSCode"))
-                                shopNo = dr["POSCode"].ToString().Trim();
+                                shopNo = StringHelper.ReplaceSpecialChar(dr["POSCode"].ToString().Trim());
                             else if (cols.Contains("POS Code"))
-                                shopNo = dr["POS Code"].ToString().Trim();
+                                shopNo = StringHelper.ReplaceSpecialChar(dr["POS Code"].ToString().Trim());
 
                             if (cols.Contains("费用金额"))
-                                price = dr["费用金额"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dr["费用金额"].ToString().Trim());
                             else if (cols.Contains("费用"))
-                                price = dr["费用"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dr["费用"].ToString().Trim());
                             else if (cols.Contains("金额"))
-                                price = dr["金额"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dr["金额"].ToString().Trim());
                             else if (cols.Contains("应收金额"))
-                                price = dr["应收金额"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dr["应收金额"].ToString().Trim());
                             else if (cols.Contains("应收费用金额"))
-                                price = dr["应收费用金额"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dr["应收费用金额"].ToString().Trim());
                             else if (cols.Contains("应收费用"))
-                                price = dr["应收费用"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dr["应收费用"].ToString().Trim());
 
                             if (cols.Contains("应付费用金额"))
-                                payPrice = dr["应付费用金额"].ToString().Trim();
+                                payPrice = StringHelper.ReplaceSpecialChar(dr["应付费用金额"].ToString().Trim());
                             else if (cols.Contains("应付费用"))
-                                payPrice = dr["应付费用"].ToString().Trim();
+                                payPrice = StringHelper.ReplaceSpecialChar(dr["应付费用"].ToString().Trim());
                             else if (cols.Contains("应付金额"))
-                                payPrice = dr["应付金额"].ToString().Trim();
+                                payPrice = StringHelper.ReplaceSpecialChar(dr["应付金额"].ToString().Trim());
 
                             if (cols.Contains("费用内容"))
-                                contents = dr["费用内容"].ToString().Trim();
+                                contents = StringHelper.ReplaceSpecialChar(dr["费用内容"].ToString().Trim());
                             if (cols.Contains("备注"))
-                                remark = dr["备注"].ToString().Trim();
+                                remark = StringHelper.ReplaceSpecialChar(dr["备注"].ToString().Trim());
                             if (string.IsNullOrWhiteSpace(orderType))
                             {
                                 canSave = false;

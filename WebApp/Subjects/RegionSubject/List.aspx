@@ -166,6 +166,7 @@
                     <ItemTemplate>
                         <asp:LinkButton CommandArgument='<%#Eval("Id") %>' CommandName="DeleteItem" ID="lbDelete"
                             runat="server" Style="color: red;">删除</asp:LinkButton>
+                             <img style="display:none;" src="../../image/WaitImg/loadingA.gif" />
                     </ItemTemplate>
                     <HeaderStyle Width="50px"></HeaderStyle>
                 </asp:TemplateField>
@@ -190,3 +191,13 @@
 </html>
 <script src="../../Scripts/common.js" type="text/javascript"></script>
 <script src="js/list.js" type="text/javascript"></script>
+<script type="text/javascript">
+    function LoadDelete(obj) {
+        if (confirm("确定删除吗？")) {
+            $(obj).next("img").show();
+            return true;
+        }
+        else
+            return false;
+    }
+</script>

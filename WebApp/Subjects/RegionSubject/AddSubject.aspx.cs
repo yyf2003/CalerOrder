@@ -254,11 +254,13 @@ namespace WebApp.Subjects.RegionSubject
             Subject subjectModel;
             int realSubjectId = 0;
             int subjectType = int.Parse(rblSubjectType.SelectedValue);
-            string subjectName =new System.Text.RegularExpressions.Regex("[\\s]+").Replace(txtSubjectName.Text.Trim()," ");
+            //string subjectName =new System.Text.RegularExpressions.Regex("[\\s]+").Replace(txtSubjectName.Text.Trim()," ");
+            string subjectName=StringHelper.ReplaceSpecialChar(txtSubjectName.Text.Trim());
+            string remark = StringHelper.ReplaceSpecialChar(txtRemark.Text.Trim());
             if (subjectType == (int)SubjectTypeEnum.正常单)
             {
                 realSubjectId = int.Parse(ddlSubjectName.SelectedValue);
-                subjectName = ddlSubjectName.SelectedItem.Text +"—"+ txtRemark.Text;
+                subjectName = ddlSubjectName.SelectedItem.Text + "—" + remark;
             }
             else
             {
@@ -306,7 +308,7 @@ namespace WebApp.Subjects.RegionSubject
 
             subjectModel.CustomerId = int.Parse(ddlCustomer.SelectedValue);
             subjectModel.EndDate = DateTime.Parse(txtEndDate.Text.Trim());
-            subjectModel.Remark = txtRemark.Text;
+            subjectModel.Remark = remark;
             subjectModel.SubjectName = subjectName;
             
             subjectModel.SupplementRegion = rblRegion.SelectedValue;

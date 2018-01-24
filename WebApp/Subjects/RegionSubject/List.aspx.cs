@@ -260,13 +260,15 @@ namespace WebApp.Subjects.RegionSubject
                 Models.Subject model = subjectBll.GetModel(id);
                 if (model != null)
                 {
+                    bool isOk = true;
+                    string msg = string.Empty;
                     using (TransactionScope tran = new TransactionScope())
                     {
                         try
                         {
                             model.IsDelete = true;
                             subjectBll.Update(model);
-                            BindData();
+                           
 
                             FinalOrderDetailTempBLL finalOrderBll = new FinalOrderDetailTempBLL();
                             OutsourceOrderDetailBLL outsourceOrderBll = new OutsourceOrderDetailBLL();
@@ -284,6 +286,8 @@ namespace WebApp.Subjects.RegionSubject
                                         s.IsDelete = true;
                                         finalOrderBll.Update(s);
                                     });
+                                    //从报价订单表删除
+                                    new QuoteOrderDetailBLL().Delete(s => s.RegionSupplementId == id);
                                     //删除外协订单
                                     outsourceOrderBll.Delete(s=>s.RegionSupplementId==id);
                                 }
@@ -301,6 +305,8 @@ namespace WebApp.Subjects.RegionSubject
                                         s.IsDelete = true;
                                         finalOrderBll.Update(s);
                                     });
+                                    //从报价订单表删除
+                                    new QuoteOrderDetailBLL().Delete(s => s.SubjectId == id);
                                     //删除外协订单
                                     outsourceOrderBll.Delete(s => s.SubjectId == id);
                                 }
@@ -318,23 +324,41 @@ namespace WebApp.Subjects.RegionSubject
                                     changeApplicationDetailBll.Update(changeModel);
                                 }
                             }
-                            //重新计算外协安装费
+                            //重新计算安装费
                             if (shopIdList.Any() && model.SubjectType != (int)SubjectTypeEnum.二次安装 && model.SubjectType != (int)SubjectTypeEnum.费用订单)
                             {
                                 SubjectGuidance guianceModel = new SubjectGuidanceBLL().GetModel(model.GuidanceId ?? 0);
                                 if (guianceModel != null && guianceModel.ActivityTypeId != (int)GuidanceTypeEnum.Others)
                                 {
-                                    if ((guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guianceModel.HasInstallFees ?? true)) || (guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion))
-                                        ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);
+                                    if ((guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guianceModel.HasInstallFees ?? true)))
+                                    {
+                                        RecountInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算活动安装费
+                                        ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费
+                                    }
+                                    else if (guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guianceModel.HasExperssFees ?? true))
+                                    {
+                                        ReSaveExpressPrice(model.GuidanceId ?? 0);//重新计算活动快递费
+                                        ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费
+                                    }
                                 }
 
                             }
                             tran.Complete();
                         }
                         catch (Exception ex)
-                        { }
+                        {
+                            isOk = false;
+                            msg = "删除失败：" + ex.Message;
+                        }
                     }
-                    
+                    if (isOk)
+                    {
+                        BindData();
+                    }
+                    else
+                    {
+                        Alert(msg);
+                    }
 
                 }
             }

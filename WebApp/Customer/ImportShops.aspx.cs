@@ -269,140 +269,140 @@ namespace WebApp.Customer
                     StringBuilder errorMsg = new StringBuilder();
 
                     if (cols.Contains("POS Code"))
-                        shopNo = dr["POS Code"].ToString().Trim();
+                        shopNo = StringHelper.ReplaceSpecialChar(dr["POS Code"].ToString().Trim());
                     else if (cols.Contains("POSCode"))
-                        shopNo = dr["POSCode"].ToString().Trim();
+                        shopNo = StringHelper.ReplaceSpecialChar(dr["POSCode"].ToString().Trim());
                     else if (cols.Contains("店铺编号"))
-                        shopNo = dr["店铺编号"].ToString().Trim();
+                        shopNo = StringHelper.ReplaceSpecialChar(dr["店铺编号"].ToString().Trim());
 
                     if (cols.Contains("客服名称"))
-                        csUserName = dr["客服名称"].ToString().Trim();
+                        csUserName = StringHelper.ReplaceSpecialChar(dr["客服名称"].ToString().Trim());
                     else if (cols.Contains("客服"))
-                        csUserName = dr["客服"].ToString().Trim();
+                        csUserName = StringHelper.ReplaceSpecialChar(dr["客服"].ToString().Trim());
                     else if (cols.Contains("客服姓名"))
-                        csUserName = dr["客服姓名"].ToString().Trim();
+                        csUserName = StringHelper.ReplaceSpecialChar(dr["客服姓名"].ToString().Trim());
 
                     if (cols.Contains("POS Name"))
-                        shopName = dr["POS Name"].ToString().Trim();
+                        shopName = StringHelper.ReplaceSpecialChar(dr["POS Name"].ToString().Trim());
                     else if (cols.Contains("POSName"))
-                        shopName = dr["POSName"].ToString().Trim();
+                        shopName = StringHelper.ReplaceSpecialChar(dr["POSName"].ToString().Trim());
                     else if (cols.Contains("店铺名称"))
-                        shopName = dr["店铺名称"].ToString().Trim();
+                        shopName = StringHelper.ReplaceSpecialChar(dr["店铺名称"].ToString().Trim());
                     if (cols.Contains("Region"))
-                        region = dr["Region"].ToString().Trim();
+                        region = StringHelper.ReplaceSpecialChar(dr["Region"].ToString().Trim());
                     else if (cols.Contains("区域"))
-                        region = dr["区域"].ToString().Trim();
+                        region = StringHelper.ReplaceSpecialChar(dr["区域"].ToString().Trim());
                     if (cols.Contains("Province"))
-                        province = dr["Province"].ToString().Trim();
+                        province = StringHelper.ReplaceSpecialChar(dr["Province"].ToString().Trim());
                     else if (cols.Contains("省份"))
-                        province = dr["省份"].ToString().Trim();
+                        province = StringHelper.ReplaceSpecialChar(dr["省份"].ToString().Trim());
                     if (cols.Contains("City"))
-                        city = dr["City"].ToString().Trim();
+                        city = StringHelper.ReplaceSpecialChar(dr["City"].ToString().Trim());
                     else if (cols.Contains("城市"))
-                        city = dr["城市"].ToString().Trim();
+                        city = StringHelper.ReplaceSpecialChar(dr["城市"].ToString().Trim());
                     if (cols.Contains("County"))
-                        county = dr["County"].ToString().Trim();
+                        county = StringHelper.ReplaceSpecialChar(dr["County"].ToString().Trim());
                     else if (cols.Contains("区"))
-                        county = dr["区"].ToString().Trim();
+                        county = StringHelper.ReplaceSpecialChar(dr["区"].ToString().Trim());
                     else if (cols.Contains("区县"))
-                        county = dr["区县"].ToString().Trim();
+                        county = StringHelper.ReplaceSpecialChar(dr["区县"].ToString().Trim());
                     else if (cols.Contains("区/县"))
-                        county = dr["区/县"].ToString().Trim();
+                        county = StringHelper.ReplaceSpecialChar(dr["区/县"].ToString().Trim());
                     else if (cols.Contains("县"))
-                        county = dr["县"].ToString().Trim();
+                        county = StringHelper.ReplaceSpecialChar(dr["县"].ToString().Trim());
                     if (cols.Contains("City Tier"))
-                        cityLevel = dr["City Tier"].ToString().Trim();
+                        cityLevel = StringHelper.ReplaceSpecialChar(dr["City Tier"].ToString().Trim());
                     else if (cols.Contains("CityTier"))
-                        cityLevel = dr["CityTier"].ToString().Trim();
+                        cityLevel = StringHelper.ReplaceSpecialChar(dr["CityTier"].ToString().Trim());
                     else if (cols.Contains("城市级别"))
-                        cityLevel = dr["城市级别"].ToString().Trim();
+                        cityLevel = StringHelper.ReplaceSpecialChar(dr["城市级别"].ToString().Trim());
                     if (cols.Contains("是否安装"))
-                        isInstall = dr["是否安装"].ToString().Trim();
+                        isInstall = StringHelper.ReplaceSpecialChar(dr["是否安装"].ToString().Trim());
                     else if (cols.Contains("IsInstall"))
-                        isInstall = dr["IsInstall"].ToString().Trim();
+                        isInstall = StringHelper.ReplaceSpecialChar(dr["IsInstall"].ToString().Trim());
                     else if (cols.Contains("安装级别"))
-                        isInstall = dr["安装级别"].ToString().Trim();
+                        isInstall = StringHelper.ReplaceSpecialChar(dr["安装级别"].ToString().Trim());
                     if (cols.Contains("Customer Code"))
-                        angentCode = dr["Customer Code"].ToString().Trim();
+                        angentCode = StringHelper.ReplaceSpecialChar(dr["Customer Code"].ToString().Trim());
                     else if (cols.Contains("CustomerCode"))
-                        angentCode = dr["CustomerCode"].ToString().Trim();
+                        angentCode = StringHelper.ReplaceSpecialChar(dr["CustomerCode"].ToString().Trim());
                     else if (cols.Contains("经销商编号"))
-                        angentCode = dr["经销商编号"].ToString().Trim();
+                        angentCode = StringHelper.ReplaceSpecialChar(dr["经销商编号"].ToString().Trim());
                     if (cols.Contains("Customer Name"))
-                        angentName = dr["Customer Name"].ToString().Trim();
+                        angentName = StringHelper.ReplaceSpecialChar(dr["Customer Name"].ToString().Trim());
                     else if (cols.Contains("CustomerName"))
-                        angentName = dr["CustomerName"].ToString().Trim();
+                        angentName = StringHelper.ReplaceSpecialChar(dr["CustomerName"].ToString().Trim());
                     else if (cols.Contains("经销商名称"))
-                        angentName = dr["经销商名称"].ToString().Trim();
+                        angentName = StringHelper.ReplaceSpecialChar(dr["经销商名称"].ToString().Trim());
                     if (cols.Contains("POPAddress"))
-                        adress = dr["POPAddress"].ToString().Trim();
+                        adress = StringHelper.ReplaceSpecialChar(dr["POPAddress"].ToString().Trim());
                     else if (cols.Contains("店铺地址"))
-                        adress = dr["店铺地址"].ToString().Trim();
+                        adress = StringHelper.ReplaceSpecialChar(dr["店铺地址"].ToString().Trim());
                     else if (cols.Contains("Address"))
-                        adress = dr["Address"].ToString().Trim();
+                        adress = StringHelper.ReplaceSpecialChar(dr["Address"].ToString().Trim());
 
                     if (cols.Contains("popContact1"))
-                        contact1 = dr["popContact1"].ToString().Trim();
+                        contact1 = StringHelper.ReplaceSpecialChar(dr["popContact1"].ToString().Trim());
                     else if (cols.Contains("Contact1"))
-                        contact1 = dr["Contact1"].ToString().Trim();
+                        contact1 = StringHelper.ReplaceSpecialChar(dr["Contact1"].ToString().Trim());
                     else if (cols.Contains("Contact"))
-                        contact1 = dr["Contact"].ToString().Trim();
+                        contact1 = StringHelper.ReplaceSpecialChar(dr["Contact"].ToString().Trim());
                     else if (cols.Contains("联系人1"))
-                        contact1 = dr["联系人1"].ToString().Trim();
+                        contact1 = StringHelper.ReplaceSpecialChar(dr["联系人1"].ToString().Trim());
 
                     if (cols.Contains("popTel1"))
-                        tel1 = dr["popTel1"].ToString().Trim();
+                        tel1 = StringHelper.ReplaceSpecialChar(dr["popTel1"].ToString().Trim());
                     else if (cols.Contains("Tel1"))
-                        tel1 = dr["Tel1"].ToString().Trim();
+                        tel1 = StringHelper.ReplaceSpecialChar(dr["Tel1"].ToString().Trim());
                     else if (cols.Contains("Tel"))
-                        tel1 = dr["Tel"].ToString().Trim();
+                        tel1 = StringHelper.ReplaceSpecialChar(dr["Tel"].ToString().Trim());
                     else if (cols.Contains("联系电话1"))
-                        tel1 = dr["联系电话1"].ToString().Trim();
+                        tel1 = StringHelper.ReplaceSpecialChar(dr["联系电话1"].ToString().Trim());
 
                     if (cols.Contains("popContact2"))
-                        contact2 = dr["popContact2"].ToString().Trim();
+                        contact2 = StringHelper.ReplaceSpecialChar(dr["popContact2"].ToString().Trim());
                     else if (cols.Contains("Contact2"))
-                        contact2 = dr["Contact2"].ToString().Trim();
+                        contact2 = StringHelper.ReplaceSpecialChar(dr["Contact2"].ToString().Trim());
                     else if (cols.Contains("联系人2"))
-                        contact2 = dr["联系人2"].ToString().Trim();
+                        contact2 = StringHelper.ReplaceSpecialChar(dr["联系人2"].ToString().Trim());
 
                     if (cols.Contains("popTel2"))
-                        tel2 = dr["popTel2"].ToString().Trim();
+                        tel2 = StringHelper.ReplaceSpecialChar(dr["popTel2"].ToString().Trim());
                     else if (cols.Contains("Tel2"))
-                        tel2 = dr["Tel2"].ToString().Trim();
+                        tel2 = StringHelper.ReplaceSpecialChar(dr["Tel2"].ToString().Trim());
                     else if (cols.Contains("联系电话2"))
-                        tel2 = dr["联系电话2"].ToString().Trim();
+                        tel2 = StringHelper.ReplaceSpecialChar(dr["联系电话2"].ToString().Trim());
 
                     if (cols.Contains("Channel"))
-                        channel = dr["Channel"].ToString().Trim();
+                        channel = StringHelper.ReplaceSpecialChar(dr["Channel"].ToString().Trim());
                     else if (cols.Contains("产品类型"))
-                        channel = dr["产品类型"].ToString().Trim();
+                        channel = StringHelper.ReplaceSpecialChar(dr["产品类型"].ToString().Trim());
 
                     if (cols.Contains("Format"))
-                        format = dr["Format"].ToString().Trim();
+                        format = StringHelper.ReplaceSpecialChar(dr["Format"].ToString().Trim());
                     else if (cols.Contains("店铺类型"))
-                        format = dr["店铺类型"].ToString().Trim();
+                        format = StringHelper.ReplaceSpecialChar(dr["店铺类型"].ToString().Trim());
                     if (cols.Contains("店铺级别"))
-                        shopLevel = dr["店铺级别"].ToString().Trim();
+                        shopLevel = StringHelper.ReplaceSpecialChar(dr["店铺级别"].ToString().Trim());
                     else if (cols.Contains("ShopLevel"))
-                        shopLevel = dr["ShopLevel"].ToString().Trim();
+                        shopLevel = StringHelper.ReplaceSpecialChar(dr["ShopLevel"].ToString().Trim());
                     else if (cols.Contains("店铺规模大小"))
-                        shopLevel = dr["店铺规模大小"].ToString().Trim();
+                        shopLevel = StringHelper.ReplaceSpecialChar(dr["店铺规模大小"].ToString().Trim());
                     else if (cols.Contains("店铺规模"))
-                        shopLevel = dr["店铺规模"].ToString().Trim();
+                        shopLevel = StringHelper.ReplaceSpecialChar(dr["店铺规模"].ToString().Trim());
                     if (cols.Contains("Location Type"))
-                        locationType = dr["Location Type"].ToString().Trim();
+                        locationType = StringHelper.ReplaceSpecialChar(dr["Location Type"].ToString().Trim());
                     else if (cols.Contains("LocationType"))
-                        locationType = dr["LocationType"].ToString().Trim();
+                        locationType = StringHelper.ReplaceSpecialChar(dr["LocationType"].ToString().Trim());
                     else if (cols.Contains("店铺属性"))
-                        locationType = dr["店铺属性"].ToString().Trim();
+                        locationType = StringHelper.ReplaceSpecialChar(dr["店铺属性"].ToString().Trim());
 
                     if (cols.Contains("Business Model"))
-                        customerModel = dr["Business Model"].ToString().Trim();
+                        customerModel = StringHelper.ReplaceSpecialChar(dr["Business Model"].ToString().Trim());
                     else if (cols.Contains("BusinessModel"))
-                        customerModel = dr["BusinessModel"].ToString().Trim();
+                        customerModel = StringHelper.ReplaceSpecialChar(dr["BusinessModel"].ToString().Trim());
                     else if (cols.Contains("客户类别"))
-                        customerModel = dr["客户类别"].ToString().Trim();
+                        customerModel = StringHelper.ReplaceSpecialChar(dr["客户类别"].ToString().Trim());
 
 
                     if (cols.Contains("Opening Date"))
@@ -414,9 +414,9 @@ namespace WebApp.Customer
                     if (openDate.Contains("0:00:00"))
                         openDate = openDate.Replace("0:00:00", "");
                     if (cols.Contains("Status"))
-                        status = dr["Status"].ToString().Trim();
+                        status = StringHelper.ReplaceSpecialChar(dr["Status"].ToString().Trim());
                     else if (cols.Contains("店铺状态"))
-                        status = dr["店铺状态"].ToString().Trim();
+                        status = StringHelper.ReplaceSpecialChar(dr["店铺状态"].ToString().Trim());
                    
                     
                     
@@ -450,17 +450,17 @@ namespace WebApp.Customer
 
 
                     if (cols.Contains("活动常规"))
-                        category = dr["活动常规"].ToString().Trim();
+                        category = StringHelper.ReplaceSpecialChar(dr["活动常规"].ToString().Trim());
 
                     if (cols.Contains("店铺渠道"))
-                        shopType = dr["店铺渠道"].ToString().Trim();
+                        shopType = StringHelper.ReplaceSpecialChar(dr["店铺渠道"].ToString().Trim());
                     else if (cols.Contains("渠道"))
-                        shopType = dr["渠道"].ToString().Trim();
+                        shopType = StringHelper.ReplaceSpecialChar(dr["渠道"].ToString().Trim());
 
                     if (cols.Contains("外协名称"))
-                        outsourceName = dr["外协名称"].ToString().Trim();
+                        outsourceName = StringHelper.ReplaceSpecialChar(dr["外协名称"].ToString().Trim());
                     else if (cols.Contains("外协"))
-                        outsourceName = dr["外协"].ToString().Trim();
+                        outsourceName = StringHelper.ReplaceSpecialChar(dr["外协"].ToString().Trim());
 
                     if (string.IsNullOrWhiteSpace(shopNo))
                     {
@@ -931,72 +931,72 @@ namespace WebApp.Customer
                     StringBuilder errorMsg = new StringBuilder();
 
                     if (cols.Contains("POS Code"))
-                        shopNo = dr["POS Code"].ToString().Trim();
+                        shopNo = StringHelper.ReplaceSpecialChar(dr["POS Code"].ToString().Trim());
                     else if (cols.Contains("POSCode"))
-                        shopNo = dr["POSCode"].ToString().Trim();
+                        shopNo = StringHelper.ReplaceSpecialChar(dr["POSCode"].ToString().Trim());
                     else if (cols.Contains("店铺编号"))
-                        shopNo = dr["店铺编号"].ToString().Trim();
+                        shopNo = StringHelper.ReplaceSpecialChar(dr["店铺编号"].ToString().Trim());
                     if (cols.Contains("Sheet"))
-                        Sheet = dr["Sheet"].ToString().Trim();
+                        Sheet = StringHelper.ReplaceSpecialChar(dr["Sheet"].ToString().Trim());
                     else if (cols.Contains("POP位置"))
-                        Sheet = dr["POP位置"].ToString().Trim();
+                        Sheet = StringHelper.ReplaceSpecialChar(dr["POP位置"].ToString().Trim());
 
                     if (cols.Contains("Graphic No"))
-                        GraphicNo = dr["Graphic No"].ToString().Trim();
+                        GraphicNo = StringHelper.ReplaceSpecialChar(dr["Graphic No"].ToString().Trim());
                     else if (cols.Contains("GraphicNo"))
-                        GraphicNo = dr["GraphicNo"].ToString().Trim();
+                        GraphicNo = StringHelper.ReplaceSpecialChar(dr["GraphicNo"].ToString().Trim());
                     else if (cols.Contains("GraphicNo."))
-                        GraphicNo = dr["GraphicNo."].ToString().Trim();
+                        GraphicNo = StringHelper.ReplaceSpecialChar(dr["GraphicNo."].ToString().Trim());
                     else if (cols.Contains("Graphic No."))
-                        GraphicNo = dr["Graphic No."].ToString().Trim();
+                        GraphicNo = StringHelper.ReplaceSpecialChar(dr["Graphic No."].ToString().Trim());
                     else if (cols.Contains("POP编号"))
-                        GraphicNo = dr["POP编号"].ToString().Trim();
+                        GraphicNo = StringHelper.ReplaceSpecialChar(dr["POP编号"].ToString().Trim());
                     else if (cols.Contains("Graphic No#"))//字段名称(Graphic No.)含有（.）的导入的时候变成了#
-                        GraphicNo = dr["Graphic No#"].ToString();
+                        GraphicNo = StringHelper.ReplaceSpecialChar(dr["Graphic No#"].ToString());
                     else if (cols.Contains("GraphicNo#"))
-                        GraphicNo = dr["GraphicNo#"].ToString();
+                        GraphicNo = StringHelper.ReplaceSpecialChar(dr["GraphicNo#"].ToString());
 
                     if (cols.Contains("Graphic Name"))
-                        POPName = dr["Graphic Name"].ToString().Trim();
+                        POPName = StringHelper.ReplaceSpecialChar(dr["Graphic Name"].ToString().Trim());
                     else if (cols.Contains("GraphicName"))
-                        POPName = dr["GraphicName"].ToString().Trim();
+                        POPName = StringHelper.ReplaceSpecialChar(dr["GraphicName"].ToString().Trim());
                     else if (cols.Contains("POP Name"))
-                        POPName = dr["POP Name"].ToString().Trim();
+                        POPName = StringHelper.ReplaceSpecialChar(dr["POP Name"].ToString().Trim());
                     else if (cols.Contains("POPName"))
-                        POPName = dr["POPName"].ToString().Trim();
+                        POPName = StringHelper.ReplaceSpecialChar(dr["POPName"].ToString().Trim());
                     else if (cols.Contains("POP名称"))
-                        POPName = dr["POP名称"].ToString().Trim();
+                        POPName = StringHelper.ReplaceSpecialChar(dr["POP名称"].ToString().Trim());
 
                     if (cols.Contains("Corner Type"))
-                        CornerType = dr["Corner Type"].ToString().Trim();
+                        CornerType = StringHelper.ReplaceSpecialChar(dr["Corner Type"].ToString().Trim());
                     else if (cols.Contains("CornerType"))
-                        CornerType = dr["CornerType"].ToString().Trim();
+                        CornerType = StringHelper.ReplaceSpecialChar(dr["CornerType"].ToString().Trim());
                     else if (cols.Contains("角落类型"))
-                        CornerType = dr["角落类型"].ToString().Trim();
+                        CornerType = StringHelper.ReplaceSpecialChar(dr["角落类型"].ToString().Trim());
 
                     if (cols.Contains("Category"))
-                        Category = dr["Category"].ToString().Trim();
+                        Category = StringHelper.ReplaceSpecialChar(dr["Category"].ToString().Trim());
                     else if (cols.Contains("系列"))
-                        Category = dr["系列"].ToString().Trim();
+                        Category = StringHelper.ReplaceSpecialChar(dr["系列"].ToString().Trim());
 
                     if (cols.Contains("Standard Dimension"))
-                        StandardDimension = dr["Standard Dimension"].ToString().Trim();
+                        StandardDimension = StringHelper.ReplaceSpecialChar(dr["Standard Dimension"].ToString().Trim());
                     else if (cols.Contains("StandardDimension"))
-                        StandardDimension = dr["StandardDimension"].ToString().Trim();
+                        StandardDimension = StringHelper.ReplaceSpecialChar(dr["StandardDimension"].ToString().Trim());
                     else if (cols.Contains("是否标准规格"))
-                        StandardDimension = dr["是否标准规格"].ToString().Trim();
+                        StandardDimension = StringHelper.ReplaceSpecialChar(dr["是否标准规格"].ToString().Trim());
 
                     if (cols.Contains("Modula"))
-                        Modula = dr["Modula"].ToString().Trim();
+                        Modula = StringHelper.ReplaceSpecialChar(dr["Modula"].ToString().Trim());
                     else if (cols.Contains("是否格栅"))
-                        Modula = dr["是否格栅"].ToString().Trim();
+                        Modula = StringHelper.ReplaceSpecialChar(dr["是否格栅"].ToString().Trim());
 
                     if (cols.Contains("M/W"))
-                        Gender = dr["M/W"].ToString().Trim();
+                        Gender = StringHelper.ReplaceSpecialChar(dr["M/W"].ToString().Trim());
                     else if (cols.Contains("性别"))
-                        Gender = dr["性别"].ToString().Trim();
+                        Gender = StringHelper.ReplaceSpecialChar(dr["性别"].ToString().Trim());
                     else if (cols.Contains("Sex"))
-                        Gender = dr["Sex"].ToString().Trim();
+                        Gender = StringHelper.ReplaceSpecialChar(dr["Sex"].ToString().Trim());
 
                     if (cols.Contains("Quantity"))
                         Quantity = dr["Quantity"].ToString().Trim();
@@ -1057,54 +1057,54 @@ namespace WebApp.Customer
                         GraphicLength = dr["POP高"].ToString().Trim();
 
                     if (cols.Contains("Double-Face"))
-                        DoubleFace = dr["Double-Face"].ToString().Trim();
+                        DoubleFace = StringHelper.ReplaceSpecialChar(dr["Double-Face"].ToString().Trim());
                     else if (cols.Contains("单双面"))
-                        DoubleFace = dr["单双面"].ToString().Trim();
+                        DoubleFace = StringHelper.ReplaceSpecialChar(dr["单双面"].ToString().Trim());
 
                     if (cols.Contains("Graphic Material"))
-                        GraphicMaterial = dr["Graphic Material"].ToString().Trim();
+                        GraphicMaterial = StringHelper.ReplaceSpecialChar(dr["Graphic Material"].ToString().Trim());
                     else if (cols.Contains("GraphicMaterial"))
-                        GraphicMaterial = dr["GraphicMaterial"].ToString().Trim();
+                        GraphicMaterial = StringHelper.ReplaceSpecialChar(dr["GraphicMaterial"].ToString().Trim());
                     else if (cols.Contains("POP材质"))
-                        GraphicMaterial = dr["POP材质"].ToString().Trim();
+                        GraphicMaterial = StringHelper.ReplaceSpecialChar(dr["POP材质"].ToString().Trim());
 
                     if (cols.Contains("Glass"))
-                        Glass = dr["Glass"].ToString().Trim();
+                        Glass = StringHelper.ReplaceSpecialChar(dr["Glass"].ToString().Trim());
                     else if (cols.Contains("是否有玻璃"))
-                        Glass = dr["是否有玻璃"].ToString().Trim();
+                        Glass = StringHelper.ReplaceSpecialChar(dr["是否有玻璃"].ToString().Trim());
 
                     if (cols.Contains("Backdrop"))
-                        Backdrop = dr["Backdrop"].ToString().Trim();
+                        Backdrop = StringHelper.ReplaceSpecialChar(dr["Backdrop"].ToString().Trim());
                     else if (cols.Contains("背景"))
-                        Backdrop = dr["背景"].ToString().Trim();
+                        Backdrop = StringHelper.ReplaceSpecialChar(dr["背景"].ToString().Trim());
 
                     if (cols.Contains("Frame"))
-                        Frame = dr["Frame"].ToString().Trim();
+                        Frame = StringHelper.ReplaceSpecialChar(dr["Frame"].ToString().Trim());
                     else if (cols.Contains("是否框架"))
-                        Frame = dr["是否框架"].ToString().Trim();
+                        Frame = StringHelper.ReplaceSpecialChar(dr["是否框架"].ToString().Trim());
 
                     if (cols.Contains("Modula Quantity Width"))
-                        ModulaQuantityWidth = dr["Modula Quantity Width"].ToString().Trim();
+                        ModulaQuantityWidth = StringHelper.ReplaceSpecialChar(dr["Modula Quantity Width"].ToString().Trim());
                     else if (cols.Contains("ModulaQuantityWidth"))
-                        ModulaQuantityWidth = dr["ModulaQuantityWidth"].ToString().Trim();
+                        ModulaQuantityWidth = StringHelper.ReplaceSpecialChar(dr["ModulaQuantityWidth"].ToString().Trim());
                     else if (cols.Contains("格栅横向数量"))
-                        ModulaQuantityWidth = dr["格栅横向数量"].ToString().Trim();
+                        ModulaQuantityWidth = StringHelper.ReplaceSpecialChar(dr["格栅横向数量"].ToString().Trim());
 
 
                     if (cols.Contains("Modula Quantity Height"))
-                        ModulaQuantityHeight = dr["Modula Quantity Height"].ToString().Trim();
+                        ModulaQuantityHeight = StringHelper.ReplaceSpecialChar(dr["Modula Quantity Height"].ToString().Trim());
                     else if (cols.Contains("ModulaQuantityHeight"))
-                        ModulaQuantityHeight = dr["ModulaQuantityHeight"].ToString().Trim();
+                        ModulaQuantityHeight = StringHelper.ReplaceSpecialChar(dr["ModulaQuantityHeight"].ToString().Trim());
                     else if (cols.Contains("格栅纵向数量"))
-                        ModulaQuantityHeight = dr["格栅纵向数量"].ToString().Trim();
+                        ModulaQuantityHeight = StringHelper.ReplaceSpecialChar(dr["格栅纵向数量"].ToString().Trim());
 
 
                     if (cols.Contains("Position Description"))
-                        PositionDescription = dr["Position Description"].ToString().Trim();
+                        PositionDescription = StringHelper.ReplaceSpecialChar(dr["Position Description"].ToString().Trim());
                     else if (cols.Contains("PositionDescription"))
-                        PositionDescription = dr["PositionDescription"].ToString().Trim();
+                        PositionDescription = StringHelper.ReplaceSpecialChar(dr["PositionDescription"].ToString().Trim());
                     else if (cols.Contains("位置描述"))
-                        PositionDescription = dr["位置描述"].ToString().Trim();
+                        PositionDescription = StringHelper.ReplaceSpecialChar(dr["位置描述"].ToString().Trim());
 
                     if (cols.Contains("Platform Length(mm)"))
                         PlatformLength = dr["Platform Length(mm)"].ToString().Trim();
@@ -1136,7 +1136,7 @@ namespace WebApp.Customer
                     if (cols.Contains("UnitPrice"))
                         UnitPrice = dr["UnitPrice"].ToString().Trim();
                     if (cols.Contains("器架名称"))
-                        frameName = dr["器架名称"].ToString().Trim();
+                        frameName = StringHelper.ReplaceSpecialChar(dr["器架名称"].ToString().Trim());
 
                     
                     if (!string.IsNullOrWhiteSpace(GraphicLength) && !string.IsNullOrWhiteSpace(GraphicWidth))
@@ -1158,37 +1158,37 @@ namespace WebApp.Customer
 
 
                     if (cols.Contains("Fixture Type"))
-                        FixtureType = dr["Fixture Type"].ToString().Trim();
+                        FixtureType = StringHelper.ReplaceSpecialChar(dr["Fixture Type"].ToString().Trim());
                     else if (cols.Contains("FixtureType"))
-                        FixtureType = dr["FixtureType"].ToString().Trim();
+                        FixtureType = StringHelper.ReplaceSpecialChar(dr["FixtureType"].ToString().Trim());
                     else if (cols.Contains("设备类别"))
-                        FixtureType = dr["设备类别"].ToString().Trim();
+                        FixtureType = StringHelper.ReplaceSpecialChar(dr["设备类别"].ToString().Trim());
 
                     if (cols.Contains("Comments 1"))
-                        Remark = dr["Comments 1"].ToString().Trim();
+                        Remark = StringHelper.ReplaceSpecialChar(dr["Comments 1"].ToString().Trim());
                     else if (cols.Contains("Comments1"))
-                        Remark = dr["Comments1"].ToString().Trim();
+                        Remark = StringHelper.ReplaceSpecialChar(dr["Comments1"].ToString().Trim());
                     else if (cols.Contains("备注"))
-                        Remark = dr["备注"].ToString().Trim();
+                        Remark = StringHelper.ReplaceSpecialChar(dr["备注"].ToString().Trim());
 
                     if (cols.Contains("通电否"))
-                        IsElectricity = dr["通电否"].ToString().Trim();
+                        IsElectricity = StringHelper.ReplaceSpecialChar(dr["通电否"].ToString().Trim());
                     if (cols.Contains("左侧贴"))
-                        LeftSideStick = dr["左侧贴"].ToString().Trim();
+                        LeftSideStick = StringHelper.ReplaceSpecialChar(dr["左侧贴"].ToString().Trim());
                     if (cols.Contains("右侧贴"))
-                        RightSideStick = dr["右侧贴"].ToString().Trim();
+                        RightSideStick = StringHelper.ReplaceSpecialChar(dr["右侧贴"].ToString().Trim());
                     if (cols.Contains("地铺"))
-                        Floor = dr["地铺"].ToString().Trim();
+                        Floor = StringHelper.ReplaceSpecialChar(dr["地铺"].ToString().Trim());
                     if (cols.Contains("窗贴"))
-                        WindowStick = dr["窗贴"].ToString().Trim();
+                        WindowStick = StringHelper.ReplaceSpecialChar(dr["窗贴"].ToString().Trim());
                     if (cols.Contains("悬挂否"))
-                        IsHang = dr["悬挂否"].ToString().Trim();
+                        IsHang = StringHelper.ReplaceSpecialChar(dr["悬挂否"].ToString().Trim());
                     if (cols.Contains("门位置"))
-                        DoorPosition = dr["门位置"].ToString().Trim();
+                        DoorPosition = StringHelper.ReplaceSpecialChar(dr["门位置"].ToString().Trim());
                     if (cols.Contains("户外安装费"))
-                        oohInstallPrice = dr["户外安装费"].ToString().Trim();
+                        oohInstallPrice = StringHelper.ReplaceSpecialChar(dr["户外安装费"].ToString().Trim());
                     if (cols.Contains("外协户外安装费"))
-                        OSOOHInstallPrice = dr["外协户外安装费"].ToString().Trim();
+                        OSOOHInstallPrice = StringHelper.ReplaceSpecialChar(dr["外协户外安装费"].ToString().Trim());
                     else if (cols.Contains("应付户外安装费"))
                           OSOOHInstallPrice = dr["应付户外安装费"].ToString().Trim();
                     else if (cols.Contains("户外应付"))
@@ -1504,35 +1504,35 @@ namespace WebApp.Customer
                     StringBuilder errorMsg = new StringBuilder();
                     string shopNo = string.Empty;
                     if (cols.Contains("店铺编号"))
-                        shopNo = dr["店铺编号"].ToString().Trim();
+                        shopNo = StringHelper.ReplaceSpecialChar(dr["店铺编号"].ToString().Trim());
                     else if (cols.Contains("POS Code"))
-                        shopNo = dr["POS Code"].ToString().Trim();
+                        shopNo = StringHelper.ReplaceSpecialChar(dr["POS Code"].ToString().Trim());
                     else if (cols.Contains("POSCode"))
-                        shopNo = dr["POSCode"].ToString().Trim();
+                        shopNo = StringHelper.ReplaceSpecialChar(dr["POSCode"].ToString().Trim());
 
                     string sheet = string.Empty;
                     if (cols.Contains("POP位置"))
-                        sheet = dr["POP位置"].ToString().Trim();
+                        sheet = StringHelper.ReplaceSpecialChar(dr["POP位置"].ToString().Trim());
                     else if (cols.Contains("器架类型"))
-                        sheet = dr["器架类型"].ToString().Trim();
+                        sheet = StringHelper.ReplaceSpecialChar(dr["器架类型"].ToString().Trim());
                     else if (cols.Contains("Sheet"))
-                        sheet = dr["Sheet"].ToString().Trim();
+                        sheet = StringHelper.ReplaceSpecialChar(dr["Sheet"].ToString().Trim());
 
                     string frameName = string.Empty;
                     if (cols.Contains("器架名称"))
-                        frameName = dr["器架名称"].ToString().Trim();
+                        frameName = StringHelper.ReplaceSpecialChar(dr["器架名称"].ToString().Trim());
                     else if (cols.Contains("名称"))
-                        frameName = dr["名称"].ToString().Trim();
+                        frameName = StringHelper.ReplaceSpecialChar(dr["名称"].ToString().Trim());
 
                     string gender = string.Empty;
                     if (cols.Contains("性别"))
-                        gender = dr["性别"].ToString().Trim();
+                        gender = StringHelper.ReplaceSpecialChar(dr["性别"].ToString().Trim());
                     else if (cols.Contains("男女"))
-                        gender = dr["男女"].ToString().Trim();
+                        gender = StringHelper.ReplaceSpecialChar(dr["男女"].ToString().Trim());
                     else if (cols.Contains("男/女"))
-                        gender = dr["男/女"].ToString().Trim();
+                        gender = StringHelper.ReplaceSpecialChar(dr["男/女"].ToString().Trim());
                     else if (cols.Contains("M/W"))
-                        gender = dr["M/W"].ToString().Trim();
+                        gender = StringHelper.ReplaceSpecialChar(dr["M/W"].ToString().Trim());
 
                     string count = string.Empty;
                     if (cols.Contains("数量"))
@@ -1542,10 +1542,10 @@ namespace WebApp.Customer
 
                     string cornerType = string.Empty;
                     if (cols.Contains("角落类型"))
-                        cornerType = dr["角落类型"].ToString().Trim();
+                        cornerType = StringHelper.ReplaceSpecialChar(dr["角落类型"].ToString().Trim());
                     string levelNum = string.Empty;
                     if (cols.Contains("级别"))
-                        levelNum = dr["级别"].ToString().Trim();
+                        levelNum = StringHelper.ReplaceSpecialChar(dr["级别"].ToString().Trim());
                     bool isShut = false;
                     bool isInstall = false;
                     if (string.IsNullOrWhiteSpace(shopNo))

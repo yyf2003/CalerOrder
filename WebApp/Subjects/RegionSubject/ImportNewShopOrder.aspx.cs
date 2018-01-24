@@ -157,111 +157,111 @@ namespace WebApp.Subjects.RegionSubject
                             StringBuilder msg = new StringBuilder();
 
                             if (cols.Contains("订单类型"))
-                                orderType = dr["订单类型"].ToString().Trim();
+                                orderType = StringHelper.ReplaceSpecialChar(dr["订单类型"].ToString().Trim());
                             
                             if (cols.Contains("店铺编号"))
-                                shopNo = dr["店铺编号"].ToString().Trim();
+                                shopNo = StringHelper.ReplaceSpecialChar(dr["店铺编号"].ToString().Trim());
                             else if (cols.Contains("POSCode"))
-                                shopNo = dr["POSCode"].ToString().Trim();
+                                shopNo = StringHelper.ReplaceSpecialChar(dr["POSCode"].ToString().Trim());
                             else if (cols.Contains("POS Code"))
-                                shopNo = dr["POS Code"].ToString().Trim();
+                                shopNo = StringHelper.ReplaceSpecialChar(dr["POS Code"].ToString().Trim());
 
                             if (cols.Contains("店铺规模大小"))
-                                posScale = dr["店铺规模大小"].ToString().Trim();
+                                posScale = StringHelper.ReplaceSpecialChar(dr["店铺规模大小"].ToString().Trim());
                             else if (cols.Contains("店铺规模"))
-                                posScale = dr["店铺规模"].ToString().Trim();
+                                posScale = StringHelper.ReplaceSpecialChar(dr["店铺规模"].ToString().Trim());
                             else if (cols.Contains("店铺大小"))
-                                posScale = dr["店铺大小"].ToString().Trim();
+                                posScale = StringHelper.ReplaceSpecialChar(dr["店铺大小"].ToString().Trim());
 
                             if (cols.Contains("物料支持"))
-                                materialSupport = dr["物料支持"].ToString().Trim();
+                                materialSupport = StringHelper.ReplaceSpecialChar(dr["物料支持"].ToString().Trim());
                             else if (cols.Contains("物料支持级别"))
-                                materialSupport = dr["物料支持级别"].ToString().Trim();
+                                materialSupport = StringHelper.ReplaceSpecialChar(dr["物料支持级别"].ToString().Trim());
                             else if (cols.Contains("店铺级别"))
-                                materialSupport = dr["店铺级别"].ToString().Trim();
+                                materialSupport = StringHelper.ReplaceSpecialChar(dr["店铺级别"].ToString().Trim());
 
 
                             if (cols.Contains("费用金额"))
-                                price = dr["费用金额"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dr["费用金额"].ToString().Trim());
                             else if (cols.Contains("费用"))
-                                price = dr["费用"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dr["费用"].ToString().Trim());
                             else if (cols.Contains("应收费用金额"))
-                                price = dr["应收费用金额"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dr["应收费用金额"].ToString().Trim());
 
                             if (cols.Contains("应付费用金额"))
-                                payPrice = dr["应付费用金额"].ToString().Trim();
+                                payPrice = StringHelper.ReplaceSpecialChar(dr["应付费用金额"].ToString().Trim());
                             else if (cols.Contains("应付费用"))
-                                payPrice = dr["应付费用"].ToString().Trim();
+                                payPrice = StringHelper.ReplaceSpecialChar(dr["应付费用"].ToString().Trim());
                             else if (cols.Contains("应付金额"))
-                                payPrice = dr["应付金额"].ToString().Trim();
+                                payPrice = StringHelper.ReplaceSpecialChar(dr["应付金额"].ToString().Trim());
 
                             if (cols.Contains("M/W"))
-                                gender = dr["M/W"].ToString().Trim();
+                                gender = StringHelper.ReplaceSpecialChar(dr["M/W"].ToString().Trim());
                             else if (cols.Contains("Gender"))
-                                gender = dr["Gender"].ToString().Trim();
+                                gender = StringHelper.ReplaceSpecialChar(dr["Gender"].ToString().Trim());
                             else if (cols.Contains("性别"))
-                                gender = dr["性别"].ToString().Trim();
+                                gender = StringHelper.ReplaceSpecialChar(dr["性别"].ToString().Trim());
                             else if (cols.Contains("男女"))
-                                gender = dr["男女"].ToString().Trim();
+                                gender = StringHelper.ReplaceSpecialChar(dr["男女"].ToString().Trim());
                             else if (cols.Contains("男/女"))
-                                gender = dr["男/女"].ToString().Trim();
+                                gender = StringHelper.ReplaceSpecialChar(dr["男/女"].ToString().Trim());
 
                             if (cols.Contains("选图"))
-                                chooseImg = dr["选图"].ToString().Trim();
+                                chooseImg = StringHelper.ReplaceSpecialChar(dr["选图"].ToString().Trim());
                             else if (cols.Contains("系列/选图"))
-                                chooseImg = dr["系列/选图"].ToString().Trim();
+                                chooseImg = StringHelper.ReplaceSpecialChar(dr["系列/选图"].ToString().Trim());
 
                             if (cols.Contains("POP位置"))
-                                sheet = dr["POP位置"].ToString().Trim();
+                                sheet = StringHelper.ReplaceSpecialChar(dr["POP位置"].ToString().Trim());
                             else if (cols.Contains("位置"))
-                                sheet = dr["位置"].ToString().Trim();
+                                sheet = StringHelper.ReplaceSpecialChar(dr["位置"].ToString().Trim());
                             else if (cols.Contains("Sheet"))
-                                sheet = dr["Sheet"].ToString().Trim();
+                                sheet = StringHelper.ReplaceSpecialChar(dr["Sheet"].ToString().Trim());
 
                             if (cols.Contains("POP位置明细"))
-                                positionDescription = dr["POP位置明细"].ToString().Trim();
+                                positionDescription = StringHelper.ReplaceSpecialChar(dr["POP位置明细"].ToString().Trim());
                             else if (cols.Contains("pop位置明细"))
-                                positionDescription = dr["pop位置明细"].ToString().Trim();
+                                positionDescription = StringHelper.ReplaceSpecialChar(dr["pop位置明细"].ToString().Trim());
                             else if (cols.Contains("位置明细"))
-                                positionDescription = dr["位置明细"].ToString().Trim();
+                                positionDescription = StringHelper.ReplaceSpecialChar(dr["位置明细"].ToString().Trim());
                             else if (cols.Contains("位置描述"))
-                                positionDescription = dr["位置描述"].ToString().Trim();
+                                positionDescription = StringHelper.ReplaceSpecialChar(dr["位置描述"].ToString().Trim());
 
                             //if (cols.Contains("级别"))
                             //    levelNum = dr["级别"].ToString().Trim();
                             
 
                             if (cols.Contains("POP数量"))
-                                num = dr["POP数量"].ToString().Trim();
+                                num = StringHelper.ReplaceSpecialChar(dr["POP数量"].ToString().Trim());
                             else if (cols.Contains("数量"))
-                                num = dr["数量"].ToString().Trim();
+                                num = StringHelper.ReplaceSpecialChar(dr["数量"].ToString().Trim());
                             else if (cols.Contains("Quantity"))
-                                num = dr["Quantity"].ToString().Trim();
+                                num = StringHelper.ReplaceSpecialChar(dr["Quantity"].ToString().Trim());
 
 
                             if (cols.Contains("POP材质"))
-                                material = dr["POP材质"].ToString().Trim();
+                                material = StringHelper.ReplaceSpecialChar(dr["POP材质"].ToString().Trim());
                             else if (cols.Contains("材质"))
-                                material = dr["材质"].ToString().Trim();
+                                material = StringHelper.ReplaceSpecialChar(dr["材质"].ToString().Trim());
 
 
                             if (cols.Contains("POP宽"))
-                                width = dr["POP宽"].ToString().Trim();
+                                width = StringHelper.ReplaceSpecialChar(dr["POP宽"].ToString().Trim());
                             else if (cols.Contains("宽"))
-                                width = dr["宽"].ToString().Trim();
+                                width = StringHelper.ReplaceSpecialChar(dr["宽"].ToString().Trim());
 
                             if (cols.Contains("POP高"))
-                                length = dr["POP高"].ToString().Trim();
+                                length = StringHelper.ReplaceSpecialChar(dr["POP高"].ToString().Trim());
                             else if (cols.Contains("高"))
-                                length = dr["高"].ToString().Trim();
+                                length = StringHelper.ReplaceSpecialChar(dr["高"].ToString().Trim());
 
                             
 
 
                             if (cols.Contains("备注"))
-                                remark = dr["备注"].ToString().Trim();
+                                remark = StringHelper.ReplaceSpecialChar(dr["备注"].ToString().Trim());
                             else if (cols.Contains("其他备注"))
-                                remark = dr["其他备注"].ToString().Trim();
+                                remark = StringHelper.ReplaceSpecialChar(dr["其他备注"].ToString().Trim());
 
                             
                             bool canSave = true;

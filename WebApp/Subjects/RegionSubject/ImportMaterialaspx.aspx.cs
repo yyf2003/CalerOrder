@@ -103,67 +103,67 @@ namespace WebApp.Subjects.RegionSubject
                             string remark = string.Empty;
                             if (cols.Contains("POSCode"))
                             {
-                                shopNo = dt1.Rows[i]["POSCode"].ToString().Trim();
+                                shopNo = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["POSCode"].ToString().Trim());
                             }
                             else if (cols.Contains("POS Code"))
                             {
-                                shopNo = dt1.Rows[i]["POS Code"].ToString().Trim();
+                                shopNo = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["POS Code"].ToString().Trim());
                             }
                             else if (cols.Contains("店铺编号"))
                             {
-                                shopNo = dt1.Rows[i]["店铺编号"].ToString().Trim();
+                                shopNo = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["店铺编号"].ToString().Trim());
                             }
                             if (cols.Contains("项目"))
                             {
-                                subjectName = dt1.Rows[i]["项目"].ToString().Trim();
+                                subjectName = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["项目"].ToString().Trim());
                             }
                             else if (cols.Contains("项目名称"))
                             {
-                                subjectName = dt1.Rows[i]["项目名称"].ToString().Trim();
+                                subjectName = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["项目名称"].ToString().Trim());
                             }
                             if (cols.Contains("Sheet"))
                             {
-                                sheet = dt1.Rows[i]["Sheet"].ToString().Trim();
+                                sheet = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["Sheet"].ToString().Trim());
                             }
                             else if (cols.Contains("POP位置"))
                             {
-                                sheet = dt1.Rows[i]["POP位置"].ToString().Trim();
+                                sheet = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["POP位置"].ToString().Trim());
                             }
                             if (cols.Contains("物料名称"))
                             {
-                                materialName = dt1.Rows[i]["物料名称"].ToString().Trim();
+                                materialName = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["物料名称"].ToString().Trim());
                             }
                             else if (cols.Contains("物料"))
                             {
-                                materialName = dt1.Rows[i]["物料"].ToString().Trim();
+                                materialName = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["物料"].ToString().Trim());
                             }
                             if (cols.Contains("数量"))
                             {
-                                num = dt1.Rows[i]["数量"].ToString().Trim();
+                                num = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["数量"].ToString().Trim());
                             }
                             if (cols.Contains("长"))
                             {
-                                length = dt1.Rows[i]["长"].ToString().Trim();
+                                length = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["长"].ToString().Trim());
                             }
                             if (cols.Contains("宽"))
                             {
-                                width = dt1.Rows[i]["宽"].ToString().Trim();
+                                width = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["宽"].ToString().Trim());
                             }
                             if (cols.Contains("高"))
                             {
-                                high = dt1.Rows[i]["高"].ToString().Trim();
+                                high = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["高"].ToString().Trim());
                             }
                             if (cols.Contains("单价"))
                             {
-                                price = dt1.Rows[i]["单价"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["单价"].ToString().Trim());
                             }
                             else if (cols.Contains("价格"))
                             {
-                                price = dt1.Rows[i]["价格"].ToString().Trim();
+                                price = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["价格"].ToString().Trim());
                             }
                             if (cols.Contains("备注"))
                             {
-                                remark = dt1.Rows[i]["备注"].ToString().Trim();
+                                remark = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["备注"].ToString().Trim());
                             }
                             if (string.IsNullOrWhiteSpace(shopNo))
                             {

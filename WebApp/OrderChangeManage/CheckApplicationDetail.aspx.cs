@@ -58,10 +58,7 @@ namespace WebApp.OrderChangeManage
                 {
                     labApproveState.Text = "已删除";
                 }
-                else
-                {
-                    GetApproveInfo();
-                }
+                GetApproveInfo();
             }
         }
 

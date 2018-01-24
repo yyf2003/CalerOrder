@@ -92,7 +92,7 @@ namespace WebApp.Subjects.RegionSubject.handler
             if (list.Any())
             {
                 StringBuilder json = new StringBuilder();
-                list.ForEach(s =>
+                list.ToList().ForEach(s =>
                 {
                     string type = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
                     string addDate = string.Empty;

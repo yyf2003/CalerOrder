@@ -2494,6 +2494,11 @@ namespace WebApp
         /// <param name="subjectId"></param>
         public void SaveExpressPrice(int guidanceId, int subjectId, int subjectType)
         {
+            ExpressPriceDetailBLL expressPriceBll = new ExpressPriceDetailBLL();
+            InstallPriceTempBLL installPriceTempBll = new InstallPriceTempBLL();
+
+            //installPriceTempBll.Delete(s => s.GuidanceId == guidanceId);
+            //expressPriceBll.Delete(s => s.GuidanceId == guidanceId);
 
             List<int> shopIdList0 = new List<int>();
             List<int> windowShopIdList = new List<int>();
@@ -2521,8 +2526,7 @@ namespace WebApp
                     shopIdList0 = shopIdList0.Except(windowShopIdList).ToList();
                 }
             }
-            ExpressPriceDetailBLL expressPriceBll = new ExpressPriceDetailBLL();
-            InstallPriceTempBLL installPriceTempBll = new InstallPriceTempBLL();
+            
             InstallPriceTemp installPriceTempModel;
             if (shopIdList0.Any())
             {
@@ -2592,10 +2596,107 @@ namespace WebApp
             }
         }
 
+        public void ReSaveExpressPrice(int guidanceId)
+        {
+            ExpressPriceDetailBLL expressPriceBll = new ExpressPriceDetailBLL();
+            InstallPriceTempBLL installPriceTempBll = new InstallPriceTempBLL();
+
+            installPriceTempBll.Delete(s => s.GuidanceId == guidanceId);
+            expressPriceBll.Delete(s => s.GuidanceId == guidanceId);
+
+            List<int> shopIdList0 = new List<int>();
+            List<int> windowShopIdList = new List<int>();
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            orderList = new FinalOrderDetailTempBLL().GetList(s => s.GuidanceId == guidanceId && (s.IsDelete == null || s.IsDelete == false) && (s.OrderType == (int)OrderTypeEnum.POP || s.OrderType == (int)OrderTypeEnum.道具));
+            int installSubjectId = 0;
+            if (orderList.Any())
+            {
+                installSubjectId = orderList[0].SubjectId ?? 0;
+                var windowOrderList = orderList.Where(s => s.Sheet != null && (s.Sheet.Contains("橱窗") || s.Sheet.Contains("窗贴")) && s.GraphicLength > 1 && s.GraphicWidth > 1 && s.GraphicMaterial != null && s.GraphicMaterial.Contains("全透贴") && s.IsInstall == "Y").ToList();
+                if (windowOrderList.Any())
+                {
+                    windowShopIdList = windowOrderList.Select(s => s.ShopId ?? 0).Distinct().ToList();
+                }
+                shopIdList0 = orderList.Select(s => s.ShopId ?? 0).Distinct().ToList();
+                if (windowShopIdList.Any())
+                {
+                    shopIdList0 = shopIdList0.Except(windowShopIdList).ToList();
+                }
+            }
+
+            InstallPriceTemp installPriceTempModel;
+            if (shopIdList0.Any())
+            {
+                decimal defaultExpressPrice = 0;
+                ExpressPriceConfig model = new ExpressPriceConfigBLL().GetList(s => s.IsDefault == true).FirstOrDefault();
+                if (model != null)
+                {
+                    defaultExpressPrice = model.ReceivePrice ?? 0;
+                }
+                defaultExpressPrice = defaultExpressPrice > 0 ? defaultExpressPrice : 35;
+
+                ExpressPriceDetail experssPriceModel;
+                InstallPriceTemp installPriceTempModel1;
+                shopIdList0.ForEach(s =>
+                {
+                    installPriceTempModel1 = installPriceTempBll.GetList(e => e.GuidanceId == guidanceId && e.ShopId == s && (e.BasicPrice ?? 0) > 0).FirstOrDefault();
+                    if (installPriceTempModel1 == null)
+                    {
+                        experssPriceModel = expressPriceBll.GetList(e => e.GuidanceId == guidanceId && e.ShopId == s).FirstOrDefault();
+                        if (experssPriceModel == null)
+                        {
+                            experssPriceModel = new ExpressPriceDetail();
+                            experssPriceModel.GuidanceId = guidanceId;
+                            experssPriceModel.ExpressPrice = defaultExpressPrice;
+                            experssPriceModel.AddDate = DateTime.Now;
+                            experssPriceModel.ShopId = s;
+                            expressPriceBll.Add(experssPriceModel);
+                        }
+                    }
+                });
+            }
+            if (windowShopIdList.Any())
+            {
+
+
+                InstallPriceShopInfoBLL InstallPriceShopInfoBll = new InstallPriceShopInfoBLL();
+                InstallPriceShopInfo installPriceShopInfoModel;
+                expressPriceBll.Delete(s => windowShopIdList.Contains(s.ShopId ?? 0) && s.GuidanceId == guidanceId);
+                windowShopIdList.ForEach(s =>
+                {
+                    installPriceTempModel = installPriceTempBll.GetList(i => i.ShopId == s && i.GuidanceId == guidanceId).FirstOrDefault();
+                    if (installPriceTempModel == null)
+                    {
+                        installPriceTempModel = new InstallPriceTemp();
+                        installPriceTempModel.GuidanceId = guidanceId;
+                        installPriceTempModel.ShopId = s;
+                        installPriceTempModel.BasicPrice = 150;
+                        installPriceTempModel.OOHPrice = 0;
+                        installPriceTempModel.WindowPrice = 0;
+                        installPriceTempModel.TotalPrice = 150;
+                        installPriceTempModel.AddDate = DateTime.Now;
+                        installPriceTempBll.Add(installPriceTempModel);
+                    }
+                    installPriceShopInfoModel = InstallPriceShopInfoBll.GetList(i => i.ShopId == s && i.GuidanceId == guidanceId).FirstOrDefault();
+                    if (installPriceShopInfoModel == null)
+                    {
+                        installPriceShopInfoModel = new InstallPriceShopInfo();
+                        installPriceShopInfoModel.GuidanceId = guidanceId;
+                        installPriceShopInfoModel.ShopId = s;
+                        installPriceShopInfoModel.BasicPrice = 150;
+                        installPriceShopInfoModel.OOHPrice = 0;
+                        installPriceShopInfoModel.WindowPrice = 0;
+                        installPriceShopInfoModel.SubjectId = installSubjectId;
+                        InstallPriceShopInfoBll.Add(installPriceShopInfoModel);
+                    }
+                });
+            }
+        }
 
         public void SaveExpressPriceForDelivery(int guidanceId, int subjectId, int subjectType, decimal? experssPrice = null)
         {
-
+            ExpressPriceDetailBLL expressPriceBll = new ExpressPriceDetailBLL();
+            expressPriceBll.Delete(s => s.GuidanceId == guidanceId);
             List<int> shopIdList0 = new List<int>();
             List<int> windowShopIdList = new List<int>();
             List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
@@ -2612,7 +2713,7 @@ namespace WebApp
             {
                 shopIdList0 = orderList.Select(s => s.ShopId ?? 0).Distinct().ToList();
             }
-            ExpressPriceDetailBLL expressPriceBll = new ExpressPriceDetailBLL();
+            
             if (shopIdList0.Any())
             {
                 new InstallPriceTempBLL().Delete(s => s.GuidanceId == guidanceId && shopIdList0.Contains(s.ShopId ?? 0));
@@ -4000,10 +4101,12 @@ namespace WebApp
                                  subject,
                                  CategoryName = subjectCategory != null ? (subjectCategory.CategoryName) : ""
                              }).ToList();
+            OutsourceOrderDetailBLL outsourceOrderDetailBll = new OutsourceOrderDetailBLL();
+            outsourceOrderDetailBll.Delete(s => s.GuidanceId == guidanceId && shopIdList.Contains(s.ShopId??0) && s.OrderType == (int)OrderTypeEnum.安装费 && s.SubjectId == 0);
             if (orderList.Any())
             {
                 OutsourceOrderDetail outsourceOrderDetailModel;
-                OutsourceOrderDetailBLL outsourceOrderDetailBll = new OutsourceOrderDetailBLL();
+                
                 int guidanceType = orderList[0].guidance.ActivityTypeId ?? 0;
                 string beiJingCalerOutsourceName = string.Empty;
                 int calerOutsourceId = 8;
@@ -4021,15 +4124,16 @@ namespace WebApp
                     if (companyModel != null)
                         calerOutsourceId = companyModel.Id;
                 }
-                List <Shop> shopList = orderList.Select(s => s.shop).Distinct().ToList();
+                List<Shop> shopList = orderList.Select(s => s.shop).Distinct().ToList();
                 List<int> newShopIdList = shopList.Select(s => s.Id).ToList();
                 List<POP> oohPOPList = new POPBLL().GetList(pop => newShopIdList.Contains(pop.ShopId ?? 0) && (pop.Sheet == "户外" || pop.Sheet.ToLower() == "ooh") && (pop.OOHInstallPrice ?? 0) > 0);
                 List<string> BCSCityTierList = new List<string>() { "T1", "T2", "T3" };
-                shopList.ForEach(shop => {
-                    outsourceOrderDetailBll.Delete(s=>s.GuidanceId==guidanceId && s.ShopId==shop.Id && s.OrderType==(int)OrderTypeEnum.安装费 && s.SubjectId==0);
+                shopList.ForEach(shop =>
+                {
+                    
                     if (guidanceType == (int)GuidanceTypeEnum.Promotion || guidanceType == (int)GuidanceTypeEnum.Delivery)
                     {
-                        var orderListP = outsourceOrderDetailBll.GetList(s =>s.GuidanceId==guidanceId && s.ShopId == shop.Id && s.SubjectId>0);
+                        var orderListP = outsourceOrderDetailBll.GetList(s => s.GuidanceId == guidanceId && s.ShopId == shop.Id && s.SubjectId > 0);
                         if (!orderListP.Any())
                         {
                             outsourceOrderDetailBll.Delete(s => s.GuidanceId == guidanceId && s.ShopId == shop.Id && s.OrderType == (int)OrderTypeEnum.发货费 && s.SubjectId == 0);
@@ -4066,7 +4170,7 @@ namespace WebApp
                         }
                         else if (guidanceType == (int)GuidanceTypeEnum.Install)
                         {
-                            
+
                             oneShopOrderList.ForEach(order =>
                             {
                                 if (order.subject.CornerType != "三叶草")
@@ -4102,7 +4206,7 @@ namespace WebApp
                             {
 
                                 //按照级别，获取基础安装费
-                               
+
                                 materialSupportList.ForEach(ma =>
                                 {
                                     decimal basicInstallPrice0 = new BasePage().GetOutsourceBasicInstallPrice(ma);
@@ -4122,7 +4226,7 @@ namespace WebApp
                                         decimal price = 0;
                                         if (!string.IsNullOrWhiteSpace(s.order.GraphicNo))
                                         {
-                                            price = oohPOPList.Where(p =>p.ShopId==shop.Id && p.GraphicNo.ToLower() == s.order.GraphicNo.ToLower()).Select(p => p.OSOOHInstallPrice ?? 0).FirstOrDefault();
+                                            price = oohPOPList.Where(p => p.ShopId == shop.Id && p.GraphicNo.ToLower() == s.order.GraphicNo.ToLower()).Select(p => p.OSOOHInstallPrice ?? 0).FirstOrDefault();
 
                                         }
                                         else
@@ -4134,7 +4238,7 @@ namespace WebApp
                                         }
                                     });
                                 }
-                                
+
 
                                 InstallPriceTempBLL installShopPriceBll = new InstallPriceTempBLL();
                                 var installShopList = installShopPriceBll.GetList(sh => sh.GuidanceId == guidanceId && sh.ShopId == shop.Id);
@@ -4184,7 +4288,7 @@ namespace WebApp
                                 remark = "活动安装费";
                             }
                         }
-                        
+
                         if (installPrice > 0)
                         {
                             if (oohInstallPrice > 0 && (shop.OOHInstallOutsourceId ?? 0) > 0)
@@ -4305,6 +4409,7 @@ namespace WebApp
                     }
                 });
             }
+            
         }
 
         //分配外协费用订单
@@ -4608,7 +4713,7 @@ namespace WebApp
         QuoteOrderDetail quoteOrderModel;
         QuoteOrderSettingBLL quoteOrderSettingBll = new QuoteOrderSettingBLL();
         List<QuoteOrderSetting> settingList = new List<QuoteOrderSetting>();
-        public void SaveQuotationOrder1234(FinalOrderDetailTemp order,bool? orderSetting=true)
+        public void SaveQuotationOrder(FinalOrderDetailTemp order,bool? orderSetting=true)
         {
             if (order != null)
             {
@@ -4752,7 +4857,7 @@ namespace WebApp
 
 
 
-        public void SaveQuotationOrder(FinalOrderDetailTemp order, bool? orderSetting = true)
+        public void SaveQuotationOrder1234(FinalOrderDetailTemp order, bool? orderSetting = true)
         { }
 
 

@@ -279,11 +279,11 @@ namespace WebApp.Subjects
             subjectModel.BeginDate = DateTime.Parse(txtBeginDate.Text.Trim());
             subjectModel.CustomerId = int.Parse(ddlCustomer.SelectedValue);
             subjectModel.EndDate = DateTime.Parse(txtEndDate.Text.Trim());
-            subjectModel.Remark = txtRemark.Text;
+            subjectModel.Remark = StringHelper.ReplaceSpecialChar(txtRemark.Text.Trim());
 
-            subjectModel.SubjectName = new System.Text.RegularExpressions.Regex("[\\s]+").Replace(txtSubjectName.Text.Trim()," ");
+            //subjectModel.SubjectName = new System.Text.RegularExpressions.Regex("[\\s]+").Replace(txtSubjectName.Text.Trim()," ");
             //subjectModel.OutSubjectName = txtOutName.Text.Trim();
-
+            subjectModel.SubjectName = StringHelper.ReplaceSpecialChar(txtSubjectName.Text.Trim());
             subjectModel.SubjectCategoryId = int.Parse(ddlSubjectCategory.SelectedValue);
             if (ddlSubjectCategory.SelectedItem.Text == CornerTypeEnum.三叶草.ToString())
             {
