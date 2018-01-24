@@ -23,6 +23,7 @@
         }
     </style>
     <script type="text/javascript">
+        var url = '<%=url %>';
         var shopId = '<%=shopId %>';
     </script>
 </head>
@@ -74,9 +75,9 @@
                         display: none;" class="easyui-linkbutton" plain="true" icon="icon-edit">编辑</a>
                 <a id="btnDeleteFrame" onclick="deleteFrame()" style="float: left; display: none;"
                     class="easyui-linkbutton" plain="true" icon="icon-remove">删除</a>
-                <div class='datagrid-btn-separator'>
+               <div id="separator"  class='datagrid-btn-separator'>
                 </div>
-                <a id="btnCheckEditLog" onclick="ShowEditLog()" style="float: left;"
+                <a id="btnCheckEditLog" onclick="ShowEditLog()" style="float: left;display: none;"
                     class="easyui-linkbutton" plain="true" icon="icon-tip">修改记录</a>
             </div>
             <div class="containerDiv1">
@@ -239,4 +240,5 @@
  <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
   <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
 <script src="js/MachineFrame.js" type="text/javascript"></script>
+<script src="../Scripts/common.js" type="text/javascript"></script>
 <script src="js/OneShopMachineFrameList.js" type="text/javascript"></script>

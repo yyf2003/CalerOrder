@@ -46,6 +46,7 @@ namespace WebApp.Handler
             int userId = new BasePage().CurrentUser.UserId;
             StringBuilder json = new StringBuilder();
             List<int> myModules = roleModuleBll.GetList(s => s.RoleId == roleId).Select(s => s.ModuleId ?? 0).ToList();
+            //单个用户的权限
             List<int> userInModuules = new UserInModuleBLL().GetList(s => s.RoleId == roleId && s.UserId == userId).Select(s => s.ModuleId ?? 0).ToList();
             myModules.AddRange(userInModuules);
             myModules = myModules.Distinct().ToList();
@@ -88,7 +89,7 @@ namespace WebApp.Handler
                               where module.IsShow==true
                               select module;
                 List<Module> list = modules.Where(s => s.ParentId == parentId && myModules.Contains(s.Id)).ToList();
-
+                //单个用户的权限
                 var userInModules = new UserInModuleBLL().GetList(s => s.RoleId == roleId && s.UserId==userId).Select(s => s.ModuleId ?? 0);
                 var userModules = from module in dc.Module
                               where module.IsShow == true

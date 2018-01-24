@@ -1,29 +1,29 @@
 ﻿
 
 $(function () {
+    CheckPrimission(url, null, $("#btnAdd"), $("#btnEdit"), $("#btnDelete"), null, $("#separator"), $("#btnCheckEditLog"), $("#toolbar"));
+//    if ($("#hfPromission").val() != "") {
+//        var arr = $("#hfPromission").val().split('|');
+//        var count = 0;
+//        $.each(arr, function (key, val) {
+//            if (val == "add") {
+//                $("#btnAdd").show();
+//                count++;
+//            }
+//            if (val == "edit") {
+//                $("#btnEdit").show();
+//                
+//                count++;
+//            }
+//            if (val == "delete") {
+//                $("#btnDelete").show();
+//                count++;
+//            }
 
-    if ($("#hfPromission").val() != "") {
-        var arr = $("#hfPromission").val().split('|');
-        var count = 0;
-        $.each(arr, function (key, val) {
-            if (val == "add") {
-                $("#btnAdd").show();
-                count++;
-            }
-            if (val == "edit") {
-                $("#btnEdit").show();
-                
-                count++;
-            }
-            if (val == "delete") {
-                $("#btnDelete").show();
-                count++;
-            }
-
-        })
-        if (count > 0)
-            $("#toolbar").show();
-    }
+//        })
+//        if (count > 0)
+//            $("#toolbar").show();
+//    }
 
     $("input[name$='cbAll']").change(function () {
         var checked = this.checked;

@@ -1,28 +1,28 @@
 ﻿$(function () {
-
+    CheckPrimission(url, null, $("#btnAddFrame"), $("#btnEditFrame"), $("#btnDeleteFrame"), null, $("#separator"), $("#btnCheckEditLog"), $("#toolbar"));
     //权限判断
-    if ($("#hfPromission").val() != "") {
-        var arr = $("#hfPromission").val().split('|');
-        var count = 0;
-        $.each(arr, function (key, val) {
-            if (val == "add") {
-                $("#btnAddFrame").show();
-                count++;
-            }
-            if (val == "edit") {
-                $("#btnEditFrame").show();
-               
-                count++;
-            }
-            if (val == "delete") {
-                $("#btnDeleteFrame").show();
-                count++;
-            }
+//    if ($("#hfPromission").val() != "") {
+//        var arr = $("#hfPromission").val().split('|');
+//        var count = 0;
+//        $.each(arr, function (key, val) {
+//            if (val == "add") {
+//                $("#btnAddFrame").show();
+//                count++;
+//            }
+//            if (val == "edit") {
+//                $("#btnEditFrame").show();
+//               
+//                count++;
+//            }
+//            if (val == "delete") {
+//                $("#btnDeleteFrame").show();
+//                count++;
+//            }
 
-        })
-        if (count > 0)
-            $("#toolbar").show();
-    }
+//        })
+//        if (count > 0)
+//            $("#toolbar").show();
+//    }
 
     $("input[name$='cbAll']").change(function () {
         var checked = this.checked;

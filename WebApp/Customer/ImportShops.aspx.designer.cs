@@ -40,13 +40,22 @@ namespace WebApp.Customer {
         protected global::System.Web.UI.WebControls.RadioButtonList rblImportType;
         
         /// <summary>
-        /// cbDeleteOld 控件。
+        /// cbDeleteOldPOP 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox cbDeleteOld;
+        protected global::System.Web.UI.WebControls.CheckBox cbDeleteOldPOP;
+        
+        /// <summary>
+        /// cbDeleteOldFrame 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox cbDeleteOldFrame;
         
         /// <summary>
         /// cbNoCheckType 控件。

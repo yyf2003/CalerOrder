@@ -3,12 +3,14 @@ function urlCodeStr(str) {
     return escape(str).replace(/\+/g, '%2B');
 }
 
-function CheckPrimission(url, view, add, edit, dele,recover, separator,showLog) {
+function CheckPrimission(url, view, add, edit, dele, recover, separator, showLog,toolBar) {
+
     $.ajax({
         type: "get",
         url: '/Handler/CheckPromission.ashx?url=' + url,
+        cache:false,
         success: function (data) {
-
+            
             if (data != "") {
                 var arr = data.split('|');
                 var count = 0;
@@ -20,15 +22,15 @@ function CheckPrimission(url, view, add, edit, dele,recover, separator,showLog) 
                         }
                     }
                     if (val == "add") {
-                        
+
                         if (add) {
-                           $(add).show();
-                           count++;
-                       }
-                       if (showLog) {
-                           $(showLog).show();
-                           count++;
-                       }
+                            $(add).show();
+                            count++;
+                        }
+                        if (showLog) {
+                            $(showLog).show();
+                            count++;
+                        }
                     }
 
                     if (val == "edit") {
@@ -55,7 +57,10 @@ function CheckPrimission(url, view, add, edit, dele,recover, separator,showLog) 
                         $(separator).show();
 
                     }
+                    if (toolBar) {
+                        $(toolBar).show();
 
+                    }
                 }
             }
         }

@@ -29,6 +29,8 @@
         }
     </style>
     <script type="text/javascript">
+        var url = '<%=url %>';
+       
         var shopId = '<%=shopId %>';
     </script>
 </head>
@@ -71,7 +73,7 @@
         </div>
         <div>
             <asp:HiddenField ID="hfPromission" runat="server" />
-            <div id="toolbar" style=" display:none;">
+            <div id="toolbar" style="display:none;">
                 
                 <div style="display: none;">
                     <asp:Button ID="btnDeletePOP" runat="server" Text="delete" OnClick="btnDeletePOP_Click" />
@@ -79,9 +81,9 @@
                 <a id="btnAdd" onclick="addPOP()" style="float: left; display:none;" class="easyui-linkbutton" plain="true" icon="icon-add">新增</a>    
                 <a id="btnEdit" onclick="editPOP()" style="float: left;display:none;"class="easyui-linkbutton" plain="true" icon="icon-edit">编辑</a>
                 <a id="btnDelete" onclick="deletePlan()" style="float: left;display:none;" class="easyui-linkbutton" plain="true" icon="icon-remove">删除</a>
-                <div class='datagrid-btn-separator'>
+                <div id="separator"  class='datagrid-btn-separator'>
                 </div>
-                <a id="btnCheckEditLog" onclick="ShowEditLog()" style="float: left;"
+                <a id="btnCheckEditLog" onclick="ShowEditLog()" style="float: left;display: none;"
                     class="easyui-linkbutton" plain="true" icon="icon-tip">修改记录</a>
             </div>
             <div class="containerDiv">

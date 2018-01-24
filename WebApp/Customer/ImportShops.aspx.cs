@@ -921,8 +921,10 @@ namespace WebApp.Customer
                 Models.POP popModel;
                 DataColumnCollection cols = ds.Tables[0].Columns;
                 DataTable errorTB = CommonMethod.CreateErrorTB(ds.Tables[0].Columns);
-                List<int> DeleteShopId = new List<int>();
-                bool isDeleteOldDate = cbDeleteOld.Checked;
+                List<int> DeletePOPShopId = new List<int>();
+                List<int> DeleteFrameShopId = new List<int>();
+                bool isDeleteOldPOP = cbDeleteOldPOP.Checked;
+                bool isDeleteOldFrame = cbDeleteOldFrame.Checked;
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
 
@@ -1323,13 +1325,18 @@ namespace WebApp.Customer
                     if (canSave)
                     {
                         popModel = new Models.POP();
-                        if (isDeleteOldDate && !DeleteShopId.Contains(shopId))
+                        if (isDeleteOldPOP && !DeletePOPShopId.Contains(shopId))
                         {
                             DeleteOldPOP(shopId);
-                            DeleteShopId.Add(shopId);
+                            DeletePOPShopId.Add(shopId);
 
                         }
-                        if (!isDeleteOldDate && isExist)
+                        if (isDeleteOldFrame && !DeleteFrameShopId.Contains(shopId))
+                        {
+                            frameBll.Delete(s => s.ShopId == shopId);
+                            DeleteFrameShopId.Add(shopId);
+                        }
+                        if (!isDeleteOldPOP && isExist)
                         {
                             popModel = popBll.GetModel(popId);
 
@@ -1410,7 +1417,7 @@ namespace WebApp.Customer
                         //popModel.RightSideStick = wdeep + "×" + wHigh;
                         //地铺：橱窗位置宽*橱窗位置深
                         //popModel.Floor = wWide + "×" + wdeep;
-                        if (!isDeleteOldDate && isExist)
+                        if (!isDeleteOldPOP && isExist)
                         {
                             popBll.Update(popModel);
                         }
@@ -1496,8 +1503,8 @@ namespace WebApp.Customer
                 Models.ShopMachineFrame model;
                 //ShopMachineFrameBLL bll = new ShopMachineFrameBLL();
                 int shopId = 0;
-                List<int> DeleteShopId = new List<int>();
-                bool isDeleteOldDate = cbDeleteOld.Checked;
+                List<int> DeleteFrameShopId = new List<int>();
+                bool isDeleteOldFrame = cbDeleteOldFrame.Checked;
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
                     bool canSave = true;
@@ -1599,15 +1606,15 @@ namespace WebApp.Customer
                     }
                     if (canSave)
                     {
-                        if (isDeleteOldDate && !DeleteShopId.Contains(shopId))
+                        if (isDeleteOldFrame && !DeleteFrameShopId.Contains(shopId))
                         {
                             frameBll.Delete(s => s.ShopId == shopId);
-                            DeleteShopId.Add(shopId);
+                            DeleteFrameShopId.Add(shopId);
                         }
 
                         int id = 0;
                         frameName = frameName.Replace("（", "(").Replace("）", ")").ToUpper();
-                        if (!isDeleteOldDate && CheckFrameIsExist(shopId, sheet, frameName, gender, cornerType, out id))
+                        if (!isDeleteOldFrame && CheckFrameIsExist(shopId, sheet, frameName, gender, cornerType, out id))
                         {
                             model = frameBll.GetModel(id);
                             if (model != null)

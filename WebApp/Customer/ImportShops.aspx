@@ -61,7 +61,9 @@
                 执行类型
             </td>
             <td style="text-align: left; padding-left: 5px;">
-                <asp:CheckBox ID="cbDeleteOld" runat="server" /><span style=" color:Red;">删除旧数据</span>
+                <asp:CheckBox ID="cbDeleteOldPOP" runat="server" /><span style=" color:Red;">删除旧POP</span>
+                &nbsp;&nbsp;
+                <asp:CheckBox ID="cbDeleteOldFrame" runat="server" /><span style=" color:Red;">删除旧器架</span>
             </td>
         </tr>
         <tr class="tr_bai">

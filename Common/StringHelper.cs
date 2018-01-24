@@ -189,15 +189,19 @@ namespace Common
 
         public static string ReplaceSpecialChar(string str)
         {
-            Regex spaceRgx = new Regex("[\\s]+");
-            Regex tableRgx = new Regex("[\\t]+");
-            Regex returnRgx0 = new Regex("[\\r]+");
-            Regex returnRgx1 = new Regex("[\\n]+");
-            string s = tableRgx.Replace(str.Trim(), "");
-            s = returnRgx0.Replace(s, "");
-            s = returnRgx1.Replace(s, "");
-            s = spaceRgx.Replace(s, " ");
-            return s;
+            //Regex spaceRgx = new Regex("[\\s]+");
+            //Regex tableRgx = new Regex("[\\t]+");
+            //Regex returnRgx0 = new Regex("[\\r]+");
+            //Regex returnRgx1 = new Regex("[\\n]+");
+            //string s = tableRgx.Replace(str.Trim(), "");
+            //s = returnRgx0.Replace(s, "");
+            //s = returnRgx1.Replace(s, "");
+            //s = spaceRgx.Replace(s, " ");
+            string s = Regex.Replace(str.Trim(), "[\\t]", " ");
+            s = Regex.Replace(s, "[\\r]", " ");
+            s = Regex.Replace(s, "[\\n]", " ");
+            s = Regex.Replace(s, "[\\s]+", " ");
+            return s.Trim();
         }
 
 

@@ -15,19 +15,21 @@ namespace WebApp.Customer
     public partial class OneShopMachineFrameList : BasePage
     {
         public int shopId;
+        public string url = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
         {
+            url = Request.FilePath;
             if (Request.QueryString["shopId"] != null)
             {
                 shopId = int.Parse(Request.QueryString["shopId"]);
             }
             if (!IsPostBack)
             {
-                string promissionStr = GetPromissionStr();
-                if (!string.IsNullOrWhiteSpace(promissionStr))
-                {
-                    hfPromission.Value = promissionStr;
-                }
+                //string promissionStr = GetPromissionStr();
+                //if (!string.IsNullOrWhiteSpace(promissionStr))
+                //{
+                //    hfPromission.Value = promissionStr;
+                //}
                 Shop model = new ShopBLL().GetModel(shopId);
                 if (model != null)
                 {
