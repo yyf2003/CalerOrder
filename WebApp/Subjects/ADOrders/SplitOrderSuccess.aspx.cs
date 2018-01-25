@@ -34,7 +34,7 @@ namespace WebApp.Subjects.ADOrders
             {
                 BindSubject();
                 BindFinalOrder();
-                StatisticsInfo();
+                //StatisticsInfo();
             }
         }
 
@@ -72,45 +72,62 @@ namespace WebApp.Subjects.ADOrders
 
         void BindFinalOrder()
         {
-
-
+            FinalOrderDetailTempBLL orderBll = new FinalOrderDetailTempBLL();
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            Subject subjectModel = new SubjectBLL().GetModel(subjectId);
+            if (subjectModel != null)
+            {
+                if (subjectModel.SubjectType == (int)SubjectTypeEnum.HC订单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区补单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区增补 || subjectModel.SubjectType == (int)SubjectTypeEnum.新开店订单)
+                {
+                    orderList = orderBll.GetList(s => s.RegionSupplementId == subjectId && (s.IsDelete == null || s.IsDelete == false));
+                }
+                else
+                {
+                    orderList = orderBll.GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0 && (s.IsDelete == null || s.IsDelete == false));
+                }
+            }
             //var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
-            //            join pop1 in CurrentContext.DbContext.POP
-            //            on new { order.ShopId, order.GraphicNo, order.Sheet } equals new { pop1.ShopId, pop1.GraphicNo, pop1.Sheet } into popTemp
-            //            from pop in popTemp.DefaultIfEmpty()
-            //            join shop in CurrentContext.DbContext.Shop
-            //            on order.ShopId equals shop.Id
             //            where order.SubjectId == subjectId
             //            && (order.IsDelete == null || order.IsDelete == false)
-            //            select new
-            //            {
-            //                order,
-            //                Sheet = order.Sheet,
-            //                LevelNum = order.LevelNum,
-            //                shop,
-            //                pop
-            //            }).ToList();
-
-            var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
-                       
-                        where order.SubjectId == subjectId
-                        && (order.IsDelete == null || order.IsDelete == false)
-                        select order).ToList();
+            //            select order).ToList();
             if (!string.IsNullOrWhiteSpace(txtShopNo.Text.Trim()))
             {
-                list = list.Where(s => s.ShopNo.ToLower() == txtShopNo.Text.Trim().ToLower()).ToList();
+                orderList = orderList.Where(s => s.ShopNo.ToLower() == txtShopNo.Text.Trim().ToLower()).ToList();
             }
             if (!string.IsNullOrWhiteSpace(txtShopName.Text.Trim()))
             {
-                list = list.Where(s => s.ShopName.Contains(txtShopNo.Text.Trim())).ToList();
+                orderList = orderList.Where(s => s.ShopName.Contains(txtShopNo.Text.Trim())).ToList();
             }
 
 
-            AspNetPagerFinal.RecordCount = list.Count;
+            AspNetPagerFinal.RecordCount = orderList.Count;
             this.AspNetPagerFinal.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPagerFinal.CurrentPageIndex, this.AspNetPagerFinal.PageCount, this.AspNetPagerFinal.RecordCount, this.AspNetPagerFinal.PageSize });
-            repeater_FinalOrder.DataSource = list.OrderBy(s => s.ShopId).Skip((AspNetPagerFinal.CurrentPageIndex - 1) * AspNetPagerFinal.PageSize).Take(AspNetPagerFinal.PageSize).ToList();
+            repeater_FinalOrder.DataSource = orderList.OrderBy(s => s.ShopId).Skip((AspNetPagerFinal.CurrentPageIndex - 1) * AspNetPagerFinal.PageSize).Take(AspNetPagerFinal.PageSize).ToList();
             repeater_FinalOrder.DataBind();
-
+            if (!IsPostBack)
+            {
+                if (orderList.Any())
+                {
+                    List<int> shopIdList = orderList.Select(s => s.ShopId ?? 0).Distinct().ToList();
+                    shopIdList.Remove(0);
+                    labShopCount.Text = shopIdList.Count.ToString();
+                    decimal totalArea = 0;
+                    decimal totalPrice = 0;
+                    StatisticPOPTotalPrice(orderList, out totalPrice, out totalArea);
+                    if (totalArea > 0)
+                    {
+                        labTotalArea.Text = Math.Round(totalArea, 2) + " 平方米";
+                    }
+                    else
+                        labTotalArea.Text = "0";
+                    if (totalPrice > 0)
+                    {
+                        labTotalPrice.Text = Math.Round(totalPrice, 2) + " 元";
+                    }
+                    else
+                        labTotalPrice.Text = "0";
+                }
+            }
 
 
         }
@@ -208,31 +225,11 @@ namespace WebApp.Subjects.ADOrders
         }
 
 
-        void StatisticsInfo() 
-        {
-            var orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId && (s.IsDelete == null || s.IsDelete == false));
-            if (orderList.Any())
-            {
-                List<int> shopIdList = orderList.Select(s=>s.ShopId??0).Distinct().ToList();
-                shopIdList.Remove(0);
-                labShopCount.Text = shopIdList.Count.ToString();
-                decimal totalArea = 0;
-                decimal totalPrice = 0;
-                StatisticPOPTotalPrice(orderList, out totalPrice, out totalArea);
-                if (totalArea > 0)
-                {
-                    labTotalArea.Text = Math.Round(totalArea, 2)+" 平方米";
-                }
-                else
-                    labTotalArea.Text = "0";
-                if (totalPrice > 0)
-                {
-                    labTotalPrice.Text = Math.Round(totalPrice, 2) + " 元";
-                }
-                else
-                    labTotalPrice.Text = "0";
-            }
-        }
+        //void StatisticsInfo() 
+        //{
+        //    var orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId && (s.IsDelete == null || s.IsDelete == false));
+            
+        //}
 
         protected void Button1_Click(object sender, EventArgs e)
         {

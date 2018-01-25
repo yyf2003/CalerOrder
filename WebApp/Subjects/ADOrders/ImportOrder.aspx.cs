@@ -3130,7 +3130,7 @@ namespace WebApp.Subjects.ADOrders
                             finalOrderTempModel.CityTier = o.shop.CityTier;
                             finalOrderTempModel.Contact = o.shop.Contact1;
                             finalOrderTempModel.Format = o.shop.Format;
-                            finalOrderTempModel.Gender = o.order.Gender;
+                            finalOrderTempModel.Gender = (o.order.OrderGender!=null && o.order.OrderGender!="")?o.order.OrderGender:o.order.Gender;
                             finalOrderTempModel.GraphicNo = o.order.GraphicNo;
                             finalOrderTempModel.IsInstall = o.shop.IsInstall;
                             finalOrderTempModel.BCSIsInstall = o.shop.BCSIsInstall;

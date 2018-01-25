@@ -134,12 +134,13 @@ namespace WebApp.Subjects.SupplementByRegion
         /// <param name="e"></param>
         /// 
         List<string> materialSupportList = new List<string>();
+        RegionOrderDetailBLL detailBll = new RegionOrderDetailBLL();
         protected void btnImport_Click(object sender, EventArgs e)
         {
             if (FileUpload1.HasFile)
             {
                 //RegionSupplementDetailBLL detailBll = new RegionSupplementDetailBLL();
-                RegionOrderDetailBLL detailBll = new RegionOrderDetailBLL();
+                
                 string path = OperateFile.UpLoadFile(FileUpload1.PostedFile);
                 if (path != "")
                 {
@@ -1260,22 +1261,26 @@ namespace WebApp.Subjects.SupplementByRegion
                     bool isOk = false;
                     string msg = string.Empty;
                     //var list = new RegionSupplementDetailBLL().GetList(s => s.ItemId == itemId);
-                    var list = from order in CurrentContext.DbContext.RegionOrderDetail
+                    var list = (from order in CurrentContext.DbContext.RegionOrderDetail
                                join shop in CurrentContext.DbContext.Shop
                                on order.ShopId equals shop.Id
                                where order.SubjectId == subjectId
                                select new { 
                                   order,
                                   shop
-                               };
+                               }).ToList();
                     if (list.Any())
                     {
+                        
                         Subject model = subjectBll.GetModel(subjectId);
-
                         if (model != null)
                         {
-                            
-                            
+                            //list.ForEach(s =>
+                            //{
+                            //    s.order.ApproveState = 0;
+                            //    detailBll.Update(s.order);
+                            //});
+                            model.ApproveState = 0;
                             model.Status = 4;
                             subjectBll.Update(model);
                             isOk = true;

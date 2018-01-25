@@ -353,15 +353,17 @@ namespace WebApp.Subjects.UC
 
         void BindFinalOrder()
         {
-
+            Subject subjectModel = new SubjectBLL().GetModel(subjectId);
 
             var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
-                        join pop1 in CurrentContext.DbContext.POP
-                        on new { order.ShopId, order.GraphicNo, order.Sheet } equals new { pop1.ShopId, pop1.GraphicNo, pop1.Sheet } into popTemp
-                        from pop in popTemp.DefaultIfEmpty()
+                        //join pop1 in CurrentContext.DbContext.POP
+                        //on new { order.ShopId, order.GraphicNo, order.Sheet } equals new { pop1.ShopId, pop1.GraphicNo, pop1.Sheet } into popTemp
+                        //from pop in popTemp.DefaultIfEmpty()
                         join shop in CurrentContext.DbContext.Shop
                         on order.ShopId equals shop.Id
-                        where order.SubjectId == subjectId
+                        where
+                        (subjectModel.SubjectType == (int)SubjectTypeEnum.HC订单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区补单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区增补 || subjectModel.SubjectType == (int)SubjectTypeEnum.新开店订单) ? (order.RegionSupplementId == subjectId) : (order.SubjectId == subjectId && (order.RegionSupplementId ?? 0) == 0)
+                        
                         && (order.IsDelete == null || order.IsDelete == false)
                         select new
                         {
@@ -370,7 +372,7 @@ namespace WebApp.Subjects.UC
                             Sheet = order.Sheet,
                             LevelNum = order.LevelNum,
                             shop,
-                            pop
+                            //pop
                         }).ToList();
 
             PanelFinalOrder.Visible = list.Any();

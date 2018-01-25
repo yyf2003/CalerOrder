@@ -2812,7 +2812,7 @@ namespace WebApp
                 {
                     orderList0 = OrderDetailTempBll.GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0 && (s.IsDelete == null || s.IsDelete == false) && (s.IsValid == null || s.IsValid == true) && (s.ShopStatus == null || s.ShopStatus == "" || s.ShopStatus == ShopStatusEnum.正常.ToString()) && ((s.OrderType == (int)OrderTypeEnum.POP && s.GraphicLength > 1 && s.GraphicWidth > 1) || (s.OrderType > 1)) && (s.OrderType != (int)OrderTypeEnum.物料));
                     //删除旧POP订单数据
-                    outsourceOrderDetailBll.Delete(s => s.SubjectId == subjectId);
+                    outsourceOrderDetailBll.Delete(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0);
                 }
                 if (orderList0.Any())
                 {
@@ -4745,7 +4745,7 @@ namespace WebApp
         QuoteOrderDetail quoteOrderModel;
         QuoteOrderSettingBLL quoteOrderSettingBll = new QuoteOrderSettingBLL();
         List<QuoteOrderSetting> settingList = new List<QuoteOrderSetting>();
-        public void SaveQuotationOrder(FinalOrderDetailTemp order, bool? orderSetting = true)
+        public void SaveQuotationOrder1234(FinalOrderDetailTemp order, bool? orderSetting = true)
         {
             if (order != null)
             {
@@ -4889,7 +4889,7 @@ namespace WebApp
 
 
 
-        public void SaveQuotationOrder1234(FinalOrderDetailTemp order, bool? orderSetting = true)
+        public void SaveQuotationOrder(FinalOrderDetailTemp order, bool? orderSetting = true)
         { }
 
 

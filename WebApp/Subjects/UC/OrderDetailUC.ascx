@@ -1435,7 +1435,7 @@
                                         </td>
                                         <td>
                                             <%--系列--%>
-                                            <%#Eval("pop") != null ? Eval("pop.Category") : ""%>
+                                            <%#Eval("order.Category")%>
                                         </td>
                                         <td>
                                             <%--选图--%>

@@ -169,7 +169,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                         }
                         orderModel.PriceType = orderType;
                         orderModel.Area = double.Parse(totalArea.ToString());
-                        orderModel.Gender = s.order.Gender;
+                        orderModel.Gender =s.order.Gender;
                         orderModel.GraphicLength = double.Parse(length.ToString());
                         orderModel.GraphicWidth = double.Parse(width.ToString());
                         orderModel.GraphicMaterial = s.order.GraphicMaterial;

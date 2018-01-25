@@ -87,7 +87,8 @@ namespace WebApp.Subjects.RegionSubject
                             join subject in CurrentContext.DbContext.Subject
                             on order.HandMakeSubjectId equals subject.Id
                             where order.SubjectId == subjectId
-                            && order.IsSubmit == 1 && (order.ApproveState == null || order.ApproveState == 0)
+                            //&& order.IsSubmit == 1 
+                            //&& (order.ApproveState == null || order.ApproveState == 0)
                             select new
                             {
                                 shop,

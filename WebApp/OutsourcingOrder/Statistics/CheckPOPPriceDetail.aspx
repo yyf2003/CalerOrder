@@ -140,7 +140,7 @@
                         <%#Eval("Quantity")%>
                     </td>
                     <td>
-                        <%#Eval("OrderGender")%>
+                        <%#Eval("Gender")%>
                     </td>
                     <td>
                         <%#Eval("GraphicWidth")%>
