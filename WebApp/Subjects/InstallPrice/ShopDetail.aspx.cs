@@ -50,6 +50,7 @@ namespace WebApp.Subjects.InstallPrice
             if (!IsPostBack)
             {
                 //BindData();
+                GetInstallShop();
             }
         }
 
@@ -422,11 +423,88 @@ namespace WebApp.Subjects.InstallPrice
             gvPrice.DataBind();
         }
 
+
+        void GetInstallShop() {
+            var list = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
+                        join shop in CurrentContext.DbContext.Shop
+                        on installShop.ShopId equals shop.Id
+                        join guidance in CurrentContext.DbContext.SubjectGuidance
+                        on installShop.GuidanceId equals guidance.ItemId
+                        join subject in CurrentContext.DbContext.Subject
+                        on installShop.SubjectId equals subject.Id
+                        where installShop.InstallDetailId == installDetailId
+                        select new
+                        {
+                            installShop,
+                            shop,
+                            guidance.ItemName,
+                            subject,
+                            installShop.BasicPrice,
+                            installShop.WindowPrice,
+                            installShop.OOHPrice
+                        }).ToList();
+            if (!IsPostBack)
+            {
+                if (list.Any())
+                {
+                    List<string> provinceList0 = list.Select(s=>s.shop.ProvinceName).Distinct().OrderBy(s=>s).ToList();
+                    if (provinceList0.Any())
+                    {
+                        provinceList0.ForEach(s => {
+                            ListItem li = new ListItem();
+                            li.Value = s;
+                            li.Text = s+"&nbsp;";
+                            cblProvince.Items.Add(li);
+                        });
+                    }
+                }
+            }
+            List<string> provinceList = new List<string>();
+            foreach (ListItem li in cblProvince.Items)
+            {
+                if (li.Selected)
+                {
+                    provinceList.Add(li.Value);
+                }
+            }
+            if (provinceList.Any())
+            {
+                list = list.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(txtShopNo.Text.Trim()))
+            {
+                string shopNo = txtShopNo.Text.Trim().ToLower();
+                list = list.Where(s => s.shop.ShopNo != null && s.shop.ShopNo.ToLower().Contains(shopNo)).ToList();
+            }
+            int totalShopCount = list.Select(s => s.shop.Id).Distinct().Count();
+            decimal totalPrice = list.Sum(s=>(s.BasicPrice+s.WindowPrice+s.OOHPrice))??0;
+            labShopCount.Text = totalShopCount.ToString();
+            labTotalPrice.Text = Math.Round(totalPrice, 2).ToString();
+            AspNetPager1.RecordCount = list.Count;
+            this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
+            gvPrice.DataSource = list.OrderBy(s => s.subject.Id).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            gvPrice.DataBind();
+        }
+
         protected void btnExport_Click(object sender, EventArgs e)
         {
-            GetData();
-            var list = shopList.OrderBy(s => s.GuidanceId).ThenBy(s => s.ShopNo).ToList();
-            
+            //GetData();
+            //var list = shopList.OrderBy(s => s.GuidanceId).ThenBy(s => s.ShopNo).ToList();
+            var list = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
+                        join shop in CurrentContext.DbContext.Shop
+                        on installShop.ShopId equals shop.Id
+                        join guidance in CurrentContext.DbContext.SubjectGuidance
+                        on installShop.GuidanceId equals guidance.ItemId
+                        join subject in CurrentContext.DbContext.Subject
+                        on installShop.SubjectId equals subject.Id
+                        where installShop.InstallDetailId == installDetailId
+                        select new
+                        {
+                            installShop,
+                            shop,
+                            guidance.ItemName,
+                            subject,
+                        }).ToList();
             if (list.Any())
             {
                 string templateFileName = "InstallPriceTemplate";
@@ -455,22 +533,22 @@ namespace WebApp.Subjects.InstallPrice
 
                     }
 
-                    double basicInstallPrice = double.Parse((item.BasicInstallPrice ?? 0).ToString());
-                    double windowInstallPrice = double.Parse((item.WindowInstallPrice ?? 0).ToString());
-                    double oohInstallPrice = double.Parse(item.OOHInstallPrice.ToString());
+                    double basicInstallPrice = double.Parse((item.installShop.BasicPrice ?? 0).ToString());
+                    double windowInstallPrice = double.Parse((item.installShop.WindowPrice ?? 0).ToString());
+                    double oohInstallPrice = double.Parse((item.installShop.OOHPrice??0).ToString());
 
-                    dataRow.GetCell(0).SetCellValue(item.GuidanceName);
-                    dataRow.GetCell(1).SetCellValue(item.SubjectName);
-                    dataRow.GetCell(2).SetCellValue(item.ShopNo);
-                    dataRow.GetCell(3).SetCellValue(item.ShopName);
-                    dataRow.GetCell(4).SetCellValue(item.POPAddress);
-                    dataRow.GetCell(5).SetCellValue(item.RegionName);
-                    dataRow.GetCell(6).SetCellValue(item.ProvinceName);
-                    dataRow.GetCell(7).SetCellValue(item.CityName);
-                    dataRow.GetCell(8).SetCellValue(item.CityTier);
-                    dataRow.GetCell(9).SetCellValue(item.IsInstall);
-                    dataRow.GetCell(10).SetCellValue(item.POSScale);
-                    dataRow.GetCell(11).SetCellValue(item.MaterialSupport);
+                    dataRow.GetCell(0).SetCellValue(item.ItemName);
+                    dataRow.GetCell(1).SetCellValue(item.subject.SubjectName);
+                    dataRow.GetCell(2).SetCellValue(item.shop.ShopNo);
+                    dataRow.GetCell(3).SetCellValue(item.shop.ShopName);
+                    dataRow.GetCell(4).SetCellValue(item.shop.POPAddress);
+                    dataRow.GetCell(5).SetCellValue(item.shop.RegionName);
+                    dataRow.GetCell(6).SetCellValue(item.shop.ProvinceName);
+                    dataRow.GetCell(7).SetCellValue(item.shop.CityName);
+                    dataRow.GetCell(8).SetCellValue(item.shop.CityTier);
+                    dataRow.GetCell(9).SetCellValue(item.shop.IsInstall);
+                    dataRow.GetCell(10).SetCellValue(item.installShop.POSScale);
+                    dataRow.GetCell(11).SetCellValue(item.installShop.MaterialSupport);
                     dataRow.GetCell(12).SetCellValue(basicInstallPrice);
                     dataRow.GetCell(13).SetCellValue(windowInstallPrice);
                     dataRow.GetCell(14).SetCellValue(oohInstallPrice);
@@ -509,26 +587,45 @@ namespace WebApp.Subjects.InstallPrice
 
         protected void AspNetPager1_PageChanged(object sender, EventArgs e)
         {
-            BindData();
+            //BindData();
+            GetInstallShop();
         }
 
         protected void gvPrice_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
             if (e.Item.ItemIndex != -1)
             {
-                Shop shop = e.Item.DataItem as Shop;
-                if (shop != null)
+                object item = e.Item.DataItem;
+                if (item != null)
                 {
+                    object objBasicPrice = item.GetType().GetProperty("BasicPrice").GetValue(item,null);
+                    object objWindowPrice = item.GetType().GetProperty("WindowPrice").GetValue(item, null);
+                    object objOOHPrice = item.GetType().GetProperty("OOHPrice").GetValue(item, null);
+
+                    decimal basicPrice = objBasicPrice != null ? decimal.Parse(objBasicPrice.ToString()) : 0;
+                    decimal windowPrice = objWindowPrice != null ? decimal.Parse(objWindowPrice.ToString()) : 0;
+                    decimal oohPrice = objOOHPrice != null ? decimal.Parse(objOOHPrice.ToString()) : 0;
                     Label labTotal = (Label)e.Item.FindControl("labTotal");
-                    decimal total = (shop.BasicInstallPrice ?? 0) + (shop.WindowInstallPrice ?? 0) + shop.OOHInstallPrice;
-                    labTotal.Text = Math.Round(total, 2).ToString();
+                    labTotal.Text = Math.Round((basicPrice + windowPrice + oohPrice), 2).ToString();
                 }
+                //Shop shop = e.Item.DataItem as Shop;
+                //if (shop != null)
+                //{
+                //    Label labTotal = (Label)e.Item.FindControl("labTotal");
+                //    decimal total = (shop.BasicInstallPrice ?? 0) + (shop.WindowInstallPrice ?? 0) + shop.OOHInstallPrice;
+                //    labTotal.Text = Math.Round(total, 2).ToString();
+                //}
             }
         }
 
         protected void Button1_Click(object sender, EventArgs e)
         {
             BindData();
+        }
+
+        protected void btnSearch_Click(object sender, EventArgs e)
+        {
+            GetInstallShop();
         }
     }
 }

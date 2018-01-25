@@ -14,26 +14,24 @@
     <script type="text/javascript">
         $(function () {
 
-            if ($("#hfProvinceAndCity").val().indexOf("$") == -1) {
-               
-                //$("#loadingImg").show();
-                var provinceAndCity = "";
-                try {
-                    //if (typeof (window.parent.GetSelectProvinceAndCity) == 'function') {
+//            if ($("#hfProvinceAndCity").val().indexOf("$") == -1) {
+//               
+//               
+//                var provinceAndCity = "";
+//                try {
+//                   
+//                    provinceAndCity = window.parent.GetSelectProvinceAndCity();
+//                }
+//                catch (e) {
 
-                    //}
-                    provinceAndCity = window.parent.GetSelectProvinceAndCity();
-                }
-                catch (e) {
+//                }
 
-                }
+//                if (provinceAndCity == "")
+//                    provinceAndCity = "$";
 
-                if (provinceAndCity == "")
-                    provinceAndCity = "$";
-
-                $("#hfProvinceAndCity").val(provinceAndCity);
-                $("#Button1").click();
-            }
+//                $("#hfProvinceAndCity").val(provinceAndCity);
+//                $("#Button1").click();
+//            }
             
         })
     </script>
@@ -48,23 +46,30 @@
     <div>
         <table class="table">
             <tr class="tr_hui">
-                <td style="text-align: center;">
+                <td style="text-align: center;width: 120px;">
                     省份：
                 </td>
-                <td style="text-align: left; padding-left: 5px;">
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
                     <asp:CheckBoxList ID="cblProvince" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
                     </asp:CheckBoxList>
                 </td>
-                <td style="text-align: center;">
-                    城市：
-                </td>
-                <td style="text-align: left; padding-left: 5px;" colspan="2">
-                    <asp:CheckBoxList ID="cblCity" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
-                    </asp:CheckBoxList>
+                <td rowspan="2" style="width: 120px;">
+                    <asp:Button ID="btnSearch" runat="server" Text="查 询" class="easyui-linkbutton"
+                        Style="width: 65px; height: 26px;" onclick="btnSearch_Click"/>
+                    <img id="searchLoading" style="display: none;" src="/image/WaitImg/loadingA.gif" />
                 </td>
             </tr>
+            <tr class="tr_hui">
+                <td style="text-align: center;">
+                    店铺编号：
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtShopNo" runat="server" MaxLength="20"></asp:TextBox>
+                </td>
+                
+            </tr>
             <tr class="tr_bai">
-                <td style="text-align: center; width: 80px;">
+                <td style="text-align: center; ">
                     店铺数量：
                 </td>
                 <td style="text-align: left; width: 250px; padding-left: 5px;">
@@ -152,46 +157,46 @@
                         <%#(AspNetPager1.CurrentPageIndex-1)*AspNetPager1.PageSize+ Container.ItemIndex + 1%>
                     </td>
                     <td>
-                       <%#Eval("GuidanceName")%>
+                       <%#Eval("ItemName")%>
                     </td>
                     <td>
-                       <%#Eval("SubjectName")%>
+                       <%#Eval("subject.SubjectName")%>
                     </td>
                     <td>
-                        <%#Eval("ShopNo") %>
+                        <%#Eval("shop.ShopNo")%>
                     </td>
                     <td>
-                        <%#Eval("ShopName") %>
+                        <%#Eval("shop.ShopName")%>
                     </td>
                     <td>
-                        <%#Eval("RegionName") %>
+                        <%#Eval("shop.RegionName")%>
                     </td>
                     <td>
-                        <%#Eval("ProvinceName") %>
+                        <%#Eval("shop.ProvinceName")%>
                     </td>
                     <td>
-                        <%#Eval("CityName") %>
+                        <%#Eval("shop.CityName")%>
                     </td>
                     <td>
-                        <%#Eval("CityTier")%>
+                        <%#Eval("shop.CityTier")%>
                     </td>
                     <td>
-                        <%#Eval("IsInstall")%>
+                        <%#Eval("shop.IsInstall")%>
                     </td>
                     <td>
-                        <%#Eval("POSScale")%>
+                        <%#Eval("installShop.POSScale")%>
                     </td>
                     <td>
-                        <%#Eval("MaterialSupport")%>
+                        <%#Eval("installShop.MaterialSupport")%>
                     </td>
                     <td>
-                        <%#Eval("BasicInstallPrice")%>
+                        <%#Eval("BasicPrice")%>
                     </td>
                     <td>
-                        <%#Eval("WindowInstallPrice")%>
+                        <%#Eval("WindowPrice")%>
                     </td>
                     <td>
-                        <%#Eval("OOHInstallPrice")%>
+                        <%#Eval("OOHPrice")%>
                     </td>
                     <td>
                         <asp:Label ID="labTotal" runat="server" Text="0"></asp:Label>
