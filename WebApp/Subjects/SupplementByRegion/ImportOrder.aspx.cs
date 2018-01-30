@@ -1237,7 +1237,7 @@ namespace WebApp.Subjects.SupplementByRegion
                 Subject subjectModel = subjectBll.GetModel(subjectId);
                 if (subjectModel != null)
                     guidanceId = subjectModel.GuidanceId ?? -1;
-                var model = subjectBll.GetList(s => s.SubjectName.Trim().ToLower() == subjectName && (((s.SubjectType ?? 1) == (int)SubjectTypeEnum.POP订单) || ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.正常单)) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && s.GuidanceId == guidanceId).FirstOrDefault();
+                var model = subjectBll.GetList(s => s.SubjectName.Trim().ToLower() == subjectName && (((s.SubjectType ?? 1) == (int)SubjectTypeEnum.POP订单) || ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.正常单) || ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.手工订单)) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && s.GuidanceId == guidanceId).FirstOrDefault();
                 if (model != null)
                 {
                     supplementSubjectId = model.Id;

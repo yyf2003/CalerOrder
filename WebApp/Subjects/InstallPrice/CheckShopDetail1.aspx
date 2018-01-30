@@ -1,7 +1,7 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ShopDetail.aspx.cs" Inherits="WebApp.Subjects.InstallPrice.ShopDetail" %>
-
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CheckShopDetail1.aspx.cs" Inherits="WebApp.Subjects.InstallPrice.CheckShopDetail1" %>
 <%@ Register Assembly="AspNetPager" Namespace="Wuqi.Webdiyer" TagPrefix="webdiyer" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title></title>
@@ -11,15 +11,9 @@
     <link href="/easyui1.4/themes/icon.css" rel="stylesheet" />
     <script src="/Scripts/jquery-1.7.2.js" type="text/javascript"></script>
     <script src="/easyui1.4/jquery.easyui.min.js"></script>
-   
 </head>
 <body>
     <form id="form1" runat="server">
-    <asp:HiddenField ID="hfProvinceAndCity" runat="server" Value=""/>
-    <asp:Button ID="Button1" runat="server" Text="Button" onclick="Button1_Click" style=" display:none;"/>
-    <%--<div class="tr">
-        》安装费明细
-    </div>--%>
     <div>
         <table class="table">
             <tr class="tr_hui">
@@ -131,7 +125,7 @@
             <ItemTemplate>
                 <tr class="tr_bai">
                     <td style="width: 40px;">
-                        <%#(AspNetPager1.CurrentPageIndex-1)*AspNetPager1.PageSize+ Container.ItemIndex + 1%>
+                       <%#(AspNetPager1.CurrentPageIndex-1)*AspNetPager1.PageSize+ Container.ItemIndex + 1%>
                     </td>
                     <td>
                        <%#Eval("ItemName")%>
@@ -194,7 +188,7 @@
         </asp:Repeater>
     </div>
     <div style="text-align: center;">
-        <webdiyer:AspNetPager ID="AspNetPager1" runat="server" PageSize="20" CssClass="paginator"
+       <webdiyer:AspNetPager ID="AspNetPager1" runat="server" PageSize="20" CssClass="paginator"
             CurrentPageButtonClass="cpb" AlwaysShow="True" FirstPageText="首页" LastPageText="尾页"
             NextPageText="下一页" PrevPageText="上一页" ShowCustomInfoSection="Left" ShowInputBox="Never"
             CustomInfoTextAlign="Left" LayoutType="Table" OnPageChanged="AspNetPager1_PageChanged">

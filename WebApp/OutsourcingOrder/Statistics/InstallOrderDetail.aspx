@@ -112,6 +112,9 @@
                         <td>
                             应收安装费
                         </td>
+                        <td>
+                            备注
+                        </td>
                     </tr>
             </HeaderTemplate>
             <ItemTemplate>
@@ -155,14 +158,16 @@
                     <td>
                         <%#Eval("ReceiveInstallPrice")%>
                     </td>
-                    
+                     <td>
+                        <%#Eval("Remark")%>
+                    </td>
                 </tr>
             </ItemTemplate>
             <FooterTemplate>
                 <%if (gvPrice.Items.Count == 0)
                   { %>
                 <tr class="tr_bai">
-                    <td colspan="13" style="text-align: center;">
+                    <td colspan="14" style="text-align: center;">
                         --无数据--
                     </td>
                 </tr>

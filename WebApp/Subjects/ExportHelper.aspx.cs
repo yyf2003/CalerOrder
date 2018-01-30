@@ -33,6 +33,7 @@ namespace WebApp.Subjects
     public partial class ExportHelper : BasePage
     {
         string type = string.Empty;
+        int selectType = 1;
         string subjectId = string.Empty;
         string region = string.Empty;
         string province = string.Empty;
@@ -49,6 +50,10 @@ namespace WebApp.Subjects
             if (Request.QueryString["type"] != null)
             {
                 type = Request.QueryString["type"];
+            }
+            if (Request.QueryString["selecttype"] != null)
+            {
+                selectType = int.Parse(Request.QueryString["selecttype"]);
             }
             if (Request.QueryString["subjectids"] != null)
             {
@@ -771,7 +776,8 @@ namespace WebApp.Subjects
                             join category1 in CurrentContext.DbContext.ADSubjectCategory
                              on subject.SubjectCategoryId equals category1.Id into temp1
                             from category in temp1.DefaultIfEmpty()
-                            where subjectIdList.Contains(order.SubjectId ?? 0)
+                            //where subjectIdList.Contains(order.SubjectId ?? 0)
+                            where selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0)
                             && ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || order.OrderType>1)
                             
                             && (order.IsValid == null || order.IsValid == true)
@@ -1524,7 +1530,8 @@ namespace WebApp.Subjects
                             join guidance in CurrentContext.DbContext.SubjectGuidance
                             on subject.GuidanceId equals guidance.ItemId
                            
-                            where subjectIdList.Contains(order.SubjectId ?? 0)
+                            //where subjectIdList.Contains(order.SubjectId ?? 0)
+                            where selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0)
                             && ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || order.OrderType>1)
                             
                             && (order.IsValid == null || order.IsValid == true)
@@ -3086,7 +3093,8 @@ namespace WebApp.Subjects
                             join category1 in CurrentContext.DbContext.ADSubjectCategory
                             on subject.SubjectCategoryId equals category1.Id into temp1
                             from category in temp1.DefaultIfEmpty()
-                            where subjectIdList.Contains(order.SubjectId ?? 0)
+                           // where subjectIdList.Contains(order.SubjectId ?? 0)
+                            where selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0)
                             && (order.IsValid == null || order.IsValid == true)
                             && (order.IsDelete == null || order.IsDelete == false)
                             && (order.ShopStatus == null || order.ShopStatus == "" || order.ShopStatus == ShopStatusEnum.正常.ToString())

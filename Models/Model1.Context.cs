@@ -130,7 +130,6 @@ namespace Models
         public DbSet<Quotations> Quotations { get; set; }
         public DbSet<QuotationTaxRate> QuotationTaxRate { get; set; }
         public DbSet<QuoteMaterial> QuoteMaterial { get; set; }
-        public DbSet<QuoteOrderDetail> QuoteOrderDetail { get; set; }
         public DbSet<Region> Region { get; set; }
         public DbSet<RegionOrderDetail> RegionOrderDetail { get; set; }
         public DbSet<RegionOrderPrice> RegionOrderPrice { get; set; }
@@ -167,5 +166,6 @@ namespace Models
         public DbSet<UserInRole> UserInRole { get; set; }
         public DbSet<UserLevel> UserLevel { get; set; }
         public DbSet<QuoteOrderSetting> QuoteOrderSetting { get; set; }
+        public DbSet<QuoteOrderDetail> QuoteOrderDetail { get; set; }
     }
 }

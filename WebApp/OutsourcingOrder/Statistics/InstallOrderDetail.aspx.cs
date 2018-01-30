@@ -171,6 +171,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                         shopModel.BasicInstallPrice = installPrice;
                         shopModel.ReceiveInstallPrice = rInstallPrice;
                         shopModel.GuidanceName = s.guidance.ItemName;
+                        shopModel.Remark = s.orderDetail.Remark;
                         shopList.Add(shopModel);
 
                     });
@@ -196,6 +197,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                         shopModel.BasicInstallPrice = installPrice;
                         shopModel.ReceiveInstallPrice = rInstallPrice;
                         shopModel.GuidanceName = s.guidance.ItemName;
+                        shopModel.Remark = s.orderDetail.Remark;
                         shopList.Add(shopModel);
 
                     });

@@ -53,9 +53,16 @@ namespace Models
         public Nullable<decimal> GraphicWidth { get; set; }
         public Nullable<decimal> GraphicLength { get; set; }
         public Nullable<decimal> Area { get; set; }
+        public Nullable<decimal> AutoAddGraphicWidth { get; set; }
+        public Nullable<decimal> AutoAddGraphicLength { get; set; }
+        public Nullable<decimal> AutoAddArea { get; set; }
+        public Nullable<decimal> TotalGraphicWidth { get; set; }
+        public Nullable<decimal> TotalGraphicLength { get; set; }
         public Nullable<decimal> TotalArea { get; set; }
         public Nullable<int> CustomerMaterialId { get; set; }
         public string GraphicMaterial { get; set; }
+        public string QuoteGraphicMaterial { get; set; }
+        public string UnitName { get; set; }
         public Nullable<decimal> UnitPrice { get; set; }
         public Nullable<decimal> TotalPrice { get; set; }
         public string ChooseImg { get; set; }
@@ -88,7 +95,7 @@ namespace Models
         public Nullable<decimal> PayOrderPrice { get; set; }
         public Nullable<int> CSUserId { get; set; }
         public Nullable<int> FinalOrderId { get; set; }
-        public string QuoteGraphicMaterial { get; set; }
-        public string UnitName { get; set; }
+        public Nullable<decimal> DefaultTotalPrice { get; set; }
+        public Nullable<decimal> AutoAddTotalPrice { get; set; }
     }
 }

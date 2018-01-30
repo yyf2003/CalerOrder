@@ -56,5 +56,6 @@ namespace Models
         public string CornerType { get; set; }
         public Nullable<bool> IsRead { get; set; }
         public Nullable<int> OutsourceId { get; set; }
+        public Nullable<bool> IsSecondInstall { get; set; }
     }
 }

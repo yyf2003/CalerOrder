@@ -14,7 +14,7 @@ var exportShopNo = "";
 var isNotInclude = "";
 $(function () {
     GetGuidance1();
-    
+
     $("#ddlCustomer").change(function () {
 
         GetGuidance1();
@@ -23,7 +23,7 @@ $(function () {
     //查询上个月活动
     $("#spanUp").click(function () {
         var month1 = $.trim($("#txtMonth").val());
-        
+
         if (month1 != "") {
             month1 = month1.replace(/-/g, "/");
             var date = new Date(month1);
@@ -48,48 +48,63 @@ $(function () {
 
 
     //查询上个月活动
-//    $("#spanUp").click(function () {
-//        var begin = $("#labBeginDate").text();
-//        var end = $("#labEndDate").text();
-//        begin = begin.replace(/-/g, "/");
-//        end = end.replace(/-/g, "/");
-//        var date = new Date(begin);
+    //    $("#spanUp").click(function () {
+    //        var begin = $("#labBeginDate").text();
+    //        var end = $("#labEndDate").text();
+    //        begin = begin.replace(/-/g, "/");
+    //        end = end.replace(/-/g, "/");
+    //        var date = new Date(begin);
 
-//        var year = date.getFullYear();
-//        var month = date.getMonth(); //上个月
-//        if (month == 0) {
-//            month = 12;
-//            year--;
-//        }
-//        var upFirstDate = year + "-" + month + "-1";
-//        var date2 = new Date(year, month, 0);
-//        var upLastDate = year + "-" + month + "-" + date2.getDate();
-//        
-//        $("#labBeginDate").html(upFirstDate);
-//        $("#labEndDate").html(upLastDate);
-//        GetGuidance(upFirstDate, upLastDate);
-//    })
+    //        var year = date.getFullYear();
+    //        var month = date.getMonth(); //上个月
+    //        if (month == 0) {
+    //            month = 12;
+    //            year--;
+    //        }
+    //        var upFirstDate = year + "-" + month + "-1";
+    //        var date2 = new Date(year, month, 0);
+    //        var upLastDate = year + "-" + month + "-" + date2.getDate();
+    //        
+    //        $("#labBeginDate").html(upFirstDate);
+    //        $("#labEndDate").html(upLastDate);
+    //        GetGuidance(upFirstDate, upLastDate);
+    //    })
 
     //查询下个月活动
     //$("#spanDown").click(function () {
-//        var begin = $("#labBeginDate").text();
-//        var end = $("#labEndDate").text();
-//        begin = begin.replace(/-/g, "/");
-//        end = end.replace(/-/g, "/");
-//        var date = new Date(end);
-//        var year = date.getFullYear();
-//        var month = date.getMonth() + 2; //下个月
-//        if (month >= 13) {
-//            month = 1;
-//            year++;
-//        }
-//        var upFirstDate = year + "-" + month + "-1";
-//        var date2 = new Date(year, month, 0);
-//        var upLastDate = year + "-" + month + "-" + date2.getDate();
-//        $("#labBeginDate").html(upFirstDate);
-//        $("#labEndDate").html(upLastDate);
-//        GetGuidance(upFirstDate, upLastDate);
-   // })
+    //        var begin = $("#labBeginDate").text();
+    //        var end = $("#labEndDate").text();
+    //        begin = begin.replace(/-/g, "/");
+    //        end = end.replace(/-/g, "/");
+    //        var date = new Date(end);
+    //        var year = date.getFullYear();
+    //        var month = date.getMonth() + 2; //下个月
+    //        if (month >= 13) {
+    //            month = 1;
+    //            year++;
+    //        }
+    //        var upFirstDate = year + "-" + month + "-1";
+    //        var date2 = new Date(year, month, 0);
+    //        var upLastDate = year + "-" + month + "-" + date2.getDate();
+    //        $("#labBeginDate").html(upFirstDate);
+    //        $("#labEndDate").html(upLastDate);
+    //        GetGuidance(upFirstDate, upLastDate);
+    // })
+
+    $("input[name='selectSubjectType']").change(function () {
+        //var val = $("input[name='selectSubjectType']:checked").val();
+        var val = $(this).val();
+        if (val == 1) {
+            $("#shanghaiSubjects").show();
+            $("#regionSubjects").hide();
+            $("input[name='projectRegionCB'],#cbALL1").attr("checked", false);
+        }
+        else {
+            $("#shanghaiSubjects").hide();
+            $("#regionSubjects").show();
+            $("input[name='projectCB'],#cbALL").attr("checked", false);
+        }
+    })
 
     //查询
     $("#btnSearch").click(function () {
@@ -116,6 +131,25 @@ $(function () {
         }
     })
 
+    //全选
+    $("#cbALL1").on("click", function () {
+        var check = this.checked;
+        $("input[name='projectRegionCB']").each(function () {
+            this.checked = check;
+        })
+        if (check) {
+            GetRegions();
+            GetProvince();
+            GetCity();
+            GetCustomerService();
+            GetInstallLevel();
+            GetMaterialCategory();
+        }
+        else {
+            $(".contentDiv").html("");
+        }
+    })
+
 
     $("#btnSearchSubject").on("click", function () {
         var begin = $.trim($("#txtBeginDate").val());
@@ -130,15 +164,12 @@ $(function () {
 
     $("#guidanceDiv").delegate("input[name='guidanceCB']", "change", function () {
         GetProjectList();
+        GetRegionProjectList();
     })
     //选择区域
     $("#regionDiv").delegate("input[name='regionCB']", "change", function () {
         ScreenProject();
-        //GetProvince();
-        //GetCity();
-        //GetCustomerService();
-        //GetInstallLevel();
-        //GetMaterialCategory();
+
     })
     //选择活动类型
     $("#activityDiv").delegate("input[name='activityCB']", "change", function () {
@@ -150,6 +181,15 @@ $(function () {
     })
     //选择项目
     $("#projectsDiv").delegate("input[name='projectCB']", "change", function () {
+        //GetRegions();
+        GetProvince();
+        //GetCity();
+        GetCustomerService();
+        GetInstallLevel();
+        GetMaterialCategory();
+    })
+
+    $("#projectsDiv1").delegate("input[name='projectRegionCB']", "change", function () {
         //GetRegions();
         GetProvince();
         //GetCity();
@@ -264,8 +304,19 @@ $(function () {
     //导出喷绘王模板-北京
     $("#btnPHWbj").click(function () {
         GetCondition();
-
-        if (subjectId == "") {
+        var selectSubjectType = $("input[name='selectSubjectType']:checked").val();
+        var ids = "";
+        if (selectSubjectType == 1) {
+            $("input[name='projectCB']:checked").each(function () {
+                ids += $(this).val() + ",";
+            })
+        }
+        else {
+            $("input[name='projectRegionCB']:checked").each(function () {
+                ids += $(this).val() + ",";
+            })
+        }
+        if (ids == "") {
             alert("请选择项目");
             return false;
         }
@@ -273,8 +324,8 @@ $(function () {
         $(this).attr("disabled", true).next("img").show();
         checkExportBJPHW($(this));
         //var url = "Handler/ExportOrders.ashx?type=exportbjphw&subjectids=" + subjectId;
-        var url = "/Subjects/ExportHelper.aspx?type=exportbjphw&subjectids=" + subjectId + "&regions=" + region + "&province=" + province + "&customerService=" + csUserId + "&isInstall=" + isInstall + "&materialCategory=" + materialCategoryId + "&exportShopNo=" + exportShopNo + "&isNotInclude=" + isNotInclude + "&exportType=" + exportType + "&materialName=" + materialName;
-       
+        var url = "/Subjects/ExportHelper.aspx?type=exportbjphw&subjectids=" + ids + "&regions=" + region + "&province=" + province + "&customerService=" + csUserId + "&isInstall=" + isInstall + "&materialCategory=" + materialCategoryId + "&exportShopNo=" + exportShopNo + "&isNotInclude=" + isNotInclude + "&exportType=" + exportType + "&materialName=" + materialName + "&selecttype=" + selectSubjectType;
+
         $("#exportFrame").attr("src", url);
 
     })
@@ -282,7 +333,19 @@ $(function () {
     //导出喷绘王模板-外协
     $("#btnPHWwx").click(function () {
         GetCondition();
-        if (subjectId == "") {
+        var selectSubjectType = $("input[name='selectSubjectType']:checked").val();
+        var ids = "";
+        if (selectSubjectType == 1) {
+            $("input[name='projectCB']:checked").each(function () {
+                ids += $(this).val() + ",";
+            })
+        }
+        else {
+            $("input[name='projectRegionCB']:checked").each(function () {
+                ids += $(this).val() + ",";
+            })
+        }
+        if (ids == "") {
             alert("请选择项目");
             return false;
         }
@@ -290,7 +353,7 @@ $(function () {
         $(this).attr("disabled", true).next("img").show();
         checkExportOtherPHW($(this));
         //var url = "Handler/ExportOrders.ashx?type=exportotherphw&subjectids=" + subjectId + "&regions=" + region + "&province=" + province + "&city=" + city;
-        var url = "/Subjects/ExportHelper.aspx?type=exportotherphw&subjectids=" + subjectId + "&regions=" + region + "&province=" + province + "&customerService=" + csUserId + "&isInstall=" + isInstall + "&materialCategory=" + materialCategoryId + "&exportShopNo=" + exportShopNo + "&isNotInclude=" + isNotInclude + "&materialName=" + materialName + "&exportType=" + exportType;
+        var url = "/Subjects/ExportHelper.aspx?type=exportotherphw&subjectids=" + ids + "&regions=" + region + "&province=" + province + "&customerService=" + csUserId + "&isInstall=" + isInstall + "&materialCategory=" + materialCategoryId + "&exportShopNo=" + exportShopNo + "&isNotInclude=" + isNotInclude + "&materialName=" + materialName + "&exportType=" + exportType + "&selecttype=" + selectSubjectType;
 
         $("#exportFrame").attr("src", url);
     })
@@ -340,8 +403,20 @@ $(function () {
     //导出系统订单（350）
     $("#btnExportNew350").click(function () {
         GetCondition();
+        var selectSubjectType = $("input[name='selectSubjectType']:checked").val();
+        var ids = "";
+        if (selectSubjectType == 1) {
+            $("input[name='projectCB']:checked").each(function () {
+                ids += $(this).val() + ",";
+            })
+        }
+        else {
+            $("input[name='projectRegionCB']:checked").each(function () {
+                ids += $(this).val() + ",";
+            })
+        }
         var btn = $(this);
-        if (subjectId == "") {
+        if (ids == "") {
             alert("请选择项目");
             return false;
         }
@@ -351,7 +426,7 @@ $(function () {
         })
         btn.attr("disabled", true).next("img").show();
         checkExportNew350(btn);
-        var url = "/Subjects/ExportHelper.aspx?type=exportNew350&subjectids=" + subjectId + "&regions=" + region + "&province=" + province + "&customerService=" + csUserId + "&isInstall=" + isInstall + "&materialCategory=" + materialCategoryId + "&exportType=" + exportType + "&exportShopNo=" + exportShopNo + "&isNotInclude=" + isNotInclude + "&materialName=" + materialName;
+        var url = "/Subjects/ExportHelper.aspx?type=exportNew350&subjectids=" + ids + "&regions=" + region + "&province=" + province + "&customerService=" + csUserId + "&isInstall=" + isInstall + "&materialCategory=" + materialCategoryId + "&exportType=" + exportType + "&exportShopNo=" + exportShopNo + "&isNotInclude=" + isNotInclude + "&materialName=" + materialName + "&selecttype=" + selectSubjectType;
 
         $("#exportFrame").attr("src", url);
     })
@@ -780,6 +855,33 @@ function GetProjectList() {
     })
 }
 
+function GetRegionProjectList() {
+    var guidanceIds0 = "";
+    $("#guidanceDiv").find("input[name='guidanceCB']:checked").each(function () {
+        guidanceIds0 += $(this).val() + ",";
+    })
+    $("#cbALL1").attr("checked", false);
+    $("#projectsDiv1").html("");
+    $(".trType1").hide();
+    $.ajax({
+        type: "get",
+        url: "Handler/CheckOrder.ashx",
+        data: { type: "getRegionProjectList", guidanceIds: guidanceIds0 },
+        success: function (data) {
+
+            if (data != "") {
+                $(".trType1").show();
+                var json1 = eval(data);
+                for (var i = 0; i < json1.length; i++) {
+                    var div = "<div style='float:left;'><input type='checkbox' name='projectRegionCB' value='" + json1[i].Id + "' /><span>" + json1[i].SubjectName + "</span>&nbsp;</div>";
+                    $("#projectsDiv1").append(div);
+                }
+            }
+
+        }
+    })
+}
+
 function ScreenProject() {
     $("#projectsDiv").html("");
     $(".contentDiv").html("");
@@ -860,17 +962,25 @@ function GetProjects() {
 }
 
 function GetRegions() {
+    var selectSubjectType = $("input[name='selectSubjectType']:checked").val();
     var ids = "";
-    $("input[name='projectCB']:checked").each(function () {
-        ids += $(this).val() + ",";
-    })
+    if (selectSubjectType == 1) {
+        $("input[name='projectCB']:checked").each(function () {
+            ids += $(this).val() + ",";
+        })
+    }
+    else {
+        $("input[name='projectRegionCB']:checked").each(function () {
+            ids += $(this).val() + ",";
+        })
+    }
     $("#RegionDiv").html("");
     if (ids.length > 0) {
         ids = ids.substring(0, ids.length - 1);
         $("#regionLoadImg").show();
         $.ajax({
             type: "get",
-            url: "Handler/ExportOrders.ashx?type=getregion&subjectids=" + ids,
+            url: "Handler/ExportOrders.ashx?type=getregion&subjectids=" + ids + "&selecttype=" + selectSubjectType,
             cache: false,
             success: function (data) {
                 
@@ -899,9 +1009,17 @@ function GetProvince() {
         regions += $(this).val() + ",";
     })
     var sds = "";
-    $("input[name='projectCB']:checked").each(function () {
-        sds += $(this).val() + ",";
-    })
+    var selectSubjectType = $("input[name='selectSubjectType']:checked").val();
+    if (selectSubjectType == 1) {
+        $("input[name='projectCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
+    else {
+        $("input[name='projectRegionCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
     $("#provinceLoadImg").show();
     $("#ProvinceDiv").html("");
     $("#CityDiv").html("");
@@ -911,7 +1029,7 @@ function GetProvince() {
     sds = sds.substring(0, sds.length - 1);
     $.ajax({
         type: "get",
-        url: "Handler/ExportOrders.ashx?type=getprovince&regions=" + regions + "&subjectids=" + sds,
+        url: "Handler/ExportOrders.ashx?type=getprovince&regions=" + regions + "&subjectids=" + sds + "&selecttype=" + selectSubjectType,
         cache: false,
         success: function (data) {
             $("#provinceLoadImg").hide();
@@ -942,9 +1060,17 @@ function GetCity() {
     $("#cbAllCity").attr("checked", false);
     $("#CityDiv").html("");
     var sds = "";
-    $("input[name='projectCB']:checked").each(function () {
-        sds += $(this).val() + ",";
-    })
+    var selectSubjectType = $("input[name='selectSubjectType']:checked").val();
+    if (selectSubjectType == 1) {
+        $("input[name='projectCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
+    else {
+        $("input[name='projectRegionCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
     var regions = "";
     $("input[name='regionCB']:checked").each(function () {
         regions += $(this).val() + ",";
@@ -960,7 +1086,7 @@ function GetCity() {
         provinces = provinces.substring(0, provinces.length - 1);
         $.ajax({
             type: "get",
-            url: "Handler/ExportOrders.ashx?type=getcity&regions=" + regions + "&subjectids=" + sds + "&province=" + escape(provinces),
+            url: "Handler/ExportOrders.ashx?type=getcity&regions=" + regions + "&subjectids=" + sds + "&province=" + escape(provinces) + "&selecttype=" + selectSubjectType,
             cache: false,
             success: function (data) {
                 $("#cityLoadImg").hide();
@@ -986,11 +1112,23 @@ function GetCity() {
 function GetCustomerService() {
 
     GetCondition();
-    if (subjectId.length > 0) {
+    var sds = "";
+    var selectSubjectType = $("input[name='selectSubjectType']:checked").val();
+    if (selectSubjectType == 1) {
+        $("input[name='projectCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
+    else {
+        $("input[name='projectRegionCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
+    if (sds.length > 0) {
         $("#csLoadImg").show();
         $.ajax({
             type: "get",
-            url: "Handler/ExportOrders.ashx?type=getCS&regions=" + region + "&subjectids=" + subjectId + "&province=" + escape(province) + "&city=" + escape(city),
+            url: "Handler/ExportOrders.ashx?type=getCS&regions=" + region + "&subjectids=" + sds + "&province=" + escape(province) + "&city=" + escape(city) + "&selecttype=" + selectSubjectType,
             cache: false,
             success: function (data) {
                 $("#csLoadImg").hide();
@@ -1020,11 +1158,23 @@ function GetCustomerService() {
 
 function GetInstallLevel() {
     GetCondition();
-    if (subjectId.length > 0) {
+    var sds = "";
+    var selectSubjectType = $("input[name='selectSubjectType']:checked").val();
+    if (selectSubjectType == 1) {
+        $("input[name='projectCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
+    else {
+        $("input[name='projectRegionCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
+    if (sds.length > 0) {
         $("#installLoadImg").show();
         $.ajax({
             type: "get",
-            url: "Handler/ExportOrders.ashx?type=getInstallLevel&regions=" + region + "&subjectids=" + subjectId + "&province=" + escape(province) + "&city=" + escape(city) + "&customerService=" + csUserId,
+            url: "Handler/ExportOrders.ashx?type=getInstallLevel&regions=" + region + "&subjectids=" + sds + "&province=" + escape(province) + "&city=" + escape(city) + "&customerService=" + csUserId + "&selecttype=" + selectSubjectType,
             cache: false,
             success: function (data) {
                 $("#installLoadImg").hide();
@@ -1050,13 +1200,25 @@ function GetInstallLevel() {
 
 function GetMaterialCategory() {
     GetCondition();
+    var sds = "";
+    var selectSubjectType = $("input[name='selectSubjectType']:checked").val();
+    if (selectSubjectType == 1) {
+        $("input[name='projectCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
+    else {
+        $("input[name='projectRegionCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
     $("#labOrderCount").html("0");
     $("#labShopCount").html("0");
-    if (subjectId.length > 0) {
+    if (sds.length > 0) {
         $("#mcLoadImg").show();
         $.ajax({
             type: "get",
-            url: "Handler/ExportOrders.ashx?type=getMaterialCategory&regions=" + region + "&subjectids=" + subjectId + "&province=" + escape(province) + "&city=" + escape(city) + "&customerService=" + csUserId + "&isInstall=" + isInstall,
+            url: "Handler/ExportOrders.ashx?type=getMaterialCategory&regions=" + region + "&subjectids=" + sds + "&province=" + escape(province) + "&city=" + escape(city) + "&customerService=" + csUserId + "&isInstall=" + isInstall + "&selecttype=" + selectSubjectType,
             cache: false,
             success: function (data) {
                 
@@ -1097,7 +1259,19 @@ var pageSize = 20;
 var currPage = 0;
 function GetOrderDetail(pageindx, pagesize) {
     GetCondition();
-    if (subjectId == "") {
+    var sds = "";
+    var selectSubjectType = $("input[name='selectSubjectType']:checked").val()||1;
+    if (selectSubjectType == 1) {
+        $("input[name='projectCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
+    else {
+        $("input[name='projectRegionCB']:checked").each(function () {
+            sds += $(this).val() + ",";
+        })
+    }
+    if (sds == "") {
         alert("请选择项目");
         return false;
     }
@@ -1105,7 +1279,7 @@ function GetOrderDetail(pageindx, pagesize) {
         type: "get",
         url: "Handler/ExportOrders.ashx?type=getlist&currpage=" + pageindx + "&pagesize=" + pagesize,
 
-        data: { subjectids: subjectId, regions: region, province: province, city: city, customerService: csUserId, isInstall: isInstall, materialCategory: materialCategoryId },
+        data: { subjectids: sds, regions: region, province: province, city: city, customerService: csUserId, isInstall: isInstall, materialCategory: materialCategoryId, selecttype: selectSubjectType },
         cache: false,
         beforeSend: function () { $("#divload").show(); $("#noData").hide(); }, //发送数据之前
         complete: function () { $("#divload").hide(); }, //接收数据完毕

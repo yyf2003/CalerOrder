@@ -137,6 +137,11 @@ namespace WebApp.Subjects.Handler
                     string guidanceIds = context.Request.QueryString["guidanceIds"];
                     result = GetProjectList(guidanceIds);
                     break;
+                case "getRegionProjectList":
+                    //int guidanceId = int.Parse(context.Request.QueryString["guidanceId"]);
+                    string guidanceIds0 = context.Request.QueryString["guidanceIds"];
+                    result = GetRegionProjectList(guidanceIds0);
+                    break;
                 case "screenProject":
                     string region = context.Request.QueryString["region"];
                     string guidanceIds1 = context.Request.QueryString["guidanceIds"];
@@ -233,22 +238,7 @@ namespace WebApp.Subjects.Handler
             regionList = popOrderList.Select(s => s.shop.RegionName).Distinct().ToList();
             List<int> orderSubjectIdList = popOrderList.Select(s => s.SubjectId).Distinct().ToList();
             
-            //List<int> orderSubjectIdList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
-            //                                join shop in CurrentContext.DbContext.Shop
-            //                                on order.ShopId equals shop.Id
-            //                                join subject in CurrentContext.DbContext.Subject
-            //                                on order.SubjectId equals subject.Id
-            //                                where guidanceIdList.Contains(subject.GuidanceId ?? 0) && (subject.IsDelete == null || subject.IsDelete == false)
-            //                                && subject.ApproveState == 1
-            //                                && subject.SubjectType != (int)SubjectTypeEnum.二次安装费
-            //                                && subject.SubjectType != (int)SubjectTypeEnum.费用订单
-            //                                //&& (myRegion.Any()?(myRegion.Contains(shop.RegionName.ToLower())):1==1)
-            //                                select order.SubjectId ?? 0
-                                                
-            //                            ).Distinct().ToList();
-
-
-
+           
             //物料订单
 
             var materialOrderList = (from materialOrder in CurrentContext.DbContext.OrderMaterial
@@ -266,15 +256,7 @@ namespace WebApp.Subjects.Handler
                                      }).Distinct().ToList();
             List<string> regionList1 = materialOrderList.Select(s => s.shop.RegionName).Distinct().ToList();
             List<int> materialOrderSubjectIdList = materialOrderList.Select(s => s.SubjectId).Distinct().ToList();
-            //List<int> materialOrderSubjectList = (from materialOrder in CurrentContext.DbContext.OrderMaterial
-            //                                      join shop in CurrentContext.DbContext.Shop
-            //                                      on materialOrder.ShopId equals shop.Id
-            //                                      join subject in CurrentContext.DbContext.Subject
-            //                                      on materialOrder.SubjectId equals subject.Id
-            //                                      where guidanceIdList.Contains(subject.GuidanceId ?? 0) && (subject.IsDelete == null || subject.IsDelete == false)
-            //                                      && subject.ApproveState == 1
-            //                                      && (myRegion.Any() ? (myRegion.Contains(shop.RegionName.ToLower())) : 1 == 1)
-            //                                      select materialOrder.SubjectId ?? 0).Distinct().ToList();
+           
 
             regionList.AddRange(regionList1);
             orderSubjectIdList.AddRange(materialOrderSubjectIdList);
@@ -367,6 +349,80 @@ namespace WebApp.Subjects.Handler
 
 
                 result = "[" + subjectJsonStr.ToString().TrimEnd(',') + "]" + "|[" + subjectTypeJsonStr.ToString().TrimEnd(',') + "]" + "|[" + activityJsonStr.ToString().TrimEnd(',') + "]|[" + regionJsonStr.ToString().TrimEnd(',') + "]";
+            }
+            return result;
+        }
+
+        string GetRegionProjectList(string guidanceIds)
+        {
+            List<int> guidanceIdList = new List<int>();
+            if (!string.IsNullOrWhiteSpace(guidanceIds))
+                guidanceIdList = StringHelper.ToIntList(guidanceIds, ',');
+            string result = string.Empty;
+            StringBuilder subjectJsonStr = new StringBuilder();
+            StringBuilder subjectTypeJsonStr = new StringBuilder();
+            StringBuilder activityJsonStr = new StringBuilder();
+            //var projectList = new SubjectBLL().GetList(s => s.GuidanceId == guidanceId && (s.IsDelete == null || s.IsDelete == false));
+            //List<string> regionList = new List<string>();
+            List<string> myRegion = new BasePage().GetResponsibleRegion;
+            if (myRegion.Any())
+            {
+                StringHelper.ToUpperOrLowerList(ref myRegion, LowerUpperEnum.ToLower);
+
+            }
+            //POP订单
+            var popOrderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                join shop in CurrentContext.DbContext.Shop
+                                on order.ShopId equals shop.Id
+                                join subject in CurrentContext.DbContext.Subject
+                                on order.RegionSupplementId equals subject.Id
+                                where guidanceIdList.Contains(subject.GuidanceId ?? 0)
+                                && (subject.IsDelete == null || subject.IsDelete == false)
+                                && subject.ApproveState == 1
+                                && subject.SubjectType != (int)SubjectTypeEnum.新开店安装费
+                                && order.IsFromRegion==true
+                                && (myRegion.Any() ? (subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(shop.RegionName.ToLower())) : 1 == 1)
+                                && (order.IsDelete == null || order.IsDelete == false)
+                                select new
+                                {
+                                    SubjectId = subject.Id,
+                                    //shop
+                                }).ToList();
+
+            //regionList = popOrderList.Select(s => s.shop.RegionName).Distinct().ToList();
+            List<int> orderSubjectIdList = popOrderList.Select(s => s.SubjectId).Distinct().ToList();
+
+            //获取项目信息
+            var projectList = (from subject in CurrentContext.DbContext.Subject
+                               join subjectType1 in CurrentContext.DbContext.SubjectType
+                               on subject.SubjectTypeId equals subjectType1.Id into typeTemp
+                               join category1 in CurrentContext.DbContext.ADSubjectCategory
+                               on subject.SubjectCategoryId equals category1.Id into categoryTemp
+                               from subjectType in typeTemp.DefaultIfEmpty()
+                               from category in categoryTemp.DefaultIfEmpty()
+                               where orderSubjectIdList.Contains(subject.Id)
+                               select new
+                               {
+                                   subject.Id,
+                                   subject.SubjectCategoryId,
+                                   subject.SubjectName,
+                                   subject.SubjectTypeId,
+                                   subject.ActivityId,
+                                   subject.Remark,
+                                   subjectType.SubjectTypeName,
+                                   category.CategoryName
+                               }).OrderBy(s => s.SubjectTypeId).ToList();
+            if (projectList.Any())
+            {
+                projectList.ForEach(s =>
+                {
+
+                    string subjectName = s.SubjectName;
+                    if (subjectName.Contains("补单") && !string.IsNullOrWhiteSpace(s.Remark))
+                        subjectName += "(" + s.Remark + ")";
+                    subjectJsonStr.Append("{\"Id\":\"" + s.Id + "\",\"SubjectName\":\"" + subjectName + "\"},");
+                });
+                result = "[" + subjectJsonStr.ToString().TrimEnd(',') + "]";
             }
             return result;
         }

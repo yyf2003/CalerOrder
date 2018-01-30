@@ -4749,6 +4749,14 @@ namespace WebApp
         {
             if (order != null)
             {
+                decimal width = order.GraphicWidth ?? 0;
+                decimal length = order.GraphicLength ?? 0;
+                decimal widthAdd = 0;
+                decimal lengthAdd = 0;
+                decimal areaAdd = 0;
+
+                decimal addTotalPrice = 0;
+
                 bool useSetting = orderSetting ?? true;
                 if (string.IsNullOrWhiteSpace(order.Sheet) || string.IsNullOrWhiteSpace(order.GraphicMaterial))
                 {
@@ -4777,32 +4785,39 @@ namespace WebApp
                             {
                                 if ((setting.POPWidth ?? 0) > 0)
                                 {
-                                    order.GraphicWidth += (order.GraphicWidth * setting.POPWidth);
+                                    //order.GraphicWidth += (order.GraphicWidth * setting.POPWidth);
+                                    widthAdd = width * (setting.POPWidth??0);
                                 }
                                 if ((setting.POPLength ?? 0) > 0)
                                 {
-                                    order.GraphicLength += (order.GraphicLength * setting.POPLength);
+                                    //order.GraphicLength += (order.GraphicLength * setting.POPLength);
+                                    lengthAdd = length * (setting.POPLength?? 0);
                                 }
                             }
                             else if (setting.OperateType == (int)QuoteOrderSettingTypeEnum.Amount)
                             {
                                 if ((setting.POPWidth ?? 0) > 0)
                                 {
-                                    order.GraphicWidth += setting.POPWidth;
+                                    //order.GraphicWidth += setting.POPWidth;
+                                    widthAdd = (setting.POPWidth??0);
                                 }
                                 if ((setting.POPLength ?? 0) > 0)
                                 {
-                                    order.GraphicLength += setting.POPLength;
+                                    //order.GraphicLength += setting.POPLength;
+                                    lengthAdd = (setting.POPLength??0);
                                 }
                             }
-                            order.Area = (order.GraphicWidth * order.GraphicLength) / 1000000;
+                            //order.Area = (order.GraphicWidth * order.GraphicLength) / 1000000;
+                            areaAdd = (widthAdd * lengthAdd) / 1000000;
                             if (order.UnitName == "平米")
                             {
-                                order.TotalPrice = order.Area * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
+                                //order.TotalPrice = order.Area * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
+                                addTotalPrice = areaAdd * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
                             }
                             else if (order.UnitName == "米")
                             {
-                                order.TotalPrice = (order.GraphicWidth / 1000) * 2 * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
+                                //order.TotalPrice = (order.GraphicWidth / 1000) * 2 * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
+                                addTotalPrice = (widthAdd / 1000) * 2 * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
                             }
                         }
                         else
@@ -4820,7 +4835,7 @@ namespace WebApp
                 quoteOrderModel.AddUserId = order.AddUserId;
                 quoteOrderModel.AgentCode = order.AgentCode;
                 quoteOrderModel.AgentName = order.AgentName;
-                quoteOrderModel.Area = order.Area;
+                
                 quoteOrderModel.BCSIsInstall = order.BCSIsInstall;
                 quoteOrderModel.BusinessModel = order.BusinessModel;
                 quoteOrderModel.Category = order.Category;
@@ -4834,12 +4849,12 @@ namespace WebApp
                 quoteOrderModel.CustomerMaterialId = order.CustomerMaterialId;
                 quoteOrderModel.FinalOrderId = order.Id;
                 quoteOrderModel.Gender = order.Gender;
-                quoteOrderModel.GraphicLength = order.GraphicLength;
+                
                 quoteOrderModel.GraphicMaterial = order.GraphicMaterial;
                 if (!string.IsNullOrWhiteSpace(order.GraphicMaterial))
                     quoteOrderModel.QuoteGraphicMaterial = this.GetQuoteMaterial(order.GraphicMaterial);
                 quoteOrderModel.GraphicNo = order.GraphicNo;
-                quoteOrderModel.GraphicWidth = order.GraphicWidth;
+                
                 quoteOrderModel.GuidanceId = order.GuidanceId;
                 quoteOrderModel.InstallPositionDescription = order.InstallPositionDescription;
                 quoteOrderModel.InstallPriceMaterialSupport = order.InstallPriceMaterialSupport;
@@ -4874,8 +4889,24 @@ namespace WebApp
                 quoteOrderModel.SmallMaterialId = order.SmallMaterialId;
                 quoteOrderModel.SubjectId = order.SubjectId;
                 quoteOrderModel.Tel = order.Tel;
-                quoteOrderModel.TotalArea = order.TotalArea;
-                quoteOrderModel.TotalPrice = order.TotalPrice;
+
+                //原始尺寸
+                quoteOrderModel.GraphicWidth = width;
+                quoteOrderModel.GraphicLength = length;
+                quoteOrderModel.Area = order.Area;
+                quoteOrderModel.DefaultTotalPrice = order.TotalPrice;
+
+                //增加的尺寸
+                quoteOrderModel.AutoAddGraphicWidth = widthAdd;
+                quoteOrderModel.AutoAddGraphicLength = lengthAdd;
+                quoteOrderModel.AutoAddArea = areaAdd;
+                quoteOrderModel.AutoAddTotalPrice = addTotalPrice;
+                //增加后尺寸
+                quoteOrderModel.TotalGraphicWidth = width + widthAdd;
+                quoteOrderModel.TotalGraphicLength = length + lengthAdd;
+                quoteOrderModel.TotalArea = order.Area + areaAdd;
+                quoteOrderModel.TotalPrice = order.TotalPrice + addTotalPrice;
+
                 quoteOrderModel.UnitPrice = order.UnitPrice;
                 quoteOrderModel.UnitName = order.UnitName;
                 quoteOrderModel.WindowDeep = order.WindowDeep;

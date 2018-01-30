@@ -433,8 +433,8 @@ namespace WebApp.QuoteOrderManager.handler
                 orderList.ForEach(s =>
                 {
                     int Quantity = s.Quantity ?? 1;
-                    decimal width = s.GraphicWidth ?? 0;
-                    decimal length = s.GraphicLength ?? 0;
+                    decimal width = s.TotalGraphicWidth ?? 0;
+                    decimal length = s.TotalGraphicLength ?? 0;
                     if (!string.IsNullOrWhiteSpace(s.QuoteGraphicMaterial))
                     {
                         MaterialClass mc = new MaterialClass();

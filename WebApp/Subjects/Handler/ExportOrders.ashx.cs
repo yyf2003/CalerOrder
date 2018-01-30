@@ -24,6 +24,7 @@ namespace WebApp.Subjects.Handler
     {
         string type = string.Empty;
         FinalOrderDetailTempBLL orderBll = new FinalOrderDetailTempBLL();
+        int selectType = 1;
         string subjectId = string.Empty;
         string region = string.Empty;
         string province = string.Empty;
@@ -44,6 +45,10 @@ namespace WebApp.Subjects.Handler
             if (context.Request.QueryString["type"] != null)
             {
                 type = context.Request.QueryString["type"];
+            }
+            if (context.Request.QueryString["selecttype"] != null)
+            {
+                selectType = int.Parse(context.Request.QueryString["selecttype"]);
             }
             if (context.Request.QueryString["subjectids"] != null)
             {
@@ -145,7 +150,7 @@ namespace WebApp.Subjects.Handler
                     var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                                 join shop in CurrentContext.DbContext.Shop
                                 on order.ShopId equals shop.Id
-                                where sidList.Contains(order.SubjectId ?? 0)
+                                where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                                 && (order.IsDelete == null || order.IsDelete == false)
                                 select new
                                 {
@@ -162,7 +167,7 @@ namespace WebApp.Subjects.Handler
                     var materialOrderList = (from order in CurrentContext.DbContext.OrderMaterial
                                              join shop in CurrentContext.DbContext.Shop
                                              on order.ShopId equals shop.Id
-                                             where sidList.Contains(order.SubjectId ?? 0)
+                                             where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                                              select new
                                              {
                                                  shop.RegionName
@@ -228,7 +233,7 @@ namespace WebApp.Subjects.Handler
                 var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                             join shop in CurrentContext.DbContext.Shop
                             on order.ShopId equals shop.Id
-                            where sidList.Contains(order.SubjectId ?? 0)
+                            where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                              && (order.IsDelete == null || order.IsDelete == false)
                             select new
                             {
@@ -262,7 +267,7 @@ namespace WebApp.Subjects.Handler
                 var materialOrderList = (from order in CurrentContext.DbContext.OrderMaterial
                                          join shop in CurrentContext.DbContext.Shop
                                          on order.ShopId equals shop.Id
-                                         where sidList.Contains(order.SubjectId ?? 0)
+                                         where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                                          select shop).ToList();
                 if (regionList.Any())
                 {
@@ -322,7 +327,7 @@ namespace WebApp.Subjects.Handler
                 var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                             join shop in CurrentContext.DbContext.Shop
                             on order.ShopId equals shop.Id
-                            where sidList.Contains(order.SubjectId ?? 0)
+                            where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                              && (order.IsDelete == null || order.IsDelete == false)
                             select new
                             {
@@ -355,7 +360,7 @@ namespace WebApp.Subjects.Handler
                 var materialOrderList = (from order in CurrentContext.DbContext.OrderMaterial
                                          join shop in CurrentContext.DbContext.Shop
                                          on order.ShopId equals shop.Id
-                                         where sidList.Contains(order.SubjectId ?? 0)
+                                         where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                                          select new
                                          {
                                              shop
@@ -426,7 +431,7 @@ namespace WebApp.Subjects.Handler
                             join user in CurrentContext.DbContext.UserInfo
                             on shop.CSUserId equals user.UserId into userTemp
                             from customerService in userTemp.DefaultIfEmpty()
-                            where sidList.Contains(order.SubjectId ?? 0)
+                            where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                              && (order.IsDelete == null || order.IsDelete == false)
                             select new
                             {
@@ -443,7 +448,7 @@ namespace WebApp.Subjects.Handler
                                          join user in CurrentContext.DbContext.UserInfo
                                          on shop.CSUserId equals user.UserId into userTemp
                                          from customerService in userTemp.DefaultIfEmpty()
-                                         where sidList.Contains(order.SubjectId ?? 0)
+                                         where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                                          select new
                                          {
                                              shop,
@@ -612,7 +617,7 @@ namespace WebApp.Subjects.Handler
                             join shop in CurrentContext.DbContext.Shop
                             on order.ShopId equals shop.Id
 
-                            where sidList.Contains(order.SubjectId ?? 0)
+                            where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                              && (order.IsDelete == null || order.IsDelete == false)
                             select new
                             {
@@ -626,7 +631,7 @@ namespace WebApp.Subjects.Handler
                                          join shop in CurrentContext.DbContext.Shop
                                          on order.ShopId equals shop.Id
 
-                                         where sidList.Contains(order.SubjectId ?? 0)
+                                         where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                                          select
 
                                              shop
@@ -820,7 +825,7 @@ namespace WebApp.Subjects.Handler
                 var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                             join shop in CurrentContext.DbContext.Shop
                             on order.ShopId equals shop.Id
-                            where sidList.Contains(order.SubjectId ?? 0)
+                            where selectType == 1 ? sidList.Contains(order.SubjectId ?? 0) : sidList.Contains(order.RegionSupplementId ?? 0)
                              && (order.IsDelete == null || order.IsDelete == false)
                             select new
                             {
@@ -1030,7 +1035,8 @@ namespace WebApp.Subjects.Handler
                                      join company1 in CurrentContext.DbContext.Company
                                      on order.OutsourceId equals company1.Id into companyTemp
                                      from company in companyTemp.DefaultIfEmpty()
-                                     where subjectList.Contains(order.SubjectId ?? 0)
+                                     //where subjectList.Contains(order.SubjectId ?? 0)
+                                     where selectType == 1 ? subjectList.Contains(order.SubjectId ?? 0) : subjectList.Contains(order.RegionSupplementId ?? 0)
                                      && ((order.OrderType != null && order.OrderType == 1 && order.GraphicWidth != null && order.GraphicWidth != 0 && order.GraphicLength != null && order.GraphicLength != 0) || (order.OrderType != null && order.OrderType == 2))
                                      && (pop != null ? (pop.IsValid == null || pop.IsValid == true) : 1 == 1)
                                      && (order.IsDelete == null || order.IsDelete == false)
@@ -1749,7 +1755,8 @@ namespace WebApp.Subjects.Handler
                             on new { order.ShopId, order.GraphicNo, order.Sheet } equals new { pop1.ShopId, pop1.GraphicNo, pop1.Sheet } into popTemp
                             from pop in popTemp.DefaultIfEmpty()
                             //pop订单中，pop尺寸为空的不导出
-                            where subjectIdList.Contains(order.SubjectId ?? 0)
+                            //where subjectIdList.Contains(order.SubjectId ?? 0)
+                            where selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0)
                             && ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || (order.OrderType == 2))
                                 //&& !shop.Format.Contains("Homecourt")
                             && (pop != null ? (pop.IsValid == null || pop.IsValid == true) : 1 == 1)
@@ -1934,7 +1941,8 @@ namespace WebApp.Subjects.Handler
                             on new { order.ShopId, order.GraphicNo, order.Sheet } equals new { pop1.ShopId, pop1.GraphicNo, pop1.Sheet } into popTemp
                             from pop in popTemp.DefaultIfEmpty()
                             //pop订单中，pop尺寸为空的不导出
-                            where subjectIdList.Contains(order.SubjectId ?? 0)
+                            //where subjectIdList.Contains(order.SubjectId ?? 0)
+                            where selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0)
                             && ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || (order.OrderType == 2))
                                 //&& !shop.Format.Contains("Homecourt")
                             && (pop != null ? (pop.IsValid == null || pop.IsValid == true) : 1 == 1)

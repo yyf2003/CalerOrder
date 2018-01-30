@@ -31,7 +31,7 @@
     <div class="layui-tab layui-tab-brief" lay-filter="order">
         <ul class="layui-tab-title">
             <li class="layui-this" lay-id="1">正常归类</li>
-            <li lay-id="2">单独安装费</li>
+            <li lay-id="2">按项目提交</li>
         </ul>
         <div class="layui-tab-content" style="overflow: auto;">
             <div class="layui-tab-item layui-show">
@@ -46,14 +46,14 @@
                                     <asp:Label ID="labGuidanceName" runat="server" Text=""></asp:Label>
                                 </td>
                             </tr>
-                            <tr class="tr_bai">
+                            <%--<tr class="tr_bai">
                                 <td style="width: 120px;">
                                     是否二次安装：
                                 </td>
                                 <td style="text-align: left; padding-left: 5px;">
                                     <asp:CheckBox ID="cbIsSecondInstall" runat="server" />是
                                 </td>
-                            </tr>
+                            </tr>--%>
                             <tr class="tr_bai">
                                 <td style="width: 120px;">
                                     区域：
@@ -206,7 +206,8 @@
                                     </td>
                                     <td>
                                         <asp:LinkButton ID="lbDelete" CommandArgument='<%#Eval("detail.Id") %>' CommandName="DeleteItem"
-                                            runat="server" ForeColor="Red">删除</asp:LinkButton>
+                                            runat="server" ForeColor="Red" OnClientClick="return LoadDelete(this)">删除</asp:LinkButton>
+                                          <img style="display:none;" src="../../image/WaitImg/loadingA.gif" />
                                     </td>
                                 </tr>
                             </ItemTemplate>
@@ -358,7 +359,8 @@
                                     </td>
                                     <td>
                                         <asp:LinkButton ID="lbDelete" CommandArgument='<%#Eval("detail.Id") %>' CommandName="DeleteItem"
-                                            runat="server" ForeColor="Red">删除</asp:LinkButton>
+                                            runat="server" ForeColor="Red" OnClientClick="return LoadDelete(this)">删除</asp:LinkButton>
+                                         <img style="display:none;" src="../../image/WaitImg/loadingA.gif" />
                                     </td>
                                 </tr>
                             </ItemTemplate>

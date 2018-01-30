@@ -86,6 +86,21 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function (sender, e
         });
     })
 
+    $("span[name='spanSecondCheckShop']").click(function () {
+        //alert($(this).html());
+        var detailId = $(this).data("detailid");
+        var url = "ShopDetail.aspx?InstallDetailId=" + detailId;
+        var layer1 = layer.open({
+            type: 2,
+            title: '安装店铺明细',
+            shadeClose: true,
+            shade: 0.8,
+            area: ['90%', '80%'],
+            content: url
+        });
+    })
+
+
     $("span[name='spanCheckLeftShop']").click(function () {
         var region = "";
         var subjectTypeId = "";
@@ -229,3 +244,12 @@ $(function () {
         });
     });
 })
+
+function LoadDelete(obj) {
+    if (confirm("确定删除吗？")) {
+        $(obj).next("img").show();
+        return true;
+    }
+    else
+        return false;
+}

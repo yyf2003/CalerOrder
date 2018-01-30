@@ -127,10 +127,24 @@
                     </tr>
                 </table>
                 <img id="loadSubjectImg" style="display: none;" src="../image/WaitImg/loadingA.gif" />
-                <div class="trType" style="width: 80%; margin: 5px; text-align: left; display: none;">
-                    <input type="checkbox" id="cbALL" /><span style="color: Blue;">全选</span>
+                <div style="text-align: left; margin: 5px;">
+                    <input type="radio" name="selectSubjectType" value="1" checked="checked" />全部项目(包括上海+分区订单)
+                    <input type="radio" name="selectSubjectType" value="2" />分区项目(只包含分区订单)
                 </div>
-                <div id="projectsDiv" style="width: 80%; margin: 5px; text-align: left;">
+                <div id="shanghaiSubjects">
+                    <div class="trType" style="width: 80%; margin: 5px; text-align: left; display: none;">
+                        <input type="checkbox" id="cbALL" /><span style="color: Blue;">全选</span>
+                    </div>
+                    <div id="projectsDiv" style="width: 80%; margin: 5px; text-align: left;">
+                    </div>
+                </div>
+                <div id="regionSubjects" style=" display:none;">
+                    <div class="trType1" style="width: 80%; margin: 5px; text-align: left; display: none;">
+                        <input type="checkbox" id="cbALL1" /><span style="color: Blue;">全选</span>
+                    </div>
+                    <div id="projectsDiv1" style="width: 80%; margin: 5px; text-align: left;">
+                       
+                    </div>
                 </div>
             </td>
         </tr>
@@ -270,7 +284,7 @@
     <asp:Panel ID="Panel2" runat="server">
         <table class="table">
             <tr class="tr_bai">
-                <td style="font-weight: bold;width: 120px;">
+                <td style="font-weight: bold; width: 120px;">
                     订单导出
                 </td>
                 <td style="text-align: left; padding-left: 5px; width: 400px;">
