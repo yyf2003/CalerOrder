@@ -185,6 +185,10 @@ var POP = {
                     $("#txtWindowDeep").val(json[0].WindowDeep);
                     $("#txtWindowSize").val(json[0].WindowSize);
 
+                    $("#seleWindowLeftSide").val(json[0].LeftSideStick);
+                    $("#seleWindowRightSide").val(json[0].RightSideStick);
+                    $("#seleWindowFloor").val(json[0].Floor);
+
                     currOrderGraphicMaterialId = json[0].OrderGraphicMaterialId;
                     POP.getMaterialCategory(json[0].MaterialCategoryId);
                     //                    $("#txtGlass").val(json[0].Glass);
@@ -358,8 +362,12 @@ function CheckVal() {
     var OOHInstallPrice = $.trim($("#txtOOHInstallPrice").val());
     var OSOOHInstallPrice = $.trim($("#txtOSOOHInstallPrice").val());
     var Remark = $.trim($("#txtRemark").val());
-    var IsValid = $("input:radio[name='radioIsValid']:checked").val()||1;
-    
+    var IsValid = $("input:radio[name='radioIsValid']:checked").val() || 1;
+
+    var LeftSide = $("#seleWindowLeftSide").val();
+    var RightSide = $("#seleWindowRightSide").val();
+    var Floor = $("#seleWindowFloor").val();
+
     if (ShopNo == "") {
         alert("请填写店铺编号");
         return false;
@@ -428,7 +436,7 @@ function CheckVal() {
     OSOOHInstallPrice = OSOOHInstallPrice.length > 0 ? OSOOHInstallPrice : "0";
     //jsonStr = '{"Id":' + currPOPId + ',"ShopNo":"' + ShopNo + '","PositionDescription":"' + PositionDescription + '","GraphicNo":"' + GraphicNo + '","Sheet":"' + Sheet + '","Gender":"' + Gender + '","Quantity":' + Quantity + ',"GraphicWidth":"' + GraphicWidth + '","GraphicLength":"' + GraphicLength + '","WindowWide":"' + WindowWide + '","WindowHigh":"' + WindowHigh + '","WindowDeep":"' + WindowDeep + '","WindowSize":"' + WindowSize + '","GraphicMaterial":"' + GraphicMaterial + '","DoubleFace":"' + DoubleFace + '","Glass":"' + Glass + '","Backdrop":"' + Backdrop + '","Category":"' + Category + '","IsElectricity":"' + IsElectricity + '","IsHang":"' + IsHang + '","DoorPosition":"' + DoorPosition + '","Remark":"' + Remark + '","IsValid":' + IsValid + ',"OOHInstallPrice":"' + OOHInstallPrice + '","MaterialCategoryId":' + MaterialCategoryId + ',"OrderGraphicMaterialId":' + OrderGraphicMaterialId + ',"CornerType":"' + CornerType + '"}';
 
-    jsonStr = '{"Id":' + currPOPId + ',"ShopId":' + shopId + ',"ShopNo":"' + ShopNo + '","PositionDescription":"' + PositionDescription + '","GraphicNo":"' + GraphicNo + '","Sheet":"' + Sheet + '","Gender":"' + Gender + '","Quantity":' + Quantity + ',"GraphicWidth":"' + GraphicWidth + '","GraphicLength":"' + GraphicLength + '","WindowWide":"' + WindowWide + '","WindowHigh":"' + WindowHigh + '","WindowDeep":"' + WindowDeep + '","WindowSize":"' + WindowSize + '","GraphicMaterial":"' + GraphicMaterial + '","Remark":"' + Remark + '","IsValid":' + IsValid + ',"OOHInstallPrice":"' + OOHInstallPrice + '","MaterialCategoryId":' + MaterialCategoryId + ',"OrderGraphicMaterialId":' + OrderGraphicMaterialId + ',"CornerType":"' + CornerType + '","MachineFrameName":"' + frameName + '","OSOOHInstallPrice":"' + OSOOHInstallPrice + '"}';
+    jsonStr = '{"Id":' + currPOPId + ',"ShopId":' + shopId + ',"ShopNo":"' + ShopNo + '","PositionDescription":"' + PositionDescription + '","GraphicNo":"' + GraphicNo + '","Sheet":"' + Sheet + '","Gender":"' + Gender + '","Quantity":' + Quantity + ',"GraphicWidth":"' + GraphicWidth + '","GraphicLength":"' + GraphicLength + '","WindowWide":"' + WindowWide + '","WindowHigh":"' + WindowHigh + '","WindowDeep":"' + WindowDeep + '","WindowSize":"' + WindowSize + '","GraphicMaterial":"' + GraphicMaterial + '","Remark":"' + Remark + '","IsValid":' + IsValid + ',"OOHInstallPrice":"' + OOHInstallPrice + '","MaterialCategoryId":' + MaterialCategoryId + ',"OrderGraphicMaterialId":' + OrderGraphicMaterialId + ',"CornerType":"' + CornerType + '","MachineFrameName":"' + frameName + '","OSOOHInstallPrice":"' + OSOOHInstallPrice + '","LeftSideStick":"' + LeftSide + '","RightSideStick":"' + RightSide + '","Floor":"' + Floor + '"}';
     return true;
 }
 
@@ -438,6 +446,10 @@ function ClearVal() {
     document.getElementById("ddlCornerType").length = 1;
     document.getElementById("ddlFrameName").length = 1;
     document.getElementById("ddlMaterial").length = 1;
+
+    $("#seleWindowLeftSide").val("");
+    $("#seleWindowRightSide").val("");
+    $("#seleWindowFloor").val("");
 }
 
 function loadingSearch() {

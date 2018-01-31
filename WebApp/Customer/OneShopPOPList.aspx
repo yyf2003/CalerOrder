@@ -89,7 +89,7 @@
             <div class="containerDiv">
                 <asp:GridView ID="gv" runat="server" AutoGenerateColumns="false" CellPadding="0"
                     CssClass="table" BorderWidth="0" DataKeyNames="Id" HeaderStyle-BorderStyle="None"
-                    EmptyDataText="--无信息--" Style="min-width: 1500px;" 
+                    EmptyDataText="--无信息--" Style="min-width: 1800px;" 
                     onrowdatabound="gv_RowDataBound">
                     <Columns>
                         <asp:TemplateField HeaderStyle-BorderColor="#dce0e9">
@@ -134,11 +134,11 @@
                         <asp:BoundField DataField="pop.Glass" HeaderText="是否有玻璃" HeaderStyle-BorderColor="#dce0e9" />
                         <asp:BoundField DataField="pop.Backdrop" HeaderText="背景" HeaderStyle-BorderColor="#dce0e9" />
                         <asp:BoundField DataField="pop.FixtureType" HeaderText="设备类别" HeaderStyle-BorderColor="#dce0e9" />
-                        <asp:BoundField DataField="pop.IsElectricity" HeaderText="通电否" HeaderStyle-BorderColor="#dce0e9" />
+                        <asp:BoundField DataField="pop.IsElectricity" HeaderText="通电否" HeaderStyle-BorderColor="#dce0e9" />--%>
                         <asp:BoundField DataField="pop.LeftSideStick" HeaderText="左侧贴" HeaderStyle-BorderColor="#dce0e9" />
-                        <asp:BoundField DataField="pop.RightSideStick" HeaderText="右侧贴" HeaderStyle-BorderColor="#dce0e9" />--%>
-                        <%--<asp:BoundField DataField="pop.Floor" HeaderText="地铺" HeaderStyle-BorderColor="#dce0e9" />
-                        <asp:BoundField DataField="pop.WindowStick" HeaderText="窗贴" HeaderStyle-BorderColor="#dce0e9" />
+                        <asp:BoundField DataField="pop.RightSideStick" HeaderText="右侧贴" HeaderStyle-BorderColor="#dce0e9" />
+                        <asp:BoundField DataField="pop.Floor" HeaderText="地铺" HeaderStyle-BorderColor="#dce0e9" />
+                        <%--<asp:BoundField DataField="pop.WindowStick" HeaderText="窗贴" HeaderStyle-BorderColor="#dce0e9" />
                         <asp:BoundField DataField="pop.IsHang" HeaderText="悬挂否" HeaderStyle-BorderColor="#dce0e9" />
                         <asp:BoundField DataField="pop.DoorPosition" HeaderText="门位置" HeaderStyle-BorderColor="#dce0e9" />--%>
                         <asp:BoundField DataField="pop.Remark" HeaderText="备注" HeaderStyle-BorderColor="#dce0e9" />
@@ -272,6 +272,34 @@
             </tr>
             <tr>
                 <td style="height: 30px;">
+                    橱窗信息
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    左侧贴：
+                    <select id="seleWindowLeftSide">
+                      <option value="">--请选择--</option>
+                      <option value="Y">有</option>
+                      <option value="N">无</option>
+                    </select>
+                    &nbsp;&nbsp;&nbsp;
+                    右侧贴：
+                    <select id="seleWindowRightSide">
+                      <option value="">--请选择--</option>
+                      <option value="Y">有</option>
+                      <option value="N">无</option>
+                    </select>
+                    &nbsp;&nbsp;&nbsp;
+                    地铺：
+                    <select id="seleWindowFloor">
+                       <option value="">--请选择--</option>
+                      <option value="Y">有</option>
+                      <option value="N">无</option>
+                    </select>
+                </td>
+               
+            </tr>
+            <tr>
+                <td style="height: 30px;">
                     POP材质
                 </td>
                 <td colspan="3" style="text-align: left; padding-left: 5px;">
@@ -285,51 +313,7 @@
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
-            <%--<tr>
-                <td style="height: 30px;">
-                    是否有玻璃
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtGlass" runat="server" MaxLength="10"></asp:TextBox>
-                </td>
-                
-                <td style="height: 30px;">
-                    背景
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtBackdrop" runat="server" MaxLength="30"></asp:TextBox>
-                </td>
-            </tr>
-            <tr>
-                <td style="height: 30px;">
-                    系列
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtCategory" runat="server" MaxLength="50"></asp:TextBox>
-                </td>
-                <td style="height: 30px;">
-                    通电否
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtIsElectricity" runat="server" MaxLength="10"></asp:TextBox>
-                </td>
-            </tr>
-            <tr>
-                <td style="height: 30px;">
-                    悬挂否
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtIsHang" runat="server" MaxLength="10"></asp:TextBox>
-                </td>
-                <td style="height: 30px;">
-                    门位置
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtDoorPosition" runat="server" MaxLength="20"></asp:TextBox>
-                </td>
-            </tr>--%>
-
-
+            
             <tr>
                 <td style="height: 30px;">
                     角落类型

@@ -106,18 +106,17 @@ namespace WebApp.OutsourcingOrder.Statistics
             }
             List<OrderPriceDetail> newOrderList = new List<OrderPriceDetail>();
             guidanceList.ForEach(gid => {
+
+                //是否全部三叶草
+                bool isBCSSubject = false;
+
                 var orderList0 = (from order in CurrentContext.DbContext.OutsourceOrderDetail
-                                 //join subject in CurrentContext.DbContext.Subject
-                                 //on order.SubjectId equals subject.Id
-                                 //join guidance in CurrentContext.DbContext.SubjectGuidance
-                                 //on order.GuidanceId equals guidance.ItemId
+                                
                                   join subject1 in CurrentContext.DbContext.Subject
                                   on order.SubjectId equals subject1.Id into subjectTemp
                                   from subject in subjectTemp.DefaultIfEmpty()
                                  where outsourceList.Contains(order.OutsourceId ?? 0)
                                  && order.GuidanceId==gid
-                                 //&& (subject.IsDelete == null || subject.IsDelete == false)
-                                 //&& order.SubjectId > 0
                                  && ((order.OrderType == (int)OrderTypeEnum.POP && order.GraphicLength!=null && order.GraphicLength>1 && order.GraphicWidth!=null && order.GraphicWidth>1) || order.OrderType>1)
                                  select new
                                  {
@@ -130,6 +129,8 @@ namespace WebApp.OutsourcingOrder.Statistics
                 if (subjectList.Any())
                 {
                     orderList = orderList.Where(s => subjectList.Contains(s.order.SubjectId ?? 0)).ToList();
+                    var NotBCSSubjectList = new SubjectBLL().GetList(s => subjectList.Contains(s.Id) && (s.CornerType == null || !s.CornerType.Contains("三叶草")));
+                    isBCSSubject = !NotBCSSubjectList.Any();
                 }
                 if (provinceList.Any())
                 {
@@ -148,6 +149,26 @@ namespace WebApp.OutsourcingOrder.Statistics
                 if (orderList.Any())
                 {
                     List<int> shopIdList = orderList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+
+
+                    List<int> installShopIdList = shopIdList;
+                    if (isBCSSubject)
+                    {
+                        //如果是三叶草，把出现在大货订单里面的店铺去掉
+                        List<int> totalOrderShopIdList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                                          join subject in CurrentContext.DbContext.Subject
+                                                          on order.SubjectId equals subject.Id
+                                                          where order.GuidanceId == gid
+                                                          && !subjectList.Contains(order.SubjectId ?? 0)
+                                                          && subject.ApproveState == 1
+                                                          && (subject.IsDelete == null || subject.IsDelete == false)
+                                                          && (order.IsDelete == null || order.IsDelete == false)
+                                                          && (order.ShopStatus == null || order.ShopStatus == "" || order.ShopStatus == ShopStatusEnum.正常.ToString())
+                                                          select order.ShopId ?? 0).Distinct().ToList();
+                        installShopIdList = installShopIdList.Except(totalOrderShopIdList).ToList();
+
+                    }
+
 
                     OrderPriceDetail orderModel;
                    
@@ -271,7 +292,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                         });
                     }
 
-                    var installPriceList = orderList0.Where(s => s.order.SubjectId == 0 && shopIdList.Contains(s.order.ShopId ?? 0) && s.order.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                    var installPriceList = orderList0.Where(s => s.order.SubjectId == 0 && installShopIdList.Contains(s.order.ShopId ?? 0) && s.order.OrderType == (int)OrderTypeEnum.安装费).ToList();
                     if (outsourceTypeList.Any())
                     {
                         installPriceList = installPriceList.Where(s => outsourceTypeList.Contains(s.order.AssignType ?? 0)).ToList();

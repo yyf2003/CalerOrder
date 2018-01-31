@@ -135,11 +135,13 @@ namespace WebApp.OutsourcingOrder.Statistics
             decimal receiveOtherPrice = 0;
             List<int> TotalShopCountList = new List<int>();
             guidanceIdList.ForEach(gid => {
+                //是否全部三叶草
+                bool isBCSSubject = false;
                 var orderList0 = (from order in CurrentContext.DbContext.OutsourceOrderDetail
                                  
                                   where outsourceList.Contains(order.OutsourceId ?? 0)
                                   
-                                 && gid==order.GuidanceId
+                                  && gid==order.GuidanceId
                                   //&& (subject.IsDelete==null || subject.IsDelete==false)
                                   && ((order.OrderType == (int)OrderTypeEnum.POP && order.GraphicLength!=null && order.GraphicLength>1 && order.GraphicWidth!=null && order.GraphicWidth>1) || order.OrderType > 1)
                                   select new
@@ -154,7 +156,12 @@ namespace WebApp.OutsourcingOrder.Statistics
                 if (subjectIdList.Any())
                 {
                     orderList = orderList.Where(s => subjectIdList.Contains(s.order.SubjectId ?? 0)).ToList();
+                    
+                    var NotBCSSubjectList = new SubjectBLL().GetList(s => subjectIdList.Contains(s.Id) && (s.CornerType==null || !s.CornerType.Contains("三叶草")));
+                    isBCSSubject = !NotBCSSubjectList.Any();
+                    
                 }
+
                 if (provinceList.Any())
                 {
                     orderList = orderList.Where(s => provinceList.Contains(s.order.Province)).ToList();
@@ -167,14 +174,31 @@ namespace WebApp.OutsourcingOrder.Statistics
                 {
                     orderList = orderList.Where(s => assignTypeList.Contains(s.order.AssignType ?? 0)).ToList();
                 }
+                
                 if (orderList.Any())
                 {
                     List<int> shopIdList = orderList.Select(s => s.order.ShopId??0).Distinct().ToList();
                     TotalShopCountList.AddRange(shopIdList);
+                    List<int> installShopIdList = shopIdList;
+                    if (isBCSSubject)
+                    {
+                        //如果是三叶草，把出现在大货订单里面的店铺去掉
+                        List<int> totalOrderShopIdList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                                          join subject in CurrentContext.DbContext.Subject
+                                                          on order.SubjectId equals subject.Id
+                                                          where order.GuidanceId == gid
+                                                          && !subjectIdList.Contains(order.SubjectId??0)
+                                                          && subject.ApproveState == 1
+                                                          && (subject.IsDelete == null || subject.IsDelete == false)
+                                                          && (order.IsDelete == null || order.IsDelete == false)
+                                                          && (order.ShopStatus == null || order.ShopStatus == "" || order.ShopStatus == ShopStatusEnum.正常.ToString())
+                                                          select order.ShopId ?? 0).Distinct().ToList();
+                        installShopIdList = installShopIdList.Except(totalOrderShopIdList).ToList();
 
+                    }
 
                     //安装费
-                    var installOrderPriceList = orderList0.Where(s => shopIdList.Contains(s.order.ShopId??0) && s.order.SubjectId == 0 && s.order.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                    var installOrderPriceList = orderList0.Where(s => installShopIdList.Contains(s.order.ShopId ?? 0) && s.order.SubjectId == 0 && s.order.OrderType == (int)OrderTypeEnum.安装费).ToList();
                     if (installOrderPriceList.Any())
                     {
                         if (assignTypeList.Any())
@@ -195,7 +219,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                         expressPrice += expressOrderPriceList.Sum(s => s.order.PayOrderPrice ?? 0);
                         receiveExpressPrice += expressOrderPriceList.Sum(s => s.order.ReceiveOrderPrice ?? 0);
                     }
-                    var assignShopList = new OutsourceAssignShopBLL().GetList(s => s.GuidanceId==gid && shopIdList.Contains(s.ShopId ?? 0) && outsourceList.Contains(s.OutsourceId ?? 0)).ToList();
+                    var assignShopList = new OutsourceAssignShopBLL().GetList(s => s.GuidanceId == gid && installShopIdList.Contains(s.ShopId ?? 0) && outsourceList.Contains(s.OutsourceId ?? 0)).ToList();
                     assignShopList.ForEach(s =>
                     {
                         if ((s.PayInstallPrice ?? 0) > 0)
@@ -230,11 +254,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                             }
                             popPrice += (s.order.TotalPrice ?? 0);
                             receivePOPPrice += (s.order.ReceiveTotalPrice ?? 0);
-                            if (s.order.OrderType == (int)OrderTypeEnum.安装费)
-                            {
-                                installPrice1 += (s.order.PayOrderPrice ?? 0);
-                                receiveInstallPrice1 += (s.order.ReceiveOrderPrice ?? 0);
-                            }
+                            
                             if (s.order.OrderType == (int)OrderTypeEnum.测量费)
                             {
                                 measurePrice += (s.order.PayOrderPrice ?? 0);
@@ -251,6 +271,16 @@ namespace WebApp.OutsourcingOrder.Statistics
                                 receiveExpressPrice += (s.order.ReceiveOrderPrice ?? 0);
                             }
                         });
+                        //安装费单独算
+                        var installOrderList = orderList.Where(s => installShopIdList.Contains(s.order.ShopId??0)).ToList();
+                        installOrderList.ForEach(s => {
+                            if (s.order.OrderType == (int)OrderTypeEnum.安装费)
+                            {
+                                installPrice1 += (s.order.PayOrderPrice ?? 0);
+                                receiveInstallPrice1 += (s.order.ReceiveOrderPrice ?? 0);
+                            }
+                        });
+
                         if (!string.IsNullOrWhiteSpace(guidanceMonth) && StringHelper.IsDateTime(guidanceMonth))
                         {
                             DateTime date0 = DateTime.Parse(guidanceMonth);
@@ -264,8 +294,6 @@ namespace WebApp.OutsourcingOrder.Statistics
                                 popPrice = popPrice - materialPrice;
                                 popPrice = popPrice > 0 ? popPrice : 0;
                             }
-
-
                         }
 
                         installPrice += installPrice1;

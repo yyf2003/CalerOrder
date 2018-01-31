@@ -102,6 +102,8 @@
                     &#xe601;</i>导 出</span>
                 <asp:Button ID="btnExportPOPOrder" runat="server" Text="Button" Style="display: none;"
                     OnClick="btnExportPOPOrder_Click" OnClientClick="return checkPOP();" />
+                <span id="span1" onclick="javascript:window.history.go(-1)" class="layui-btn layui-btn-small layui-btn-primary"
+                     style="margin-left: 30px;">返 回</span>
                 <div style="overflow: auto;">
                 <table class="layui-table" style="width: 2500px;">
                     <thead>

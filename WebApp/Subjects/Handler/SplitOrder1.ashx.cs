@@ -2458,19 +2458,45 @@ namespace WebApp.Subjects.Handler
 
                                                                         if (p.WindowType == "LeftSideStick")
                                                                         {
-                                                                            popWidth = o.pop.WindowDeep ?? 0;
-                                                                            popHeight = o.pop.WindowHigh ?? 0;
+                                                                            if (o.pop.LeftSideStick != "N")
+                                                                            {
+                                                                                popWidth = o.pop.WindowDeep ?? 0;
+                                                                                popHeight = o.pop.WindowHigh ?? 0;
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                popWidth = 0;
+                                                                                popHeight = 0;
+                                                                            }
 
                                                                         }
                                                                         if (p.WindowType == "RightSideStick")
                                                                         {
-                                                                            popWidth = o.pop.WindowDeep ?? 0;
-                                                                            popHeight = o.pop.WindowHigh ?? 0;
+
+                                                                            if (o.pop.RightSideStick != "N")
+                                                                            {
+                                                                                popWidth = o.pop.WindowDeep ?? 0;
+                                                                                popHeight = o.pop.WindowHigh ?? 0;
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                popWidth = 0;
+                                                                                popHeight = 0;
+                                                                            }
                                                                         }
                                                                         if (p.WindowType == "Floor")
                                                                         {
-                                                                            popWidth = o.pop.WindowWide ?? 0;
-                                                                            popHeight = o.pop.WindowDeep ?? 0;
+
+                                                                            if (o.pop.Floor != "N")
+                                                                            {
+                                                                                popWidth = o.pop.WindowWide ?? 0;
+                                                                                popHeight = o.pop.WindowDeep ?? 0;
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                popWidth = 0;
+                                                                                popHeight = 0;
+                                                                            }
                                                                         }
                                                                         if (p.WindowType == "WindowStick")
                                                                         {
@@ -2478,8 +2504,8 @@ namespace WebApp.Subjects.Handler
                                                                             popHeight = 1;
                                                                             remark = remark + "(需要分区确认尺寸)";
                                                                         }
-                                                                        popWidth = popWidth == 0 ? 1 : popWidth;
-                                                                        popHeight = popHeight == 0 ? 1 : popHeight;
+                                                                        //popWidth = popWidth == 0 ? 1 : popWidth;
+                                                                        //popHeight = popHeight == 0 ? 1 : popHeight;
                                                                     }
                                                                 }
 
@@ -2822,20 +2848,62 @@ namespace WebApp.Subjects.Handler
                                                             finalOrderTempModel.IsPOPMaterial = 1;
                                                         }
 
+                                                        //if (p.WindowType == "LeftSideStick")
+                                                        //{
+                                                        //    popWidth = o.pop.WindowDeep ?? 0;
+                                                        //    popHeight = o.pop.WindowHigh ?? 0;
+                                                        //}
+                                                        //if (p.WindowType == "RightSideStick")
+                                                        //{
+                                                        //    popWidth = o.pop.WindowDeep ?? 0;
+                                                        //    popHeight = o.pop.WindowHigh ?? 0;
+                                                        //}
+                                                        //if (p.WindowType == "Floor")
+                                                        //{
+                                                        //    popWidth = o.pop.WindowWide ?? 0;
+                                                        //    popHeight = o.pop.WindowDeep ?? 0;
+                                                        //}
                                                         if (p.WindowType == "LeftSideStick")
                                                         {
-                                                            popWidth = o.pop.WindowDeep ?? 0;
-                                                            popHeight = o.pop.WindowHigh ?? 0;
+                                                            if (o.pop.LeftSideStick != "N")
+                                                            {
+                                                                popWidth = o.pop.WindowDeep ?? 0;
+                                                                popHeight = o.pop.WindowHigh ?? 0;
+                                                            }
+                                                            else
+                                                            {
+                                                                popWidth = 0;
+                                                                popHeight = 0;
+                                                            }
+
                                                         }
                                                         if (p.WindowType == "RightSideStick")
                                                         {
-                                                            popWidth = o.pop.WindowDeep ?? 0;
-                                                            popHeight = o.pop.WindowHigh ?? 0;
+
+                                                            if (o.pop.RightSideStick != "N")
+                                                            {
+                                                                popWidth = o.pop.WindowDeep ?? 0;
+                                                                popHeight = o.pop.WindowHigh ?? 0;
+                                                            }
+                                                            else
+                                                            {
+                                                                popWidth = 0;
+                                                                popHeight = 0;
+                                                            }
                                                         }
                                                         if (p.WindowType == "Floor")
                                                         {
-                                                            popWidth = o.pop.WindowWide ?? 0;
-                                                            popHeight = o.pop.WindowDeep ?? 0;
+
+                                                            if (o.pop.Floor !="N")
+                                                            {
+                                                                popWidth = o.pop.WindowWide ?? 0;
+                                                                popHeight = o.pop.WindowDeep ?? 0;
+                                                            }
+                                                            else
+                                                            {
+                                                                popWidth = 0;
+                                                                popHeight = 0;
+                                                            }
                                                         }
                                                         if (p.WindowType == "WindowStick")
                                                         {
