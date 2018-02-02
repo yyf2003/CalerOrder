@@ -132,6 +132,16 @@ namespace WebApp.Subjects.PriceOrder
                         
                         foreach (DataRow dr in ds.Tables[0].Rows)
                         {
+                            shopId = 0;
+                            orderType = string.Empty;
+                            //店铺编号
+                            shopNo = string.Empty;
+                            //应收费用金额
+                            price = string.Empty;
+                            //应付费用金额
+                            payPrice = string.Empty;
+                            contents = string.Empty;
+                            remark = string.Empty;
                             StringBuilder msg = new StringBuilder();
                             int orderTypeIndex = 0;
                             bool canSave = true;

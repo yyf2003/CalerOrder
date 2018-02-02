@@ -60,8 +60,8 @@ namespace Models
     [Serializable]
     public partial class FinalOrderDetailTemp
     {
-        public string UnitName { get; set; }
-        
+        //public string UnitName { get; set; }
+        public int RealSubjectId { get; set; }
     }
 
     public partial class OrderPriceDetail

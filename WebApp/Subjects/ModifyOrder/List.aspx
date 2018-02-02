@@ -146,6 +146,9 @@
                         序号
                     </th>
                     <th>
+                        所属项目
+                    </th>
+                    <th>
                         类型
                     </th>
                     <th>
@@ -154,6 +157,7 @@
                     <th>
                         店铺名称
                     </th>
+                    
                     <th>
                         区域
                     </th>
@@ -224,7 +228,7 @@
             </thead>
             <tbody id="tbodyOrderEmpty">
                 <tr>
-                    <td colspan="27" style="text-align: center;">
+                    <td colspan="28" style="text-align: center;">
                         --暂无数据--
                     </td>
                 </tr>
@@ -236,7 +240,7 @@
     <div id="page1" style="text-align: center; margin-top: 10px;">
     </div>
     <div style="height: 50px; text-align: center;">
-        <span id="Span2" onclick="javascript:window.history.go(-1)" class="layui-btn layui-btn-small layui-btn-normal">
+        <span id="Span2" onclick="javascript:window.history.go(-1)" class="layui-btn layui-btn-normal">
             返 回</span>
     </div>
     <div id="editDiv" title="编辑POP信息" style="display: none;">
@@ -250,6 +254,18 @@
                         RepeatLayout="Flow">
                     </asp:RadioButtonList>
                 </td>
+            </tr>
+            <tr class="showSubjectList" style=" display:none;">
+                <td style="width: 100px; height: 30px;">
+                    所属项目
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    <asp:DropDownList ID="ddlSubjectList" runat="server">
+                       <asp:ListItem Value="0">--请选择项目--</asp:ListItem>
+                    </asp:DropDownList>
+                    <span style="color: Red;">*</span>
+                </td>
+                
             </tr>
             <tr>
                 <td style="width: 100px; height: 30px;">
@@ -517,6 +533,9 @@
             </tr>
         </table>
     </div>
+
+
+    <asp:HiddenField ID="hfIsRegionSubject" runat="server" />
     </form>
 </body>
 </html>

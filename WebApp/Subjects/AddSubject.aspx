@@ -137,6 +137,14 @@
                 </tr>
                 <tr class="tr_bai">
                     <td>
+                        是否二次安装：
+                    </td>
+                    <td colspan="3" style="text-align: left; padding-left: 5px;">
+                        <asp:CheckBox ID="cbIsSecondInstall" runat="server" />是（安装费单独报）
+                    </td>
+                </tr>
+                <tr class="tr_bai">
+                    <td>
                         备注：
                     </td>
                     <td colspan="3" style="text-align: left; padding-left: 5px;">

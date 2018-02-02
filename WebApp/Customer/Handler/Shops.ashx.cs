@@ -117,8 +117,11 @@ namespace WebApp.Customer.Handler
                           on shop.OutsourceId equals company1.Id into companyTemp
                           from company in companyTemp.DefaultIfEmpty()
                           join company2 in CurrentContext.DbContext.Company
-                          on shop.OOHInstallOutsourceId equals company2.Id into companyTemp1
-                          from oohcompany in companyTemp1.DefaultIfEmpty()
+                          on shop.OOHInstallOutsourceId equals company2.Id into companyTemp2
+                          from oohcompany in companyTemp2.DefaultIfEmpty()
+                          join company3 in CurrentContext.DbContext.Company
+                          on shop.BCSOutsourceId equals company3.Id into companyTemp3
+                          from bcscompany in companyTemp3.DefaultIfEmpty()
                           where shop.Id == id
                           select new
                           {
@@ -126,7 +129,8 @@ namespace WebApp.Customer.Handler
                               customer.CustomerName,
                               CSUserName = user.RealName,
                               OutsourceName = company.CompanyName,
-                              OOHOutsourceName = oohcompany.CompanyName
+                              OOHOutsourceName = oohcompany.CompanyName,
+                              BCSOutsourctName=bcscompany.CompanyName
                           }).FirstOrDefault();
             if (model1 != null)
             {
@@ -139,7 +143,7 @@ namespace WebApp.Customer.Handler
                 string Status = !string.IsNullOrWhiteSpace(model1.shop.Status) ? model1.shop.Status : "正常";
                 if (new BasePage().CurrentUser.RoleId == 2)
                     Status = "正常";
-                json.Append("{\"ShopName\":\"" + model1.shop.ShopName + "\",\"ShopNo\":\"" + model1.shop.ShopNo + "\",\"CustomerId\":\"" + (model1.shop.CustomerId ?? 0) + "\",\"Customer\":\"" + model1.CustomerName + "\",\"RegionName\":\"" + model1.shop.RegionName + "\",\"ProvinceName\":\"" + model1.shop.ProvinceName + "\",\"CityName\":\"" + model1.shop.CityName + "\",\"AreaName\":\"" + model1.shop.AreaName + "\",\"CityTier\":\"" + model1.shop.CityTier + "\",\"IsInstall\":\"" + model1.shop.IsInstall + "\",\"AgentCode\":\"" + model1.shop.AgentCode + "\",\"AgentName\":\"" + model1.shop.AgentName + "\",\"POPAddress\":\"" + model1.shop.POPAddress + "\",\"Contact1\":\"" + model1.shop.Contact1 + "\",\"Tel1\":\"" + model1.shop.Tel1 + "\",\"Contact2\":\"" + model1.shop.Contact2 + "\",\"Tel2\":\"" + model1.shop.Tel2 + "\",\"Channel\":\"" + model1.shop.Channel + "\",\"Format\":\"" + model1.shop.Format + "\",\"LocationType\":\"" + model1.shop.LocationType + "\",\"BusinessModel\":\"" + model1.shop.BusinessModel + "\",\"OpeningDate\":\"" + opendate + "\",\"Status\":\"" + Status + "\",\"CSUserId\":\"" + model1.shop.CSUserId + "\",\"CSUserName\":\"" + model1.CSUserName + "\",\"Remark\":\"" + model1.shop.Remark + "\",\"InstallPrice\":\"" + model1.shop.InstallPrice + "\",\"WindowInstallPrice\":\"" + model1.shop.WindowInstallPrice + "\",\"POSScale\":\"" + model1.shop.POSScale + "\",\"BasicInstallPrice\":\"" + model1.shop.BasicInstallPrice + "\",\"ProvinceId\":\"" + (model1.shop.ProvinceId ?? 0) + "\",\"CityId\":\"" + (model1.shop.CityId ?? 0) + "\",\"AreaId\":\"" + (model1.shop.AreaId ?? 0) + "\",\"ShopType\":\"" + model1.shop.ShopType + "\",\"BCSInstallPrice\":\"" + model1.shop.BCSInstallPrice + "\",\"OutsourceInstallPrice\":\"" + model1.shop.OutsourceInstallPrice + "\",\"OutsourceBCSInstallPrice\":\"" + model1.shop.OutsourceBCSInstallPrice + "\",\"OutsourceName\":\"" + model1.OutsourceName + "\",\"OutsourceId\":\"" + (model1.shop.OutsourceId ?? 0) + "\",\"BCSIsInstall\":\"" + model1.shop.BCSIsInstall + "\",\"OOHOutsourceName\":\"" + model1.OOHOutsourceName + "\",\"OOHInstallOutsourceId\":\"" + (model1.shop.OOHInstallOutsourceId ?? 0) + "\"}");
+                json.Append("{\"ShopName\":\"" + model1.shop.ShopName + "\",\"ShopNo\":\"" + model1.shop.ShopNo + "\",\"CustomerId\":\"" + (model1.shop.CustomerId ?? 0) + "\",\"Customer\":\"" + model1.CustomerName + "\",\"RegionName\":\"" + model1.shop.RegionName + "\",\"ProvinceName\":\"" + model1.shop.ProvinceName + "\",\"CityName\":\"" + model1.shop.CityName + "\",\"AreaName\":\"" + model1.shop.AreaName + "\",\"CityTier\":\"" + model1.shop.CityTier + "\",\"IsInstall\":\"" + model1.shop.IsInstall + "\",\"AgentCode\":\"" + model1.shop.AgentCode + "\",\"AgentName\":\"" + model1.shop.AgentName + "\",\"POPAddress\":\"" + model1.shop.POPAddress + "\",\"Contact1\":\"" + model1.shop.Contact1 + "\",\"Tel1\":\"" + model1.shop.Tel1 + "\",\"Contact2\":\"" + model1.shop.Contact2 + "\",\"Tel2\":\"" + model1.shop.Tel2 + "\",\"Channel\":\"" + model1.shop.Channel + "\",\"Format\":\"" + model1.shop.Format + "\",\"LocationType\":\"" + model1.shop.LocationType + "\",\"BusinessModel\":\"" + model1.shop.BusinessModel + "\",\"OpeningDate\":\"" + opendate + "\",\"Status\":\"" + Status + "\",\"CSUserId\":\"" + model1.shop.CSUserId + "\",\"CSUserName\":\"" + model1.CSUserName + "\",\"Remark\":\"" + model1.shop.Remark + "\",\"InstallPrice\":\"" + model1.shop.InstallPrice + "\",\"WindowInstallPrice\":\"" + model1.shop.WindowInstallPrice + "\",\"POSScale\":\"" + model1.shop.POSScale + "\",\"BasicInstallPrice\":\"" + model1.shop.BasicInstallPrice + "\",\"ProvinceId\":\"" + (model1.shop.ProvinceId ?? 0) + "\",\"CityId\":\"" + (model1.shop.CityId ?? 0) + "\",\"AreaId\":\"" + (model1.shop.AreaId ?? 0) + "\",\"ShopType\":\"" + model1.shop.ShopType + "\",\"BCSInstallPrice\":\"" + model1.shop.BCSInstallPrice + "\",\"OutsourceInstallPrice\":\"" + model1.shop.OutsourceInstallPrice + "\",\"OutsourceBCSInstallPrice\":\"" + model1.shop.OutsourceBCSInstallPrice + "\",\"OutsourceName\":\"" + model1.OutsourceName + "\",\"OutsourceId\":\"" + (model1.shop.OutsourceId ?? 0) + "\",\"BCSIsInstall\":\"" + model1.shop.BCSIsInstall + "\",\"OOHOutsourceName\":\"" + model1.OOHOutsourceName + "\",\"OOHInstallOutsourceId\":\"" + (model1.shop.OOHInstallOutsourceId ?? 0) + "\",\"BCSOutsourceId\":\"" + (model1.shop.BCSOutsourceId ?? 0) + "\",\"BCSOutsourctName\":\"" + model1.BCSOutsourctName+ "\"}");
                 return "[" + json.ToString() + "]";
             }
             return "";

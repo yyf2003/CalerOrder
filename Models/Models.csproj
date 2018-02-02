@@ -269,6 +269,9 @@
     <Compile Include="OrderChangeApproveInfo.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="OrderChangeLog.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="OrderMaterial.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

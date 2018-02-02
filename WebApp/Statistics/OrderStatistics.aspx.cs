@@ -1390,12 +1390,15 @@ namespace WebApp.Statistics
             if (newShopInstallPrice > 0)
             {
                 labNewShopInstallPrice.Text = Math.Round(newShopInstallPrice, 2) + "元";
+                labNewShopInstallPrice.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
+                labNewShopInstallPrice.Attributes.Add("name", "checkNewShopInstallPrice");
 
             }
             if (freightPrice > 0)
             {
                 labFreight.Text = Math.Round(freightPrice, 2) + "元";
-
+                labFreight.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
+                labFreight.Attributes.Add("name", "checkOtherPrice");
             }
 
             if (regionInstallPrice > 0)
@@ -2900,8 +2903,9 @@ namespace WebApp.Statistics
             BindAddUser();
             BindSubjectCategory();
             BindProvince();
-            BindPriceSubjects();
-            BindSubjects();
+            //BindPriceSubjects();
+            //BindSubjects();
+            BindSubjectNameList();
         }
 
         protected void btnCheckAllGuidance_Click(object sender, EventArgs e)
@@ -3129,15 +3133,18 @@ namespace WebApp.Statistics
 
         void BindSubjectNameList()
         {
+            BindPriceSubjects();
+            BindSubjects();
             if (cbShowSubjectNameList.Checked)
             {
-                Panel_SubjectNameList.Visible = true;
-                BindPriceSubjects();
-                BindSubjects();
+                //Panel_SubjectNameList.Visible = true;
+                Panel_SubjectNameList.Style.Add("display","block");
+                
             }
             else
             {
-                Panel_SubjectNameList.Visible = false;
+                Panel_SubjectNameList.Style.Add("display", "none");
+                //Panel_SubjectNameList.Visible = false;
             }
         }
 
@@ -3342,6 +3349,21 @@ namespace WebApp.Statistics
                         li.Selected = true;
                     cblPriceSubjects.Items.Add(li);
                 });
+
+                var newShopInstallPriceSList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId??0) && (s.IsDelete==null || s.IsDelete==false) && s.SubjectType==(int)SubjectTypeEnum.新开店安装费 && s.ApproveState==1);
+                if (newShopInstallPriceSList.Any())
+                {
+                    newShopInstallPriceSList.ForEach(s => {
+                        ListItem li = new ListItem();
+                        li.Value = s.Id.ToString();
+                        string subjectName = s.SubjectName;
+                        li.Text = "<span name='spanCheckSubject' data-subjectid='" + s.Id + "' style='cursor:pointer;'>" + subjectName + "</span>&nbsp;&nbsp;";
+                        if (selectedList.Contains(s.Id))
+                            li.Selected = true;
+                        cblPriceSubjects.Items.Add(li);
+                    });
+                }
+
             }
             catch (Exception ex)
             { }

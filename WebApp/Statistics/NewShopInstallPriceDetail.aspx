@@ -1,21 +1,18 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="PriceSubjectStatistic.aspx.cs" Inherits="WebApp.Statistics.PriceSubjectStatistic" %>
-
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="NewShopInstallPriceDetail.aspx.cs" Inherits="WebApp.Statistics.NewShopInstallPriceDetail" %>
 <%@ Register Assembly="AspNetPager" Namespace="Wuqi.Webdiyer" TagPrefix="webdiyer" %>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title></title>
     <link href="/CSS/Systen_style.css" rel="stylesheet" type="text/css" />
-  
 </head>
 <body>
     <form id="form1" runat="server">
     <div class="nav_title">
         <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" /><p
             class="nav_table_p">
-            <asp:Label ID="labTitle" runat="server" Text="运费/其他费用明细"></asp:Label>
+            <asp:Label ID="labTitle" runat="server" Text="新开店安装费用明细"></asp:Label>
         </p>
     </div>
     <div style="margin: 0px;">
@@ -41,7 +38,7 @@
     <div class="tr">
         >>信息列表
     </div>
-    <asp:Repeater ID="gvList" runat="server" onitemdatabound="gvList_ItemDataBound">
+    <asp:Repeater ID="gvList" runat="server">
         <HeaderTemplate>
             <table class="table1" style="width: 100%;">
                 <tr class="tr_hui">
@@ -49,13 +46,7 @@
                         序号
                     </td>
                     <td>
-                        费用类型
-                    </td>
-                    <td>
                         项目名称
-                    </td>
-                    <td>
-                        店铺编号
                     </td>
                     <td>
                         店铺名称
@@ -69,13 +60,12 @@
                     <td>
                         城市
                     </td>
-                    <%--<td>
+                    <td>
                         店铺地址
-                    </td>--%>
+                    </td>
                     <td>
                         金额(元)
                     </td>
-                    
                     <td>
                         备注
                     </td>
@@ -86,15 +76,11 @@
                 <td style="width: 40px;">
                     <%#(AspNetPager1.CurrentPageIndex-1)*AspNetPager1.PageSize+ Container.ItemIndex + 1%>
                 </td>
-                <td>
-                    <asp:Label ID="labOrderType" runat="server" Text=""></asp:Label>
-                </td>
+               
                 <td>
                     <%#Eval("subject.SubjectName")%>
                 </td>
-                <td>
-                    <%#Eval("order.ShopNo") %>
-                </td>
+                
                 <td>
                     <%#Eval("order.ShopName")%>
                 </td>
@@ -107,26 +93,23 @@
                 <td>
                     <%#Eval("order.City")%>
                 </td>
-               <%-- <td>
-                    <%#Eval("order.Address")%>
-                </td>--%>
                 <td>
-                    <%#Eval("order.OrderPrice")%>
+                    <%#Eval("order.Address")%>
                 </td>
-               
+                <td>
+                    <%#Eval("order.Amount")%>
+                </td>
                 <td>
                      <%#Eval("order.Remark")%>
                     
                 </td>
-               
-                
             </tr>
         </ItemTemplate>
         <FooterTemplate>
             <%if (gvList.Items.Count == 0)
               {%>
             <tr class="tr_bai">
-                <td colspan="10" style="text-align: center;">
+                <td colspan="9" style="text-align: center;">
                     --无数据--
                 </td>
             </tr>

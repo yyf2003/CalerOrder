@@ -541,8 +541,14 @@
                 <td style="height: 30px;">
                     OOH安装外协
                 </td>
-                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labOOHOutsourceName" runat="server" Text=""></asp:Label>
+                </td>
+                <td style="height: 30px;">
+                    三叶草外协
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                   <asp:Label ID="labBCSOutsourceName" runat="server" Text=""></asp:Label>
                 </td>
             </tr>
             <tr>
@@ -569,7 +575,7 @@
                 <td style="width: 100px; height: 30px;">
                     所属客户
                 </td>
-                <td style="text-align: left; width: 210px; padding-left: 5px;">
+                <td style="text-align: left; width: 200px; padding-left: 5px;">
                     <select id="selCustomer">
                         <option value="0">--请选择--</option>
                     </select>
@@ -830,8 +836,16 @@
                 <td style="height: 30px;">
                     OOH安装外协
                 </td>
-                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                <td style="text-align: left; padding-left: 5px;">
                     <select id="seleOOHInstallOutsource">
+                        <option value="0">--请选择客服--</option>
+                    </select>
+                </td>
+                 <td style="height: 30px;">
+                    三叶草外协
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <select id="seleBCSOutsource">
                         <option value="0">--请选择客服--</option>
                     </select>
                 </td>

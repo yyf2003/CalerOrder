@@ -257,7 +257,10 @@
                         oncheckedchanged="cbShowSubjectNameList_CheckedChanged" />显示
                  <img id="loadSubjectNames" style="display: none;" src="../image/WaitImg/loadingA.gif" />
                 </div>
-                <asp:Panel ID="Panel_SubjectNameList" runat="server" Visible="false">
+               <%-- <asp:Panel ID="Panel_SubjectNameList" runat="server" Visible="false">
+                   
+                </asp:Panel>--%>
+                <div id="Panel_SubjectNameList" runat="server" style=" display:none;">
                     <table class="table">
                         <tr class="tr_bai">
                             <td style="width: 120px;">
@@ -296,7 +299,7 @@
                             </td>
                         </tr>
                     </table>
-                </asp:Panel>
+                </div>
             </ContentTemplate>
             
         </asp:UpdatePanel>

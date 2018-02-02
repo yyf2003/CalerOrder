@@ -64,6 +64,8 @@ namespace Models
         public string QuoteGraphicMaterial { get; set; }
         public string UnitName { get; set; }
         public Nullable<decimal> UnitPrice { get; set; }
+        public Nullable<decimal> DefaultTotalPrice { get; set; }
+        public Nullable<decimal> AutoAddTotalPrice { get; set; }
         public Nullable<decimal> TotalPrice { get; set; }
         public string ChooseImg { get; set; }
         public string Remark { get; set; }
@@ -95,7 +97,5 @@ namespace Models
         public Nullable<decimal> PayOrderPrice { get; set; }
         public Nullable<int> CSUserId { get; set; }
         public Nullable<int> FinalOrderId { get; set; }
-        public Nullable<decimal> DefaultTotalPrice { get; set; }
-        public Nullable<decimal> AutoAddTotalPrice { get; set; }
     }
 }

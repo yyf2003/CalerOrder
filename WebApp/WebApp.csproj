@@ -1400,11 +1400,13 @@
     <Content Include="Statistics\ByOrderStatistics.aspx" />
     <Content Include="Statistics\CheckMaterialOrderDetail.aspx" />
     <Content Include="Statistics\CheckShops.aspx" />
+    <Content Include="Statistics\ExpressPriceDetail.aspx" />
     <Content Include="Statistics\FreightDetail.aspx" />
     <Content Include="Statistics\InstallPriceDetail.aspx" />
     <Content Include="Statistics\js\OrderStatistics.js" />
     <Content Include="Statistics\js\SubjectStatistics.js" />
     <Content Include="Statistics\MaterialStatistics.aspx" />
+    <Content Include="Statistics\NewShopInstallPriceDetail.aspx" />
     <Content Include="Statistics\OrderStatistics.aspx" />
     <Content Include="Statistics\PriceSubjectStatistic.aspx" />
     <Content Include="Statistics\SecondInstallPriceStatistic.aspx" />
@@ -3098,6 +3100,13 @@
     <Compile Include="Statistics\CheckShops.aspx.designer.cs">
       <DependentUpon>CheckShops.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Statistics\ExpressPriceDetail.aspx.cs">
+      <DependentUpon>ExpressPriceDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\ExpressPriceDetail.aspx.designer.cs">
+      <DependentUpon>ExpressPriceDetail.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Statistics\FreightDetail.aspx.cs">
       <DependentUpon>FreightDetail.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -3130,6 +3139,13 @@
     </Compile>
     <Compile Include="Statistics\MaterialStatistics.aspx.designer.cs">
       <DependentUpon>MaterialStatistics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\NewShopInstallPriceDetail.aspx.cs">
+      <DependentUpon>NewShopInstallPriceDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\NewShopInstallPriceDetail.aspx.designer.cs">
+      <DependentUpon>NewShopInstallPriceDetail.aspx</DependentUpon>
     </Compile>
     <Compile Include="Statistics\OrderStatistics.aspx.cs">
       <DependentUpon>OrderStatistics.aspx</DependentUpon>

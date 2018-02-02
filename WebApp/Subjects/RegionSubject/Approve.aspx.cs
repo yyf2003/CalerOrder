@@ -469,8 +469,8 @@ namespace WebApp.Subjects.RegionSubject
                                     finalOrderTempModel.PayOrderPrice = o.order.PayPrice;
                                     finalOrderTempModel.GuidanceId = o.guidance.ItemId;
                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
-                                    finalOrderTempBll.Add(finalOrderTempModel);
                                     finalOrderTempModel.UnitName = unitName;
+                                    finalOrderTempBll.Add(finalOrderTempModel);
                                     new BasePage().SaveQuotationOrder(finalOrderTempModel, useQuoteSetting);
                                 }
                             });

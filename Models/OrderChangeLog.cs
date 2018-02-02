@@ -12,7 +12,7 @@ namespace Models
     using System;
     using System.Collections.Generic;
     
-    public partial class FinalOrderDetailTemp
+    public partial class OrderChangeLog
     {
         public int Id { get; set; }
         public Nullable<int> GuidanceId { get; set; }
@@ -27,15 +27,11 @@ namespace Models
         public string CityTier { get; set; }
         public string IsInstall { get; set; }
         public string BCSIsInstall { get; set; }
-        public string AgentCode { get; set; }
-        public string AgentName { get; set; }
         public string POPAddress { get; set; }
         public string Contact { get; set; }
         public string Tel { get; set; }
         public string Channel { get; set; }
         public string Format { get; set; }
-        public string LocationType { get; set; }
-        public string BusinessModel { get; set; }
         public string MaterialSupport { get; set; }
         public string POSScale { get; set; }
         public string MachineFrame { get; set; }
@@ -54,62 +50,27 @@ namespace Models
         public Nullable<decimal> GraphicLength { get; set; }
         public Nullable<decimal> Area { get; set; }
         public Nullable<decimal> TotalArea { get; set; }
-        public Nullable<int> CustomerMaterialId { get; set; }
         public string GraphicMaterial { get; set; }
         public Nullable<decimal> UnitPrice { get; set; }
         public string UnitName { get; set; }
         public Nullable<decimal> TotalPrice { get; set; }
         public string ChooseImg { get; set; }
         public string Remark { get; set; }
-        public string IsElectricity { get; set; }
-        public string LeftSideStick { get; set; }
-        public string RightSideStick { get; set; }
-        public string Floor { get; set; }
-        public string WindowStick { get; set; }
-        public string IsHang { get; set; }
-        public string DoorPosition { get; set; }
         public string CornerType { get; set; }
-        public Nullable<int> MachineFrameNum { get; set; }
-        public string AlertMsg { get; set; }
         public string PositionDescription { get; set; }
-        public Nullable<bool> IsSplit { get; set; }
-        public string NotSplitReson { get; set; }
-        public Nullable<int> LevelNum { get; set; }
-        public Nullable<int> SmallMaterialId { get; set; }
-        public Nullable<int> IsPOPMaterial { get; set; }
-        public Nullable<bool> IsDelete { get; set; }
-        public Nullable<bool> IsHC { get; set; }
         public string Category { get; set; }
-        public Nullable<int> IsSendToErp { get; set; }
-        public Nullable<System.DateTime> SendDate { get; set; }
-        public string InstallPositionDescription { get; set; }
-        public string InstallPricePOSScale { get; set; }
         public Nullable<int> RegionSupplementId { get; set; }
-        public string SplitOrderRemark { get; set; }
-        public Nullable<System.DateTime> DeleteDate { get; set; }
-        public Nullable<int> DeleteUserId { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
         public Nullable<int> AddUserId { get; set; }
-        public Nullable<System.DateTime> EditDate { get; set; }
-        public Nullable<int> EditUserId { get; set; }
-        public string InstallPriceMaterialSupport { get; set; }
         public string PriceBlongRegion { get; set; }
         public Nullable<bool> IsValid { get; set; }
-        public Nullable<bool> IsCheckByRegion { get; set; }
-        public Nullable<System.DateTime> CheckDate { get; set; }
-        public Nullable<int> CheckUserId { get; set; }
-        public string CheckResult { get; set; }
-        public string CheckRemark { get; set; }
-        public Nullable<bool> PassCheck { get; set; }
         public Nullable<bool> IsFromRegion { get; set; }
         public string ShopStatus { get; set; }
         public Nullable<decimal> OrderPrice { get; set; }
         public Nullable<decimal> PayOrderPrice { get; set; }
-        public Nullable<int> OutsourceId { get; set; }
-        public Nullable<int> OutsourceOrderType { get; set; }
-        public Nullable<bool> IsProduce { get; set; }
-        public Nullable<bool> IsValidFromAssign { get; set; }
         public Nullable<int> CSUserId { get; set; }
-        public Nullable<int> InstallPriceAddType { get; set; }
+        public Nullable<int> FinalOrderId { get; set; }
+        public string EditType { get; set; }
+        public string EditRemark { get; set; }
     }
 }

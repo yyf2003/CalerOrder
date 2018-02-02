@@ -10,7 +10,7 @@
 namespace WebApp.Statistics {
     
     
-    public partial class PriceSubjectStatistic {
+    public partial class NewShopInstallPriceDetail {
         
         /// <summary>
         /// form1 控件。

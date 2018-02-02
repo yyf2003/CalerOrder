@@ -49,9 +49,10 @@ namespace WebApp.QuoteOrderManager.handler
                 guidanceIdList = StringHelper.ToIntList(guidanceIds, ',');
                 if (!string.IsNullOrWhiteSpace(subjectIds))
                     subjectIdList = StringHelper.ToIntList(subjectIds, ',');
-                var orderList = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (subjectIdList.Any() ? subjectIdList.Contains(s.SubjectId ?? 0) : 1 == 1) && (s.IsDelete == false || s.IsDelete == null) && s.Sheet != null && (s.OrderType == (int)OrderTypeEnum.POP && s.GraphicLength != null && s.GraphicLength > 1 && s.GraphicWidth != null && s.GraphicWidth > 1));
+                var orderList = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (subjectIdList.Any() ? subjectIdList.Contains(s.SubjectId ?? 0) : 1 == 1) && (s.IsDelete == false || s.IsDelete == null) && s.Sheet != null && ((s.OrderType == (int)OrderTypeEnum.POP && s.GraphicLength != null && s.GraphicLength > 1 && s.GraphicWidth != null && s.GraphicWidth > 1) || (s.OrderType>(int)OrderTypeEnum.POP)));
                 if (orderList.Any())
                 {
+                    var popOrderList = orderList.Where(s=>s.OrderType==(int)OrderTypeEnum.POP || s.OrderType==(int)OrderTypeEnum.道具).ToList();
                     //VVIP店铺
                     var vvipList = orderList.Where(s => s.MaterialSupport != null && s.MaterialSupport.ToLower() == "vvip").ToList();
                     List<int> vvipShopList = vvipList.Select(s => s.ShopId ?? 0).Distinct().ToList();
@@ -82,29 +83,29 @@ namespace WebApp.QuoteOrderManager.handler
                     List<QuoteModel> tableModuleList = new List<QuoteModel>();//陈列桌模特阵
 
                     //橱窗背景订单
-                    var windowOrderList = orderList.Where(s => s.Sheet == "橱窗" && !s.PositionDescription.Contains("窗贴") && s.PositionDescription != "左侧贴" && s.PositionDescription != "右侧贴" && s.PositionDescription != "地贴").ToList();
+                    var windowOrderList = popOrderList.Where(s => s.Sheet == "橱窗" && !s.PositionDescription.Contains("窗贴") && s.PositionDescription != "左侧贴" && s.PositionDescription != "右侧贴" && s.PositionDescription != "地贴").ToList();
                     StatisticMaterial(windowOrderList, ref windowList);
                     //橱窗侧贴订单
-                    var windowSizeStickOrderList = orderList.Where(s => s.Sheet == "橱窗" && s.PositionDescription.Contains("侧贴")).ToList();
+                    var windowSizeStickOrderList = popOrderList.Where(s => s.Sheet == "橱窗" && s.PositionDescription.Contains("侧贴")).ToList();
                     StatisticMaterial(windowSizeStickOrderList, ref windowSizeStickList);
                     //橱窗地贴订单
-                    var windowFlootStickOrderList = orderList.Where(s => s.Sheet == "橱窗" && s.PositionDescription == "地贴").ToList();
+                    var windowFlootStickOrderList = popOrderList.Where(s => s.Sheet == "橱窗" && s.PositionDescription == "地贴").ToList();
                     StatisticMaterial(windowFlootStickOrderList, ref windowFlootStickList);
                     //橱窗地贴订单
-                    var windowStickOrderList = orderList.Where(s => (s.Sheet.Contains("橱窗") && s.PositionDescription == "窗贴") || (s.Sheet.Contains("窗贴"))).ToList();
+                    var windowStickOrderList = popOrderList.Where(s => (s.Sheet.Contains("橱窗") && s.PositionDescription == "窗贴") || (s.Sheet.Contains("窗贴"))).ToList();
                     StatisticMaterial(windowStickOrderList, ref windowStickList);
 
                     //陈列桌订单
-                    var tableOrderList = orderList.Where(s => s.Sheet == "陈列桌" && !s.PositionDescription.Contains("台卡") && !s.PositionDescription.Contains("静态展") && !s.PositionDescription.Contains("模特阵")).ToList();
+                    var tableOrderList = popOrderList.Where(s => s.Sheet == "陈列桌" && !s.PositionDescription.Contains("台卡") && !s.PositionDescription.Contains("静态展") && !s.PositionDescription.Contains("模特阵")).ToList();
                     StatisticMaterial(tableOrderList, ref tableList);
                     //陈列桌台卡订单
-                    var tableTKOrderList = orderList.Where(s => s.Sheet == "陈列桌" && s.PositionDescription.Contains("台卡")).ToList();
+                    var tableTKOrderList = popOrderList.Where(s => s.Sheet == "陈列桌" && s.PositionDescription.Contains("台卡")).ToList();
                     StatisticMaterial(tableTKOrderList, ref tableTKList);
                     //陈列桌静态展订单
-                    var tableJTZOrderList = orderList.Where(s => s.Sheet == "陈列桌" && s.PositionDescription.Contains("静态展")).ToList();
+                    var tableJTZOrderList = popOrderList.Where(s => s.Sheet == "陈列桌" && s.PositionDescription.Contains("静态展")).ToList();
                     StatisticMaterial(tableJTZOrderList, ref tableJTZList);
                     //陈列桌模特阵订单
-                    var tableModuleOrderList = orderList.Where(s => s.Sheet == "陈列桌" && s.PositionDescription.Contains("模特阵")).ToList();
+                    var tableModuleOrderList = popOrderList.Where(s => s.Sheet == "陈列桌" && s.PositionDescription.Contains("模特阵")).ToList();
                     StatisticMaterial(tableModuleOrderList, ref tableModuleList);
 
 
@@ -206,7 +207,7 @@ namespace WebApp.QuoteOrderManager.handler
                     }
 
                     //服装墙区域订单
-                    var appOrderList = orderList.Where(s => s.Sheet.Contains("服装墙") && !s.PositionDescription.Contains("台卡")).ToList();
+                    var appOrderList = popOrderList.Where(s => s.Sheet.Contains("服装墙") && !s.PositionDescription.Contains("台卡")).ToList();
                     if (appOrderList.Any())
                     {
                         List<string> shopChannelList = appOrderList.Select(s => s.Channel).Distinct().ToList();
@@ -232,7 +233,7 @@ namespace WebApp.QuoteOrderManager.handler
                         }
                     }
                     //服装墙台卡区域订单
-                    var appTKOrderList = orderList.Where(s => s.Sheet.Contains("服装墙") && s.PositionDescription.Contains("台卡")).ToList();
+                    var appTKOrderList = popOrderList.Where(s => s.Sheet.Contains("服装墙") && s.PositionDescription.Contains("台卡")).ToList();
                     if (appTKOrderList.Any())
                     {
                         List<QuoteModel> appTKList = new List<QuoteModel>();//
@@ -251,14 +252,14 @@ namespace WebApp.QuoteOrderManager.handler
 
 
                     //鞋墙区域订单
-                    var ftwOrderList = orderList.Where(s => s.Sheet.Contains("鞋墙")).ToList();
+                    var ftwOrderList = popOrderList.Where(s => s.Sheet.Contains("鞋墙")).ToList();
                     if (ftwOrderList.Any())
                     {
 
                     }
 
                     //SMU区域订单
-                    var smuOrderList = orderList.Where(s => s.Sheet.ToLower().Contains("smu")).ToList();
+                    var smuOrderList = popOrderList.Where(s => s.Sheet.ToLower().Contains("smu")).ToList();
                     if (smuOrderList.Any())
                     {
                         List<QuoteModel> smuList = new List<QuoteModel>();//
@@ -274,9 +275,25 @@ namespace WebApp.QuoteOrderManager.handler
                             });
                         }
                     }
+                    var zdOrderList = popOrderList.Where(s => s.Sheet.ToLower().Contains("中岛")).ToList();
+                    if (zdOrderList.Any())
+                    {
+                        List<QuoteModel> smuList = new List<QuoteModel>();//
+                        StatisticMaterial(zdOrderList, ref smuList);
+                        if (smuList.Any())
+                        {
+                            smuList.ForEach(s =>
+                            {
+                                sheet.Cells[smuStartRow, 2].Value = "中岛";
+                                sheet.Cells[smuStartRow, 3].Value = s.QuoteGraphicMaterial;
+                                sheet.Cells[smuStartRow, 5].Value = s.Amount;
+                                smuStartRow++;
+                            });
+                        }
+                    }
 
                     //收银台区域订单
-                    var cashierOrderList = orderList.Where(s => s.Sheet == "收银台").ToList();
+                    var cashierOrderList = popOrderList.Where(s => s.Sheet == "收银台").ToList();
                     if (cashierOrderList.Any())
                     {
                         List<QuoteModel> cashierList = new List<QuoteModel>();//
@@ -294,7 +311,7 @@ namespace WebApp.QuoteOrderManager.handler
                     }
 
                     //OOH区域订单
-                    var oohOrderList = orderList.Where(s => s.Sheet.ToLower().Contains("ooh")).ToList();
+                    var oohOrderList = popOrderList.Where(s => s.Sheet.ToLower().Contains("ooh")).ToList();
                     if (oohOrderList.Any())
                     {
                         List<QuoteModel> oohList = new List<QuoteModel>();//
@@ -326,10 +343,23 @@ namespace WebApp.QuoteOrderManager.handler
                     int basicInstallLevelTwo = 0;
                     int basicInstallLevelThree = 0;
 
+                    List<ExpressPriceDetail> expressPriceList = new List<ExpressPriceDetail>();
+                    //快递费订单
+                    var expressPriceOrderList = orderList.Where(s=>s.OrderType==(int)OrderTypeEnum.发货费).ToList();
+                    if (expressPriceOrderList.Any())
+                    {
+                        expressPriceOrderList.ForEach(s => {
+                            ExpressPriceDetail model = new ExpressPriceDetail();
+                            model.ShopId = s.ShopId;
+                            model.ExpressPrice = s.PayOrderPrice;
+                            expressPriceList.Add(model);
+                        });
+                    }
                     guidanceIdList.ForEach(gid =>
                     {
-                        List<int> shopIdList = orderList.Where(s => s.GuidanceId == gid && cityTierList.Contains(s.CityTier)).Select(s => s.ShopId ?? 0).Distinct().ToList();
-                        var installPriceList = installShopBll.GetList(s => s.GuidanceId == gid && shopIdList.Contains(s.ShopId ?? 0)).ToList();
+                        //安装费
+                        List<int> installShopIdList = orderList.Where(s => s.GuidanceId == gid && cityTierList.Contains(s.CityTier)).Select(s => s.ShopId ?? 0).Distinct().ToList();
+                        var installPriceList = installShopBll.GetList(s => s.GuidanceId == gid && installShopIdList.Contains(s.ShopId ?? 0)).ToList();
                         if (installPriceList.Any())
                         {
                             installPriceList.ForEach(s =>
@@ -381,7 +411,26 @@ namespace WebApp.QuoteOrderManager.handler
                                 }
                             });
                         }
+                        SubjectGuidance guidanceModel = new SubjectGuidanceBLL().GetModel(gid);
+                        if (guidanceModel != null && (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion || guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery))
+                        {
+                            //活动快递费
+                            List<int> expressPriceShopIdList = orderList.Where(s => s.GuidanceId == gid).Select(s => s.ShopId ?? 0).Distinct().ToList();
+                            var expressList = new ExpressPriceDetailBLL().GetList(s => s.GuidanceId == gid && expressPriceShopIdList.Contains(s.ShopId??0));
+                            if (expressList.Any())
+                            {
+                                expressPriceList.AddRange(expressList);
+                            }
+                        }
+                        
+
+
                     });
+                    
+
+
+
+
                     if (oohInstallLevelOne > 0)
                         sheet.Cells[96, 7].Value = oohInstallLevelOne.ToString();
                     if (oohInstallLevelTwo > 0)
@@ -405,6 +454,57 @@ namespace WebApp.QuoteOrderManager.handler
                         sheet.Cells[103, 7].Value = basicInstallLevelTwo.ToString();
                     if (basicInstallLevelThree > 0)
                         sheet.Cells[105, 7].Value = basicInstallLevelThree.ToString();
+
+                    //第二张表
+                    ExcelWorksheet sheet2 = package.Workbook.Worksheets[2];
+                    int secondSheetRowIndex = 13;
+                    //快递费
+                    if (expressPriceList.Any())
+                    {
+                        
+                        var groupList = (from order in expressPriceList
+                                         group order by order.ExpressPrice
+                                             into g
+                                             select new
+                                             {
+                                                 ExpressPrice = g.Key,
+                                                 ShopCount = g.Select(s => s.ShopId??0).Count()
+                                             }).ToList();
+                        
+                        groupList.ForEach(s => {
+                            sheet2.Cells[secondSheetRowIndex, 1].Value = "快递费";
+                            sheet2.Cells[secondSheetRowIndex, 10].Value = s.ShopCount;
+                            sheet2.Cells[secondSheetRowIndex, 14].Value = s.ExpressPrice;
+                            secondSheetRowIndex++;
+                        });
+
+                    }
+                    //物料
+                    var materialList = orderList.Where(s=>s.OrderType==(int)OrderTypeEnum.物料).ToList();
+                    if (materialList.Any())
+                    {
+                        var mgroupList = (from order in materialList
+                                         group order by new
+                                         {
+                                             order.Sheet,
+                                             order.UnitPrice
+                                         } into g
+                                         select new { 
+                                             MaterialName=g.Key.Sheet,
+                                             UnitPrice=g.Key.UnitPrice,
+                                             Count=g.Sum(s=>s.Quantity??0)
+                                         }).ToList();
+                        mgroupList.ForEach(s => {
+                            sheet2.Cells[secondSheetRowIndex, 1].Value = s.MaterialName;
+                            sheet2.Cells[secondSheetRowIndex, 10].Value = s.Count;
+                            sheet2.Cells[secondSheetRowIndex, 12].Value = s.UnitPrice;
+                            secondSheetRowIndex++;
+                        });
+                    }
+                    //第三张表
+                    ExcelWorksheet sheet3 = package.Workbook.Worksheets[3];
+                    int thirdSheetRowIndex = 12;
+
 
                     using (MemoryStream ms = new MemoryStream())
                     {

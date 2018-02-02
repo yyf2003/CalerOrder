@@ -278,6 +278,79 @@ $(function () {
         CheckMaterialOrderPriceFUN();
     })
 
+    //查看其他费用明细
+    $("span[name='checkOtherPrice']").click(function () {
+        var subjectid = "";
+        var regions = "";
+        var provinces = "";
+        var citys = "";
+        $("input[name^='cblSubjects']:checked").each(function () {
+            subjectid += $(this).val() + ",";
+        })
+        $("input[name^='cblPriceSubjects']:checked").each(function () {
+            subjectid += $(this).val() + ",";
+        })
+        if (subjectid == "") {
+            $("input[name^='cblSubjects']").each(function () {
+                subjectid += $(this).val() + ",";
+            })
+            $("input[name^='cblPriceSubjects']").each(function () {
+                subjectid += $(this).val() + ",";
+            })
+        }
+        $("input[name^='cblRegion']:checked").each(function () {
+            regions += $(this).val() + ",";
+        })
+        $("input[name^='cblProvince']:checked").each(function () {
+            provinces += $(this).val() + ",";
+        })
+        $("input[name^='cblCity']:checked").each(function () {
+            citys += $(this).val() + ",";
+        })
+        var url = "PriceSubjectStatistic.aspx?subjectIds=" + subjectid + "&region=" + regions + "&province=" + provinces + "&city=" + citys;
+        $.fancybox({
+            href: url,
+            type: 'iframe',
+            padding: 5,
+            width: '90%',
+            hideOnOverlayClick: false
+        })
+    })
+
+    //查看新开店安装费用明细
+    $("span[name='checkNewShopInstallPrice']").click(function () {
+        var subjectid = "";
+        var regions = "";
+        var provinces = "";
+        var citys = "";
+        
+        $("input[name^='cblPriceSubjects']:checked").each(function () {
+            subjectid += $(this).val() + ",";
+        })
+        if (subjectid == "") {
+            $("input[name^='cblPriceSubjects']").each(function () {
+                subjectid += $(this).val() + ",";
+            })
+        }
+        $("input[name^='cblRegion']:checked").each(function () {
+            regions += $(this).val() + ",";
+        })
+        $("input[name^='cblProvince']:checked").each(function () {
+            provinces += $(this).val() + ",";
+        })
+        $("input[name^='cblCity']:checked").each(function () {
+            citys += $(this).val() + ",";
+        })
+        var url = "NewShopInstallPriceDetail.aspx?subjectIds=" + subjectid + "&region=" + regions + "&province=" + provinces + "&city=" + citys;
+        $.fancybox({
+            href: url,
+            type: 'iframe',
+            padding: 5,
+            width: '90%',
+            hideOnOverlayClick: false
+        })
+    })
+
     //导出
     $("#btnExport").click(function () {
         var guidanceIds = "";
@@ -425,8 +498,13 @@ $(function () {
         $("input[name^='cblCustomerService']:checked").each(function () {
             customerServiceIds += $(this).val() + ",";
         })
+
         var url = "SubjectStatistics.aspx";
-        if (subjectType == 2 || subjectType == 9) {
+        if (subjectType == 2) {
+            //新开店安装费用订单明细
+            url = "NewShopInstallPriceDetail.aspx";
+        }
+        if (subjectType == 12) {
             //费用订单明细
             url = "PriceSubjectStatistic.aspx";
         }

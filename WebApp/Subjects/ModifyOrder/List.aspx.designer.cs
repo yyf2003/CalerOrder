@@ -103,6 +103,15 @@ namespace WebApp.Subjects.ModifyOrder {
         protected global::System.Web.UI.WebControls.RadioButtonList rblOrderType;
         
         /// <summary>
+        /// ddlSubjectList 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlSubjectList;
+        
+        /// <summary>
         /// txtShopNo 控件。
         /// </summary>
         /// <remarks>
@@ -317,5 +326,14 @@ namespace WebApp.Subjects.ModifyOrder {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.RadioButtonList rbl_ShopStatus;
+        
+        /// <summary>
+        /// hfIsRegionSubject 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfIsRegionSubject;
     }
 }

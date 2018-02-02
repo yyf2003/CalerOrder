@@ -3192,9 +3192,10 @@ namespace WebApp.Subjects.ADOrders
                             finalOrderTempModel.ShopStatus = o.shop.Status;
                             finalOrderTempModel.GuidanceId = o.GuidanceId;
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
+                            finalOrderTempModel.UnitName = unitName;
                             finalOrderTempBll.Add(finalOrderTempModel);
                             //保存报价单
-                            finalOrderTempModel.UnitName = unitName;
+                            
                             new BasePage().SaveQuotationOrder(finalOrderTempModel);
                         });
                     }
@@ -3272,6 +3273,7 @@ namespace WebApp.Subjects.ADOrders
                                 finalOrderTempModel.PayOrderPrice = (o.material.PayPrice ?? 0) * (o.material.MaterialCount ?? 0);
                             }
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
+
                             finalOrderTempBll.Add(finalOrderTempModel);
                             //保存报价单
                             new BasePage().SaveQuotationOrder(finalOrderTempModel,false);

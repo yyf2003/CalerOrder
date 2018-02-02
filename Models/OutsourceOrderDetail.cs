@@ -86,5 +86,6 @@ namespace Models
         public Nullable<int> ModifyUserId { get; set; }
         public string ModifyRemark { get; set; }
         public Nullable<int> FinalOrderId { get; set; }
+        public Nullable<int> InstallPriceAddType { get; set; }
     }
 }

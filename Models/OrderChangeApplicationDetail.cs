@@ -20,9 +20,9 @@ namespace Models
         public int ChangeType { get; set; }
         public string Remark { get; set; }
         public Nullable<System.DateTime> ActivityDate { get; set; }
+        public Nullable<bool> Running { get; set; }
         public Nullable<int> State { get; set; }
         public Nullable<int> FinishUserId { get; set; }
         public Nullable<System.DateTime> FinishDate { get; set; }
-        public Nullable<bool> Running { get; set; }
     }
 }

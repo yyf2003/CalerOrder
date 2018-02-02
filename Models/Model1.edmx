@@ -81,6 +81,7 @@
           <EntitySet Name="OrderChangeApplication" EntityType="KalerOrderDBModel.Store.OrderChangeApplication" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="OrderChangeApplicationDetail" EntityType="KalerOrderDBModel.Store.OrderChangeApplicationDetail" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="OrderChangeApproveInfo" EntityType="KalerOrderDBModel.Store.OrderChangeApproveInfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="OrderChangeLog" EntityType="KalerOrderDBModel.Store.OrderChangeLog" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="OrderMaterial" EntityType="KalerOrderDBModel.Store.OrderMaterial" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="OrderMaterialBaseInfo" EntityType="KalerOrderDBModel.Store.OrderMaterialBaseInfo" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="OrderMaterialItem" EntityType="KalerOrderDBModel.Store.OrderMaterialItem" store:Type="Tables" Schema="dbo" />
@@ -720,6 +721,7 @@
           <Property Name="CustomerMaterialId" Type="int" />
           <Property Name="GraphicMaterial" Type="varchar" MaxLength="500" />
           <Property Name="UnitPrice" Type="decimal" Scale="2" />
+          <Property Name="UnitName" Type="varchar" MaxLength="50" />
           <Property Name="TotalPrice" Type="decimal" Scale="6" />
           <Property Name="ChooseImg" Type="varchar" MaxLength="500" />
           <Property Name="Remark" Type="varchar" MaxLength="500" />
@@ -772,6 +774,7 @@
           <Property Name="IsProduce" Type="bit" />
           <Property Name="IsValidFromAssign" Type="bit" />
           <Property Name="CSUserId" Type="int" />
+          <Property Name="InstallPriceAddType" Type="int" />
         </EntityType>
         <EntityType Name="HandMadeOrderDetail">
           <Key>
@@ -940,6 +943,7 @@
           <Property Name="OOHPrice" Type="decimal" Scale="2" />
           <Property Name="TotalPrice" Type="decimal" Scale="2" />
           <Property Name="AddDate" Type="datetime" />
+          <Property Name="AddType" Type="int" />
         </EntityType>
         <EntityType Name="KidsNewShopProp">
           <Key>
@@ -1244,6 +1248,69 @@
           <Property Name="Remark" Type="varchar" MaxLength="500" />
           <Property Name="AddUserId" Type="int" />
           <Property Name="AddDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="OrderChangeLog">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="GuidanceId" Type="int" />
+          <Property Name="SubjectId" Type="int" />
+          <Property Name="ShopId" Type="int" />
+          <Property Name="ShopNo" Type="varchar" MaxLength="100" />
+          <Property Name="ShopName" Type="varchar" MaxLength="500" />
+          <Property Name="OrderType" Type="int" />
+          <Property Name="Region" Type="varchar" MaxLength="50" />
+          <Property Name="Province" Type="varchar" MaxLength="50" />
+          <Property Name="City" Type="varchar" MaxLength="50" />
+          <Property Name="CityTier" Type="varchar" MaxLength="50" />
+          <Property Name="IsInstall" Type="varchar" MaxLength="50" />
+          <Property Name="BCSIsInstall" Type="varchar" MaxLength="50" />
+          <Property Name="POPAddress" Type="varchar" MaxLength="500" />
+          <Property Name="Contact" Type="varchar" MaxLength="200" />
+          <Property Name="Tel" Type="varchar" MaxLength="200" />
+          <Property Name="Channel" Type="varchar" MaxLength="50" />
+          <Property Name="Format" Type="varchar" MaxLength="50" />
+          <Property Name="MaterialSupport" Type="varchar" MaxLength="50" />
+          <Property Name="POSScale" Type="varchar" MaxLength="50" />
+          <Property Name="MachineFrame" Type="varchar" MaxLength="50" />
+          <Property Name="GraphicNo" Type="varchar" MaxLength="50" />
+          <Property Name="POPName" Type="varchar" MaxLength="50" />
+          <Property Name="POPType" Type="varchar" MaxLength="50" />
+          <Property Name="Sheet" Type="varchar" MaxLength="50" />
+          <Property Name="Gender" Type="varchar" MaxLength="50" />
+          <Property Name="OrderGender" Type="varchar" MaxLength="50" />
+          <Property Name="Quantity" Type="int" />
+          <Property Name="WindowWide" Type="decimal" />
+          <Property Name="WindowHigh" Type="decimal" />
+          <Property Name="WindowDeep" Type="decimal" />
+          <Property Name="WindowSize" Type="varchar" MaxLength="50" />
+          <Property Name="GraphicWidth" Type="decimal" />
+          <Property Name="GraphicLength" Type="decimal" />
+          <Property Name="Area" Type="decimal" Scale="6" />
+          <Property Name="TotalArea" Type="decimal" Scale="6" />
+          <Property Name="GraphicMaterial" Type="varchar" MaxLength="500" />
+          <Property Name="UnitPrice" Type="decimal" Scale="2" />
+          <Property Name="UnitName" Type="varchar" MaxLength="50" />
+          <Property Name="TotalPrice" Type="decimal" Scale="6" />
+          <Property Name="ChooseImg" Type="varchar" MaxLength="500" />
+          <Property Name="Remark" Type="varchar" MaxLength="500" />
+          <Property Name="CornerType" Type="varchar" MaxLength="100" />
+          <Property Name="PositionDescription" Type="varchar" MaxLength="500" />
+          <Property Name="Category" Type="varchar" MaxLength="50" />
+          <Property Name="RegionSupplementId" Type="int" />
+          <Property Name="AddDate" Type="datetime" />
+          <Property Name="AddUserId" Type="int" />
+          <Property Name="PriceBlongRegion" Type="varchar" MaxLength="50" />
+          <Property Name="IsValid" Type="bit" />
+          <Property Name="IsFromRegion" Type="bit" />
+          <Property Name="ShopStatus" Type="varchar" MaxLength="50" />
+          <Property Name="OrderPrice" Type="decimal" Scale="2" />
+          <Property Name="PayOrderPrice" Type="decimal" Scale="2" />
+          <Property Name="CSUserId" Type="int" />
+          <Property Name="FinalOrderId" Type="int" />
+          <Property Name="EditType" Type="varchar" MaxLength="50" />
+          <Property Name="EditRemark" Type="varchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="OrderMaterial">
           <Key>
@@ -1582,6 +1649,7 @@
           <Property Name="ModifyUserId" Type="int" />
           <Property Name="ModifyRemark" Type="nvarchar" MaxLength="100" />
           <Property Name="FinalOrderId" Type="int" />
+          <Property Name="InstallPriceAddType" Type="int" />
         </EntityType>
         <EntityType Name="OutsourceOrderDetailNew">
           <Key>
@@ -2782,6 +2850,7 @@
           <EntitySet Name="OrderChangeApplication" EntityType="KalerOrderDBModel.OrderChangeApplication" />
           <EntitySet Name="OrderChangeApplicationDetail" EntityType="KalerOrderDBModel.OrderChangeApplicationDetail" />
           <EntitySet Name="OrderChangeApproveInfo" EntityType="KalerOrderDBModel.OrderChangeApproveInfo" />
+          <EntitySet Name="OrderChangeLog" EntityType="KalerOrderDBModel.OrderChangeLog" />
           <EntitySet Name="OrderMaterial" EntityType="KalerOrderDBModel.OrderMaterial" />
           <EntitySet Name="OrderMaterialBaseInfo" EntityType="KalerOrderDBModel.OrderMaterialBaseInfo" />
           <EntitySet Name="OrderMaterialItem" EntityType="KalerOrderDBModel.OrderMaterialItem" />
@@ -2822,6 +2891,8 @@
           <EntitySet Name="Quotations" EntityType="KalerOrderDBModel.Quotations" />
           <EntitySet Name="QuotationTaxRate" EntityType="KalerOrderDBModel.QuotationTaxRate" />
           <EntitySet Name="QuoteMaterial" EntityType="KalerOrderDBModel.QuoteMaterial" />
+          <EntitySet Name="QuoteOrderDetail" EntityType="KalerOrderDBModel.QuoteOrderDetail" />
+          <EntitySet Name="QuoteOrderSetting" EntityType="KalerOrderDBModel.QuoteOrderSetting" />
           <EntitySet Name="Region" EntityType="KalerOrderDBModel.Region" />
           <EntitySet Name="RegionOrderDetail" EntityType="KalerOrderDBModel.RegionOrderDetail" />
           <EntitySet Name="RegionOrderPrice" EntityType="KalerOrderDBModel.RegionOrderPrice" />
@@ -2857,8 +2928,6 @@
           <EntitySet Name="UserInRegion" EntityType="KalerOrderDBModel.UserInRegion" />
           <EntitySet Name="UserInRole" EntityType="KalerOrderDBModel.UserInRole" />
           <EntitySet Name="UserLevel" EntityType="KalerOrderDBModel.UserLevel" />
-          <EntitySet Name="QuoteOrderSetting" EntityType="KalerOrderDBModel.QuoteOrderSetting" />
-          <EntitySet Name="QuoteOrderDetail" EntityType="KalerOrderDBModel.QuoteOrderDetail" />
         </EntityContainer>
         <EntityType Name="AccountCheckSupplement">
           <Key>
@@ -3415,6 +3484,7 @@
           <Property Type="Int32" Name="CustomerMaterialId" />
           <Property Type="String" Name="GraphicMaterial" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Type="Decimal" Name="UnitPrice" Precision="18" Scale="2" />
+          <Property Type="String" Name="UnitName" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Type="Decimal" Name="TotalPrice" Precision="18" Scale="6" />
           <Property Type="String" Name="ChooseImg" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
@@ -3467,6 +3537,7 @@
           <Property Type="Boolean" Name="IsProduce" />
           <Property Type="Boolean" Name="IsValidFromAssign" />
           <Property Type="Int32" Name="CSUserId" />
+          <Property Type="Int32" Name="InstallPriceAddType" />
         </EntityType>
         <EntityType Name="HandMadeOrderDetail">
           <Key>
@@ -3635,6 +3706,7 @@
           <Property Type="Decimal" Name="OOHPrice" Precision="18" Scale="2" />
           <Property Type="Decimal" Name="TotalPrice" Precision="18" Scale="2" />
           <Property Type="DateTime" Name="AddDate" />
+          <Property Type="Int32" Name="AddType" />
         </EntityType>
         <EntityType Name="KidsNewShopProp">
           <Key>
@@ -3921,10 +3993,10 @@
           <Property Type="Int32" Name="ChangeType" Nullable="false" />
           <Property Type="String" Name="Remark" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Type="DateTime" Name="ActivityDate" />
+          <Property Type="Boolean" Name="Running" />
           <Property Type="Int32" Name="State" />
           <Property Type="Int32" Name="FinishUserId" />
           <Property Type="DateTime" Name="FinishDate" />
-          <Property Type="Boolean" Name="Running" />
         </EntityType>
         <EntityType Name="OrderChangeApproveInfo">
           <Key>
@@ -3936,6 +4008,69 @@
           <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Type="Int32" Name="AddUserId" />
           <Property Type="DateTime" Name="AddDate" />
+        </EntityType>
+        <EntityType Name="OrderChangeLog">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="GuidanceId" />
+          <Property Type="Int32" Name="SubjectId" />
+          <Property Type="Int32" Name="ShopId" />
+          <Property Type="String" Name="ShopNo" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="ShopName" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="OrderType" />
+          <Property Type="String" Name="Region" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Province" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="City" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="CityTier" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="IsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="BCSIsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="POPAddress" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Contact" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Tel" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Channel" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Format" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="POSScale" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="MachineFrame" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="GraphicNo" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="POPName" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="POPType" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="OrderGender" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="Quantity" />
+          <Property Type="Decimal" Name="WindowWide" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="WindowHigh" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="WindowDeep" Precision="18" Scale="0" />
+          <Property Type="String" Name="WindowSize" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="GraphicWidth" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="GraphicLength" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="Area" Precision="18" Scale="6" />
+          <Property Type="Decimal" Name="TotalArea" Precision="18" Scale="6" />
+          <Property Type="String" Name="GraphicMaterial" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="UnitPrice" Precision="18" Scale="2" />
+          <Property Type="String" Name="UnitName" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="TotalPrice" Precision="18" Scale="6" />
+          <Property Type="String" Name="ChooseImg" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="CornerType" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="PositionDescription" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Category" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="RegionSupplementId" />
+          <Property Type="DateTime" Name="AddDate" />
+          <Property Type="Int32" Name="AddUserId" />
+          <Property Type="String" Name="PriceBlongRegion" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Boolean" Name="IsValid" />
+          <Property Type="Boolean" Name="IsFromRegion" />
+          <Property Type="String" Name="ShopStatus" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="OrderPrice" Precision="18" Scale="2" />
+          <Property Type="Decimal" Name="PayOrderPrice" Precision="18" Scale="2" />
+          <Property Type="Int32" Name="CSUserId" />
+          <Property Type="Int32" Name="FinalOrderId" />
+          <Property Type="String" Name="EditType" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="EditRemark" MaxLength="100" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="OrderMaterial">
           <Key>
@@ -4274,6 +4409,7 @@
           <Property Type="Int32" Name="ModifyUserId" />
           <Property Type="String" Name="ModifyRemark" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Type="Int32" Name="FinalOrderId" />
+          <Property Type="Int32" Name="InstallPriceAddType" />
         </EntityType>
         <EntityType Name="OutsourceOrderDetailNew">
           <Key>
@@ -4683,6 +4819,104 @@
           <Property Type="Int32" Name="BasicCategoryId" />
           <Property Type="Int32" Name="CustomerMaterialId" />
           <Property Type="String" Name="QuoteMaterialName" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="QuoteOrderDetail">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="GuidanceId" />
+          <Property Type="Int32" Name="SubjectId" />
+          <Property Type="Int32" Name="ShopId" />
+          <Property Type="String" Name="ShopNo" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="ShopName" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="OrderType" />
+          <Property Type="String" Name="Region" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Province" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="City" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="CityTier" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="IsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="BCSIsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="AgentCode" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="AgentName" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="POPAddress" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Contact" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Tel" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Channel" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Format" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="LocationType" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="BusinessModel" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="POSScale" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="MachineFrame" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="GraphicNo" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="POPName" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="POPType" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="OrderGender" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="Quantity" />
+          <Property Type="Decimal" Name="WindowWide" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="WindowHigh" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="WindowDeep" Precision="18" Scale="0" />
+          <Property Type="String" Name="WindowSize" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="GraphicWidth" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="GraphicLength" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="Area" Precision="18" Scale="6" />
+          <Property Type="Decimal" Name="AutoAddGraphicWidth" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="AutoAddGraphicLength" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="AutoAddArea" Precision="18" Scale="6" />
+          <Property Type="Decimal" Name="TotalGraphicWidth" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="TotalGraphicLength" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="TotalArea" Precision="18" Scale="6" />
+          <Property Type="Int32" Name="CustomerMaterialId" />
+          <Property Type="String" Name="GraphicMaterial" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="QuoteGraphicMaterial" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="UnitName" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="UnitPrice" Precision="18" Scale="2" />
+          <Property Type="Decimal" Name="DefaultTotalPrice" Precision="18" Scale="6" />
+          <Property Type="Decimal" Name="AutoAddTotalPrice" Precision="18" Scale="6" />
+          <Property Type="Decimal" Name="TotalPrice" Precision="18" Scale="6" />
+          <Property Type="String" Name="ChooseImg" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="IsElectricity" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="LeftSideStick" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="RightSideStick" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Floor" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="WindowStick" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="IsHang" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="DoorPosition" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="CornerType" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="PositionDescription" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="SmallMaterialId" />
+          <Property Type="Boolean" Name="IsDelete" />
+          <Property Type="String" Name="Category" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="InstallPositionDescription" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="InstallPricePOSScale" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="RegionSupplementId" />
+          <Property Type="DateTime" Name="DeleteDate" />
+          <Property Type="Int32" Name="DeleteUserId" />
+          <Property Type="DateTime" Name="AddDate" />
+          <Property Type="Int32" Name="AddUserId" />
+          <Property Type="String" Name="InstallPriceMaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="PriceBlongRegion" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Boolean" Name="IsValid" />
+          <Property Type="Boolean" Name="IsFromRegion" />
+          <Property Type="String" Name="ShopStatus" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="OrderPrice" Precision="18" Scale="2" />
+          <Property Type="Decimal" Name="PayOrderPrice" Precision="18" Scale="2" />
+          <Property Type="Int32" Name="CSUserId" />
+          <Property Type="Int32" Name="FinalOrderId" />
+        </EntityType>
+        <EntityType Name="QuoteOrderSetting">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="Decimal" Name="POPWidth" Precision="18" Scale="2" />
+          <Property Type="Decimal" Name="POPLength" Precision="18" Scale="2" />
+          <Property Type="Int32" Name="OperateType" />
         </EntityType>
         <EntityType Name="Region">
           <Key>
@@ -5303,104 +5537,6 @@
           <Property Type="Int32" Name="LevelId" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Type="String" Name="LevelName" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="QuoteOrderSetting">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Type="Decimal" Name="POPWidth" Precision="18" Scale="2" />
-          <Property Type="Decimal" Name="POPLength" Precision="18" Scale="2" />
-          <Property Type="Int32" Name="OperateType" />
-        </EntityType>
-        <EntityType Name="QuoteOrderDetail">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="Int32" Name="GuidanceId" />
-          <Property Type="Int32" Name="SubjectId" />
-          <Property Type="Int32" Name="ShopId" />
-          <Property Type="String" Name="ShopNo" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="ShopName" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Type="Int32" Name="OrderType" />
-          <Property Type="String" Name="Region" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Province" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="City" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="CityTier" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="IsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="BCSIsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="AgentCode" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="AgentName" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="POPAddress" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Contact" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Tel" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Channel" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Format" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="LocationType" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="BusinessModel" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="POSScale" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="MachineFrame" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="GraphicNo" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="POPName" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="POPType" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Gender" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="OrderGender" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Int32" Name="Quantity" />
-          <Property Type="Decimal" Name="WindowWide" Precision="18" Scale="0" />
-          <Property Type="Decimal" Name="WindowHigh" Precision="18" Scale="0" />
-          <Property Type="Decimal" Name="WindowDeep" Precision="18" Scale="0" />
-          <Property Type="String" Name="WindowSize" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Decimal" Name="GraphicWidth" Precision="18" Scale="0" />
-          <Property Type="Decimal" Name="GraphicLength" Precision="18" Scale="0" />
-          <Property Type="Decimal" Name="Area" Precision="18" Scale="6" />
-          <Property Type="Decimal" Name="AutoAddGraphicWidth" Precision="18" Scale="0" />
-          <Property Type="Decimal" Name="AutoAddGraphicLength" Precision="18" Scale="0" />
-          <Property Type="Decimal" Name="AutoAddArea" Precision="18" Scale="6" />
-          <Property Type="Decimal" Name="TotalGraphicWidth" Precision="18" Scale="0" />
-          <Property Type="Decimal" Name="TotalGraphicLength" Precision="18" Scale="0" />
-          <Property Type="Decimal" Name="TotalArea" Precision="18" Scale="6" />
-          <Property Type="Int32" Name="CustomerMaterialId" />
-          <Property Type="String" Name="GraphicMaterial" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="QuoteGraphicMaterial" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="UnitName" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Decimal" Name="UnitPrice" Precision="18" Scale="2" />
-          <Property Type="Decimal" Name="TotalPrice" Precision="18" Scale="6" />
-          <Property Type="String" Name="ChooseImg" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="IsElectricity" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="LeftSideStick" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="RightSideStick" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Floor" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="WindowStick" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="IsHang" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="DoorPosition" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="CornerType" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="PositionDescription" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Type="Int32" Name="SmallMaterialId" />
-          <Property Type="Boolean" Name="IsDelete" />
-          <Property Type="String" Name="Category" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="InstallPositionDescription" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="InstallPricePOSScale" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Int32" Name="RegionSupplementId" />
-          <Property Type="DateTime" Name="DeleteDate" />
-          <Property Type="Int32" Name="DeleteUserId" />
-          <Property Type="DateTime" Name="AddDate" />
-          <Property Type="Int32" Name="AddUserId" />
-          <Property Type="String" Name="InstallPriceMaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="PriceBlongRegion" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Boolean" Name="IsValid" />
-          <Property Type="Boolean" Name="IsFromRegion" />
-          <Property Type="String" Name="ShopStatus" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Decimal" Name="OrderPrice" Precision="18" Scale="2" />
-          <Property Type="Decimal" Name="PayOrderPrice" Precision="18" Scale="2" />
-          <Property Type="Int32" Name="CSUserId" />
-          <Property Type="Int32" Name="FinalOrderId" />
-          <Property Type="Decimal" Name="DefaultTotalPrice" Precision="18" Scale="6" />
-          <Property Type="Decimal" Name="AutoAddTotalPrice" Precision="18" Scale="6" />
-        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -5952,6 +6088,7 @@
           <EntitySetMapping Name="FinalOrderDetailTemp">
             <EntityTypeMapping TypeName="KalerOrderDBModel.FinalOrderDetailTemp">
               <MappingFragment StoreEntitySet="FinalOrderDetailTemp">
+                <ScalarProperty Name="InstallPriceAddType" ColumnName="InstallPriceAddType" />
                 <ScalarProperty Name="CSUserId" ColumnName="CSUserId" />
                 <ScalarProperty Name="IsValidFromAssign" ColumnName="IsValidFromAssign" />
                 <ScalarProperty Name="IsProduce" ColumnName="IsProduce" />
@@ -6004,6 +6141,7 @@
                 <ScalarProperty Name="Remark" ColumnName="Remark" />
                 <ScalarProperty Name="ChooseImg" ColumnName="ChooseImg" />
                 <ScalarProperty Name="TotalPrice" ColumnName="TotalPrice" />
+                <ScalarProperty Name="UnitName" ColumnName="UnitName" />
                 <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
                 <ScalarProperty Name="GraphicMaterial" ColumnName="GraphicMaterial" />
                 <ScalarProperty Name="CustomerMaterialId" ColumnName="CustomerMaterialId" />
@@ -6216,6 +6354,7 @@
           <EntitySetMapping Name="InstallPriceTemp">
             <EntityTypeMapping TypeName="KalerOrderDBModel.InstallPriceTemp">
               <MappingFragment StoreEntitySet="InstallPriceTemp">
+                <ScalarProperty Name="AddType" ColumnName="AddType" />
                 <ScalarProperty Name="AddDate" ColumnName="AddDate" />
                 <ScalarProperty Name="TotalPrice" ColumnName="TotalPrice" />
                 <ScalarProperty Name="OOHPrice" ColumnName="OOHPrice" />
@@ -6518,10 +6657,10 @@
           <EntitySetMapping Name="OrderChangeApplicationDetail">
             <EntityTypeMapping TypeName="KalerOrderDBModel.OrderChangeApplicationDetail">
               <MappingFragment StoreEntitySet="OrderChangeApplicationDetail">
-                <ScalarProperty Name="Running" ColumnName="Running" />
                 <ScalarProperty Name="FinishDate" ColumnName="FinishDate" />
                 <ScalarProperty Name="FinishUserId" ColumnName="FinishUserId" />
                 <ScalarProperty Name="State" ColumnName="State" />
+                <ScalarProperty Name="Running" ColumnName="Running" />
                 <ScalarProperty Name="ActivityDate" ColumnName="ActivityDate" />
                 <ScalarProperty Name="Remark" ColumnName="Remark" />
                 <ScalarProperty Name="ChangeType" ColumnName="ChangeType" />
@@ -6539,6 +6678,70 @@
                 <ScalarProperty Name="Remark" ColumnName="Remark" />
                 <ScalarProperty Name="Result" ColumnName="Result" />
                 <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OrderChangeLog">
+            <EntityTypeMapping TypeName="KalerOrderDBModel.OrderChangeLog">
+              <MappingFragment StoreEntitySet="OrderChangeLog">
+                <ScalarProperty Name="EditRemark" ColumnName="EditRemark" />
+                <ScalarProperty Name="EditType" ColumnName="EditType" />
+                <ScalarProperty Name="FinalOrderId" ColumnName="FinalOrderId" />
+                <ScalarProperty Name="CSUserId" ColumnName="CSUserId" />
+                <ScalarProperty Name="PayOrderPrice" ColumnName="PayOrderPrice" />
+                <ScalarProperty Name="OrderPrice" ColumnName="OrderPrice" />
+                <ScalarProperty Name="ShopStatus" ColumnName="ShopStatus" />
+                <ScalarProperty Name="IsFromRegion" ColumnName="IsFromRegion" />
+                <ScalarProperty Name="IsValid" ColumnName="IsValid" />
+                <ScalarProperty Name="PriceBlongRegion" ColumnName="PriceBlongRegion" />
+                <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+                <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+                <ScalarProperty Name="RegionSupplementId" ColumnName="RegionSupplementId" />
+                <ScalarProperty Name="Category" ColumnName="Category" />
+                <ScalarProperty Name="PositionDescription" ColumnName="PositionDescription" />
+                <ScalarProperty Name="CornerType" ColumnName="CornerType" />
+                <ScalarProperty Name="Remark" ColumnName="Remark" />
+                <ScalarProperty Name="ChooseImg" ColumnName="ChooseImg" />
+                <ScalarProperty Name="TotalPrice" ColumnName="TotalPrice" />
+                <ScalarProperty Name="UnitName" ColumnName="UnitName" />
+                <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
+                <ScalarProperty Name="GraphicMaterial" ColumnName="GraphicMaterial" />
+                <ScalarProperty Name="TotalArea" ColumnName="TotalArea" />
+                <ScalarProperty Name="Area" ColumnName="Area" />
+                <ScalarProperty Name="GraphicLength" ColumnName="GraphicLength" />
+                <ScalarProperty Name="GraphicWidth" ColumnName="GraphicWidth" />
+                <ScalarProperty Name="WindowSize" ColumnName="WindowSize" />
+                <ScalarProperty Name="WindowDeep" ColumnName="WindowDeep" />
+                <ScalarProperty Name="WindowHigh" ColumnName="WindowHigh" />
+                <ScalarProperty Name="WindowWide" ColumnName="WindowWide" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="OrderGender" ColumnName="OrderGender" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="Sheet" ColumnName="Sheet" />
+                <ScalarProperty Name="POPType" ColumnName="POPType" />
+                <ScalarProperty Name="POPName" ColumnName="POPName" />
+                <ScalarProperty Name="GraphicNo" ColumnName="GraphicNo" />
+                <ScalarProperty Name="MachineFrame" ColumnName="MachineFrame" />
+                <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+                <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+                <ScalarProperty Name="Format" ColumnName="Format" />
+                <ScalarProperty Name="Channel" ColumnName="Channel" />
+                <ScalarProperty Name="Tel" ColumnName="Tel" />
+                <ScalarProperty Name="Contact" ColumnName="Contact" />
+                <ScalarProperty Name="POPAddress" ColumnName="POPAddress" />
+                <ScalarProperty Name="BCSIsInstall" ColumnName="BCSIsInstall" />
+                <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
+                <ScalarProperty Name="CityTier" ColumnName="CityTier" />
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="Province" ColumnName="Province" />
+                <ScalarProperty Name="Region" ColumnName="Region" />
+                <ScalarProperty Name="OrderType" ColumnName="OrderType" />
+                <ScalarProperty Name="ShopName" ColumnName="ShopName" />
+                <ScalarProperty Name="ShopNo" ColumnName="ShopNo" />
+                <ScalarProperty Name="ShopId" ColumnName="ShopId" />
+                <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+                <ScalarProperty Name="GuidanceId" ColumnName="GuidanceId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -6823,6 +7026,7 @@
           <EntitySetMapping Name="OutsourceOrderDetail">
             <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourceOrderDetail">
               <MappingFragment StoreEntitySet="OutsourceOrderDetail">
+                <ScalarProperty Name="InstallPriceAddType" ColumnName="InstallPriceAddType" />
                 <ScalarProperty Name="FinalOrderId" ColumnName="FinalOrderId" />
                 <ScalarProperty Name="ModifyRemark" ColumnName="ModifyRemark" />
                 <ScalarProperty Name="ModifyUserId" ColumnName="ModifyUserId" />
@@ -7326,6 +7530,106 @@
                 <ScalarProperty Name="CustomerMaterialId" ColumnName="CustomerMaterialId" />
                 <ScalarProperty Name="BasicCategoryId" ColumnName="BasicCategoryId" />
                 <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="QuoteOrderDetail">
+            <EntityTypeMapping TypeName="KalerOrderDBModel.QuoteOrderDetail">
+              <MappingFragment StoreEntitySet="QuoteOrderDetail">
+                <ScalarProperty Name="FinalOrderId" ColumnName="FinalOrderId" />
+                <ScalarProperty Name="CSUserId" ColumnName="CSUserId" />
+                <ScalarProperty Name="PayOrderPrice" ColumnName="PayOrderPrice" />
+                <ScalarProperty Name="OrderPrice" ColumnName="OrderPrice" />
+                <ScalarProperty Name="ShopStatus" ColumnName="ShopStatus" />
+                <ScalarProperty Name="IsFromRegion" ColumnName="IsFromRegion" />
+                <ScalarProperty Name="IsValid" ColumnName="IsValid" />
+                <ScalarProperty Name="PriceBlongRegion" ColumnName="PriceBlongRegion" />
+                <ScalarProperty Name="InstallPriceMaterialSupport" ColumnName="InstallPriceMaterialSupport" />
+                <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+                <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+                <ScalarProperty Name="DeleteUserId" ColumnName="DeleteUserId" />
+                <ScalarProperty Name="DeleteDate" ColumnName="DeleteDate" />
+                <ScalarProperty Name="RegionSupplementId" ColumnName="RegionSupplementId" />
+                <ScalarProperty Name="InstallPricePOSScale" ColumnName="InstallPricePOSScale" />
+                <ScalarProperty Name="InstallPositionDescription" ColumnName="InstallPositionDescription" />
+                <ScalarProperty Name="Category" ColumnName="Category" />
+                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+                <ScalarProperty Name="SmallMaterialId" ColumnName="SmallMaterialId" />
+                <ScalarProperty Name="PositionDescription" ColumnName="PositionDescription" />
+                <ScalarProperty Name="CornerType" ColumnName="CornerType" />
+                <ScalarProperty Name="DoorPosition" ColumnName="DoorPosition" />
+                <ScalarProperty Name="IsHang" ColumnName="IsHang" />
+                <ScalarProperty Name="WindowStick" ColumnName="WindowStick" />
+                <ScalarProperty Name="Floor" ColumnName="Floor" />
+                <ScalarProperty Name="RightSideStick" ColumnName="RightSideStick" />
+                <ScalarProperty Name="LeftSideStick" ColumnName="LeftSideStick" />
+                <ScalarProperty Name="IsElectricity" ColumnName="IsElectricity" />
+                <ScalarProperty Name="Remark" ColumnName="Remark" />
+                <ScalarProperty Name="ChooseImg" ColumnName="ChooseImg" />
+                <ScalarProperty Name="TotalPrice" ColumnName="TotalPrice" />
+                <ScalarProperty Name="AutoAddTotalPrice" ColumnName="AutoAddTotalPrice" />
+                <ScalarProperty Name="DefaultTotalPrice" ColumnName="DefaultTotalPrice" />
+                <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
+                <ScalarProperty Name="UnitName" ColumnName="UnitName" />
+                <ScalarProperty Name="QuoteGraphicMaterial" ColumnName="QuoteGraphicMaterial" />
+                <ScalarProperty Name="GraphicMaterial" ColumnName="GraphicMaterial" />
+                <ScalarProperty Name="CustomerMaterialId" ColumnName="CustomerMaterialId" />
+                <ScalarProperty Name="TotalArea" ColumnName="TotalArea" />
+                <ScalarProperty Name="TotalGraphicLength" ColumnName="TotalGraphicLength" />
+                <ScalarProperty Name="TotalGraphicWidth" ColumnName="TotalGraphicWidth" />
+                <ScalarProperty Name="AutoAddArea" ColumnName="AutoAddArea" />
+                <ScalarProperty Name="AutoAddGraphicLength" ColumnName="AutoAddGraphicLength" />
+                <ScalarProperty Name="AutoAddGraphicWidth" ColumnName="AutoAddGraphicWidth" />
+                <ScalarProperty Name="Area" ColumnName="Area" />
+                <ScalarProperty Name="GraphicLength" ColumnName="GraphicLength" />
+                <ScalarProperty Name="GraphicWidth" ColumnName="GraphicWidth" />
+                <ScalarProperty Name="WindowSize" ColumnName="WindowSize" />
+                <ScalarProperty Name="WindowDeep" ColumnName="WindowDeep" />
+                <ScalarProperty Name="WindowHigh" ColumnName="WindowHigh" />
+                <ScalarProperty Name="WindowWide" ColumnName="WindowWide" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="OrderGender" ColumnName="OrderGender" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="Sheet" ColumnName="Sheet" />
+                <ScalarProperty Name="POPType" ColumnName="POPType" />
+                <ScalarProperty Name="POPName" ColumnName="POPName" />
+                <ScalarProperty Name="GraphicNo" ColumnName="GraphicNo" />
+                <ScalarProperty Name="MachineFrame" ColumnName="MachineFrame" />
+                <ScalarProperty Name="POSScale" ColumnName="POSScale" />
+                <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+                <ScalarProperty Name="BusinessModel" ColumnName="BusinessModel" />
+                <ScalarProperty Name="LocationType" ColumnName="LocationType" />
+                <ScalarProperty Name="Format" ColumnName="Format" />
+                <ScalarProperty Name="Channel" ColumnName="Channel" />
+                <ScalarProperty Name="Tel" ColumnName="Tel" />
+                <ScalarProperty Name="Contact" ColumnName="Contact" />
+                <ScalarProperty Name="POPAddress" ColumnName="POPAddress" />
+                <ScalarProperty Name="AgentName" ColumnName="AgentName" />
+                <ScalarProperty Name="AgentCode" ColumnName="AgentCode" />
+                <ScalarProperty Name="BCSIsInstall" ColumnName="BCSIsInstall" />
+                <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
+                <ScalarProperty Name="CityTier" ColumnName="CityTier" />
+                <ScalarProperty Name="City" ColumnName="City" />
+                <ScalarProperty Name="Province" ColumnName="Province" />
+                <ScalarProperty Name="Region" ColumnName="Region" />
+                <ScalarProperty Name="OrderType" ColumnName="OrderType" />
+                <ScalarProperty Name="ShopName" ColumnName="ShopName" />
+                <ScalarProperty Name="ShopNo" ColumnName="ShopNo" />
+                <ScalarProperty Name="ShopId" ColumnName="ShopId" />
+                <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+                <ScalarProperty Name="GuidanceId" ColumnName="GuidanceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="QuoteOrderSetting">
+            <EntityTypeMapping TypeName="KalerOrderDBModel.QuoteOrderSetting">
+              <MappingFragment StoreEntitySet="QuoteOrderSetting">
+                <ScalarProperty Name="OperateType" ColumnName="OperateType" />
+                <ScalarProperty Name="POPLength" ColumnName="POPLength" />
+                <ScalarProperty Name="POPWidth" ColumnName="POPWidth" />
+                <ScalarProperty Name="Sheet" ColumnName="Sheet" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -7984,106 +8288,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="QuoteOrderSetting">
-            <EntityTypeMapping TypeName="KalerOrderDBModel.QuoteOrderSetting">
-              <MappingFragment StoreEntitySet="QuoteOrderSetting">
-                <ScalarProperty Name="OperateType" ColumnName="OperateType" />
-                <ScalarProperty Name="POPLength" ColumnName="POPLength" />
-                <ScalarProperty Name="POPWidth" ColumnName="POPWidth" />
-                <ScalarProperty Name="Sheet" ColumnName="Sheet" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="QuoteOrderDetail">
-            <EntityTypeMapping TypeName="KalerOrderDBModel.QuoteOrderDetail">
-              <MappingFragment StoreEntitySet="QuoteOrderDetail">
-                <ScalarProperty Name="AutoAddTotalPrice" ColumnName="AutoAddTotalPrice" />
-                <ScalarProperty Name="DefaultTotalPrice" ColumnName="DefaultTotalPrice" />
-                <ScalarProperty Name="FinalOrderId" ColumnName="FinalOrderId" />
-                <ScalarProperty Name="CSUserId" ColumnName="CSUserId" />
-                <ScalarProperty Name="PayOrderPrice" ColumnName="PayOrderPrice" />
-                <ScalarProperty Name="OrderPrice" ColumnName="OrderPrice" />
-                <ScalarProperty Name="ShopStatus" ColumnName="ShopStatus" />
-                <ScalarProperty Name="IsFromRegion" ColumnName="IsFromRegion" />
-                <ScalarProperty Name="IsValid" ColumnName="IsValid" />
-                <ScalarProperty Name="PriceBlongRegion" ColumnName="PriceBlongRegion" />
-                <ScalarProperty Name="InstallPriceMaterialSupport" ColumnName="InstallPriceMaterialSupport" />
-                <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
-                <ScalarProperty Name="AddDate" ColumnName="AddDate" />
-                <ScalarProperty Name="DeleteUserId" ColumnName="DeleteUserId" />
-                <ScalarProperty Name="DeleteDate" ColumnName="DeleteDate" />
-                <ScalarProperty Name="RegionSupplementId" ColumnName="RegionSupplementId" />
-                <ScalarProperty Name="InstallPricePOSScale" ColumnName="InstallPricePOSScale" />
-                <ScalarProperty Name="InstallPositionDescription" ColumnName="InstallPositionDescription" />
-                <ScalarProperty Name="Category" ColumnName="Category" />
-                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
-                <ScalarProperty Name="SmallMaterialId" ColumnName="SmallMaterialId" />
-                <ScalarProperty Name="PositionDescription" ColumnName="PositionDescription" />
-                <ScalarProperty Name="CornerType" ColumnName="CornerType" />
-                <ScalarProperty Name="DoorPosition" ColumnName="DoorPosition" />
-                <ScalarProperty Name="IsHang" ColumnName="IsHang" />
-                <ScalarProperty Name="WindowStick" ColumnName="WindowStick" />
-                <ScalarProperty Name="Floor" ColumnName="Floor" />
-                <ScalarProperty Name="RightSideStick" ColumnName="RightSideStick" />
-                <ScalarProperty Name="LeftSideStick" ColumnName="LeftSideStick" />
-                <ScalarProperty Name="IsElectricity" ColumnName="IsElectricity" />
-                <ScalarProperty Name="Remark" ColumnName="Remark" />
-                <ScalarProperty Name="ChooseImg" ColumnName="ChooseImg" />
-                <ScalarProperty Name="TotalPrice" ColumnName="TotalPrice" />
-                <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
-                <ScalarProperty Name="UnitName" ColumnName="UnitName" />
-                <ScalarProperty Name="QuoteGraphicMaterial" ColumnName="QuoteGraphicMaterial" />
-                <ScalarProperty Name="GraphicMaterial" ColumnName="GraphicMaterial" />
-                <ScalarProperty Name="CustomerMaterialId" ColumnName="CustomerMaterialId" />
-                <ScalarProperty Name="TotalArea" ColumnName="TotalArea" />
-                <ScalarProperty Name="TotalGraphicLength" ColumnName="TotalGraphicLength" />
-                <ScalarProperty Name="TotalGraphicWidth" ColumnName="TotalGraphicWidth" />
-                <ScalarProperty Name="AutoAddArea" ColumnName="AutoAddArea" />
-                <ScalarProperty Name="AutoAddGraphicLength" ColumnName="AutoAddGraphicLength" />
-                <ScalarProperty Name="AutoAddGraphicWidth" ColumnName="AutoAddGraphicWidth" />
-                <ScalarProperty Name="Area" ColumnName="Area" />
-                <ScalarProperty Name="GraphicLength" ColumnName="GraphicLength" />
-                <ScalarProperty Name="GraphicWidth" ColumnName="GraphicWidth" />
-                <ScalarProperty Name="WindowSize" ColumnName="WindowSize" />
-                <ScalarProperty Name="WindowDeep" ColumnName="WindowDeep" />
-                <ScalarProperty Name="WindowHigh" ColumnName="WindowHigh" />
-                <ScalarProperty Name="WindowWide" ColumnName="WindowWide" />
-                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
-                <ScalarProperty Name="OrderGender" ColumnName="OrderGender" />
-                <ScalarProperty Name="Gender" ColumnName="Gender" />
-                <ScalarProperty Name="Sheet" ColumnName="Sheet" />
-                <ScalarProperty Name="POPType" ColumnName="POPType" />
-                <ScalarProperty Name="POPName" ColumnName="POPName" />
-                <ScalarProperty Name="GraphicNo" ColumnName="GraphicNo" />
-                <ScalarProperty Name="MachineFrame" ColumnName="MachineFrame" />
-                <ScalarProperty Name="POSScale" ColumnName="POSScale" />
-                <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
-                <ScalarProperty Name="BusinessModel" ColumnName="BusinessModel" />
-                <ScalarProperty Name="LocationType" ColumnName="LocationType" />
-                <ScalarProperty Name="Format" ColumnName="Format" />
-                <ScalarProperty Name="Channel" ColumnName="Channel" />
-                <ScalarProperty Name="Tel" ColumnName="Tel" />
-                <ScalarProperty Name="Contact" ColumnName="Contact" />
-                <ScalarProperty Name="POPAddress" ColumnName="POPAddress" />
-                <ScalarProperty Name="AgentName" ColumnName="AgentName" />
-                <ScalarProperty Name="AgentCode" ColumnName="AgentCode" />
-                <ScalarProperty Name="BCSIsInstall" ColumnName="BCSIsInstall" />
-                <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
-                <ScalarProperty Name="CityTier" ColumnName="CityTier" />
-                <ScalarProperty Name="City" ColumnName="City" />
-                <ScalarProperty Name="Province" ColumnName="Province" />
-                <ScalarProperty Name="Region" ColumnName="Region" />
-                <ScalarProperty Name="OrderType" ColumnName="OrderType" />
-                <ScalarProperty Name="ShopName" ColumnName="ShopName" />
-                <ScalarProperty Name="ShopNo" ColumnName="ShopNo" />
-                <ScalarProperty Name="ShopId" ColumnName="ShopId" />
-                <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
-                <ScalarProperty Name="GuidanceId" ColumnName="GuidanceId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -8132,15 +8336,15 @@
         <EntityTypeShape EntityType="KalerOrderDBModel.Customer" Width="1.5" PointX="12.75" PointY="7.75" Height="2.6594042968749818" />
         <EntityTypeShape EntityType="KalerOrderDBModel.CustomerMaterial" Width="1.5" PointX="12.75" PointY="11.75" Height="3.583374837239603" />
         <EntityTypeShape EntityType="KalerOrderDBModel.CustomerMaterialDetail" Width="1.5" PointX="8.75" PointY="13.75" Height="1.7354337565104174" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.CustomerMaterialInfo" Width="1.5" PointX="14.75" PointY="0.75" Height="3.2137866210937318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.CustomerMaterialPriceItem" Width="1.5" PointX="14.75" PointY="4.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.CustomerOrderType" Width="1.5" PointX="14.75" PointY="7.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.CustomerMaterialInfo" Width="1.5" PointX="14.75" PointY="0.75" Height="3.2137866210937887" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.CustomerMaterialPriceItem" Width="1.5" PointX="14.75" PointY="4.75" Height="2.1050219726563455" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.CustomerOrderType" Width="1.5" PointX="14.75" PointY="7.75" Height="1.5506396484375955" />
         <EntityTypeShape EntityType="KalerOrderDBModel.ErpHost" Width="1.5" PointX="14.75" PointY="10.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ExpressPriceConfig" Width="1.5" PointX="14.75" PointY="14.75" Height="1.7354337565103606" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ExpressPriceConfig" Width="1.5" PointX="14.75" PointY="14.75" Height="1.7354337565104743" />
         <EntityTypeShape EntityType="KalerOrderDBModel.ExpressPriceDetail" Width="1.5" PointX="0.75" PointY="15.75" Height="1.920227864583353" />
         <EntityTypeShape EntityType="KalerOrderDBModel.ExtraOrderDetail" Width="1.5" PointX="2.75" PointY="15.75" Height="6.909668782552103" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.FinalOrderDetail" Width="1.5" PointX="4.75" PointY="15.75" Height="10.420756835937596" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.FinalOrderDetailTemp" Width="1.5" PointX="16.75" PointY="0.75" Height="18.551697591145853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.FinalOrderDetail" Width="1.5" PointX="4.75" PointY="15.75" Height="10.420756835937482" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.FinalOrderDetailTemp" Width="1.5" PointX="16.75" PointY="0.75" Height="18.921285807291724" />
         <EntityTypeShape EntityType="KalerOrderDBModel.HandMadeOrderDetail" Width="1.5" PointX="6.75" PointY="16.75" Height="6.355286458333353" />
         <EntityTypeShape EntityType="KalerOrderDBModel.HCOrderDetail" Width="1.5" PointX="8.75" PointY="16.75" Height="5.4313159179687318" />
         <EntityTypeShape EntityType="KalerOrderDBModel.HCPOP" Width="1.5" PointX="10.75" PointY="16.75" Height="3.028992513020853" />
@@ -8149,7 +8353,7 @@
         <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceConfig" Width="1.5" PointX="18.75" PointY="4.75" Height="2.2898160807292243" />
         <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceDetail" Width="1.5" PointX="18.75" PointY="8.75" Height="3.2137866210937318" />
         <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceShopInfo" Width="1.5" PointX="18.75" PointY="12.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceTemp" Width="1.5" PointX="18.75" PointY="16.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceTemp" Width="1.5" PointX="18.75" PointY="16.75" Height="2.6594042968749818" />
         <EntityTypeShape EntityType="KalerOrderDBModel.KidsNewShopProp" Width="1.5" PointX="20.75" PointY="0.75" Height="2.8441984049479743" />
         <EntityTypeShape EntityType="KalerOrderDBModel.ListOrderDetail" Width="1.5" PointX="20.75" PointY="4.75" Height="5.9856982421874818" />
         <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrame" Width="1.5" PointX="20.75" PointY="11.75" Height="1.5506396484374818" />
@@ -8169,85 +8373,86 @@
         <EntityTypeShape EntityType="KalerOrderDBModel.NewShopMachineFrame" Width="1.5" PointX="0.75" PointY="23.75" Height="2.6594042968749818" />
         <EntityTypeShape EntityType="KalerOrderDBModel.OrderApprovePermission" Width="1.5" PointX="12.75" PointY="23.75" Height="1.7354337565104743" />
         <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeApplication" Width="1.5" PointX="24.75" PointY="0.75" Height="3.583374837239603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeApplicationDetail" Width="1.5" PointX="24.75" PointY="5.75" Height="2.6594042968749818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeApplicationDetail" Width="1.5" PointX="24.75" PointY="5.75" Height="2.8441984049479743" />
         <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeApproveInfo" Width="1.5" PointX="6.75" PointY="24.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterial" Width="1.5" PointX="24.75" PointY="9.75" Height="3.7681689453124818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterialBaseInfo" Width="1.5" PointX="24.75" PointY="14.75" Height="2.8441984049479743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterialItem" Width="1.5" PointX="24.75" PointY="18.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterialMpping" Width="1.5" PointX="18.75" PointY="24.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderPlan" Width="1.5" PointX="24.75" PointY="21.75" Height="8.9424039713542243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderType" Width="1.5" PointX="8.75" PointY="25.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceAssignShop" Width="1.5" PointX="14.75" PointY="25.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInfo" Width="1.5" PointX="20.75" PointY="25.75" Height="4.3225512695312318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInUser" Width="1.5" PointX="26.75" PointY="0.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutSourceMaterial" Width="1.5" PointX="26.75" PointY="3.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialInfo" Width="1.5" PointX="26.75" PointY="6.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialOrderDetail" Width="1.5" PointX="26.75" PointY="10.75" Height="2.474610188802103" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialPrice" Width="1.5" PointX="10.75" PointY="26.75" Height="2.474610188802103" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialPriceItem" Width="1.5" PointX="26.75" PointY="14.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialSubject" Width="1.5" PointX="26.75" PointY="18.75" Height="2.8441984049479743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderAssignConfig" Width="1.5" PointX="26.75" PointY="22.75" Height="3.2137866210937318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderDetail" Width="1.5" PointX="26.75" PointY="26.75" Height="14.301433105468732" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderDetailNew" Width="1.5" PointX="0.75" PointY="27.75" Height="12.268697916666724" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderPlaceConfig" Width="1.5" PointX="2.75" PointY="27.75" Height="1.7354337565104743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderPrice" Width="1.5" PointX="4.75" PointY="27.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourcePriceOrder" Width="1.5" PointX="28.75" PointY="0.75" Height="3.7681689453124818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceReceivePriceOrder" Width="1.5" PointX="28.75" PointY="5.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Place" Width="1.5" PointX="6.75" PointY="28.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Place1" Width="1.5" PointX="28.75" PointY="9.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.POP" Width="1.5" PointX="28.75" PointY="12.75" Height="10.975139160156232" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.POPBlackList" Width="1.5" PointX="16.75" PointY="28.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.POPChangeDetail" Width="1.5" PointX="28.75" PointY="24.75" Height="5.4313159179687318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.POPOrderDetail" Width="1.5" PointX="30.75" PointY="0.75" Height="7.2792569986979743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Position" Width="1.5" PointX="8.75" PointY="30.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.POSScaleInfo" Width="1.5" PointX="30.75" PointY="9.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.PriceOrderDetail" Width="1.5" PointX="10.75" PointY="30.75" Height="4.3225512695312318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ProvinceInOrderPlan" Width="1.5" PointX="30.75" PointY="12.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ProvinceInRegion" Width="1.5" PointX="12.75" PointY="30.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationAccount" Width="1.5" PointX="30.75" PointY="15.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationBlongs" Width="1.5" PointX="30.75" PointY="18.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationCategory" Width="1.5" PointX="30.75" PointY="21.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationClassification" Width="1.5" PointX="30.75" PointY="24.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Quotations" Width="1.5" PointX="30.75" PointY="27.75" Height="4.5073453776042243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationTaxRate" Width="1.5" PointX="14.75" PointY="31.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteMaterial" Width="1.5" PointX="16.75" PointY="31.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Region" Width="1.5" PointX="22.75" PointY="31.75" Height="1.7354337565104743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.RegionOrderDetail" Width="1.5" PointX="32.75" PointY="0.75" Height="5.9856982421874818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.RegionOrderPrice" Width="1.5" PointX="2.75" PointY="32.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.RegionSupplement" Width="1.5" PointX="4.75" PointY="32.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.RegionSupplementDetail" Width="1.5" PointX="32.75" PointY="7.75" Height="5.4313159179687318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Role" Width="1.5" PointX="32.75" PointY="14.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.RoleInModule" Width="1.5" PointX="32.75" PointY="17.75" Height="1.7354337565104743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SecondInstallFeeDetail" Width="1.5" PointX="32.75" PointY="20.75" Height="2.474610188802103" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Send" Width="1.5" PointX="32.75" PointY="24.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SendERPResult" Width="1.5" PointX="32.75" PointY="29.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Shop" Width="1.5" PointX="32.75" PointY="32.75" Height="10.051168619791724" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeLog" Width="1.5" PointX="24.75" PointY="9.75" Height="11.714315592447974" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterial" Width="1.5" PointX="18.75" PointY="24.75" Height="3.7681689453124818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterialBaseInfo" Width="1.5" PointX="24.75" PointY="22.75" Height="2.8441984049479743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterialItem" Width="1.5" PointX="8.75" PointY="25.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterialMpping" Width="1.5" PointX="14.75" PointY="25.75" Height="2.2898160807292243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderPlan" Width="1.5" PointX="20.75" PointY="25.75" Height="8.9424039713542243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderType" Width="1.5" PointX="26.75" PointY="0.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceAssignShop" Width="1.5" PointX="26.75" PointY="3.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInfo" Width="1.5" PointX="26.75" PointY="8.75" Height="4.3225512695312318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInUser" Width="1.5" PointX="10.75" PointY="26.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutSourceMaterial" Width="1.5" PointX="26.75" PointY="14.75" Height="2.1050219726562318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialInfo" Width="1.5" PointX="26.75" PointY="17.75" Height="3.028992513020853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialOrderDetail" Width="1.5" PointX="26.75" PointY="21.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialPrice" Width="1.5" PointX="22.75" PointY="26.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialPriceItem" Width="1.5" PointX="24.75" PointY="26.75" Height="2.2898160807292243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialSubject" Width="1.5" PointX="26.75" PointY="25.75" Height="2.8441984049479743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderAssignConfig" Width="1.5" PointX="0.75" PointY="27.75" Height="3.2137866210937318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderDetail" Width="1.5" PointX="2.75" PointY="27.75" Height="14.486227213541724" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderDetailNew" Width="1.5" PointX="4.75" PointY="27.75" Height="12.268697916666724" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderPlaceConfig" Width="1.5" PointX="28.75" PointY="0.75" Height="1.7354337565104743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderPrice" Width="1.5" PointX="28.75" PointY="3.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourcePriceOrder" Width="1.5" PointX="6.75" PointY="28.75" Height="3.7681689453124818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceReceivePriceOrder" Width="1.5" PointX="28.75" PointY="8.75" Height="3.028992513020853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Place" Width="1.5" PointX="28.75" PointY="12.75" Height="2.1050219726562318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Place1" Width="1.5" PointX="28.75" PointY="15.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.POP" Width="1.5" PointX="28.75" PointY="18.75" Height="10.975139160156232" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.POPBlackList" Width="1.5" PointX="8.75" PointY="29.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.POPChangeDetail" Width="1.5" PointX="10.75" PointY="29.75" Height="5.4313159179687318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.POPOrderDetail" Width="1.5" PointX="12.75" PointY="29.75" Height="7.2792569986979743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Position" Width="1.5" PointX="14.75" PointY="29.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.POSScaleInfo" Width="1.5" PointX="16.75" PointY="29.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.PriceOrderDetail" Width="1.5" PointX="30.75" PointY="0.75" Height="4.3225512695312318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ProvinceInOrderPlan" Width="1.5" PointX="30.75" PointY="6.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ProvinceInRegion" Width="1.5" PointX="30.75" PointY="9.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationAccount" Width="1.5" PointX="30.75" PointY="12.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationBlongs" Width="1.5" PointX="30.75" PointY="15.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationCategory" Width="1.5" PointX="30.75" PointY="18.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationClassification" Width="1.5" PointX="30.75" PointY="21.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Quotations" Width="1.5" PointX="22.75" PointY="30.75" Height="4.5073453776042243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationTaxRate" Width="1.5" PointX="30.75" PointY="24.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteMaterial" Width="1.5" PointX="24.75" PointY="30.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteOrderDetail" Width="1.5" PointX="26.75" PointY="30.75" Height="16.334168294270853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteOrderSetting" Width="1.5" PointX="30.75" PointY="27.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Region" Width="1.5" PointX="28.75" PointY="30.75" Height="1.7354337565104743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.RegionOrderDetail" Width="1.5" PointX="30.75" PointY="30.75" Height="5.9856982421874818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.RegionOrderPrice" Width="1.5" PointX="32.75" PointY="0.75" Height="3.028992513020853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.RegionSupplement" Width="1.5" PointX="32.75" PointY="4.75" Height="3.028992513020853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.RegionSupplementDetail" Width="1.5" PointX="32.75" PointY="8.75" Height="5.4313159179687318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Role" Width="1.5" PointX="14.75" PointY="32.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.RoleInModule" Width="1.5" PointX="32.75" PointY="15.75" Height="1.7354337565104743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SecondInstallFeeDetail" Width="1.5" PointX="16.75" PointY="32.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Send" Width="1.5" PointX="32.75" PointY="18.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SendERPResult" Width="1.5" PointX="32.75" PointY="23.75" Height="2.1050219726562318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Shop" Width="1.5" PointX="32.75" PointY="26.75" Height="10.235962727864603" />
         <EntityTypeShape EntityType="KalerOrderDBModel.ShopChangeDetail" Width="1.5" PointX="6.75" PointY="33.75" Height="7.0944628906249818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMachineFrame" Width="1.5" PointX="28.75" PointY="33.75" Height="2.8441984049479743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMachineFrameChangeDetail" Width="1.5" PointX="34.75" PointY="0.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMaterialSupport" Width="1.5" PointX="34.75" PointY="5.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SmallMaterial" Width="1.5" PointX="34.75" PointY="8.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SmallMaterialMapping" Width="1.5" PointX="34.75" PointY="11.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SplitOrderDetailPerShop" Width="1.5" PointX="12.75" PointY="34.75" Height="4.3225512695312318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SplitOrderPlanDetail" Width="1.5" PointX="34.75" PointY="14.75" Height="5.246521809895853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Subject" Width="1.5" PointX="14.75" PointY="34.75" Height="8.7576098632812318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectGuidance" Width="1.5" PointX="34.75" PointY="20.75" Height="6.7248746744792243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectLog" Width="1.5" PointX="20.75" PointY="34.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectType" Width="1.5" PointX="22.75" PointY="34.75" Height="1.7354337565104743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementDetail" Width="1.5" PointX="34.75" PointY="28.75" Height="3.583374837239603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementItem" Width="1.5" PointX="34.75" PointY="33.75" Height="3.9529630533854743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementOrderDetail" Width="1.5" PointX="36.75" PointY="0.75" Height="3.7681689453124818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.TableSize" Width="1.5" PointX="2.75" PointY="36.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UnitInfo" Width="1.5" PointX="36.75" PointY="5.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInActivity" Width="1.5" PointX="36.75" PointY="8.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInCustomer" Width="1.5" PointX="8.75" PointY="36.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInfo" Width="1.5" PointX="36.75" PointY="11.75" Height="2.474610188802103" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInModule" Width="1.5" PointX="36.75" PointY="15.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInRegion" Width="1.5" PointX="36.75" PointY="18.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInRole" Width="1.5" PointX="36.75" PointY="22.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserLevel" Width="1.5" PointX="36.75" PointY="25.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteOrderSetting" Width="1.5" PointX="23.375" PointY="37.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteOrderDetail" Width="1.5" PointX="17.375" PointY="34.75" Height="15.964580078124982" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMachineFrame" Width="1.5" PointX="34.75" PointY="0.75" Height="2.8441984049479743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMachineFrameChangeDetail" Width="1.5" PointX="34.75" PointY="4.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMaterialSupport" Width="1.5" PointX="34.75" PointY="9.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SmallMaterial" Width="1.5" PointX="34.75" PointY="12.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SmallMaterialMapping" Width="1.5" PointX="34.75" PointY="15.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SplitOrderDetailPerShop" Width="1.5" PointX="34.75" PointY="18.75" Height="4.3225512695312318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SplitOrderPlanDetail" Width="1.5" PointX="34.75" PointY="24.75" Height="5.246521809895853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Subject" Width="1.5" PointX="34.75" PointY="30.75" Height="8.9424039713542243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectGuidance" Width="1.5" PointX="18.75" PointY="35.75" Height="6.7248746744792243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectLog" Width="1.5" PointX="36.75" PointY="0.75" Height="2.2898160807292243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectType" Width="1.5" PointX="36.75" PointY="4.75" Height="1.7354337565104743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementDetail" Width="1.5" PointX="36.75" PointY="7.75" Height="3.583374837239603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementItem" Width="1.5" PointX="8.75" PointY="36.75" Height="3.9529630533854743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementOrderDetail" Width="1.5" PointX="36.75" PointY="12.75" Height="3.7681689453124818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.TableSize" Width="1.5" PointX="14.75" PointY="36.75" Height="3.028992513020853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UnitInfo" Width="1.5" PointX="36.75" PointY="17.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInActivity" Width="1.5" PointX="36.75" PointY="20.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInCustomer" Width="1.5" PointX="20.75" PointY="36.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInfo" Width="1.5" PointX="22.75" PointY="36.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInModule" Width="1.5" PointX="36.75" PointY="23.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInRegion" Width="1.5" PointX="36.75" PointY="26.75" Height="2.2898160807292243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInRole" Width="1.5" PointX="36.75" PointY="30.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserLevel" Width="1.5" PointX="36.75" PointY="33.75" Height="1.365845540364603" />
       </Diagram>
     </Diagrams>
   </Designer>

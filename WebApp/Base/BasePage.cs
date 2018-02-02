@@ -4725,6 +4725,7 @@ namespace WebApp
                             installPriceModel.MaterialSupport = materialSupport;
                             installPriceShopInfoBll.Update(installPriceModel);
                         }
+                        
                     }
                     else
                     {
@@ -4745,7 +4746,7 @@ namespace WebApp
         QuoteOrderDetail quoteOrderModel;
         QuoteOrderSettingBLL quoteOrderSettingBll = new QuoteOrderSettingBLL();
         List<QuoteOrderSetting> settingList = new List<QuoteOrderSetting>();
-        public void SaveQuotationOrder1234(FinalOrderDetailTemp order, bool? orderSetting = true)
+        public void SaveQuotationOrder(FinalOrderDetailTemp order, bool? orderSetting = true)
         {
             if (order != null)
             {
@@ -4831,7 +4832,7 @@ namespace WebApp
                     }
                 }
                 quoteOrderModel = new QuoteOrderDetail();
-                quoteOrderModel.AddDate = order.AddDate;
+                quoteOrderModel.AddDate = DateTime.Now;
                 quoteOrderModel.AddUserId = order.AddUserId;
                 quoteOrderModel.AgentCode = order.AgentCode;
                 quoteOrderModel.AgentName = order.AgentName;
@@ -4920,7 +4921,7 @@ namespace WebApp
 
 
 
-        public void SaveQuotationOrder(FinalOrderDetailTemp order, bool? orderSetting = true)
+        public void SaveQuotationOrder12(FinalOrderDetailTemp order, bool? orderSetting = true)
         { }
 
 

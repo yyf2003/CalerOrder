@@ -22,5 +22,6 @@ namespace Models
         public Nullable<decimal> OOHPrice { get; set; }
         public Nullable<decimal> TotalPrice { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
+        public Nullable<int> AddType { get; set; }
     }
 }

@@ -26,6 +26,14 @@ $(function () {
         isAdd = 1;
         Order.bindSheet();
         Order.bindMaterialCategory();
+        if ($("#hfIsRegionSubject").val() == "1") {
+            $("tr.showSubjectList").show();
+            $("#ddlSubjectList").val("0");
+        }
+        else {
+            $("tr.showSubjectList").hide();
+            $("#ddlSubjectList").val("0");
+        }
         var index0 = layer.open({
             type: 1,
             time: 0,
@@ -93,7 +101,15 @@ $(function () {
                             Order.bindMaterialCategory(json[0].MaterialCategoryId);
                             $("#txtChooseImg").val(json[0].ChooseImg);
                             $("#txtRemark").val(json[0].Remark);
-
+                            
+                            if ($("#hfIsRegionSubject").val() == "1") {
+                                $("tr.showSubjectList").show();
+                                $("#ddlSubjectList").val(json[0].SubjectId);
+                            }
+                            else {
+                                $("tr.showSubjectList").hide();
+                                $("#ddlSubjectList").val("0");
+                            }
                             if (json[0].OrderType > 3) {
                                 $("tr.pop").hide();
                                 $("tr.price").show();
@@ -324,6 +340,8 @@ var Order = {
     model: function () {
         this.Id = 0;
         this.OrderType = 0;
+        this.SubjectId = 0;
+        this.RegionSupplementId = 0;
         this.ShopNo = "";
         this.Sheet = "";
         this.POSScale = "";
@@ -337,13 +355,11 @@ var Order = {
         this.GraphicMaterial = "";
         this.ChooseImg = "";
         this.Remark = "";
-
         this.Channel = "";
         this.Format = "";
         this.CityTier = "";
         this.IsInstall = "";
         this.ShopStatus = "";
-
         this.OrderPrice = 0;
         this.PayOrderPrice = 0;
 
@@ -392,6 +408,7 @@ var Order = {
             gender: gender
         }, function (res) {
             //从第1页开始请求。返回的json格式可以任意定义 
+
             DisplayOrderList(res.rows);
             //layer.closeAll("loading");
             layer.close(loadIndex);
@@ -506,7 +523,7 @@ var Order = {
     },
     submit: function () {
         if (CheckVal()) {
-            jsonStr = '{"Id":' + (this.model.Id || 0) + ',"SubjectId":' + subjectId + ',"OrderType":' + this.model.OrderType + ',"ShopNo":"' + this.model.ShopNo + '","PositionDescription":"' + this.model.PositionDescription + '","Sheet":"' + this.model.Sheet + '","POSScale":"' + this.model.POSScale + '","MaterialSupport":"' + this.model.MaterialSupport + '","MachineFrame":"' + this.model.MachineFrame + '","Gender":"' + this.model.Gender + '","Quantity":' + this.model.Quantity + ',"GraphicWidth":"' + this.model.GraphicWidth + '","GraphicLength":"' + this.model.GraphicLength + '","GraphicMaterial":"' + this.model.GraphicMaterial + '","Remark":"' + this.model.Remark + '","ChooseImg":"' + this.model.ChooseImg + '","OrderPrice":' + this.model.OrderPrice + ',"PayOrderPrice":' + this.model.PayOrderPrice + '}';
+            jsonStr = '{"Id":' + (this.model.Id || 0) + ',"SubjectId":' + this.model.SubjectId + ',"RegionSupplementId":' + this.model.RegionSupplementId + ',"OrderType":' + this.model.OrderType + ',"ShopNo":"' + this.model.ShopNo + '","PositionDescription":"' + this.model.PositionDescription + '","Sheet":"' + this.model.Sheet + '","POSScale":"' + this.model.POSScale + '","MaterialSupport":"' + this.model.MaterialSupport + '","MachineFrame":"' + this.model.MachineFrame + '","Gender":"' + this.model.Gender + '","Quantity":' + this.model.Quantity + ',"GraphicWidth":"' + this.model.GraphicWidth + '","GraphicLength":"' + this.model.GraphicLength + '","GraphicMaterial":"' + this.model.GraphicMaterial + '","Remark":"' + this.model.Remark + '","ChooseImg":"' + this.model.ChooseImg + '","OrderPrice":' + this.model.OrderPrice + ',"PayOrderPrice":' + this.model.PayOrderPrice + '}';
             var loadIndex = layer.load(0, { shade: false });
             $.ajax({
                 type: "post",
@@ -551,7 +568,7 @@ var Order = {
 };
 
 function DisplayOrderList(json) {
-    
+   
     if (json.length > 0) {
         $("#tbodyOrderEmpty").hide();
         var tr = "";
@@ -566,6 +583,7 @@ function DisplayOrderList(json) {
             
             tr += "<td><input type='checkbox' name='cbOnePOP' value='" + json[i].Id + "'></td>";
             tr += "<td>" + json[i].rowIndex + "</td>";
+            tr += "<td>" + json[i].SubjectName + "</td>";
             tr += "<td>" + json[i].OrderTypeName + "</td>";
             tr += "<td>" + json[i].ShopNo + "</td>";
             tr += "<td>" + json[i].ShopName + "</td>";
@@ -661,6 +679,7 @@ function ClearVal() {
     $("#txtShopNo").attr("disabled", false);
     $("input:radio[name^='rblOrderType']").attr("disabled", false);
     $("#txtQuantity").val("1");
+    $("#ddlSubjectList").val("0");
     document.getElementById("ddlMachineFrame").length = 1;
     document.getElementById("ddlMaterial").length = 1;
     Order.model.Id = 0;
@@ -680,6 +699,8 @@ function ClearVal() {
     Order.model.Remark = "";
     Order.model.OrderPrice = 0;
     Order.model.PayOrderPrice = 0;
+    Order.model.SubjectId = 0;
+    Order.model.RegionSupplementId = 0;
 }
 
 function CheckVal() {
@@ -700,7 +721,22 @@ function CheckVal() {
     var ChooseImg = $.trim($("#txtChooseImg").val());
     var Remark = $.trim($("#txtRemark").val());
     var ReceivePrice = $.trim($("#txtReceivePrice").val())||0;
-    var PayPrice = $.trim($("#txtPayPrice").val())||0;
+    var PayPrice = $.trim($("#txtPayPrice").val()) || 0;
+    var realSubjectId = 0;
+    if ($("#hfIsRegionSubject").val() == "1") {
+        $("tr.showSubjectList").show();
+        realSubjectId = $("#ddlSubjectList").val();
+        if (realSubjectId == 0) {
+            layer.msg("请选择所属项目");
+            return false;
+        }
+        Order.model.SubjectId = realSubjectId;
+        Order.model.RegionSupplementId = subjectId;
+    }
+    else {
+        Order.model.SubjectId = subjectId;
+        Order.model.RegionSupplementId = 0;
+    }
     if (ShopNo == "") {
         layer.msg("请填写店铺编号");
         return false;
@@ -789,6 +825,7 @@ function CheckVal() {
     Order.model.Remark = Remark;
     Order.model.OrderPrice = ReceivePrice;
     Order.model.PayOrderPrice = PayPrice;
+    
     return true;
 }
 

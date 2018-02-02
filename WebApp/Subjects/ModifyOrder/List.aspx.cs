@@ -6,12 +6,15 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using DAL;
 using Common;
+using Models;
+using BLL;
 
 namespace WebApp.Subjects.ModifyOrder
 {
     public partial class List :BasePage
     {
         public int subjectId=0;
+        
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["subjectId"] != null)
@@ -60,8 +63,20 @@ namespace WebApp.Subjects.ModifyOrder
                 int subjectType = subjectModel.subject.SubjectType ?? 1;
                 labSubjectType.Text = CommonMethod.GeEnumName<SubjectTypeEnum>(subjectType.ToString());
                 labRemark.Text = subjectModel.subject.Remark;
-                
-
+                if (subjectModel.subject.SubjectType == (int)SubjectTypeEnum.HC订单 || subjectModel.subject.SubjectType == (int)SubjectTypeEnum.分区补单)
+                {
+                    hfIsRegionSubject.Value = "1";
+                }
+                List<Subject> subjectList = new SubjectBLL().GetList(s => s.GuidanceId == subjectModel.subject.GuidanceId && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false) && (s.SubjectType == (int)SubjectTypeEnum.POP订单 || s.SubjectType == (int)SubjectTypeEnum.手工订单)).OrderByDescending(s=>s.AddDate).OrderBy(s=>s.SubjectName).ToList();
+                if (subjectList.Any())
+                {
+                    subjectList.ForEach(s => {
+                        ListItem li = new ListItem();
+                        li.Value = s.Id.ToString();
+                        li.Text = s.SubjectName;
+                        ddlSubjectList.Items.Add(li);
+                    });
+                }
             }
         }
     }

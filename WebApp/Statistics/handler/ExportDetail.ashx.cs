@@ -700,6 +700,7 @@ namespace WebApp.Statistics.handler
                                                   join subject in CurrentContext.DbContext.Subject
                                                   on order.SubjectId equals subject.Id
                                                   where subjectIdList.Contains(order.SubjectId ?? 0)
+                                                  && subject.SubjectType==(int)SubjectTypeEnum.新开店安装费
                                                   select new
                                                   {
                                                       order,
@@ -756,12 +757,13 @@ namespace WebApp.Statistics.handler
                                 orderModel.Sheet = string.Empty;
                                 orderModel.ShopName = s.order.ShopName;
                                 orderModel.ShopNo = "";
-                                orderModel.Region = string.Empty;
-                                orderModel.Province = string.Empty;
-                                orderModel.City = string.Empty;
+                                orderModel.Region = s.order.Region;
+                                orderModel.Province = s.order.Province;
+                                orderModel.City = s.order.City;
                                 orderModel.SubjectName = s.subject.SubjectName;
                                 orderModel.SubjectNo = s.subject.SubjectNo;
                                 orderModel.UnitPrice = 0;
+                                orderModel.Remark = s.order.Remark;
                                 orderModel.TotalPrice = double.Parse((s.order.Amount ?? 0).ToString());
                                 newOrderList.Add(orderModel);
                             });

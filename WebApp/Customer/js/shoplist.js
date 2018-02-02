@@ -3,6 +3,7 @@ var currCustomerId = 0; //选中的报价的客户ID
 var CSUserId = 0;
 var outsourceId = 0;
 var oohInstallOutsourceId = 0
+var bcsOutsourceId = 0;
 var currShopId = 0;
 var currRegion = "";
 var currProvinceId = 0;
@@ -50,7 +51,7 @@ $(function () {
 function AddNewShop() {
     ClearVal();
     shop.getOutsourceList();
-    shop.getOOHInstallOutsourceList();
+    //shop.getOOHInstallOutsourceList();
     shop.bindChannel();
     shop.add();
 }
@@ -193,6 +194,8 @@ var shop = {
     },
     getOutsourceList: function () {
         document.getElementById("seleOutsource").length = 1;
+        document.getElementById("seleBCSOutsource").length = 1;
+        document.getElementById("seleOOHInstallOutsource").length = 1;
         $.ajax({
             type: "get",
             url: "./Handler/Shops.ashx?type=getOutsource",
@@ -208,9 +211,33 @@ var shop = {
                                 selected = "selected='selected'";
                             var option = "<option value='" + json[i].Id + "' " + selected + ">" + json[i].OutsourceName + "</option>";
                             $("#seleOutsource").append(option);
+
+
                         }
 
+                        var obj0 = $("#seleOOHInstallOutsource").find("option[value='" + json[i].Id + "']");
+                        if (($(obj0).val() || "") == "") {
+                            var selected0 = "";
+                            if (oohInstallOutsourceId == json[i].Id)
+                                selected0 = "selected='selected'";
+                            var option = "<option value='" + json[i].Id + "' " + selected0 + ">" + json[i].OutsourceName + "</option>";
+                            $("#seleOOHInstallOutsource").append(option);
+                        }
+
+                        var obj1 = $("#seleBCSOutsource").find("option[value='" + json[i].Id + "']");
+                        if (($(obj1).val() || "") == "") {
+                            var selected1 = "";
+                            if (bcsOutsourceId == json[i].Id)
+                                selected1 = "selected='selected'";
+                            var option = "<option value='" + json[i].Id + "' " + selected1 + ">" + json[i].OutsourceName + "</option>";
+                            $("#seleBCSOutsource").append(option);
+
+                           
+
+                        }
                     }
+
+
                 }
             },
             complate: function () {
@@ -321,6 +348,7 @@ var shop = {
                     $("#labShopType").html(shop[0].ShopType);
                     $("#labOutsourceName").html(shop[0].OutsourceName);
                     $("#labOOHOutsourceName").html(shop[0].OOHOutsourceName);
+                    $("#labBCSOutsourceName").html(shop[0].BCSOutsourctName);
                     $("#checkDiv").show().dialog({
                         modal: true,
                         width: 820,
@@ -392,8 +420,9 @@ var shop = {
                     currCustomerId = shopJson[0].CustomerId;
                     outsourceId = shopJson[0].OutsourceId;
                     oohInstallOutsourceId = shopJson[0].OOHInstallOutsourceId;
+                    bcsOutsourceId = shopJson[0].BCSOutsourceId;
                     shop.getOutsourceList();
-                    shop.getOOHInstallOutsourceList();
+                    //shop.getOOHInstallOutsourceList();
                     $("#editDiv").show().dialog({
                         modal: true,
                         width: 870,
@@ -754,6 +783,7 @@ function CheckVal() {
     var shopType = $.trim($("#txtShopType").val());
     var outsourceId = $("#seleOutsource").val();
     var oohOutsourceId = $("#seleOOHInstallOutsource").val();
+    var bcsOutsourceId = $("#seleBCSOutsource").val();
     jsonStr = "";
     if (RegionId == "0") {
         alert("请填写客户");
@@ -803,7 +833,7 @@ function CheckVal() {
     bcsInstallPrice = bcsInstallPrice.length > 0 ? bcsInstallPrice : 0;
     osInstallPrice = osInstallPrice.length > 0 ? osInstallPrice : 0;
     osBCSInstallPrice = osBCSInstallPrice.length > 0 ? osBCSInstallPrice : 0;
-    jsonStr = '{"Id":' + currShopId + ',"CustomerId":' + customerId + ',"ShopName":"' + POSName + '","ShopNo":"' + POSCode + '","RegionId":' + RegionId + ',"RegionName":"' + RegionName + '","ProvinceId":' + ProvinceId + ',"ProvinceName":"' + ProvinceName + '","CityId":' + CityId + ',"CityName":"' + CityName + '","AreaId":' + AreaId + ',"AreaName":"' + AreaName + '","CityTier":"' + CityTier + '","IsInstall":"' + IsInstall + '","AgentCode":"' + AgentNo + '","AgentName":"' + AgentName + '","POPAddress":"' + POPAddress + '","Contact1":"' + Contact1 + '","Tel1":"' + Tel1 + '","Contact2":"' + Contact2 + '","Tel2":"' + Tel2 + '","Channel":"' + Channel + '","Format":"' + Format + '","LocationType":"' + LocationType + '","BusinessModel":"' + BusinessModel + '","OpeningDate":"' + OpeningDate + '","Status":"' + Status + '","CSUserId":' + csUserId + ',"Remark":"' + remark + '","BasicInstallPrice":' + basicInstallPrice + ',"ShopType":"' + shopType + '","BCSInstallPrice":' + bcsInstallPrice + ',"OutsourceInstallPrice":' + osInstallPrice + ',"OutsourceBCSInstallPrice":' + osBCSInstallPrice + ',"OutsourceId":' + outsourceId + ',"OOHInstallOutsourceId":' + oohOutsourceId + ',"BCSIsInstall":"' + BCSIsInstall + '"}';
+    jsonStr = '{"Id":' + currShopId + ',"CustomerId":' + customerId + ',"ShopName":"' + POSName + '","ShopNo":"' + POSCode + '","RegionId":' + RegionId + ',"RegionName":"' + RegionName + '","ProvinceId":' + ProvinceId + ',"ProvinceName":"' + ProvinceName + '","CityId":' + CityId + ',"CityName":"' + CityName + '","AreaId":' + AreaId + ',"AreaName":"' + AreaName + '","CityTier":"' + CityTier + '","IsInstall":"' + IsInstall + '","AgentCode":"' + AgentNo + '","AgentName":"' + AgentName + '","POPAddress":"' + POPAddress + '","Contact1":"' + Contact1 + '","Tel1":"' + Tel1 + '","Contact2":"' + Contact2 + '","Tel2":"' + Tel2 + '","Channel":"' + Channel + '","Format":"' + Format + '","LocationType":"' + LocationType + '","BusinessModel":"' + BusinessModel + '","OpeningDate":"' + OpeningDate + '","Status":"' + Status + '","CSUserId":' + csUserId + ',"Remark":"' + remark + '","BasicInstallPrice":' + basicInstallPrice + ',"ShopType":"' + shopType + '","BCSInstallPrice":' + bcsInstallPrice + ',"OutsourceInstallPrice":' + osInstallPrice + ',"OutsourceBCSInstallPrice":' + osBCSInstallPrice + ',"OutsourceId":' + outsourceId + ',"OOHInstallOutsourceId":' + oohOutsourceId + ',"BCSIsInstall":"' + BCSIsInstall + '","BCSOutsourceId":"' + bcsOutsourceId + '"}';
 
     return true;
 }

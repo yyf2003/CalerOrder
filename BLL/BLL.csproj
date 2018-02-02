@@ -118,6 +118,7 @@
     <Compile Include="OrderChangeApplicationBLL.cs" />
     <Compile Include="OrderChangeApplicationDetailBLL.cs" />
     <Compile Include="OrderChangeApproveInfoBLL.cs" />
+    <Compile Include="OrderChangeLogBLL.cs" />
     <Compile Include="OrderMaterialBaseInfoBLL.cs" />
     <Compile Include="OrderMaterialBLL.cs" />
     <Compile Include="OrderMaterialItemBLL.cs" />

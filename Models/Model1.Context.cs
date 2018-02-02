@@ -90,6 +90,7 @@ namespace Models
         public DbSet<OrderChangeApplication> OrderChangeApplication { get; set; }
         public DbSet<OrderChangeApplicationDetail> OrderChangeApplicationDetail { get; set; }
         public DbSet<OrderChangeApproveInfo> OrderChangeApproveInfo { get; set; }
+        public DbSet<OrderChangeLog> OrderChangeLog { get; set; }
         public DbSet<OrderMaterial> OrderMaterial { get; set; }
         public DbSet<OrderMaterialBaseInfo> OrderMaterialBaseInfo { get; set; }
         public DbSet<OrderMaterialItem> OrderMaterialItem { get; set; }
@@ -130,6 +131,8 @@ namespace Models
         public DbSet<Quotations> Quotations { get; set; }
         public DbSet<QuotationTaxRate> QuotationTaxRate { get; set; }
         public DbSet<QuoteMaterial> QuoteMaterial { get; set; }
+        public DbSet<QuoteOrderDetail> QuoteOrderDetail { get; set; }
+        public DbSet<QuoteOrderSetting> QuoteOrderSetting { get; set; }
         public DbSet<Region> Region { get; set; }
         public DbSet<RegionOrderDetail> RegionOrderDetail { get; set; }
         public DbSet<RegionOrderPrice> RegionOrderPrice { get; set; }
@@ -165,7 +168,5 @@ namespace Models
         public DbSet<UserInRegion> UserInRegion { get; set; }
         public DbSet<UserInRole> UserInRole { get; set; }
         public DbSet<UserLevel> UserLevel { get; set; }
-        public DbSet<QuoteOrderSetting> QuoteOrderSetting { get; set; }
-        public DbSet<QuoteOrderDetail> QuoteOrderDetail { get; set; }
     }
 }
