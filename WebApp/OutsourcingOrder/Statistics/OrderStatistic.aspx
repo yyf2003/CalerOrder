@@ -55,6 +55,16 @@
                     </tr>
                     <tr class="tr_bai">
                         <td>
+                            时间范围
+                        </td>
+                        <td colspan="3" style="text-align: left; padding-left: 5px;">
+                            <asp:TextBox ID="txtBegin" runat="server"></asp:TextBox>
+                            -
+                            <asp:TextBox ID="txtEnd" runat="server"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
                             活动名称
                         </td>
                         <td colspan="3" style="text-align: left; padding-left: 5px;">

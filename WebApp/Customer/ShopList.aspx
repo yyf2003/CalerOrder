@@ -163,6 +163,18 @@
                             </asp:CheckBoxList>
                         </td>
                     </tr>
+                    <tr class="tr_bai conditionTr">
+                        <td>
+                            客服
+                        </td>
+                        <td colspan="3" style="text-align: left; padding-left: 5px;">
+                            <div id="loadCS" style="display: none;">
+                                <img src="../image/WaitImg/loadingA.gif" />
+                            </div>
+                            <asp:CheckBoxList ID="cblCS" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                            </asp:CheckBoxList>
+                        </td>
+                    </tr>
                     <tr class="tr_bai">
                         <td>
                             店铺编号
@@ -877,6 +889,7 @@
 
         if (eleId.indexOf("ddlCustomer") != -1) {
             $("#loadRegion").show();
+
         }
         if (eleId.indexOf("cblRegion") != -1) {
             $("#loadProvince").show();
@@ -886,6 +899,7 @@
             $("#loadFormat").show();
             $("#loadShopLevel").show();
             $("#loadIsInstall").show();
+            $("#loadCS").show();
         }
         if (eleId.indexOf("cblProvince") != -1) {
             //$("#loadCity").show();
@@ -894,6 +908,7 @@
             $("#loadFormat").show();
             $("#loadShopLevel").show();
             $("#loadIsInstall").show();
+            $("#loadCS").show();
         }
 
         if (eleId.indexOf("cblCity") != -1) {
@@ -902,6 +917,7 @@
             $("#loadFormat").show();
             $("#loadShopLevel").show();
             $("#loadIsInstall").show();
+            $("#loadCS").show();
         }
 
         if (eleId.indexOf("cblCityTier") != -1) {
@@ -945,7 +961,7 @@
         $("#loadShopLevel").hide();
         $("#loadIsInstall").hide();
         $("#loadShopType").hide();
-
+        $("#loadCS").hide();
         $("#spanShowConditions").click(function () {
             var isShow = $("#hfIsShowConditions").val() || 0;
             if (isShow == 0) {

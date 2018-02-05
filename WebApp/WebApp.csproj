@@ -4210,6 +4210,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Modules\ModuleImg\" />
+    <Folder Include="OutsourcingOrder\OrderStatistics\" />
     <Folder Include="PlaceInfo\handler\" />
     <Folder Include="PlaceInfo\js\" />
     <Folder Include="Subjects\YAOrder\handler\" />

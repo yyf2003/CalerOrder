@@ -56,7 +56,7 @@ namespace WebApp.Subjects
             {
                 labSubjectNo.Text = subjectModel.subject.SubjectNo;
                 labSubjectName.Text = subjectModel.subject.SubjectName;
-                labOutSubjectName.Text = subjectModel.subject.OutSubjectName;
+                labIsSecondInstall.Text = (subjectModel.subject.IsSecondInstall??false)?"是":"否";
                 labBeginDate.Text = subjectModel.subject.BeginDate != null ? DateTime.Parse(subjectModel.subject.BeginDate.ToString()).ToShortDateString() : "";
                 labEndDate.Text = subjectModel.subject.EndDate != null ? DateTime.Parse(subjectModel.subject.EndDate.ToString()).ToShortDateString() : "";
                 labAddUserName.Text = subjectModel.AddUserName;

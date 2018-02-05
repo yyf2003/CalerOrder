@@ -240,7 +240,7 @@ namespace WebApp.Subjects
                     }
                     if ((subjectModel.IsSecondInstall??false))
                     {
-                        cbIsSecondInstall.Checked = true;
+                        //cbIsSecondInstall.Checked = true;
                     }
                     if (subjectModel.Status == 4)
                     {
@@ -302,7 +302,7 @@ namespace WebApp.Subjects
             else
                 subjectModel.SubjectType = 1;//默认是pop订单
 
-            subjectModel.IsSecondInstall = cbIsSecondInstall.Checked;
+            //subjectModel.IsSecondInstall = cbIsSecondInstall.Checked;
 
             if (subjectId > 0)
             {

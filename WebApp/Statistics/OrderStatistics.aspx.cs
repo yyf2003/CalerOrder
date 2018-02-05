@@ -129,6 +129,13 @@ namespace WebApp.Statistics
                 Session["subjectStatistics"] = orderList.Select(s => s.subject).Distinct().ToList();
                 Session["guidanceStatistics"] = orderList.Select(s => s.guidance).Distinct().ToList();
             }
+            else
+            {
+                Session["orderDetailStatistics"] = null;
+                Session["shopStatistics"] = null;
+                Session["subjectStatistics"] = null;
+                Session["guidanceStatistics"] = null;
+            }
         }
 
         void BindGuidance(int? onDateSearch = null)

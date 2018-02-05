@@ -972,12 +972,7 @@ namespace WebApp.Customer
                         if (li.Selected && !formatList.Contains(li.Value))
                             formatList.Add(li.Value);
                     }
-                    //List<string> shopLevelList = new List<string>();
-                    //foreach (ListItem li in cblShopLevel.Items)
-                    //{
-                    //    if (li.Selected && !shopLevelList.Contains(li.Value))
-                    //        shopLevelList.Add(li.Value);
-                    //}
+                    
                     List<string> installList = new List<string>();
                     foreach (ListItem li in cblIsInstall.Items)
                     {
@@ -1053,19 +1048,7 @@ namespace WebApp.Customer
                         else
                             list = list.Where(s => formatList.Contains(s.Format)).ToList();
                     }
-                    //if (shopLevelList.Any())
-                    //{
-                    //    if (shopLevelList.Contains("空"))
-                    //    {
-                    //        shopLevelList.Remove("空");
-                    //        if (shopLevelList.Any())
-                    //            list = list.Where(s => shopLevelList.Contains(s.POSScale) || (s.POSScale == null || s.POSScale == "")).ToList();
-                    //        else
-                    //            list = list.Where(s => s.POSScale == null || s.POSScale == "").ToList();
-                    //    }
-                    //    else
-                    //        list = list.Where(s => shopLevelList.Contains(s.POSScale)).ToList();
-                    //}
+                   
                     if (installList.Any())
                     {
                         if (installList.Contains("空"))
@@ -1100,6 +1083,192 @@ namespace WebApp.Customer
                     });
                     if (hasNull)
                         cblShopType.Items.Add(new ListItem("空", "空"));
+                }
+            }
+        }
+
+        /// <summary>
+        /// 客服
+        /// </summary>
+        void BindCS()
+        {
+            cblCS.Items.Clear();
+            if (Session["shopList"] != null)
+            {
+
+                List<Shop> list = Session["shopList"] as List<Shop>;
+                if (list.Any())
+                {
+                    List<string> regionList = new List<string>();
+                    foreach (ListItem li in cblRegion.Items)
+                    {
+                        if (li.Selected && !regionList.Contains(li.Value.ToLower()))
+                            regionList.Add(li.Value.ToLower());
+                    }
+                    List<string> provinceList = new List<string>();
+                    foreach (ListItem li in cblProvince.Items)
+                    {
+                        if (li.Selected && !provinceList.Contains(li.Value))
+                            provinceList.Add(li.Value);
+                    }
+
+                    List<string> cityTierList = new List<string>();
+                    foreach (ListItem li in cblCityTier.Items)
+                    {
+                        if (li.Selected && !cityTierList.Contains(li.Value))
+                            cityTierList.Add(li.Value);
+                    }
+                    List<string> channelList = new List<string>();
+                    foreach (ListItem li in cblChannel.Items)
+                    {
+                        if (li.Selected && !channelList.Contains(li.Value))
+                            channelList.Add(li.Value);
+                    }
+                    List<string> formatList = new List<string>();
+                    foreach (ListItem li in cblFormat.Items)
+                    {
+                        if (li.Selected && !formatList.Contains(li.Value))
+                            formatList.Add(li.Value);
+                    }
+
+                    List<string> installList = new List<string>();
+                    foreach (ListItem li in cblIsInstall.Items)
+                    {
+                        if (li.Selected && !installList.Contains(li.Value))
+                            installList.Add(li.Value);
+                    }
+                    List<string> shopTypeList = new List<string>();
+                    foreach (ListItem li in cblShopType.Items)
+                    {
+                        if (li.Selected && !shopTypeList.Contains(li.Value))
+                            shopTypeList.Add(li.Value);
+                    }
+                    if (regionList.Any())
+                    {
+                        if (regionList.Contains("空"))
+                        {
+                            regionList.Remove("空");
+                            if (regionList.Any())
+                                list = list.Where(s => regionList.Contains(s.RegionName.ToLower()) || (s.RegionName == null || s.RegionName == "")).ToList();
+                            else
+                                list = list.Where(s => s.RegionName == null || s.RegionName == "").ToList();
+                        }
+                        else
+                            list = list.Where(s => regionList.Contains(s.RegionName.ToLower())).ToList();
+
+                    }
+                    if (provinceList.Any())
+                    {
+                        if (provinceList.Contains("空"))
+                        {
+                            provinceList.Remove("空");
+                            if (provinceList.Any())
+                                list = list.Where(s => provinceList.Contains(s.ProvinceName) || (s.ProvinceName == null || s.ProvinceName == "")).ToList();
+                            else
+                                list = list.Where(s => s.ProvinceName == null || s.ProvinceName == "").ToList();
+                        }
+                        else
+                            list = list.Where(s => provinceList.Contains(s.ProvinceName)).ToList();
+
+                    }
+
+                    if (cityTierList.Any())
+                    {
+                        if (cityTierList.Contains("空"))
+                        {
+                            cityTierList.Remove("空");
+                            if (cityTierList.Any())
+                                list = list.Where(s => cityTierList.Contains(s.CityTier) || (s.CityTier == null || s.CityTier == "")).ToList();
+                            else
+                                list = list.Where(s => s.CityTier == null || s.CityTier == "").ToList();
+                        }
+                        else
+                            list = list.Where(s => cityTierList.Contains(s.CityTier)).ToList();
+                    }
+                    if (channelList.Any())
+                    {
+                        if (channelList.Contains("空"))
+                        {
+                            channelList.Remove("空");
+                            if (channelList.Any())
+                                list = list.Where(s => channelList.Contains(s.Channel) || (s.Channel == null || s.Channel == "")).ToList();
+                            else
+                                list = list.Where(s => s.Channel == null || s.Channel == "").ToList();
+                        }
+                        else
+                            list = list.Where(s => channelList.Contains(s.Channel)).ToList();
+
+                    }
+                    if (formatList.Any())
+                    {
+                        if (formatList.Contains("空"))
+                        {
+                            formatList.Remove("空");
+                            if (formatList.Any())
+                                list = list.Where(s => formatList.Contains(s.Format) || (s.Format == null || s.Format == "")).ToList();
+                            else
+                                list = list.Where(s => s.Format == null || s.Format == "").ToList();
+                        }
+                        else
+                            list = list.Where(s => formatList.Contains(s.Format)).ToList();
+                    }
+
+                    if (installList.Any())
+                    {
+                        if (installList.Contains("空"))
+                        {
+                            installList.Remove("空");
+                            if (installList.Any())
+                                list = list.Where(s => installList.Contains(s.IsInstall) || (s.IsInstall == null || s.IsInstall == "")).ToList();
+                            else
+                                list = list.Where(s => s.IsInstall == null || s.IsInstall == "").ToList();
+                        }
+                        else
+                            list = list.Where(s => installList.Contains(s.IsInstall)).ToList();
+                    }
+                    if (shopTypeList.Any())
+                    {
+                        if (shopTypeList.Contains("空"))
+                        {
+                            shopTypeList.Remove("空");
+                            if (shopTypeList.Any())
+                                list = list.Where(s => shopTypeList.Contains(s.ShopType) || (s.ShopType == null || s.ShopType == "")).ToList();
+                            else
+                                list = list.Where(s => s.ShopType == null || s.ShopType == "").ToList();
+                        }
+                        else
+                            list = list.Where(s => shopTypeList.Contains(s.ShopType)).ToList();
+                    }
+                    var shopList = (from shop in list
+                                    join user1 in CurrentContext.DbContext.UserInfo
+                                    on shop.CSUserId equals user1.UserId into temp
+                                    from user in temp.DefaultIfEmpty()
+                                    select new
+                                    {
+                                        shop,
+                                        user
+                                    }).ToList();
+                    var userList = shopList.Select(s => s.user).Distinct().ToList();
+                    bool hasNull = false;
+                    userList.ForEach(s =>
+                    {
+
+
+                        if (s!=null)
+                        {
+                            ListItem li = new ListItem();
+                            li.Value = s.UserId.ToString();
+                            li.Text = s.RealName + "&nbsp;";
+                            cblCS.Items.Add(li);
+                        }
+                        else
+                        {
+                            hasNull = true;
+                        }
+
+                    });
+                    if (hasNull)
+                        cblCS.Items.Add(new ListItem("空", "0"));
                 }
             }
         }
@@ -1142,7 +1311,8 @@ namespace WebApp.Customer
                             CSUserName = user.RealName,
                             shop.POSScale,
                             shop.ShopType,
-                            shop.OutsourceId
+                            shop.OutsourceId,
+                            shop.CSUserId
                         }).ToList();
 
             List<string> myRegions = GetResponsibleRegion.Select(s=>s.ToLower()).ToList();
@@ -1187,12 +1357,7 @@ namespace WebApp.Customer
                 if (li.Selected && !formatList.Contains(li.Value))
                     formatList.Add(li.Value);
             }
-            //List<string> shopLevelList = new List<string>();
-            //foreach (ListItem li in cblShopLevel.Items)
-            //{
-            //    if (li.Selected && !shopLevelList.Contains(li.Value))
-            //        shopLevelList.Add(li.Value);
-            //}
+            
             List<string> installList = new List<string>();
             foreach (ListItem li in cblIsInstall.Items)
             {
@@ -1205,7 +1370,12 @@ namespace WebApp.Customer
                 if (li.Selected && !shopTypeList.Contains(li.Value))
                     shopTypeList.Add(li.Value);
             }
-
+            List<int> csList = new List<int>();
+            foreach (ListItem li in cblCS.Items)
+            {
+                if (li.Selected && !csList.Contains(int.Parse(li.Value)))
+                    csList.Add(int.Parse(li.Value));
+            }
 
             if (regionList.Any())
             {
@@ -1277,20 +1447,6 @@ namespace WebApp.Customer
                     list = list.Where(s => formatList.Contains(s.Format)).ToList();
             }
 
-
-            //if (shopLevelList.Any())
-            //{
-            //    if (shopLevelList.Contains("空"))
-            //    {
-            //        shopLevelList.Remove("空");
-            //        if (shopLevelList.Any())
-            //            list = list.Where(s => shopLevelList.Contains(s.POSScale) || (s.POSScale == null || s.POSScale == "")).ToList();
-            //        else
-            //            list = list.Where(s => s.POSScale == null || s.POSScale == "").ToList();
-            //    }
-            //    else
-            //        list = list.Where(s => shopLevelList.Contains(s.POSScale)).ToList();
-            //}
             if (installList.Any())
             {
                 if (installList.Contains("空"))
@@ -1318,8 +1474,19 @@ namespace WebApp.Customer
                 else
                     list = list.Where(s => shopTypeList.Contains(s.ShopType)).ToList();
             }
-
-
+            if (csList.Any())
+            {
+                if (csList.Contains(0))
+                {
+                    csList.Remove(0);
+                    if (csList.Any())
+                        list = list.Where(s => csList.Contains(s.CSUserId ?? 0) || (s.CSUserId == null || s.CSUserId == 0)).ToList();
+                    else
+                        list = list.Where(s => s.CSUserId == null || s.CSUserId == 0).ToList();
+                }
+                else
+                    list = list.Where(s => csList.Contains(s.CSUserId??0)).ToList();
+            }
 
 
             if (!string.IsNullOrWhiteSpace(txtShopNo.Text))
@@ -1397,6 +1564,7 @@ namespace WebApp.Customer
             //BindShopLevel();
             BindIsInstall();
             BindShopType();
+            BindCS();
         }
 
         protected void cblRegion_SelectedIndexChanged(object sender, EventArgs e)
@@ -1409,6 +1577,7 @@ namespace WebApp.Customer
             //BindShopLevel();
             BindIsInstall();
             BindShopType();
+            BindCS();
         }
 
 
@@ -1421,6 +1590,7 @@ namespace WebApp.Customer
             //BindShopLevel();
             BindIsInstall();
             BindShopType();
+            BindCS();
         }
 
         //protected void cblCity_SelectedIndexChanged(object sender, EventArgs e)
@@ -1438,6 +1608,7 @@ namespace WebApp.Customer
             //BindShopLevel();
             BindIsInstall();
             BindShopType();
+            BindCS();
         }
 
         protected void cblChannel_SelectedIndexChanged(object sender, EventArgs e)
@@ -1446,6 +1617,7 @@ namespace WebApp.Customer
             //BindShopLevel();
             BindIsInstall();
             BindShopType();
+            
         }
 
         protected void cblFormat_SelectedIndexChanged(object sender, EventArgs e)
@@ -1453,6 +1625,7 @@ namespace WebApp.Customer
             //BindShopLevel();
             BindIsInstall();
             BindShopType();
+           
         }
 
         //protected void cblShopLevel_SelectedIndexChanged(object sender, EventArgs e)
@@ -1594,6 +1767,12 @@ namespace WebApp.Customer
                 if (li.Selected && !shopTypeList.Contains(li.Value))
                     shopTypeList.Add(li.Value);
             }
+            List<int> csList = new List<int>();
+            foreach (ListItem li in cblCS.Items)
+            {
+                if (li.Selected && !csList.Contains(int.Parse(li.Value)))
+                    csList.Add(int.Parse(li.Value));
+            }
             if (regionList.Any())
             {
                 StringBuilder regions = new StringBuilder();
@@ -1728,22 +1907,7 @@ namespace WebApp.Customer
             {
 
                 System.Text.StringBuilder formats = new System.Text.StringBuilder();
-                //if (exportFormatList.Any())
-                //{
-                //    for (int i = 0; i < formatList.Count; i++)
-                //    {
-
-                //        string format = formatList[i].ToLower();
-                //        bool flag = false;
-                //        exportFormatList.ForEach(s =>
-                //        {
-                //            if (format.Contains(s.ToLower()))
-                //                flag = true;
-                //        });
-                //        if (!flag)
-                //            formatList.RemoveAt(i);
-                //    }
-                //}
+                
                 formatList.ForEach(s =>
                 {
 
@@ -1817,8 +1981,24 @@ namespace WebApp.Customer
                     where.AppendFormat(" and Shop.ShopType in ({0})", shopTypes.ToString().TrimEnd(','));
                 }
             }
-
-
+            if (csList.Any())
+            {
+                
+                if (csList.Contains(0))
+                {
+                    csList.Remove(0);
+                    if (csList.Any())
+                    {
+                        where.AppendFormat(" and (Shop.CSUserId in ({0}) or (Shop.CSUserId is null or Shop.CSUserId=0))", StringHelper.ListToString(csList));
+                    }
+                    else
+                        where.AppendFormat(" and (Shop.CSUserId is null or Shop.CSUserId=0)");
+                }
+                else
+                {
+                    where.AppendFormat(" and Shop.CSUserId in ({0})", StringHelper.ListToString(csList));
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(txtShopNo.Text))
             {

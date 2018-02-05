@@ -2782,6 +2782,7 @@ namespace WebApp
         //项目审批同时分外协订单
         public void AutoAssignOutsourceOrder(int subjectId, int subjectType)
         {
+           
             var subjectModel = (from subject in CurrentContext.DbContext.Subject
                                 join subjectCategory1 in CurrentContext.DbContext.ADSubjectCategory
                                 on subject.SubjectCategoryId equals subjectCategory1.Id into categortTemp
@@ -2797,6 +2798,7 @@ namespace WebApp
                                 }).FirstOrDefault();
             if (subjectModel != null)
             {
+                
                 int guidanceType = subjectModel.gudiance.ActivityTypeId ?? 0;
                 List<FinalOrderDetailTemp> orderList0 = new List<FinalOrderDetailTemp>();
                 FinalOrderDetailTempBLL OrderDetailTempBll = new FinalOrderDetailTempBLL();
@@ -2972,7 +2974,13 @@ namespace WebApp
                                 assignType = shop.IsInstall == "Y" ? (int)OutsourceOrderTypeEnum.Install : (int)OutsourceOrderTypeEnum.Send;
                             }
                         }
-
+                        var oneShopOrderListNew = (from order in oneShopOrderList
+                                                  join subject in CurrentContext.DbContext.Subject
+                                                  on order.SubjectId equals subject.Id
+                                                  select new {
+                                                      order,
+                                                      subject
+                                                  }).ToList();
                         if (!shop.ProvinceName.Contains("北京"))
                         {
                             #region 非北京订单
@@ -2987,7 +2995,7 @@ namespace WebApp
                                     OutsourceOrderPlaceConfigBLL placeConfigBll = new OutsourceOrderPlaceConfigBLL();
                                     if (!string.IsNullOrWhiteSpace(config.MaterialName))
                                     {
-                                        var orderList = oneShopOrderList.Where(order => !assignedOrderIdList.Contains(order.Id) && order.GraphicMaterial != null && order.GraphicMaterial.ToLower().Contains(config.MaterialName.ToLower()) && (order.OrderType == (int)OrderTypeEnum.POP || order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                        var orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && order.order.GraphicMaterial.ToLower().Contains(config.MaterialName.ToLower()) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
 
                                         List<int> cityIdList = new List<int>();
 
@@ -3010,102 +3018,102 @@ namespace WebApp
                                             {
                                                 if (pc.PlaceName == shop.ProvinceName)
                                                 {
-                                                    orderList = orderList.Where(order => order.Province == pc.PlaceName).ToList();
+                                                    orderList = orderList.Where(order => order.order.Province == pc.PlaceName).ToList();
                                                     if (!string.IsNullOrWhiteSpace(pc.CityIds))
                                                     {
                                                         cityIdList = StringHelper.ToIntList(pc.CityIds, ',');
                                                         cityNameList = placeList.Where(p => cityIdList.Contains(p.ID)).Select(p => p.PlaceName).ToList();
-                                                        orderList = orderList.Where(order => cityNameList.Contains(order.City)).ToList();
+                                                        orderList = orderList.Where(order => cityNameList.Contains(order.order.City)).ToList();
                                                     }
                                                     canGo = true;
                                                 }
                                             });
                                         }
                                         if (hasProvince && !canGo)
-                                            orderList = new List<FinalOrderDetailTemp>();
+                                            orderList.Clear();
                                         if (!string.IsNullOrWhiteSpace(config.Channel))
                                         {
                                             List<string> channelList = StringHelper.ToStringList(config.Channel, ',', LowerUpperEnum.ToLower);
                                             if (channelList.Any())
                                             {
-                                                orderList = orderList.Where(order => order.Channel != null && channelList.Contains(order.Channel.ToLower())).ToList();
+                                                orderList = orderList.Where(order => order.order.Channel != null && channelList.Contains(order.order.Channel.ToLower())).ToList();
                                             }
                                         }
                                         if (orderList.Any())
                                         {
                                             orderList.ForEach(order =>
                                             {
-                                                string material0 = order.GraphicMaterial;
-                                                int Quantity = order.Quantity ?? 1;
-                                                if (!string.IsNullOrWhiteSpace(order.Sheet) && ChangePOPCountSheetList.Any() && ChangePOPCountSheetList.Contains(order.Sheet.ToUpper()))
+                                                string material0 = order.order.GraphicMaterial;
+                                                int Quantity = order.order.Quantity ?? 1;
+                                                if (!string.IsNullOrWhiteSpace(order.order.Sheet) && ChangePOPCountSheetList.Any() && ChangePOPCountSheetList.Contains(order.order.Sheet.ToUpper()))
                                                 {
                                                     Quantity = Quantity > 0 ? 1 : 0;
                                                 }
                                                 outsourceOrderDetailModel = new OutsourceOrderDetail();
                                                 outsourceOrderDetailModel.AddDate = DateTime.Now;
                                                 outsourceOrderDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
-                                                outsourceOrderDetailModel.AgentCode = order.AgentCode;
-                                                outsourceOrderDetailModel.AgentName = order.AgentName;
-                                                outsourceOrderDetailModel.Area = order.Area;
-                                                outsourceOrderDetailModel.BusinessModel = order.BusinessModel;
-                                                outsourceOrderDetailModel.Channel = order.Channel;
-                                                outsourceOrderDetailModel.ChooseImg = order.ChooseImg;
-                                                outsourceOrderDetailModel.City = order.City;
-                                                outsourceOrderDetailModel.CityTier = order.CityTier;
-                                                outsourceOrderDetailModel.Contact = order.Contact;
-                                                outsourceOrderDetailModel.CornerType = order.CornerType;
-                                                outsourceOrderDetailModel.Format = order.Format;
-                                                outsourceOrderDetailModel.Gender = (order.OrderGender != null && order.OrderGender != "") ? order.OrderGender : order.Gender;
-                                                outsourceOrderDetailModel.GraphicLength = order.GraphicLength;
-                                                outsourceOrderDetailModel.OrderGraphicMaterial = order.GraphicMaterial;
+                                                outsourceOrderDetailModel.AgentCode = order.order.AgentCode;
+                                                outsourceOrderDetailModel.AgentName = order.order.AgentName;
+                                                outsourceOrderDetailModel.Area = order.order.Area;
+                                                outsourceOrderDetailModel.BusinessModel = order.order.BusinessModel;
+                                                outsourceOrderDetailModel.Channel = order.order.Channel;
+                                                outsourceOrderDetailModel.ChooseImg = order.order.ChooseImg;
+                                                outsourceOrderDetailModel.City = order.order.City;
+                                                outsourceOrderDetailModel.CityTier = order.order.CityTier;
+                                                outsourceOrderDetailModel.Contact = order.order.Contact;
+                                                outsourceOrderDetailModel.CornerType = order.order.CornerType;
+                                                outsourceOrderDetailModel.Format = order.order.Format;
+                                                outsourceOrderDetailModel.Gender = (order.order.OrderGender != null && order.order.OrderGender != "") ? order.order.OrderGender : order.order.Gender;
+                                                outsourceOrderDetailModel.GraphicLength = order.order.GraphicLength;
+                                                outsourceOrderDetailModel.OrderGraphicMaterial = order.order.GraphicMaterial;
                                                 string material = string.Empty;
                                                 if (!string.IsNullOrWhiteSpace(material0))
                                                     material = new BasePage().GetBasicMaterial(material0);
                                                 if (string.IsNullOrWhiteSpace(material))
-                                                    material = order.GraphicMaterial;
+                                                    material = order.order.GraphicMaterial;
                                                 outsourceOrderDetailModel.GraphicMaterial = material;
-                                                outsourceOrderDetailModel.GraphicNo = order.GraphicNo;
-                                                outsourceOrderDetailModel.GraphicWidth = order.GraphicWidth;
-                                                outsourceOrderDetailModel.GuidanceId = order.GuidanceId;
-                                                outsourceOrderDetailModel.IsInstall = order.IsInstall;
-                                                outsourceOrderDetailModel.BCSIsInstall = order.BCSIsInstall;
-                                                outsourceOrderDetailModel.LocationType = order.LocationType;
-                                                outsourceOrderDetailModel.MachineFrame = order.MachineFrame;
-                                                outsourceOrderDetailModel.MaterialSupport = order.MaterialSupport;
-                                                outsourceOrderDetailModel.OrderGender = order.OrderGender;
-                                                outsourceOrderDetailModel.OrderType = order.OrderType;
-                                                outsourceOrderDetailModel.POPAddress = order.POPAddress;
-                                                outsourceOrderDetailModel.POPName = order.POPName;
-                                                outsourceOrderDetailModel.POPType = order.POPType;
-                                                outsourceOrderDetailModel.PositionDescription = order.PositionDescription;
-                                                outsourceOrderDetailModel.POSScale = order.POSScale;
-                                                outsourceOrderDetailModel.Province = order.Province;
+                                                outsourceOrderDetailModel.GraphicNo = order.order.GraphicNo;
+                                                outsourceOrderDetailModel.GraphicWidth = order.order.GraphicWidth;
+                                                outsourceOrderDetailModel.GuidanceId = order.order.GuidanceId;
+                                                outsourceOrderDetailModel.IsInstall = order.order.IsInstall;
+                                                outsourceOrderDetailModel.BCSIsInstall = order.order.BCSIsInstall;
+                                                outsourceOrderDetailModel.LocationType = order.order.LocationType;
+                                                outsourceOrderDetailModel.MachineFrame = order.order.MachineFrame;
+                                                outsourceOrderDetailModel.MaterialSupport = order.order.MaterialSupport;
+                                                outsourceOrderDetailModel.OrderGender = order.order.OrderGender;
+                                                outsourceOrderDetailModel.OrderType = order.order.OrderType;
+                                                outsourceOrderDetailModel.POPAddress = order.order.POPAddress;
+                                                outsourceOrderDetailModel.POPName = order.order.POPName;
+                                                outsourceOrderDetailModel.POPType = order.order.POPType;
+                                                outsourceOrderDetailModel.PositionDescription = order.order.PositionDescription;
+                                                outsourceOrderDetailModel.POSScale = order.order.POSScale;
+                                                outsourceOrderDetailModel.Province = order.order.Province;
                                                 outsourceOrderDetailModel.Quantity = Quantity;
-                                                outsourceOrderDetailModel.Region = order.Region;
-                                                outsourceOrderDetailModel.Remark = order.Remark;
-                                                outsourceOrderDetailModel.Sheet = order.Sheet;
-                                                outsourceOrderDetailModel.ShopId = order.ShopId;
-                                                outsourceOrderDetailModel.ShopName = order.ShopName;
-                                                outsourceOrderDetailModel.ShopNo = order.ShopNo;
-                                                outsourceOrderDetailModel.ShopStatus = order.ShopStatus;
-                                                outsourceOrderDetailModel.SubjectId = order.SubjectId;
-                                                outsourceOrderDetailModel.Tel = order.Tel;
-                                                outsourceOrderDetailModel.TotalArea = order.TotalArea;
-                                                outsourceOrderDetailModel.WindowDeep = order.WindowDeep;
-                                                outsourceOrderDetailModel.WindowHigh = order.WindowHigh;
-                                                outsourceOrderDetailModel.WindowSize = order.WindowSize;
-                                                outsourceOrderDetailModel.WindowWide = order.WindowWide;
-                                                outsourceOrderDetailModel.ReceiveOrderPrice = order.OrderPrice;
-                                                outsourceOrderDetailModel.PayOrderPrice = order.PayOrderPrice;
-                                                outsourceOrderDetailModel.InstallPriceMaterialSupport = order.InstallPriceMaterialSupport;
+                                                outsourceOrderDetailModel.Region = order.order.Region;
+                                                outsourceOrderDetailModel.Remark = order.order.Remark;
+                                                outsourceOrderDetailModel.Sheet = order.order.Sheet;
+                                                outsourceOrderDetailModel.ShopId = order.order.ShopId;
+                                                outsourceOrderDetailModel.ShopName = order.order.ShopName;
+                                                outsourceOrderDetailModel.ShopNo = order.order.ShopNo;
+                                                outsourceOrderDetailModel.ShopStatus = order.order.ShopStatus;
+                                                outsourceOrderDetailModel.SubjectId = order.order.SubjectId;
+                                                outsourceOrderDetailModel.Tel = order.order.Tel;
+                                                outsourceOrderDetailModel.TotalArea = order.order.TotalArea;
+                                                outsourceOrderDetailModel.WindowDeep = order.order.WindowDeep;
+                                                outsourceOrderDetailModel.WindowHigh = order.order.WindowHigh;
+                                                outsourceOrderDetailModel.WindowSize = order.order.WindowSize;
+                                                outsourceOrderDetailModel.WindowWide = order.order.WindowWide;
+                                                outsourceOrderDetailModel.ReceiveOrderPrice = order.order.OrderPrice;
+                                                outsourceOrderDetailModel.PayOrderPrice = order.order.PayOrderPrice;
+                                                outsourceOrderDetailModel.InstallPriceMaterialSupport = order.order.InstallPriceMaterialSupport;
                                                 decimal unitPrice = 0;
                                                 decimal totalPrice = 0;
                                                 if (!string.IsNullOrWhiteSpace(material))
                                                 {
                                                     POP pop = new POP();
                                                     pop.GraphicMaterial = material;
-                                                    pop.GraphicLength = order.GraphicLength;
-                                                    pop.GraphicWidth = order.GraphicWidth;
+                                                    pop.GraphicLength = order.order.GraphicLength;
+                                                    pop.GraphicWidth = order.order.GraphicWidth;
                                                     pop.Quantity = Quantity;
                                                     pop.CustomerId = subjectModel.subject.CustomerId;
                                                     pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
@@ -3113,15 +3121,15 @@ namespace WebApp
                                                     outsourceOrderDetailModel.UnitPrice = unitPrice;
                                                     outsourceOrderDetailModel.TotalPrice = totalPrice;
                                                 }
-                                                outsourceOrderDetailModel.ReceiveUnitPrice = order.UnitPrice;
-                                                outsourceOrderDetailModel.ReceiveTotalPrice = order.TotalPrice;
-                                                outsourceOrderDetailModel.RegionSupplementId = order.RegionSupplementId;
-                                                outsourceOrderDetailModel.CSUserId = order.CSUserId;
+                                                outsourceOrderDetailModel.ReceiveUnitPrice = order.order.UnitPrice;
+                                                outsourceOrderDetailModel.ReceiveTotalPrice = order.order.TotalPrice;
+                                                outsourceOrderDetailModel.RegionSupplementId = order.order.RegionSupplementId;
+                                                outsourceOrderDetailModel.CSUserId = order.order.CSUserId;
                                                 outsourceOrderDetailModel.OutsourceId = config.ProductOutsourctId;
                                                 outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
-                                                outsourceOrderDetailModel.FinalOrderId = order.Id;
+                                                outsourceOrderDetailModel.FinalOrderId = order.order.Id;
                                                 outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
-                                                assignedOrderIdList.Add(order.Id);
+                                                assignedOrderIdList.Add(order.order.Id);
                                                 //assignOrderCount++;
                                             });
                                         }
@@ -3131,14 +3139,14 @@ namespace WebApp
                             #endregion
 
                             #region 其他材质订单
-                            var orderList1 = (from order in oneShopOrderList
+                            var orderList1 = (from order in oneShopOrderListNew
                                               //join subject in CurrentContext.DbContext.Subject
                                               //on order.SubjectId equals subject.Id
-                                              where !assignedOrderIdList.Contains(order.Id)
+                                              where !assignedOrderIdList.Contains(order.order.Id)
                                               select new
                                               {
-                                                  order
-                                                  //subject
+                                                  order=order.order,
+                                                  subject=order.subject
 
                                               }).ToList();
                             if (orderList1.Any())
@@ -3608,7 +3616,13 @@ namespace WebApp
                                         outsourceOrderDetailModel.ReceiveTotalPrice = s.order.TotalPrice;
                                         outsourceOrderDetailModel.RegionSupplementId = s.order.RegionSupplementId;
                                         outsourceOrderDetailModel.CSUserId = s.order.CSUserId;
-                                        outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
+                                        if ((shop.BCSOutsourceId ?? 0) > 0 && s.subject.CornerType == "三叶草")
+                                        {
+                                            outsourceOrderDetailModel.OutsourceId = shop.BCSOutsourceId ?? 0;
+                                        }
+                                        else
+                                            outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
+
                                         outsourceOrderDetailModel.AssignType = assignType;
                                         if (s.order.OrderType == (int)OrderTypeEnum.安装费 || s.order.OrderType == (int)OrderTypeEnum.测量费 || s.order.OrderType == (int)OrderTypeEnum.其他费用)
                                         {
@@ -4746,7 +4760,7 @@ namespace WebApp
         QuoteOrderDetail quoteOrderModel;
         QuoteOrderSettingBLL quoteOrderSettingBll = new QuoteOrderSettingBLL();
         List<QuoteOrderSetting> settingList = new List<QuoteOrderSetting>();
-        public void SaveQuotationOrder(FinalOrderDetailTemp order, bool? orderSetting = true)
+        public void SaveQuotationOrder123(FinalOrderDetailTemp order, bool? orderSetting = true)
         {
             if (order != null)
             {
@@ -4921,7 +4935,7 @@ namespace WebApp
 
 
 
-        public void SaveQuotationOrder12(FinalOrderDetailTemp order, bool? orderSetting = true)
+        public void SaveQuotationOrder(FinalOrderDetailTemp order, bool? orderSetting = true)
         { }
 
 

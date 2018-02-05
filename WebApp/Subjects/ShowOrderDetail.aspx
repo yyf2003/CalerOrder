@@ -46,10 +46,10 @@
                 <asp:Label ID="labSubjectName" runat="server" Text=""></asp:Label>
             </td>
             <td class="style1">
-                外部项目名称
+                是否二次安装
             </td>
             <td style="text-align: left; padding-left: 5px;" class="style3">
-                <asp:Label ID="labOutSubjectName" runat="server" Text=""></asp:Label>
+                <asp:Label ID="labIsSecondInstall" runat="server" Text=""></asp:Label>
             </td>
         </tr>
         <tr class="tr_bai">

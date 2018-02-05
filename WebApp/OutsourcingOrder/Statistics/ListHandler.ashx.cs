@@ -480,7 +480,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                 if (!string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
                 {
                     DateTime endDate = DateTime.Parse(endDateStr);
-                    orderList0 = orderList0.Where(s => s.subject.AddDate < endDate).ToList();
+                    orderList0 = orderList0.Where(s => s.subject.AddDate < endDate.AddDays(1)).ToList();
                 }
                 if (provinceList.Contains("空"))
                 {
@@ -648,7 +648,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             }
             if (orderList0.Any())
             {
-                List<int> guidanceIdList = orderList0.Select(s => s.order.GuidanceId ?? 0).ToList();
+                List<int> guidanceIdList = orderList0.Select(s => s.order.GuidanceId ?? 0).Distinct().ToList();
                 int totalShopCount = 0;
                 decimal totalArea = 0;
 
