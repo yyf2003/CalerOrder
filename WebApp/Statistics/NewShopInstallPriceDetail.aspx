@@ -12,7 +12,7 @@
     <div class="nav_title">
         <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" /><p
             class="nav_table_p">
-            <asp:Label ID="labTitle" runat="server" Text="新开店安装费用明细"></asp:Label>
+            <asp:Label ID="labTitle" runat="server" Text="运费/新开店安装费用明细"></asp:Label>
         </p>
     </div>
     <div style="margin: 0px;">
@@ -38,7 +38,7 @@
     <div class="tr">
         >>信息列表
     </div>
-    <asp:Repeater ID="gvList" runat="server">
+    <asp:Repeater ID="gvList" runat="server" onitemdatabound="gvList_ItemDataBound">
         <HeaderTemplate>
             <table class="table1" style="width: 100%;">
                 <tr class="tr_hui">
@@ -47,6 +47,9 @@
                     </td>
                     <td>
                         项目名称
+                    </td>
+                    <td>
+                        订单类型
                     </td>
                     <td>
                         店铺名称
@@ -80,7 +83,9 @@
                 <td>
                     <%#Eval("subject.SubjectName")%>
                 </td>
-                
+                 <td>
+                     <asp:Label ID="labSubjectType" runat="server" Text=""></asp:Label>
+                </td>
                 <td>
                     <%#Eval("order.ShopName")%>
                 </td>
@@ -109,7 +114,7 @@
             <%if (gvList.Items.Count == 0)
               {%>
             <tr class="tr_bai">
-                <td colspan="9" style="text-align: center;">
+                <td colspan="10" style="text-align: center;">
                     --无数据--
                 </td>
             </tr>

@@ -74,12 +74,13 @@ namespace WebApp.Statistics
                         join subject in CurrentContext.DbContext.Subject
                         on order.SubjectId equals subject.Id
                         where subjectIdList.Contains(order.SubjectId ?? 0)
-                        && subject.SubjectType==(int)SubjectTypeEnum.新开店安装费
+                        && (subject.SubjectType == (int)SubjectTypeEnum.新开店安装费 || subject.SubjectType == (int)SubjectTypeEnum.运费)
                         && (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
                         select new
                         {
                             order,
-                            subject
+                            subject,
+                            subject.SubjectType
                         }).ToList();
 
             if (!string.IsNullOrWhiteSpace(province))
@@ -105,6 +106,20 @@ namespace WebApp.Statistics
         protected void AspNetPager1_PageChanged(object sender, EventArgs e)
         {
             BindData();
+        }
+
+        protected void gvList_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemIndex != -1)
+            {
+                object item = e.Item.DataItem;
+                if (item != null)
+                {
+                    object objSubjectType = item.GetType().GetProperty("SubjectType").GetValue(item, null);
+                    string subjectType = objSubjectType != null ? objSubjectType.ToString() : "0";
+                    ((Label)e.Item.FindControl("labSubjectType")).Text = CommonMethod.GeEnumName<SubjectTypeEnum>(subjectType);
+                }
+            }
         }
     }
 }

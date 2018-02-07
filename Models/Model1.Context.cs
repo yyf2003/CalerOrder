@@ -111,6 +111,7 @@ namespace Models
         public DbSet<OutsourceOrderDetailNew> OutsourceOrderDetailNew { get; set; }
         public DbSet<OutsourceOrderPlaceConfig> OutsourceOrderPlaceConfig { get; set; }
         public DbSet<OutsourceOrderPrice> OutsourceOrderPrice { get; set; }
+        public DbSet<OutsourceOrderSavingLog> OutsourceOrderSavingLog { get; set; }
         public DbSet<OutsourcePriceOrder> OutsourcePriceOrder { get; set; }
         public DbSet<OutsourceReceivePriceOrder> OutsourceReceivePriceOrder { get; set; }
         public DbSet<Place> Place { get; set; }

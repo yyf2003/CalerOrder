@@ -141,6 +141,8 @@
                     </td>
                     <td colspan="3" style="text-align: left; padding-left: 5px;">
                         <asp:CheckBox ID="cbIsSecondInstall" runat="server" />是（安装费单独报）
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <asp:CheckBox ID="cbNoSecondInstallPrice" runat="server" />无安装费(安装费不用系统算，或者单独下安装费)
                     </td>
                 </tr>--%>
                 <tr class="tr_bai">

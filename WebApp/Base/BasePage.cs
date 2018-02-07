@@ -2519,7 +2519,28 @@ namespace WebApp
 
         }
 
+        /// <summary>
+        /// 保存二次安装费
+        /// </summary>
+        public void SaveSecondInstallPrice(int subjectId, int subjectType)
+        {
+            List<int> shopIdList0 = new List<int>();
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            if (subjectType == (int)SubjectTypeEnum.HC订单 || subjectType == (int)SubjectTypeEnum.分区补单)
+            {
+                orderList = new FinalOrderDetailTempBLL().GetList(s => s.RegionSupplementId == subjectId && (s.IsDelete == null || s.IsDelete == false));
+            }
+            else
+            {
+                orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0 && (s.IsDelete == null || s.IsDelete == false));
+            }
+            if (orderList.Any())
+            {
+                shopIdList0 = orderList.Select(s => s.ShopId ?? 0).Distinct().ToList();
+            }
 
+
+        }
         /// <summary>
         /// 项目审批的时候保存快递费
         /// </summary>

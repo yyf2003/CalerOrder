@@ -1325,7 +1325,7 @@ namespace WebApp.Subjects.ADOrders
                                     successNum++;
 
                                     //非关闭店铺，检查器架是不是为空
-                                    if (!IsShut && !IsHc && sheetList.Contains(sheet))
+                                    if (!IsHc && sheetList.Contains(sheet))
                                     {
                                         //
                                         string errMsg = string.Empty;
@@ -1333,10 +1333,16 @@ namespace WebApp.Subjects.ADOrders
                                         {
                                             if (!string.IsNullOrWhiteSpace(errMsg))
                                             {
+                                                if (IsShut)
+                                                    emptyFrameMsg.Append("闭店：");
                                                 emptyFrameMsg.Append(errMsg);
                                             }
                                             else
+                                            {
+                                                if (IsShut)
+                                                    emptyFrameMsg.Append("闭店：");
                                                 emptyFrameMsg.AppendFormat("{0}{1}器架为空,请补充；", sheet, gender);
+                                            }
                                         }
                                     }
                                 }
@@ -1636,7 +1642,7 @@ namespace WebApp.Subjects.ADOrders
                         if (realGender.Contains("男") && realGender.Contains("女"))
                             realGender = gender;
                         //要在插入数据库之前检查
-                        if (!IsShut && !IsHc && popFromDB != null)
+                        if (!IsHc && popFromDB != null)
                         {
                             if (!string.IsNullOrWhiteSpace(popFromDB.MachineFrameName))
                             {
@@ -1651,6 +1657,8 @@ namespace WebApp.Subjects.ADOrders
                                 }
                                 if (!frameModel.Any())
                                 {
+                                    if (IsShut)
+                                        wrongFrameMsg.Append("闭店：");
                                     wrongFrameMsg.Append("器架对应关系有错，请查实；");
                                 }
                             }
@@ -1669,10 +1677,16 @@ namespace WebApp.Subjects.ADOrders
                                 {
                                     if (!string.IsNullOrWhiteSpace(errMsg))
                                     {
+                                        if (IsShut)
+                                            emptyFrameMsg.Append("闭店：");
                                         emptyFrameMsg.Append(errMsg);
                                     }
                                     else
+                                    {
+                                        if (IsShut)
+                                            emptyFrameMsg.Append("闭店：");
                                         emptyFrameMsg.AppendFormat("{0}{1}器架为空,请补充；", sheet, realGender);
+                                    }
                                 }
                             }
                         }

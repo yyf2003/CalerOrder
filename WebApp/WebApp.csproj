@@ -2159,6 +2159,7 @@
     <Compile Include="Base\BasePage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Base\DelegateClass.cs" />
     <Compile Include="Base\MyHttpModel.cs" />
     <Compile Include="CompanyManage\handler\List1.ashx.cs">
       <DependentUpon>List1.ashx</DependentUpon>

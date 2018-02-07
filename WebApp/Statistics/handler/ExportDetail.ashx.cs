@@ -700,7 +700,7 @@ namespace WebApp.Statistics.handler
                                                   join subject in CurrentContext.DbContext.Subject
                                                   on order.SubjectId equals subject.Id
                                                   where subjectIdList.Contains(order.SubjectId ?? 0)
-                                                  && subject.SubjectType==(int)SubjectTypeEnum.新开店安装费
+                                                  && (subject.SubjectType==(int)SubjectTypeEnum.新开店安装费 || subject.SubjectType==(int)SubjectTypeEnum.运费)
                                                   select new
                                                   {
                                                       order,
@@ -746,7 +746,7 @@ namespace WebApp.Statistics.handler
                                 orderModel = new OrderPriceDetail();
                                 if (s.subject.AddDate != null)
                                     orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
-                                orderModel.PriceType = "新开店安装费";
+                                orderModel.PriceType = CommonMethod.GeEnumName<SubjectTypeEnum>((s.subject.SubjectType??0).ToString());
                                 orderModel.Area = 0;
                                 orderModel.Gender = string.Empty;
                                 orderModel.GraphicLength = 0;

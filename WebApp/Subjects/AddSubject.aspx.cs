@@ -238,10 +238,14 @@ namespace WebApp.Subjects
                         rblPriceBlong.SelectedValue = subjectModel.PriceBlongRegion;
 
                     }
-                    if ((subjectModel.IsSecondInstall??false))
-                    {
-                        //cbIsSecondInstall.Checked = true;
-                    }
+                    //if ((subjectModel.IsSecondInstall??false))
+                    //{
+                    //    cbIsSecondInstall.Checked = true;
+                    //    if (!(subjectModel.HasSecondInstallPrice??true))
+                    //    {
+                    //        cbNoSecondInstallPrice.Checked = true;
+                    //    }
+                    //}
                     if (subjectModel.Status == 4)
                     {
                         rblSubjectType.Enabled = false;
@@ -301,6 +305,16 @@ namespace WebApp.Subjects
                 subjectModel.SubjectType = int.Parse(rblSubjectType.SelectedValue);
             else
                 subjectModel.SubjectType = 1;//默认是pop订单
+            //if (cbIsSecondInstall.Checked)
+            //{
+            //    subjectModel.IsSecondInstall = true;
+            //    subjectModel.HasSecondInstallPrice = !cbNoSecondInstallPrice.Checked;
+            //}
+            //else
+            //{
+            //    subjectModel.IsSecondInstall = false;
+            //    subjectModel.HasSecondInstallPrice =null;
+            //}
 
             //subjectModel.IsSecondInstall = cbIsSecondInstall.Checked;
 

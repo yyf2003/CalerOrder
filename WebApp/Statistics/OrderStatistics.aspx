@@ -381,7 +381,7 @@
                     <asp:Label ID="labMaterialPrice" runat="server" Text="0"></asp:Label>
                 </td>
                 <td style="text-align: right;">
-                    新开店装修费：
+                    运费/新开店装修费：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labNewShopInstallPrice" runat="server" Text="0"></asp:Label>
@@ -409,7 +409,7 @@
             </tr>
             <tr class="tr_bai">
                 <td style="text-align: right;">
-                    运费/其他费用：
+                    其他费用：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labFreight" runat="server" Text="0"></asp:Label>
@@ -549,10 +549,10 @@
                         物料费
                     </td>
                     <td>
-                        新开店安装费
+                        运费/新开店安装费
                     </td>
                     <td>
-                        运费/其他费用
+                        其他费用
                     </td>
                     <td>
                         查看

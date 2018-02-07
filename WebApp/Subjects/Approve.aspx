@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" EnableEventValidation="false" CodeBehind="Approve.aspx.cs" Inherits="WebApp.Subjects.Approve" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" EnableEventValidation="false" CodeBehind="Approve.aspx.cs" Async="true" Inherits="WebApp.Subjects.Approve" %>
 
 <%@ Register Assembly="AspNetPager" Namespace="Wuqi.Webdiyer" TagPrefix="webdiyer" %>
 <%@ Register src="UC/OrderDetailUC.ascx" tagname="OrderDetailUC" tagprefix="uc1" %>

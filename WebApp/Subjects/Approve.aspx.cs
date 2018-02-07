@@ -95,7 +95,7 @@ namespace WebApp.Subjects
         //    this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
         //    gvPOP.DataSource = list.ToList().OrderBy(s => s.order.Id).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
         //    gvPOP.DataBind();
-            
+
 
         //}
 
@@ -111,15 +111,17 @@ namespace WebApp.Subjects
             SubjectBLL subjectBll = new SubjectBLL();
             bool isApproveOk = false;
             string msg = string.Empty;
+            int guidanceId = 0;
             int subjectType = 1;
             using (TransactionScope tran = new TransactionScope())
             {
-                
+
                 try
                 {
                     Models.Subject model = subjectBll.GetModel(subjectId);
                     if (model != null)
                     {
+                        guidanceId = model.GuidanceId ?? 0;
                         subjectType = model.SubjectType ?? 1;
                         model.ApproveState = result;
                         model.ApproveDate = DateTime.Now;
@@ -140,84 +142,86 @@ namespace WebApp.Subjects
                         {
 
                             //bool hasPriceOrder = false;
-                            var list = (from order in CurrentContext.DbContext.PriceOrderDetail
-                                        join shop in CurrentContext.DbContext.Shop
-                                        on order.ShopId equals shop.Id
-                                        where order.SubjectId == subjectId
-                                        select new
-                                        {
-                                            order,
-                                            shop
-                                        }).ToList();
-                            if (list.Any())
+                            if (subjectType != (int)SubjectTypeEnum.新开店安装费 && subjectType != (int)SubjectTypeEnum.运费)
                             {
-                                //hasPriceOrder = true;
-                                FinalOrderDetailTempBLL finalOrderTempBll = new FinalOrderDetailTempBLL();
-                                FinalOrderDetailTemp finalOrderTempModel;
-                                finalOrderTempBll.Delete(s => s.SubjectId == subjectId && (s.OrderType == (int)OrderTypeEnum.安装费 || s.OrderType == (int)OrderTypeEnum.测量费 || s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.其他费用));
-                                new QuoteOrderDetailBLL().Delete(s => s.SubjectId == subjectId && (s.OrderType == (int)OrderTypeEnum.安装费 || s.OrderType == (int)OrderTypeEnum.测量费 || s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.其他费用));
-                                list.ForEach(o =>
+                                var list = (from order in CurrentContext.DbContext.PriceOrderDetail
+                                            join shop in CurrentContext.DbContext.Shop
+                                            on order.ShopId equals shop.Id
+                                            where order.SubjectId == subjectId
+                                            select new
+                                            {
+                                                order,
+                                                shop
+                                            }).ToList();
+                                if (list.Any())
                                 {
-                                    finalOrderTempModel = new FinalOrderDetailTemp();
-                                    finalOrderTempModel.AgentCode = o.shop.AgentCode;
-                                    finalOrderTempModel.AgentName = o.shop.AgentName;
-                                    finalOrderTempModel.BusinessModel = o.shop.BusinessModel;
-                                    finalOrderTempModel.Channel = o.shop.Channel;
-                                    finalOrderTempModel.City = o.shop.CityName;
-                                    finalOrderTempModel.CityTier = o.shop.CityTier;
-                                    finalOrderTempModel.Contact = o.shop.Contact1;
-                                    finalOrderTempModel.Format = o.shop.Format;
-                                    finalOrderTempModel.IsInstall = o.shop.IsInstall;
-                                    finalOrderTempModel.BCSIsInstall = o.shop.BCSIsInstall;
-                                    finalOrderTempModel.LocationType = o.shop.LocationType;
-                                    finalOrderTempModel.MaterialSupport = "";
-                                    finalOrderTempModel.OrderType = o.order.OrderType;
-                                    finalOrderTempModel.POPAddress = o.shop.POPAddress;
-                                    finalOrderTempModel.POSScale = "";
-                                    finalOrderTempModel.InstallPricePOSScale = "";
-                                    finalOrderTempModel.InstallPriceMaterialSupport = "";
-                                    finalOrderTempModel.Province = o.shop.ProvinceName;
-                                    finalOrderTempModel.Quantity = 1;
-                                    finalOrderTempModel.Region = o.shop.RegionName;
-                                    finalOrderTempModel.ChooseImg = "";
-                                    finalOrderTempModel.Remark = o.order.Remark;
-                                    finalOrderTempModel.Sheet = "";
-                                    finalOrderTempModel.ShopId = o.shop.Id;
-                                    finalOrderTempModel.ShopName = o.shop.ShopName;
-                                    finalOrderTempModel.ShopNo = o.shop.ShopNo;
-                                    finalOrderTempModel.SubjectId = subjectId;
-                                    finalOrderTempModel.Tel = o.shop.Tel1;
-                                    finalOrderTempModel.MachineFrame = "";
+                                    //hasPriceOrder = true;
+                                    FinalOrderDetailTempBLL finalOrderTempBll = new FinalOrderDetailTempBLL();
+                                    FinalOrderDetailTemp finalOrderTempModel;
+                                    finalOrderTempBll.Delete(s => s.SubjectId == subjectId && (s.OrderType == (int)OrderTypeEnum.安装费 || s.OrderType == (int)OrderTypeEnum.测量费 || s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.其他费用));
+                                    new QuoteOrderDetailBLL().Delete(s => s.SubjectId == subjectId && (s.OrderType == (int)OrderTypeEnum.安装费 || s.OrderType == (int)OrderTypeEnum.测量费 || s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.其他费用));
+                                    list.ForEach(o =>
+                                    {
+                                        finalOrderTempModel = new FinalOrderDetailTemp();
+                                        finalOrderTempModel.AgentCode = o.shop.AgentCode;
+                                        finalOrderTempModel.AgentName = o.shop.AgentName;
+                                        finalOrderTempModel.BusinessModel = o.shop.BusinessModel;
+                                        finalOrderTempModel.Channel = o.shop.Channel;
+                                        finalOrderTempModel.City = o.shop.CityName;
+                                        finalOrderTempModel.CityTier = o.shop.CityTier;
+                                        finalOrderTempModel.Contact = o.shop.Contact1;
+                                        finalOrderTempModel.Format = o.shop.Format;
+                                        finalOrderTempModel.IsInstall = o.shop.IsInstall;
+                                        finalOrderTempModel.BCSIsInstall = o.shop.BCSIsInstall;
+                                        finalOrderTempModel.LocationType = o.shop.LocationType;
+                                        finalOrderTempModel.MaterialSupport = "";
+                                        finalOrderTempModel.OrderType = o.order.OrderType;
+                                        finalOrderTempModel.POPAddress = o.shop.POPAddress;
+                                        finalOrderTempModel.POSScale = "";
+                                        finalOrderTempModel.InstallPricePOSScale = "";
+                                        finalOrderTempModel.InstallPriceMaterialSupport = "";
+                                        finalOrderTempModel.Province = o.shop.ProvinceName;
+                                        finalOrderTempModel.Quantity = 1;
+                                        finalOrderTempModel.Region = o.shop.RegionName;
+                                        finalOrderTempModel.ChooseImg = "";
+                                        finalOrderTempModel.Remark = o.order.Remark;
+                                        finalOrderTempModel.Sheet = "";
+                                        finalOrderTempModel.ShopId = o.shop.Id;
+                                        finalOrderTempModel.ShopName = o.shop.ShopName;
+                                        finalOrderTempModel.ShopNo = o.shop.ShopNo;
+                                        finalOrderTempModel.SubjectId = subjectId;
+                                        finalOrderTempModel.Tel = o.shop.Tel1;
+                                        finalOrderTempModel.MachineFrame = "";
 
-                                    finalOrderTempModel.GraphicLength = 0;
-                                    finalOrderTempModel.GraphicMaterial = "";
-                                    finalOrderTempModel.GraphicWidth = 0;
-                                    finalOrderTempModel.PositionDescription = "";
-                                    finalOrderTempModel.Area = 0;
-                                    finalOrderTempModel.InstallPositionDescription = "";
-                                    finalOrderTempModel.RegionSupplementId = 0;
+                                        finalOrderTempModel.GraphicLength = 0;
+                                        finalOrderTempModel.GraphicMaterial = "";
+                                        finalOrderTempModel.GraphicWidth = 0;
+                                        finalOrderTempModel.PositionDescription = "";
+                                        finalOrderTempModel.Area = 0;
+                                        finalOrderTempModel.InstallPositionDescription = "";
+                                        finalOrderTempModel.RegionSupplementId = 0;
 
-                                    decimal unitPrice = 0;
-                                    decimal totalPrice = 0;
+                                        decimal unitPrice = 0;
+                                        decimal totalPrice = 0;
 
-                                    finalOrderTempModel.UnitPrice = unitPrice;
-                                    finalOrderTempModel.TotalPrice = totalPrice;
-                                    finalOrderTempModel.IsFromRegion = true;
-                                    finalOrderTempModel.ShopStatus = o.shop.Status;
-                                    finalOrderTempModel.OrderPrice = o.order.Amount;
-                                    finalOrderTempModel.PayOrderPrice = o.order.PayAmount;
-                                    finalOrderTempModel.GuidanceId = o.order.GuidanceId;
-                                    finalOrderTempModel.CSUserId = o.shop.CSUserId;
-                                    finalOrderTempBll.Add(finalOrderTempModel);
-                                    new BasePage().SaveQuotationOrder(finalOrderTempModel, false);
-                                });
+                                        finalOrderTempModel.UnitPrice = unitPrice;
+                                        finalOrderTempModel.TotalPrice = totalPrice;
+                                        finalOrderTempModel.IsFromRegion = true;
+                                        finalOrderTempModel.ShopStatus = o.shop.Status;
+                                        finalOrderTempModel.OrderPrice = o.order.Amount;
+                                        finalOrderTempModel.PayOrderPrice = o.order.PayAmount;
+                                        finalOrderTempModel.GuidanceId = o.order.GuidanceId;
+                                        finalOrderTempModel.CSUserId = o.shop.CSUserId;
+                                        finalOrderTempBll.Add(finalOrderTempModel);
+                                        new BasePage().SaveQuotationOrder(finalOrderTempModel, false);
+                                    });
+                                }
                             }
 
 
 
-
                             OrderChangeApplicationDetailBLL changeApplicationBll = new OrderChangeApplicationDetailBLL();
-                            OrderChangeApplicationDetail changeModel = changeApplicationBll.GetList(s => s.SubjectId == subjectId && s.State ==1).FirstOrDefault();
+                            OrderChangeApplicationDetail changeModel = changeApplicationBll.GetList(s => s.SubjectId == subjectId && s.State == 1).FirstOrDefault();
                             if (changeModel != null)
                             {
                                 changeModel.State = 2;
@@ -225,25 +229,25 @@ namespace WebApp.Subjects
                                 changeModel.FinishUserId = CurrentUser.UserId;
                                 changeApplicationBll.Update(changeModel);
                             }
-                            SubjectGuidance guidanceModel = new SubjectGuidanceBLL().GetModel(model.GuidanceId ?? 0);
-                            if (guidanceModel != null && (model.SubjectType != (int)SubjectTypeEnum.二次安装 && model.SubjectType != (int)SubjectTypeEnum.费用订单 && model.SubjectType != (int)SubjectTypeEnum.新开店安装费))
-                            {
-                                if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
-                                {
-                                    SaveInstallPrice(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1);
-                                }
-                                else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
-                                {
-                                    SaveExpressPrice(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1);
-                                }
-                                else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
-                                {
-                                    SaveExpressPriceForDelivery(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1, guidanceModel.ExperssPrice);
-                                }
-                            }
+                            //SubjectGuidance guidanceModel = new SubjectGuidanceBLL().GetModel(model.GuidanceId ?? 0);
+                            //if (guidanceModel != null && (subjectType != (int)SubjectTypeEnum.二次安装 && subjectType != (int)SubjectTypeEnum.费用订单 && subjectType != (int)SubjectTypeEnum.新开店安装费))
+                            //{
+                            //    if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
+                            //    {
+                            //        SaveInstallPrice(guidanceModel.ItemId, subjectId, subjectType);
+                            //    }
+                            //    else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
+                            //    {
+                            //        SaveExpressPrice(guidanceModel.ItemId, subjectId, subjectType);
+                            //    }
+                            //    else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
+                            //    {
+                            //        SaveExpressPriceForDelivery(guidanceModel.ItemId, subjectId, subjectType, guidanceModel.ExperssPrice);
+                            //    }
+                            //}
                             //外协自动分单
-                            AutoAssignOutsourceOrder(subjectId, model.SubjectType ?? 1);
-                           
+                            //AutoAssignOutsourceOrder(subjectId, subjectType);
+
                         }
                         tran.Complete();
                         isApproveOk = true;
@@ -258,6 +262,10 @@ namespace WebApp.Subjects
             {
                 //if (subjectType!=2)
                 //Sent();
+                if (result == 1 && subjectType != (int)SubjectTypeEnum.新开店安装费 && subjectType != (int)SubjectTypeEnum.运费)
+                {
+                    new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId, subjectType);
+                }
                 string url = "ApproveList.aspx";
                 if (subjectType == (int)SubjectTypeEnum.正常单)
                     url = "/Subjects/RegionSubject/ApproveList.aspx";
@@ -288,7 +296,7 @@ namespace WebApp.Subjects
 
         void SentToERP()
         {
-           
+
             var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                         join subject in CurrentContext.DbContext.Subject
                         on order.SubjectId equals subject.Id
@@ -366,7 +374,7 @@ namespace WebApp.Subjects
                                 });
                                 string jsonStr = JsonConvert.SerializeObject(orderList);
                                 HttpClient httpClient = new HttpClient();
-                               
+
 
                                 WebClient wc = new WebClient();
                                 wc.Headers.Add("Content-Type", "application/json");
@@ -416,16 +424,17 @@ namespace WebApp.Subjects
                                 resultModel.ErpHostId = client.Id;
                                 resultModel.SubjectId = subjectId;
                                 resultModel.SendResult = 2;
-                                resultModel.CallBackMsg ="主机端："+ ex.Message;
+                                resultModel.CallBackMsg = "主机端：" + ex.Message;
                                 new SendERPResultBLL().Add(resultModel);
                             }
 
-                           
+
                         }
 
                     }
                 }
             }
         }
+
     }
 }

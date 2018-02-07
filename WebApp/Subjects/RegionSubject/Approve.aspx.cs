@@ -299,7 +299,8 @@ namespace WebApp.Subjects.RegionSubject
             SubjectBLL subjectBll = new SubjectBLL();
             bool isApproveOk = false;
             string msg = string.Empty;
-            //int subjectType = 1;
+            int subjectType = 1;
+            int guidanceId = 0;
             using (TransactionScope tran = new TransactionScope())
             {
                 try
@@ -309,6 +310,8 @@ namespace WebApp.Subjects.RegionSubject
                     int newSubjectId = subjectId;
                     if (model != null)
                     {
+                        guidanceId = model.GuidanceId ?? 0;
+                        subjectType = model.SubjectType ?? 1;
                         var list = (from order in CurrentContext.DbContext.RegionOrderDetail
                                    join shop in CurrentContext.DbContext.Shop
                                    on order.ShopId equals shop.Id
@@ -502,23 +505,23 @@ namespace WebApp.Subjects.RegionSubject
                                 changeModel.FinishUserId = CurrentUser.UserId;
                                 changeApplicationBll.Update(changeModel);
                             }
-                            if (guidanceModel != null && (model.SubjectType != (int)SubjectTypeEnum.二次安装 && model.SubjectType != (int)SubjectTypeEnum.费用订单 && model.SubjectType != (int)SubjectTypeEnum.新开店安装费))
-                            {
-                                if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
-                                {
-                                    SaveInstallPrice(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1);
-                                }
-                                else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
-                                {
-                                    SaveExpressPrice(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1);
-                                }
-                                else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
-                                {
-                                    SaveExpressPriceForDelivery(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1, guidanceModel.ExperssPrice);
-                                }
-                            }
-                            //外协自动分单
-                            AutoAssignOutsourceOrder(subjectId, model.SubjectType ?? 1);
+                            //if (guidanceModel != null && (model.SubjectType != (int)SubjectTypeEnum.二次安装 && model.SubjectType != (int)SubjectTypeEnum.费用订单 && model.SubjectType != (int)SubjectTypeEnum.新开店安装费))
+                            //{
+                            //    if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
+                            //    {
+                            //        SaveInstallPrice(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1);
+                            //    }
+                            //    else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
+                            //    {
+                            //        SaveExpressPrice(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1);
+                            //    }
+                            //    else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
+                            //    {
+                            //        SaveExpressPriceForDelivery(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1, guidanceModel.ExperssPrice);
+                            //    }
+                            //}
+                            ////外协自动分单
+                            //AutoAssignOutsourceOrder(subjectId, model.SubjectType ?? 1);
                         }
                         
                         tran.Complete();
@@ -534,6 +537,10 @@ namespace WebApp.Subjects.RegionSubject
             {
                 //if (subjectType!=2)
                 //Sent();
+                if (result == 1)
+                {
+                    new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId, subjectType);
+                }
                 Alert("审批成功！", "ApproveList.aspx");
             }
             else

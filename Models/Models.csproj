@@ -332,6 +332,9 @@
     <Compile Include="OutsourceOrderPrice.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="OutsourceOrderSavingLog.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="OutsourcePriceOrder.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

@@ -139,6 +139,7 @@
     <Compile Include="OutsourceOrderDetailNewBLL.cs" />
     <Compile Include="OutsourceOrderPlaceConfigBLL.cs" />
     <Compile Include="OutsourceOrderPriceBLL.cs" />
+    <Compile Include="OutsourceOrderSavingLogBLL.cs" />
     <Compile Include="OutsourcePriceOrderBLL.cs" />
     <Compile Include="OutsourceReceivePriceOrderBLL.cs" />
     <Compile Include="PlaceBLL.cs" />

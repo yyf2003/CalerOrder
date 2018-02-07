@@ -1146,7 +1146,7 @@ namespace WebApp.Statistics
             //Session["secondExperssDicStatistics"] = secondExperssPrice;
             #endregion
             #region 统计其他费用（新开安装费）
-            var orderDetailList = new PriceOrderDetailBLL().GetList(s => priceSubjectIdList.Contains(s.SubjectId ?? 0) && (s.SubjectType ?? 1) == (int)SubjectTypeEnum.新开店安装费);
+            var orderDetailList = new PriceOrderDetailBLL().GetList(s => priceSubjectIdList.Contains(s.SubjectId ?? 0) && ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.新开店安装费 || (s.SubjectType ?? 1) == (int)SubjectTypeEnum.运费));
             if (regionList.Any())
             {
                 orderDetailList = orderDetailList.Where(s => regionList.Contains(s.Region.ToLower())).ToList();
@@ -1174,32 +1174,32 @@ namespace WebApp.Statistics
             }
             #endregion
             #region 运费
-            if (priceSubjectIdList.Any())
-            {
+            //if (priceSubjectIdList.Any())
+            //{
 
-                var freightOrderList = new PriceOrderDetailBLL().GetList(s => priceSubjectIdList.Contains(s.SubjectId ?? 0) && (s.SubjectType ?? 1) == (int)SubjectTypeEnum.运费);
-                if (regionList.Any())
-                {
-                    freightOrderList = freightOrderList.Where(s => regionList.Contains(s.Region.ToLower())).ToList();
+            //    var freightOrderList = new PriceOrderDetailBLL().GetList(s => priceSubjectIdList.Contains(s.SubjectId ?? 0) && (s.SubjectType ?? 1) == (int)SubjectTypeEnum.运费);
+            //    if (regionList.Any())
+            //    {
+            //        freightOrderList = freightOrderList.Where(s => regionList.Contains(s.Region.ToLower())).ToList();
 
-                }
-                if (freightOrderList.Any())
-                {
-                    freightOrderList.ForEach(s =>
-                    {
-                        if (!freightDic.Keys.Contains((s.SubjectId ?? 0)))
-                        {
-                            freightDic.Add((s.SubjectId ?? 0), (s.Amount ?? 0));
-                        }
-                        else
-                        {
-                            freightDic[(s.SubjectId ?? 0)] += (s.Amount ?? 0);
-                        }
-                        freightPrice += (s.Amount ?? 0);
-                    });
-                }
+            //    }
+            //    if (freightOrderList.Any())
+            //    {
+            //        freightOrderList.ForEach(s =>
+            //        {
+            //            if (!freightDic.Keys.Contains((s.SubjectId ?? 0)))
+            //            {
+            //                freightDic.Add((s.SubjectId ?? 0), (s.Amount ?? 0));
+            //            }
+            //            else
+            //            {
+            //                freightDic[(s.SubjectId ?? 0)] += (s.Amount ?? 0);
+            //            }
+            //            freightPrice += (s.Amount ?? 0);
+            //        });
+            //    }
 
-            }
+            //}
             #endregion
             #region 分区活动费（安装费，测量费，其他费用）
             var regionPriceOrderList = orderList.Where(s => (s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Others && (s.order.OrderType ?? 1) > 1).ToList();
@@ -1297,19 +1297,19 @@ namespace WebApp.Statistics
                             freightDic[(s.order.SubjectId ?? 0)] += price0;
                         }
                     }
-                    else if (s.order.OrderType == (int)OrderTypeEnum.运费)
-                    {
-                        freightPrice += price0;
-                        if (!freightDic.Keys.Contains((s.order.SubjectId ?? 0)))
-                        {
-                            freightDic.Add((s.order.SubjectId ?? 0), price0);
-                        }
-                        else
-                        {
-                            freightDic[(s.order.SubjectId ?? 0)] += price0;
-                        }
+                    //else if (s.order.OrderType == (int)OrderTypeEnum.运费)
+                    //{
+                    //    freightPrice += price0;
+                    //    if (!freightDic.Keys.Contains((s.order.SubjectId ?? 0)))
+                    //    {
+                    //        freightDic.Add((s.order.SubjectId ?? 0), price0);
+                    //    }
+                    //    else
+                    //    {
+                    //        freightDic[(s.order.SubjectId ?? 0)] += price0;
+                    //    }
 
-                    }
+                    //}
                 });
             }
             Session["freightDicStatistics"] = freightDic;
@@ -1401,12 +1401,12 @@ namespace WebApp.Statistics
                 labNewShopInstallPrice.Attributes.Add("name", "checkNewShopInstallPrice");
 
             }
-            if (freightPrice > 0)
-            {
-                labFreight.Text = Math.Round(freightPrice, 2) + "元";
-                labFreight.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
-                labFreight.Attributes.Add("name", "checkOtherPrice");
-            }
+            //if (freightPrice > 0)
+            //{
+            //    labFreight.Text = Math.Round(freightPrice, 2) + "元";
+            //    labFreight.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
+            //    labFreight.Attributes.Add("name", "checkOtherPrice");
+            //}
 
             if (regionInstallPrice > 0)
             {
@@ -3357,7 +3357,7 @@ namespace WebApp.Statistics
                     cblPriceSubjects.Items.Add(li);
                 });
 
-                var newShopInstallPriceSList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId??0) && (s.IsDelete==null || s.IsDelete==false) && s.SubjectType==(int)SubjectTypeEnum.新开店安装费 && s.ApproveState==1);
+                var newShopInstallPriceSList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && (s.SubjectType == (int)SubjectTypeEnum.新开店安装费 || s.SubjectType == (int)SubjectTypeEnum.运费) && s.ApproveState == 1);
                 if (newShopInstallPriceSList.Any())
                 {
                     newShopInstallPriceSList.ForEach(s => {

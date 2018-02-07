@@ -1268,7 +1268,10 @@ namespace WebApp.Customer
 
                         Quantity = "1";
                     }
-                    Sheet = Sheet == "户外" ? "OOH" : Sheet;
+                    if (Sheet == "户外")
+                        Sheet = "OOH";
+                    if (Sheet.ToLower() == "window" || Sheet.ToLower() == "windows")
+                        Sheet = "橱窗";
                     int popId = 0;
                     if (canSave && !string.IsNullOrWhiteSpace(GraphicNo) && !GraphicNo.Contains("无") && CheckPOP(shopId, Sheet, GraphicNo, out popId))
                     {
