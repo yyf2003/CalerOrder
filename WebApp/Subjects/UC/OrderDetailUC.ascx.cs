@@ -61,6 +61,16 @@ namespace WebApp.Subjects.UC
                 hfSubjectType.Value = subjectType.ToString();
                 hfPlanIds.Value = subjectModel.subject.SplitPlanIds;
                 labPriceBlong.Text = !string.IsNullOrWhiteSpace(subjectModel.subject.PriceBlongRegion)?subjectModel.subject.PriceBlongRegion:"默认";
+                if (subjectModel.subject.IsSecondInstall ?? false)
+                {
+                    labIsSecondInstall.Text = "是";
+                    labSecondInstallType.Text = CommonMethod.GetEnumDescription<SecondInstallInstallTypeEnum>((subjectModel.subject.SecondBasicInstallPriceType ?? 1).ToString());
+                }
+                else {
+                    labIsSecondInstall.Text = "否";
+                    labSecondInstallType.Text = "";
+                }
+
 
             }
         }

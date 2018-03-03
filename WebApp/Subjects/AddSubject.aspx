@@ -135,16 +135,20 @@
                         <asp:Label ID="labTipsMsg" runat="server" Text="" style=" color:Red; margin-left:10px;"></asp:Label>
                     </td>
                 </tr>
-                <%--<tr class="tr_bai">
+                <tr class="tr_bai" runat="server" id="trSecondInstall">
                     <td>
                         是否二次安装：
                     </td>
                     <td colspan="3" style="text-align: left; padding-left: 5px;">
-                        <asp:CheckBox ID="cbIsSecondInstall" runat="server" />是（安装费单独报）
+                        <asp:CheckBox ID="cbIsSecondInstall" runat="server" />是（安装费单独算）
                         &nbsp;&nbsp;&nbsp;&nbsp;
-                        <asp:CheckBox ID="cbNoSecondInstallPrice" runat="server" />无安装费(安装费不用系统算，或者单独下安装费)
+                        基础安装费类型：
+                        <asp:RadioButtonList ID="rblSecondInstallType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                           <%--<asp:ListItem Value="1">全部150</asp:ListItem>
+                           <asp:ListItem Value="2">T1-T3级别150,T4-T7按实际算</asp:ListItem>--%>
+                        </asp:RadioButtonList>
                     </td>
-                </tr>--%>
+                </tr>
                 <tr class="tr_bai">
                     <td>
                         备注：

@@ -1822,10 +1822,10 @@
 <script type="text/javascript">
 
 
-    function loading() {
-        $("#imgLoading1").show();
-        return true;
-    }
+//    function loading() {
+//        $("#imgLoading1").show();
+//        return true;
+//    }
 
     $(function () {
         if (hasOrder == 1) {
@@ -1842,6 +1842,7 @@
 
     var postBackId;
     Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function (sender, e) {
+        $("#imgLoading1").hide();
         $("#imgSubmitPrice").hide();
         $("#imgSubmitSIS").hide();
         if (postBackId.indexOf("btnSubmit") != -1 || postBackId.indexOf("btnSubmitSIS") != -1) {
@@ -1861,22 +1862,16 @@
 
     Sys.WebForms.PageRequestManager.getInstance().add_initializeRequest(function (sender, e) {
         postBackId = e.get_postBackElement().id;
+        if (postBackId.indexOf("lbGoSkip") != -1) {
+            $("#imgLoading1").show();
+        }
         if (postBackId.indexOf("btnSubmit") != -1) {
             $("#imgSubmitPrice").show();
         }
         if (postBackId.indexOf("btnSubmitSIS") != -1) {
             $("#imgSubmitSIS").show();
         }
-        //        if (postBackId.indexOf("btnSplit") != -1 || postBackId.indexOf("btnGoNext") != -1 || postBackId.indexOf("lbGoSkip") != -1 || postBackId.indexOf("btnSubmitHM") != -1) {
-        //            var val = $("#hfHasErrorMaterialSupport").val();
-        //            if (val == 1) {
-        //              
-        //                e.set_cancel(true);
-        //                alert("警告：存在物料支持级别不统一的店铺，请更新订单后再进行下一步")
-        //            }
-        //            else
-        //                loading();
-        //        }
+       
     })
     
 

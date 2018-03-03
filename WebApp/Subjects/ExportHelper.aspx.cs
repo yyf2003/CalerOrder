@@ -777,7 +777,7 @@ namespace WebApp.Subjects
                              on subject.SubjectCategoryId equals category1.Id into temp1
                             from category in temp1.DefaultIfEmpty()
                             //where subjectIdList.Contains(order.SubjectId ?? 0)
-                            where selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0)
+                            where (selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0))
                             && ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || order.OrderType>1)
                             
                             && (order.IsValid == null || order.IsValid == true)
@@ -1531,7 +1531,7 @@ namespace WebApp.Subjects
                             on subject.GuidanceId equals guidance.ItemId
                            
                             //where subjectIdList.Contains(order.SubjectId ?? 0)
-                            where selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0)
+                            where (selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0))
                             && ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || order.OrderType>1)
                             
                             && (order.IsValid == null || order.IsValid == true)
@@ -3062,7 +3062,7 @@ namespace WebApp.Subjects
 
         
 
-
+        //系统单350
         void ExportNew350()
         {
 
@@ -3094,12 +3094,12 @@ namespace WebApp.Subjects
                             on subject.SubjectCategoryId equals category1.Id into temp1
                             from category in temp1.DefaultIfEmpty()
                            // where subjectIdList.Contains(order.SubjectId ?? 0)
-                            where selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0)
+                            where (selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0))
                             && (order.IsValid == null || order.IsValid == true)
                             && (order.IsDelete == null || order.IsDelete == false)
                             && (order.ShopStatus == null || order.ShopStatus == "" || order.ShopStatus == ShopStatusEnum.正常.ToString())
                             && (myRegionList.Any()?((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? myRegionList.Contains(subject.PriceBlongRegion.ToLower()) : myRegionList.Contains(shop.RegionName.ToLower())):1==1)
-                            & (order.OrderType!=(int)OrderTypeEnum.物料)
+                            && (order.OrderType!=(int)OrderTypeEnum.物料)
                             select new
                             {
                                 subject,

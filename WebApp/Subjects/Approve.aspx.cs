@@ -264,7 +264,7 @@ namespace WebApp.Subjects
                 //Sent();
                 if (result == 1 && subjectType != (int)SubjectTypeEnum.新开店安装费 && subjectType != (int)SubjectTypeEnum.运费)
                 {
-                    new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId, subjectType);
+                    new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId);
                 }
                 string url = "ApproveList.aspx";
                 if (subjectType == (int)SubjectTypeEnum.正常单)

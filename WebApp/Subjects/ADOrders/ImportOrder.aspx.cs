@@ -3334,6 +3334,33 @@ namespace WebApp.Subjects.ADOrders
                 priceOrderBll.Delete(s => s.SubjectId == subjectId);
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
+
+                Dictionary<string, string> regionChangeDic = new Dictionary<string, string>();
+                string tempStr = string.Empty;
+                try
+                {
+                    tempStr = ConfigurationManager.AppSettings["RegionChangeLanguage"];
+                }
+                catch { }
+                if (!string.IsNullOrWhiteSpace(tempStr))
+                {
+                    List<string> list1 = StringHelper.ToStringList(tempStr, '|');
+                    if (list1.Any())
+                    {
+                        list1.ForEach(s =>
+                        {
+                            string eng = s.Split(':')[0];
+                            string ch = s.Split(':')[1];
+                            if (!regionChangeDic.Keys.Contains(eng))
+                            {
+                                regionChangeDic.Add(eng, ch);
+                            }
+                        });
+                    }
+                }
+
+
+
                 DataColumnCollection cols = ds.Tables[0].Columns;
                 DataTable errorTB = CommonMethod.CreateErrorTB(cols);
                 int shopId = 0;
@@ -3401,6 +3428,14 @@ namespace WebApp.Subjects.ADOrders
                     {
                         canSave = false;
                         msg.Append("备注不能空；");
+                    }
+                    if (!string.IsNullOrWhiteSpace(Region))
+                    {
+                        if (regionChangeDic.Keys.Count > 0 && regionChangeDic.Keys.Contains(Region))
+                        {
+                            Region = regionChangeDic[Region];
+                        }
+                        Region = Region.Substring(0, 1).ToUpper() + Region.Substring(1).ToLower();
                     }
                     if (canSave)
                     {

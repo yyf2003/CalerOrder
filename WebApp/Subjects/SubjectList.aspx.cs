@@ -480,8 +480,10 @@ namespace WebApp.Subjects
                                 model.DeleteDate = DateTime.Now;
                                 subjectBll.Update(model);
 
-                               
-
+                                if ((model.IsSecondInstall ?? false))
+                                {
+                                    ReSaveSecondInstallPrice(model.GuidanceId ?? 0);
+                                }
                                 OutsourceOrderDetailBLL outsourceOrderBll = new OutsourceOrderDetailBLL();
 
                                 List<int> shopIdList = new List<int>();
@@ -501,7 +503,7 @@ namespace WebApp.Subjects
                                         });
                                     }
                                     //从报价订单表删除
-                                    new QuoteOrderDetailBLL().Delete(s => s.RegionSupplementId == id);
+                                    //new QuoteOrderDetailBLL().Delete(s => s.RegionSupplementId == id);
                                     //从外协订单表删除
                                     outsourceOrderBll.Delete(s => s.RegionSupplementId == id);
                                 }
@@ -521,7 +523,7 @@ namespace WebApp.Subjects
 
                                     }
                                     //从报价订单表删除
-                                    new QuoteOrderDetailBLL().Delete(s => s.SubjectId == id);
+                                    //new QuoteOrderDetailBLL().Delete(s => s.SubjectId == id);
                                     //从外协订单表删除
                                     outsourceOrderBll.Delete(s => s.SubjectId == id);
                                 }
@@ -551,8 +553,16 @@ namespace WebApp.Subjects
                                     {
                                         if ((guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guianceModel.HasInstallFees ?? true)))
                                         {
-                                            RecountInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算活动安装费
-                                            ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费
+                                            if ((model.IsSecondInstall ?? false))
+                                            {
+                                                ReSaveSecondInstallPrice(model.GuidanceId ?? 0);//重新计算活动安装费(二次安装)
+                                                ResetOutsourceSecondInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费(二次安装)
+                                            }
+                                            else
+                                            {
+                                                RecountInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算活动安装费
+                                                ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费
+                                            }
                                         }
                                         else if (guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guianceModel.HasExperssFees ?? true))
                                         {

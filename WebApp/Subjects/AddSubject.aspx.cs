@@ -32,6 +32,7 @@ namespace WebApp.Subjects
             if (!IsPostBack)
             {
                 BindMyCustomerList(ddlCustomer);
+                BindSBCInstallType();
                 if (subjectId == 0)
                 {
                     BindOrderType();
@@ -208,6 +209,7 @@ namespace WebApp.Subjects
                         ddlCustomer.SelectedValue = subjectModel.CustomerId.ToString();
                         BindOrderType();
                         BindGuidanceList();
+                        rblSubjectType.Enabled = false;
                     }
                     
                     //string name = System.Web.HttpUtility.UrlDecode(subjectModel.SubjectName, System.Text.Encoding.UTF8);
@@ -238,14 +240,11 @@ namespace WebApp.Subjects
                         rblPriceBlong.SelectedValue = subjectModel.PriceBlongRegion;
 
                     }
-                    //if ((subjectModel.IsSecondInstall??false))
-                    //{
-                    //    cbIsSecondInstall.Checked = true;
-                    //    if (!(subjectModel.HasSecondInstallPrice??true))
-                    //    {
-                    //        cbNoSecondInstallPrice.Checked = true;
-                    //    }
-                    //}
+                    if ((subjectModel.IsSecondInstall ?? false))
+                    {
+                        cbIsSecondInstall.Checked = true;
+                        rblSecondInstallType.SelectedValue = (subjectModel.SecondBasicInstallPriceType ?? 1).ToString();
+                    }
                     if (subjectModel.Status == 4)
                     {
                         rblSubjectType.Enabled = false;
@@ -305,18 +304,19 @@ namespace WebApp.Subjects
                 subjectModel.SubjectType = int.Parse(rblSubjectType.SelectedValue);
             else
                 subjectModel.SubjectType = 1;//默认是pop订单
-            //if (cbIsSecondInstall.Checked)
-            //{
-            //    subjectModel.IsSecondInstall = true;
-            //    subjectModel.HasSecondInstallPrice = !cbNoSecondInstallPrice.Checked;
-            //}
-            //else
-            //{
-            //    subjectModel.IsSecondInstall = false;
-            //    subjectModel.HasSecondInstallPrice =null;
-            //}
-
-            //subjectModel.IsSecondInstall = cbIsSecondInstall.Checked;
+            if (cbIsSecondInstall.Checked)
+            {
+                subjectModel.IsSecondInstall = true;
+                if (rblSecondInstallType.SelectedIndex > 0)
+                    subjectModel.SecondBasicInstallPriceType = int.Parse(rblSecondInstallType.SelectedValue);
+                else
+                    subjectModel.SecondBasicInstallPriceType = 1;
+            }
+            else
+            {
+                subjectModel.IsSecondInstall = false;
+                subjectModel.SecondBasicInstallPriceType = null;
+            }
 
             if (subjectId > 0)
             {
@@ -451,9 +451,19 @@ namespace WebApp.Subjects
                     subjectModel.RegionOrderType = 1;
                     if (!string.IsNullOrWhiteSpace(rblRegion.SelectedValue))
                         subjectModel.Region = rblRegion.SelectedValue;
-                    //if (!string.IsNullOrWhiteSpace(rblSubjectType.SelectedValue))
-                    //    subjectModel.SubjectType = int.Parse(rblSubjectType.SelectedValue);
-                    //else
+                    if (cbIsSecondInstall.Checked)
+                    {
+                        subjectModel.IsSecondInstall = true;
+                        if (rblSecondInstallType.SelectedIndex > 0)
+                            subjectModel.SecondBasicInstallPriceType = int.Parse(rblSecondInstallType.SelectedValue);
+                        else
+                            subjectModel.SecondBasicInstallPriceType = 1;
+                    }
+                    else
+                    {
+                        subjectModel.IsSecondInstall = false;
+                        subjectModel.SecondBasicInstallPriceType = null;
+                    }
                     subjectModel.SubjectType = 1;//默认是pop订单
                     if (subjectId > 0)
                     {
@@ -570,6 +580,7 @@ namespace WebApp.Subjects
             {
                 cbNoOrderList.Enabled = true;
                 rblRegion.Enabled = true;
+                trSecondInstall.Style.Add("display","");
             }
             else
             {
@@ -580,6 +591,11 @@ namespace WebApp.Subjects
                 rblRegion.Enabled = false;
                 Panel1.Visible = false;
                 Panel2.Visible = true;
+                
+                cbIsSecondInstall.Checked = false;
+                if (rblSecondInstallType.SelectedItem != null)
+                    rblSecondInstallType.SelectedItem.Selected = false;
+                trSecondInstall.Style.Add("display", "none");
             }
             //if (orderType == (int)SubjectTypeEnum.补单)
             //{
@@ -621,6 +637,16 @@ namespace WebApp.Subjects
             }
         }
 
+        void BindSBCInstallType()
+        {
+            var list = CommonMethod.GetEnumList<SecondInstallInstallTypeEnum>();
+            list.ForEach(s => {
+                ListItem li = new ListItem();
+                li.Value = s.Value.ToString();
+                li.Text = s.Desction + "&nbsp;&nbsp;";
+                rblSecondInstallType.Items.Add(li);
+            });
+        }
 
     }
 }

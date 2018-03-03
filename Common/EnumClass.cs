@@ -149,12 +149,13 @@ namespace Common
     /// <summary>
     /// 外协分单配置选项
     /// </summary>
-    public enum OutsourceOrderConfigType {
+    public enum OutsourceOrderConfigType
+    {
         /// <summary>
         /// 材质选项
         /// </summary>
         [Description("材质")]
-        Material=1,
+        Material = 1,
         /// <summary>
         /// 不算安装费
         /// </summary>
@@ -165,8 +166,8 @@ namespace Common
         /// </summary>
         [Description("不算快递费")]
         NoExpressPrice,
-        
-        
+
+
 
     }
 
@@ -243,7 +244,7 @@ namespace Common
         /// </summary>
         [Description("删除")]
         Delete,
-        
+
     }
 
     /// <summary>
@@ -306,9 +307,20 @@ namespace Common
     public enum QuoteOrderSettingTypeEnum
     {
         [Description("百分比")]
-        Percent=1,
+        Percent = 1,
         [Description("数值")]
         Amount,
+    }
+
+    /// <summary>
+    /// 二次安装费类型
+    /// </summary>
+    public enum SecondInstallInstallTypeEnum
+    {
+        [Description("全部150")]
+        basic = 1,
+        [Description("T1-T3级别150，T4-T7按实际算")]
+        highLevel = 2,
     }
 }
 

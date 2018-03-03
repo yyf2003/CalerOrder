@@ -99,6 +99,7 @@ namespace WebApp.Subjects.InstallPrice
                                  && subject.SubjectType != (int)SubjectTypeEnum.二次安装
                                  && subject.SubjectType != (int)SubjectTypeEnum.费用订单
                                  && subject.SubjectType != (int)SubjectTypeEnum.新开店安装费
+                                 && (subject.IsSecondInstall ?? false) == false
                                  && ((order.IsInstall != null && order.IsInstall == "Y" && (subject.CornerType == null || subject.CornerType == "" || subject.CornerType != "三叶草")) || (subject.CornerType == "三叶草" && order.BCSIsInstall != null && order.BCSIsInstall == "Y"))
 
                                  select new { order, shop, subject }).ToList();
@@ -649,6 +650,7 @@ namespace WebApp.Subjects.InstallPrice
                         where subject.GuidanceId == guidanceId && (subject.IsDelete == null || subject.IsDelete == false)
                         && subject.ApproveState == 1
                         && (subject.SubjectType != (int)SubjectTypeEnum.二次安装 && subject.SubjectType != (int)SubjectTypeEnum.补单)
+                        && (subject.IsSecondInstall??false)==false
                         && ((order.OrderType == (int)OrderTypeEnum.POP && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || (order.OrderType == (int)OrderTypeEnum.道具))
                         select new { shop, subject }).ToList();
             if (regions.Any())

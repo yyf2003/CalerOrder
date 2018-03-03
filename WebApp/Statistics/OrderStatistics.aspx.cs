@@ -1401,12 +1401,12 @@ namespace WebApp.Statistics
                 labNewShopInstallPrice.Attributes.Add("name", "checkNewShopInstallPrice");
 
             }
-            //if (freightPrice > 0)
-            //{
-            //    labFreight.Text = Math.Round(freightPrice, 2) + "元";
-            //    labFreight.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
-            //    labFreight.Attributes.Add("name", "checkOtherPrice");
-            //}
+            if (freightPrice > 0)
+            {
+                labFreight.Text = Math.Round(freightPrice, 2) + "元";
+                labFreight.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
+                labFreight.Attributes.Add("name", "checkOtherPrice");
+            }
 
             if (regionInstallPrice > 0)
             {

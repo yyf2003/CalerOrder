@@ -539,7 +539,7 @@ namespace WebApp.Subjects.RegionSubject
                 //Sent();
                 if (result == 1)
                 {
-                    new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId, subjectType);
+                    new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId);
                 }
                 Alert("审批成功！", "ApproveList.aspx");
             }

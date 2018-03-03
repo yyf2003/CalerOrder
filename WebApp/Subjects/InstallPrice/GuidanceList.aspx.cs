@@ -106,6 +106,7 @@ namespace WebApp.Subjects.InstallPrice
                                    && (subject.IsDelete == null || subject.IsDelete == false)
                                    && subject.ApproveState == 1
                                    && subject.SubjectType != (int)SubjectTypeEnum.费用订单
+                                   && (subject.IsSecondInstall??false)==false
                                    && ((order.IsInstall == "Y" && (subject.CornerType == null || subject.CornerType == "" || subject.CornerType != "三叶草")) || (subject.CornerType == "三叶草" && order.BCSIsInstall == "Y"))
                                    select order).ToList();
             installPriceShopList = InstallPriceShopInfoBll.GetList(s => currPageGuidanceIdList.Contains(s.GuidanceId ?? 0));

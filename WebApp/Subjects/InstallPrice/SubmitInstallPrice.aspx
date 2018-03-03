@@ -22,7 +22,9 @@
     <asp:ScriptManager ID="ScriptManager1" runat="server">
     </asp:ScriptManager>
     <div class="nav_title">
+    <a href="/index.aspx">
         <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" />
+        </a>
         <p class="nav_table_p">
             提交安装费
             <asp:Label ID="labTitle" runat="server" Text="" Style="font-weight: normal;"></asp:Label>

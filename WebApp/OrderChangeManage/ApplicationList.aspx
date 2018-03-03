@@ -45,12 +45,10 @@
                 </asp:TemplateField>
                 
                 <asp:BoundField DataField="ItemName" HeaderText="活动名称"/>
-                <asp:BoundField DataField="RealName" HeaderText="申请人" HeaderStyle-Width="80px">
-<HeaderStyle Width="80px"></HeaderStyle>
-                </asp:BoundField>
-                <asp:BoundField DataField="AddDate" HeaderText="申请时间" HeaderStyle-Width="180px">
+                <asp:BoundField DataField="RealName" HeaderText="申请人" HeaderStyle-Width="80px"/>
 
-                </asp:BoundField>
+                <asp:BoundField DataField="AddDate" HeaderText="申请时间" HeaderStyle-Width="150px"/>
+
                 <asp:TemplateField HeaderText="状态">
                     <ItemTemplate>
                         <asp:Label ID="labState" runat="server" Text=""></asp:Label>
@@ -63,7 +61,12 @@
                     </ItemTemplate>
                     <HeaderStyle Width="70px"></HeaderStyle>
                 </asp:TemplateField>
-                
+                <asp:TemplateField HeaderText="处理状态">
+                    <ItemTemplate>
+                        <asp:Label ID="labHandleState" runat="server" Text=""></asp:Label>
+                    </ItemTemplate>
+                    <HeaderStyle Width="70px"></HeaderStyle>
+                </asp:TemplateField>
                 <asp:TemplateField HeaderText="查看">
                     <ItemTemplate>
                         <asp:LinkButton CommandArgument='<%#Eval("Id") %>' CommandName="Check" ID="lbCheck"

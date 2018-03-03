@@ -377,21 +377,22 @@
       <tr class="tr_hui">
         <td style=" width:120px;">店铺数量：</td>
         <td style=" width:120px; text-align:left; padding-left:5px;">
-            <asp:Label ID="labShopCount" runat="server" Text=""></asp:Label>
+            <asp:Label ID="labShopCount" runat="server" Text="0"></asp:Label>
         </td>
         <td style=" width:120px;">总面积：</td>
         <td style=" width:150px; text-align:left; padding-left:5px;">
-           <asp:Label ID="labTotalArea" runat="server" Text=""></asp:Label>
+           <asp:Label ID="labTotalArea" runat="server" Text="0"></asp:Label>
         </td>
         <td style=" width:120px;">POP总金额：</td>
         <td style=" text-align:left; padding-left:5px;">
-           <asp:Label ID="labTotalPrice" runat="server" Text=""></asp:Label>
+           <asp:Label ID="labTotalPrice" runat="server" Text="0"></asp:Label>
         </td>
       </tr>
     </table>
     <div style="text-align: center; margin-top :30px;">
         <asp:Button ID="btnSubmit" runat="server" Text="确定提交" class="easyui-linkbutton" Style="width: 65px;
-            height: 26px;" OnClick="btnSubmit_Click" />
+            height: 26px;" OnClick="btnSubmit_Click" OnClientClick="return checkSubmit(this)"/>
+        <img src="../../image/WaitImg/loadingA.gif" style=" display:none;"/>
         &nbsp;&nbsp;&nbsp;
         <asp:Button ID="btnReSplit" runat="server" Text="上一步" class="easyui-linkbutton" Style="width: 65px;
             height: 26px;" OnClick="btnReSplit_Click" />
@@ -448,6 +449,8 @@
         }, 1000);
     }
 
-
+    function checkSubmit(obj) {
+        $(obj).next("img").show();
+    }
     
 </script>

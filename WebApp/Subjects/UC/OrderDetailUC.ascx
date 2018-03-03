@@ -24,13 +24,13 @@
             <td class="style1">
                 项目编号
             </td>
-            <td style="text-align: left; padding-left: 5px;" class="style2">
+            <td style="text-align: left; padding-left: 5px;">
                 <asp:Label ID="labSubjectNo" runat="server" Text=""></asp:Label>
             </td>
             <td class="style1">
                 项目名称
             </td>
-            <td style="text-align: left; padding-left: 5px;" class="style3">
+            <td style="text-align: left; padding-left: 5px;">
                 <asp:Label ID="labSubjectName" runat="server" Text=""></asp:Label>
             </td>
         </tr>
@@ -41,7 +41,7 @@
             <td style="text-align: left; padding-left: 5px; width: 300px;">
                 <asp:Label ID="labBeginDate" runat="server" Text=""></asp:Label>
             </td>
-            <td style="width: 120px;">
+            <td style="width: 150px;">
                 结束时间
             </td>
             <td style="text-align: left; padding-left: 5px;">
@@ -74,6 +74,20 @@
             </td>
             <td style="text-align: left; padding-left: 5px;">
                 <asp:Label ID="labPriceBlong" runat="server" Text=""></asp:Label>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td>
+                是否二次安装
+            </td>
+            <td  style="text-align: left; padding-left: 5px;">
+                <asp:Label ID="labIsSecondInstall" runat="server" Text=""></asp:Label>
+            </td>
+            <td style="width: 120px;">
+                二次基础安装费类型
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <asp:Label ID="labSecondInstallType" runat="server" Text=""></asp:Label>
             </td>
         </tr>
         <tr class="tr_bai">

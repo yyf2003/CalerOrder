@@ -152,7 +152,7 @@ namespace WebApp.Subjects.ADOrders
         {
             bool canSubmit = true;
             string area = labTotalArea.Text;
-            if (area == "0")
+            if (string.IsNullOrWhiteSpace(area) || area == "0")
             {
                 canSubmit = false;
                 ExcuteJs("SubmintFail");
