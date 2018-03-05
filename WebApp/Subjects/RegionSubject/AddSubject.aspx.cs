@@ -24,6 +24,7 @@ namespace WebApp.Subjects.RegionSubject
             if (!IsPostBack)
             {
                 BindMyCustomerList(ddlCustomer);
+                BindSBCInstallType();
                 if (subjectId == 0)
                 {
                     BindOrderType();
@@ -70,7 +71,11 @@ namespace WebApp.Subjects.RegionSubject
                     txtEndDate.Text = DateTime.Parse(model.EndDate.ToString()).ToShortDateString();
                 
                 rblRegion.SelectedValue = model.SupplementRegion;
-                
+                if ((model.IsSecondInstall ?? false))
+                {
+                    cbIsSecondInstall.Checked = true;
+                    rblSecondInstallType.SelectedValue = (model.SecondBasicInstallPriceType ?? 1).ToString();
+                }
                 txtRemark.Text = model.Remark;
             }
         }
@@ -136,6 +141,17 @@ namespace WebApp.Subjects.RegionSubject
             //}
         }
 
+        void BindSBCInstallType()
+        {
+            var list = CommonMethod.GetEnumList<SecondInstallInstallTypeEnum>();
+            list.ForEach(s =>
+            {
+                ListItem li = new ListItem();
+                li.Value = s.Value.ToString();
+                li.Text = s.Desction + "&nbsp;&nbsp;";
+                rblSecondInstallType.Items.Add(li);
+            });
+        }
 
         void BindOrderType()
         {
@@ -315,6 +331,19 @@ namespace WebApp.Subjects.RegionSubject
             subjectModel.HandMakeSubjectId = realSubjectId;
             subjectModel.SubjectType = subjectType;//
             subjectModel.GuidanceId = int.Parse(ddlGuidance.SelectedValue);
+            if (cbIsSecondInstall.Checked)
+            {
+                subjectModel.IsSecondInstall = true;
+                if (rblSecondInstallType.SelectedIndex > 0)
+                    subjectModel.SecondBasicInstallPriceType = int.Parse(rblSecondInstallType.SelectedValue);
+                else
+                    subjectModel.SecondBasicInstallPriceType = 1;
+            }
+            else
+            {
+                subjectModel.IsSecondInstall = false;
+                subjectModel.SecondBasicInstallPriceType = null;
+            }
             if (subjectId > 0)
             {
                 subjectBll.Update(subjectModel);

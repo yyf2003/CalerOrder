@@ -596,13 +596,10 @@ namespace WebApp.Customer
                     bool isShut = false;
                     bool isInstall0 = false;
                     isexist = CheckShop(shopNo, out shopId, out isShut, out isInstall0);
-                    if (!isexist)
+                    if (!isexist && !string.IsNullOrWhiteSpace(shopName) && ShopNameIsExist(shopName))
                     {
-                        if (ShopNameIsExist(shopName))
-                        {
-                            canSave = false;
-                            errorMsg.Append("店铺名称已存在；");
-                        }
+                        canSave = false;
+                        errorMsg.Append("店铺名称已存在；");
                     }
                     if (canSave)
                     {

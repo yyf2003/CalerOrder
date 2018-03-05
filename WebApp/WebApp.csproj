@@ -1319,6 +1319,7 @@
     <Content Include="OrderChangeManage\AddNewApplication.aspx" />
     <Content Include="OrderChangeManage\ApplicationApproveList.aspx" />
     <Content Include="OrderChangeManage\CheckApplicationDetail.aspx" />
+    <Content Include="OrderChangeManage\HandleSubjectList.aspx" />
     <Content Include="OrderChangeManage\js\applicationList.js" />
     <Content Include="Outsource\BasicMaterial\List.aspx" />
     <Content Include="Outsource\BasicMaterial\list.js" />
@@ -2732,6 +2733,13 @@
     </Compile>
     <Compile Include="OrderChangeManage\CheckApplicationDetail.aspx.designer.cs">
       <DependentUpon>CheckApplicationDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OrderChangeManage\HandleSubjectList.aspx.cs">
+      <DependentUpon>HandleSubjectList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OrderChangeManage\HandleSubjectList.aspx.designer.cs">
+      <DependentUpon>HandleSubjectList.aspx</DependentUpon>
     </Compile>
     <Compile Include="Outsource\BasicMaterial\Handler1.ashx.cs">
       <DependentUpon>Handler1.ashx</DependentUpon>

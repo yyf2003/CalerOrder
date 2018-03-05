@@ -2926,6 +2926,7 @@
           <EntitySet Name="SmallMaterialMapping" EntityType="KalerOrderDBModel.SmallMaterialMapping" />
           <EntitySet Name="SplitOrderDetailPerShop" EntityType="KalerOrderDBModel.SplitOrderDetailPerShop" />
           <EntitySet Name="SplitOrderPlanDetail" EntityType="KalerOrderDBModel.SplitOrderPlanDetail" />
+          <EntitySet Name="Subject" EntityType="KalerOrderDBModel.Subject" />
           <EntitySet Name="SubjectGuidance" EntityType="KalerOrderDBModel.SubjectGuidance" />
           <EntitySet Name="SubjectLog" EntityType="KalerOrderDBModel.SubjectLog" />
           <EntitySet Name="SubjectType" EntityType="KalerOrderDBModel.SubjectType" />
@@ -2941,7 +2942,6 @@
           <EntitySet Name="UserInRegion" EntityType="KalerOrderDBModel.UserInRegion" />
           <EntitySet Name="UserInRole" EntityType="KalerOrderDBModel.UserInRole" />
           <EntitySet Name="UserLevel" EntityType="KalerOrderDBModel.UserLevel" />
-          <EntitySet Name="Subject" EntityType="KalerOrderDBModel.Subject" />
         </EntityContainer>
         <EntityType Name="AccountCheckSupplement">
           <Key>
@@ -5308,6 +5308,55 @@
           <Property Type="Boolean" Name="WindowStick" />
           <Property Type="String" Name="WindowType" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="Subject">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="SubjectType" />
+          <Property Type="String" Name="SubjectName" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="OutSubjectName" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="SubjectNo" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="AddOrderType" />
+          <Property Type="String" Name="Contact" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Tel" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="CompanyId" />
+          <Property Type="Int32" Name="CustomerId" />
+          <Property Type="DateTime" Name="BeginDate" />
+          <Property Type="DateTime" Name="EndDate" />
+          <Property Type="Int32" Name="AddUserId" />
+          <Property Type="DateTime" Name="AddDate" />
+          <Property Type="Int32" Name="Status" />
+          <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="ApproveState" />
+          <Property Type="Int32" Name="ApproveUserId" />
+          <Property Type="DateTime" Name="ApproveDate" />
+          <Property Type="String" Name="ApproveRemark" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="Boolean" Name="IsDelete" />
+          <Property Type="String" Name="SplitPlanIds" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="SaleCost" Precision="18" Scale="0" />
+          <Property Type="Decimal" Name="PredictCost" Precision="18" Scale="0" />
+          <Property Type="Int32" Name="GuidanceId" />
+          <Property Type="Int32" Name="ActivityId" />
+          <Property Type="Int32" Name="SubjectTypeId" />
+          <Property Type="Int32" Name="IsHandMade" />
+          <Property Type="Int32" Name="IsInstall" />
+          <Property Type="Int32" Name="SubjectCategoryId" />
+          <Property Type="Int32" Name="HandMakeSubjectId" />
+          <Property Type="Boolean" Name="HasHC" />
+          <Property Type="Decimal" Name="SecondInstallPrice" Precision="18" Scale="2" />
+          <Property Type="String" Name="Region" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="SupplementRegion" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="DateTime" Name="DeleteDate" />
+          <Property Type="Int32" Name="RegionOrderType" />
+          <Property Type="Int32" Name="SubmitUserId" />
+          <Property Type="String" Name="PriceBlongRegion" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="CornerType" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Boolean" Name="IsRead" />
+          <Property Type="Int32" Name="OutsourceId" />
+          <Property Type="Boolean" Name="IsSecondInstall" />
+          <Property Type="Int32" Name="SecondBasicInstallPriceType" />
+        </EntityType>
         <EntityType Name="SubjectGuidance">
           <Key>
             <PropertyRef Name="ItemId" />
@@ -5513,55 +5562,6 @@
           </Key>
           <Property Type="Int32" Name="LevelId" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Type="String" Name="LevelName" MaxLength="50" FixedLength="false" Unicode="false" />
-        </EntityType>
-        <EntityType Name="Subject">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="Int32" Name="SubjectType" />
-          <Property Type="String" Name="SubjectName" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Type="String" Name="OutSubjectName" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="SubjectNo" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Int32" Name="AddOrderType" />
-          <Property Type="String" Name="Contact" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Tel" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Int32" Name="CompanyId" />
-          <Property Type="Int32" Name="CustomerId" />
-          <Property Type="DateTime" Name="BeginDate" />
-          <Property Type="DateTime" Name="EndDate" />
-          <Property Type="Int32" Name="AddUserId" />
-          <Property Type="DateTime" Name="AddDate" />
-          <Property Type="Int32" Name="Status" />
-          <Property Type="String" Name="Remark" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Type="Int32" Name="ApproveState" />
-          <Property Type="Int32" Name="ApproveUserId" />
-          <Property Type="DateTime" Name="ApproveDate" />
-          <Property Type="String" Name="ApproveRemark" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Type="Boolean" Name="IsDelete" />
-          <Property Type="String" Name="SplitPlanIds" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Type="Decimal" Name="SaleCost" Precision="18" Scale="0" />
-          <Property Type="Decimal" Name="PredictCost" Precision="18" Scale="0" />
-          <Property Type="Int32" Name="GuidanceId" />
-          <Property Type="Int32" Name="ActivityId" />
-          <Property Type="Int32" Name="SubjectTypeId" />
-          <Property Type="Int32" Name="IsHandMade" />
-          <Property Type="Int32" Name="IsInstall" />
-          <Property Type="Int32" Name="SubjectCategoryId" />
-          <Property Type="Int32" Name="HandMakeSubjectId" />
-          <Property Type="Boolean" Name="HasHC" />
-          <Property Type="Decimal" Name="SecondInstallPrice" Precision="18" Scale="2" />
-          <Property Type="String" Name="Region" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="SupplementRegion" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="DateTime" Name="DeleteDate" />
-          <Property Type="Int32" Name="RegionOrderType" />
-          <Property Type="Int32" Name="SubmitUserId" />
-          <Property Type="String" Name="PriceBlongRegion" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="CornerType" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Boolean" Name="IsRead" />
-          <Property Type="Int32" Name="OutsourceId" />
-          <Property Type="Boolean" Name="IsSecondInstall" />
-          <Property Type="Int32" Name="SecondBasicInstallPriceType" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -8056,6 +8056,56 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Subject">
+            <EntityTypeMapping TypeName="KalerOrderDBModel.Subject">
+              <MappingFragment StoreEntitySet="Subject">
+                <ScalarProperty Name="SecondBasicInstallPriceType" ColumnName="SecondBasicInstallPriceType" />
+                <ScalarProperty Name="IsSecondInstall" ColumnName="IsSecondInstall" />
+                <ScalarProperty Name="OutsourceId" ColumnName="OutsourceId" />
+                <ScalarProperty Name="IsRead" ColumnName="IsRead" />
+                <ScalarProperty Name="CornerType" ColumnName="CornerType" />
+                <ScalarProperty Name="PriceBlongRegion" ColumnName="PriceBlongRegion" />
+                <ScalarProperty Name="SubmitUserId" ColumnName="SubmitUserId" />
+                <ScalarProperty Name="RegionOrderType" ColumnName="RegionOrderType" />
+                <ScalarProperty Name="DeleteDate" ColumnName="DeleteDate" />
+                <ScalarProperty Name="SupplementRegion" ColumnName="SupplementRegion" />
+                <ScalarProperty Name="Region" ColumnName="Region" />
+                <ScalarProperty Name="SecondInstallPrice" ColumnName="SecondInstallPrice" />
+                <ScalarProperty Name="HasHC" ColumnName="HasHC" />
+                <ScalarProperty Name="HandMakeSubjectId" ColumnName="HandMakeSubjectId" />
+                <ScalarProperty Name="SubjectCategoryId" ColumnName="SubjectCategoryId" />
+                <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
+                <ScalarProperty Name="IsHandMade" ColumnName="IsHandMade" />
+                <ScalarProperty Name="SubjectTypeId" ColumnName="SubjectTypeId" />
+                <ScalarProperty Name="ActivityId" ColumnName="ActivityId" />
+                <ScalarProperty Name="GuidanceId" ColumnName="GuidanceId" />
+                <ScalarProperty Name="PredictCost" ColumnName="PredictCost" />
+                <ScalarProperty Name="SaleCost" ColumnName="SaleCost" />
+                <ScalarProperty Name="SplitPlanIds" ColumnName="SplitPlanIds" />
+                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+                <ScalarProperty Name="ApproveRemark" ColumnName="ApproveRemark" />
+                <ScalarProperty Name="ApproveDate" ColumnName="ApproveDate" />
+                <ScalarProperty Name="ApproveUserId" ColumnName="ApproveUserId" />
+                <ScalarProperty Name="ApproveState" ColumnName="ApproveState" />
+                <ScalarProperty Name="Remark" ColumnName="Remark" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+                <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="BeginDate" ColumnName="BeginDate" />
+                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
+                <ScalarProperty Name="Tel" ColumnName="Tel" />
+                <ScalarProperty Name="Contact" ColumnName="Contact" />
+                <ScalarProperty Name="AddOrderType" ColumnName="AddOrderType" />
+                <ScalarProperty Name="SubjectNo" ColumnName="SubjectNo" />
+                <ScalarProperty Name="OutSubjectName" ColumnName="OutSubjectName" />
+                <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
+                <ScalarProperty Name="SubjectType" ColumnName="SubjectType" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="SubjectGuidance">
             <EntityTypeMapping TypeName="KalerOrderDBModel.SubjectGuidance">
               <MappingFragment StoreEntitySet="SubjectGuidance">
@@ -8277,56 +8327,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Subject">
-            <EntityTypeMapping TypeName="KalerOrderDBModel.Subject">
-              <MappingFragment StoreEntitySet="Subject">
-                <ScalarProperty Name="SecondBasicInstallPriceType" ColumnName="SecondBasicInstallPriceType" />
-                <ScalarProperty Name="IsSecondInstall" ColumnName="IsSecondInstall" />
-                <ScalarProperty Name="OutsourceId" ColumnName="OutsourceId" />
-                <ScalarProperty Name="IsRead" ColumnName="IsRead" />
-                <ScalarProperty Name="CornerType" ColumnName="CornerType" />
-                <ScalarProperty Name="PriceBlongRegion" ColumnName="PriceBlongRegion" />
-                <ScalarProperty Name="SubmitUserId" ColumnName="SubmitUserId" />
-                <ScalarProperty Name="RegionOrderType" ColumnName="RegionOrderType" />
-                <ScalarProperty Name="DeleteDate" ColumnName="DeleteDate" />
-                <ScalarProperty Name="SupplementRegion" ColumnName="SupplementRegion" />
-                <ScalarProperty Name="Region" ColumnName="Region" />
-                <ScalarProperty Name="SecondInstallPrice" ColumnName="SecondInstallPrice" />
-                <ScalarProperty Name="HasHC" ColumnName="HasHC" />
-                <ScalarProperty Name="HandMakeSubjectId" ColumnName="HandMakeSubjectId" />
-                <ScalarProperty Name="SubjectCategoryId" ColumnName="SubjectCategoryId" />
-                <ScalarProperty Name="IsInstall" ColumnName="IsInstall" />
-                <ScalarProperty Name="IsHandMade" ColumnName="IsHandMade" />
-                <ScalarProperty Name="SubjectTypeId" ColumnName="SubjectTypeId" />
-                <ScalarProperty Name="ActivityId" ColumnName="ActivityId" />
-                <ScalarProperty Name="GuidanceId" ColumnName="GuidanceId" />
-                <ScalarProperty Name="PredictCost" ColumnName="PredictCost" />
-                <ScalarProperty Name="SaleCost" ColumnName="SaleCost" />
-                <ScalarProperty Name="SplitPlanIds" ColumnName="SplitPlanIds" />
-                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
-                <ScalarProperty Name="ApproveRemark" ColumnName="ApproveRemark" />
-                <ScalarProperty Name="ApproveDate" ColumnName="ApproveDate" />
-                <ScalarProperty Name="ApproveUserId" ColumnName="ApproveUserId" />
-                <ScalarProperty Name="ApproveState" ColumnName="ApproveState" />
-                <ScalarProperty Name="Remark" ColumnName="Remark" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="AddDate" ColumnName="AddDate" />
-                <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
-                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
-                <ScalarProperty Name="BeginDate" ColumnName="BeginDate" />
-                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
-                <ScalarProperty Name="CompanyId" ColumnName="CompanyId" />
-                <ScalarProperty Name="Tel" ColumnName="Tel" />
-                <ScalarProperty Name="Contact" ColumnName="Contact" />
-                <ScalarProperty Name="AddOrderType" ColumnName="AddOrderType" />
-                <ScalarProperty Name="SubjectNo" ColumnName="SubjectNo" />
-                <ScalarProperty Name="OutSubjectName" ColumnName="OutSubjectName" />
-                <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
-                <ScalarProperty Name="SubjectType" ColumnName="SubjectType" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -8477,6 +8477,7 @@
         <EntityTypeShape EntityType="KalerOrderDBModel.SmallMaterialMapping" Width="1.5" PointX="34.75" PointY="15.75" Height="1.920227864583353" />
         <EntityTypeShape EntityType="KalerOrderDBModel.SplitOrderDetailPerShop" Width="1.5" PointX="34.75" PointY="18.75" Height="4.3225512695312318" />
         <EntityTypeShape EntityType="KalerOrderDBModel.SplitOrderPlanDetail" Width="1.5" PointX="34.75" PointY="24.75" Height="5.246521809895853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Subject" Width="1.5" PointX="34.75" PointY="30.75" Height="9.127198079427103" />
         <EntityTypeShape EntityType="KalerOrderDBModel.SubjectGuidance" Width="1.5" PointX="16.75" PointY="35.75" Height="6.7248746744792243" />
         <EntityTypeShape EntityType="KalerOrderDBModel.SubjectLog" Width="1.5" PointX="18.75" PointY="35.75" Height="2.2898160807292243" />
         <EntityTypeShape EntityType="KalerOrderDBModel.SubjectType" Width="1.5" PointX="26.75" PointY="35.75" Height="1.7354337565104743" />
@@ -8492,7 +8493,6 @@
         <EntityTypeShape EntityType="KalerOrderDBModel.UserInRegion" Width="1.5" PointX="36.75" PointY="23.75" Height="2.2898160807292243" />
         <EntityTypeShape EntityType="KalerOrderDBModel.UserInRole" Width="1.5" PointX="36.75" PointY="27.75" Height="1.5506396484374818" />
         <EntityTypeShape EntityType="KalerOrderDBModel.UserLevel" Width="1.5" PointX="36.75" PointY="30.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Subject" Width="1.5" PointX="35.375" PointY="33.75" Height="9.127198079427103" />
       </Diagram>
     </Diagrams>
   </Designer>

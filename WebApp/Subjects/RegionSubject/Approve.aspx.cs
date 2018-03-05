@@ -537,7 +537,11 @@ namespace WebApp.Subjects.RegionSubject
             {
                 //if (subjectType!=2)
                 //Sent();
-                if (result == 1)
+                //if (result == 1)
+                //{
+                //    new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId);
+                //}
+                if (result == 1 && subjectType != (int)SubjectTypeEnum.新开店安装费 && subjectType != (int)SubjectTypeEnum.运费)
                 {
                     new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId);
                 }

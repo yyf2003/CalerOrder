@@ -25,105 +25,108 @@
     <div class="tr">
         >>项目信息</div>
     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
-      <ContentTemplate>
-    <table class="table">
-        <tr class="tr_bai">
-            <td style="width: 120px;">
-               所属客户：
-            </td>
-            <td style="text-align: left; padding-left: 5px; width: 300px;">
-                <asp:DropDownList ID="ddlCustomer" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlCustomer_SelectedIndexChanged">
-                </asp:DropDownList>
-                <span style="color: Red;">*</span>
-            </td>
-            <td style="width: 120px;">
-                 订单类型：
-            </td>
-            <td style="text-align: left; padding-left: 5px;">
-               <asp:RadioButtonList ID="rblSubjectType" runat="server" RepeatDirection="Horizontal"
-                    RepeatLayout="Flow" AutoPostBack="true"
-                    onselectedindexchanged="rblSubjectType_SelectedIndexChanged">
-                </asp:RadioButtonList>
-                <span style="color: Red;">*</span>
-            </td>
-        </tr>
-        <tr class="tr_bai">
-            <td>
-                活动名称：
-            </td>
-            <td style="text-align: left; padding-left: 5px;">
-                <asp:DropDownList ID="ddlGuidance" runat="server"  AutoPostBack="true"
-                    onselectedindexchanged="ddlGuidance_SelectedIndexChanged">
-                    <asp:ListItem Value="-1">请选择</asp:ListItem>
-                </asp:DropDownList>
-                <span style="color: Red;">*</span>
-            </td>
-            <td>
-                项目名称：
-            </td>
-            <td style="text-align: left; padding-left: 5px;">
-                <asp:TextBox ID="txtSubjectName" runat="server" MaxLength="50" Style="width: 250px;"></asp:TextBox>
-                <asp:DropDownList ID="ddlSubjectName" runat="server" Visible="false">
-                   <asp:ListItem Value="0">--请选择项目--</asp:ListItem>
-                </asp:DropDownList>
-                <span style="color: Red;">*</span>
-                <asp:Label ID="labMsg" runat="server" Text="" Style="color: Red;"></asp:Label>
-            </td>
-        </tr>
-        <tr class="tr_bai">
-            <td>
-                开始时间：
-            </td>
-            <td style="text-align: left; padding-left: 5px; width: 300px;">
-                <asp:TextBox ID="txtBeginDate" runat="server" onclick="WdatePicker()" MaxLength="20"></asp:TextBox>
-                <span style="color: Red;">*</span>
-            </td>
-            <td style="width: 120px;">
-                结束时间：
-            </td>
-            <td style="text-align: left; padding-left: 5px;">
-                <asp:TextBox ID="txtEndDate" runat="server" onclick="WdatePicker()" MaxLength="20"></asp:TextBox>
-                <span style="color: Red;">*</span>
-            </td>
-        </tr>
-        <tr class="tr_bai">
-            
-            <td>
-                区域：
-            </td>
-            <td colspan="3" style="text-align: left; padding-left: 5px;">
-                <asp:RadioButtonList ID="rblRegion" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
-                </asp:RadioButtonList>
-                <span style="color: Red;">*</span>
-            </td>
-        </tr>
-        
-        <tr class="tr_bai">
-            <td>
-                备注：
-            </td>
-            <td colspan="3" style="text-align: left; padding-left: 5px;">
-                <asp:TextBox ID="txtRemark" runat="server" Style="width: 280px;"></asp:TextBox>
-            </td>
-        </tr>
-    </table>
-    <br />
-    
-     </ContentTemplate>
-     <Triggers>
-        <asp:AsyncPostBackTrigger ControlID="btnNext" EventName="click" />
-     </Triggers>
+        <ContentTemplate>
+            <table class="table">
+                <tr class="tr_bai">
+                    <td style="width: 120px;">
+                        所属客户：
+                    </td>
+                    <td style="text-align: left; padding-left: 5px; width: 300px;">
+                        <asp:DropDownList ID="ddlCustomer" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlCustomer_SelectedIndexChanged">
+                        </asp:DropDownList>
+                        <span style="color: Red;">*</span>
+                    </td>
+                    <td style="width: 120px;">
+                        订单类型：
+                    </td>
+                    <td style="text-align: left; padding-left: 5px;">
+                        <asp:RadioButtonList ID="rblSubjectType" runat="server" RepeatDirection="Horizontal"
+                            RepeatLayout="Flow" AutoPostBack="true" OnSelectedIndexChanged="rblSubjectType_SelectedIndexChanged">
+                        </asp:RadioButtonList>
+                        <span style="color: Red;">*</span>
+                    </td>
+                </tr>
+                <tr class="tr_bai">
+                    <td>
+                        活动名称：
+                    </td>
+                    <td style="text-align: left; padding-left: 5px;">
+                        <asp:DropDownList ID="ddlGuidance" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlGuidance_SelectedIndexChanged">
+                            <asp:ListItem Value="-1">请选择</asp:ListItem>
+                        </asp:DropDownList>
+                        <span style="color: Red;">*</span>
+                    </td>
+                    <td>
+                        项目名称：
+                    </td>
+                    <td style="text-align: left; padding-left: 5px;">
+                        <asp:TextBox ID="txtSubjectName" runat="server" MaxLength="50" Style="width: 250px;"></asp:TextBox>
+                        <asp:DropDownList ID="ddlSubjectName" runat="server" Visible="false">
+                            <asp:ListItem Value="0">--请选择项目--</asp:ListItem>
+                        </asp:DropDownList>
+                        <span style="color: Red;">*</span>
+                        <asp:Label ID="labMsg" runat="server" Text="" Style="color: Red;"></asp:Label>
+                    </td>
+                </tr>
+                <tr class="tr_bai">
+                    <td>
+                        开始时间：
+                    </td>
+                    <td style="text-align: left; padding-left: 5px; width: 300px;">
+                        <asp:TextBox ID="txtBeginDate" runat="server" onclick="WdatePicker()" MaxLength="20"></asp:TextBox>
+                        <span style="color: Red;">*</span>
+                    </td>
+                    <td style="width: 120px;">
+                        结束时间：
+                    </td>
+                    <td style="text-align: left; padding-left: 5px;">
+                        <asp:TextBox ID="txtEndDate" runat="server" onclick="WdatePicker()" MaxLength="20"></asp:TextBox>
+                        <span style="color: Red;">*</span>
+                    </td>
+                </tr>
+                <tr class="tr_bai">
+                    <td>
+                        区域：
+                    </td>
+                    <td style="text-align: left; padding-left: 5px;">
+                        <asp:RadioButtonList ID="rblRegion" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                        </asp:RadioButtonList>
+                        <span style="color: Red;">*</span>
+                    </td>
+                    <td>
+                        是否二次安装：
+                    </td>
+                    <td style="text-align: left; padding-left: 5px;">
+                        <asp:CheckBox ID="cbIsSecondInstall" runat="server" />是（安装费单独算）
+                         &nbsp;&nbsp;&nbsp;&nbsp;
+                        基础安装费类型：
+                        <asp:RadioButtonList ID="rblSecondInstallType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                         
+                        </asp:RadioButtonList>
+                    </td>
+                </tr>
+                <tr class="tr_bai">
+                    <td>
+                        备注：
+                    </td>
+                    <td colspan="3" style="text-align: left; padding-left: 5px;">
+                        <asp:TextBox ID="txtRemark" runat="server" Style="width: 280px;"></asp:TextBox>
+                    </td>
+                </tr>
+            </table>
+            <br />
+        </ContentTemplate>
+        <Triggers>
+            <asp:AsyncPostBackTrigger ControlID="btnNext" EventName="click" />
+        </Triggers>
     </asp:UpdatePanel>
     <div style="text-align: center; height: 35px;">
-       <asp:Button ID="btnNext" runat="server" Text="下一步" 
-            OnClientClick="return CheckVal()" class="easyui-linkbutton" 
-            style="width: 65px; height:26px;" onclick="btnNext_Click"/>
-            <img id="loadingImg" src="/image/WaitImg/loadingA.gif" style=" display:none;"/>
-            &nbsp;&nbsp;&nbsp;
-           
-           <asp:Button ID="btnReturn" runat="server" Text="返 回" 
-            class="easyui-linkbutton" style="width: 65px; height:26px;" 
-            onclick="btnReturn_Click"/>
+        <asp:Button ID="btnNext" runat="server" Text="下一步" OnClientClick="return CheckVal()"
+            class="easyui-linkbutton" Style="width: 65px; height: 26px;" OnClick="btnNext_Click" />
+        <img id="loadingImg" src="/image/WaitImg/loadingA.gif" style="display: none;" />
+        &nbsp;&nbsp;&nbsp;
+        <asp:Button ID="btnReturn" runat="server" Text="返 回" class="easyui-linkbutton" Style="width: 65px;
+            height: 26px;" OnClick="btnReturn_Click" />
     </div>
     </form>
 </body>

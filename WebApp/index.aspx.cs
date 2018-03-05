@@ -70,6 +70,19 @@ namespace WebApp
                         if (list1.Any())
                             div.Append("<span class='badge1'>" + list1.Count() + "</span>");//
                     }
+                    if (s.module.ModuleName.Contains("项目变更处理"))
+                    {
+                        int userId = new BasePage().CurrentUser.UserId;
+                        var list2 = from detail in CurrentContext.DbContext.OrderChangeApplicationDetail
+                                    join application in CurrentContext.DbContext.OrderChangeApplication
+                                    on detail.ApplicationId equals application.Id
+                                    where application.AddUserId == CurrentUser.UserId
+                                    && (application.IsDelete == null || application.IsDelete == false)
+                                    && (detail.State ?? 0) < 2
+                                    select detail;
+                        if (list2.Any())
+                            div.Append("<span class='badge1'>" + list2.Count() + "</span>");//
+                    }
                     div.AppendFormat("<div style='text-align:center;'>{0}</div>",s.module.ModuleName);
                     menu.AppendFormat("<li style='position:relative;'><a href='{0}'>{1}</a></li>", s.module.Url, div.ToString());
                 });

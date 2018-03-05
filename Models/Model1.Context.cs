@@ -153,6 +153,7 @@ namespace Models
         public DbSet<SmallMaterialMapping> SmallMaterialMapping { get; set; }
         public DbSet<SplitOrderDetailPerShop> SplitOrderDetailPerShop { get; set; }
         public DbSet<SplitOrderPlanDetail> SplitOrderPlanDetail { get; set; }
+        public DbSet<Subject> Subject { get; set; }
         public DbSet<SubjectGuidance> SubjectGuidance { get; set; }
         public DbSet<SubjectLog> SubjectLog { get; set; }
         public DbSet<SubjectType> SubjectType { get; set; }
@@ -168,6 +169,5 @@ namespace Models
         public DbSet<UserInRegion> UserInRegion { get; set; }
         public DbSet<UserInRole> UserInRole { get; set; }
         public DbSet<UserLevel> UserLevel { get; set; }
-        public DbSet<Subject> Subject { get; set; }
     }
 }
