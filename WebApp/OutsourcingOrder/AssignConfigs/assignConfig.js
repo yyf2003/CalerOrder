@@ -1,5 +1,6 @@
 ﻿
-
+var currChannel = "";
+var currFormat = "";
 var currRegion = 0;
 var currProvinceId = "";
 var currCityId = "";
@@ -13,7 +14,7 @@ $(function () {
 
     $("#btnAdd").click(function () {
         ClearVal();
-
+        Confing.getChannel();
         Confing.getRegionList();
 
         layer.open({
@@ -51,6 +52,9 @@ $(function () {
         }
         if (rows) {
             Confing.model.Id = rows[0].Id;
+            currChannel = rows[0].Channel;
+            currFormat = rows[0].Format;
+            Confing.getChannel();
             currRegion = rows[0].RegionId;
             currProvinceId = rows[0].ProvinceId;
             currCityId = rows[0].CityId;
@@ -60,8 +64,8 @@ $(function () {
             $("#txtMaterialName").val(rows[0].MaterialName);
             if (rows[0].OutsourctId > 0)
                 $("#seleOutsource").val(rows[0].OutsourctId);
-            $("#txtChannel").val(rows[0].Channel);
-            $("#txtFormat").val(rows[0].Format);
+            //$("#txtChannel").val(rows[0].Channel);
+            //$("#txtFormat").val(rows[0].Format);
             if (rows[0].TypeId != 1) {
                 $("#txtMaterialName").val("").attr("disabled", "disabled");
                 $("#seleOutsource").val("-1").attr("disabled", "disabled");
@@ -177,6 +181,43 @@ $(function () {
             $(this).parent("td").prev().find("input[name='cbAllCity']").prop("checked", checked);
         }
     })
+
+    $("#cbAllChannel").click(function () {
+        var checked = this.checked;
+        $("input[name='cbChannel']").each(function () {
+            this.checked = checked;
+        })
+        Confing.getFormat();
+    })
+
+    $("#channelContainer").delegate("input[name='cbChannel']", "change", function () {
+        if (!this.checked) {
+            $("#cbAllChannel").prop("checked", false);
+        }
+        else {
+            var checked = $("input[name='cbAllChannel']:checked").length == $("input[name='cbAllChannel']").length;
+            $("#cbAllChannel").prop("checked", checked);
+        }
+        Confing.getFormat();
+    })
+
+    $("#cbAllFormat").click(function () {
+        var checked = this.checked;
+        $("input[name='cbFormat']").each(function () {
+            this.checked = checked;
+        })
+    })
+
+    $("#formatContainer").delegate("input[name='cbFormat']", "change", function () {
+        if (!this.checked) {
+            $("#cbAllFormat").prop("checked", false);
+        }
+        else {
+            var checked = $("input[name='cbFormat']:checked").length == $("input[name='cbFormat']").length;
+            $("#cbAllFormat").prop("checked", checked);
+        }
+    })
+
 })
 
 var Confing = {
@@ -203,10 +244,10 @@ var Confing = {
                {field: 'RowIndex', title: "序号" },
                { field: 'checked', checkbox: true },
                { field: 'TypeName', title: "类型" },
-               { field: 'MaterialName', title: "材质名称"},
+               { field: 'MaterialName', title: "材质名称" },
                { field: 'OutsourctName', title: "生产外协" },
-               { field: 'Channel', title: "店铺Channel"},
-               { field: 'Format', title: "店铺Format"},
+               { field: 'Channel', title: "店铺Channel" },
+               { field: 'Format', title: "店铺Format" },
                { field: 'RegionName', title: "应用区域" },
                { field: 'ProvinceName', title: "应用省份" },
                { field: 'CityName', title: "应用城市" }
@@ -360,7 +401,7 @@ var Confing = {
             success: function (data) {
 
                 if (data != "") {
-                   
+
                     var json = eval(data);
                     var provinceName = "";
                     var table = "<table>";
@@ -371,7 +412,7 @@ var Confing = {
                         arr = currCityId.split(',');
                     }
                     for (var i = 0; i < count; i++) {
-                        var provinceId=json[i].ParentId;
+                        var provinceId = json[i].ParentId;
                         var province = json[i].ParentName;
                         var city = json[i].PlaceName;
                         var cityId = json[i].PlaceId;
@@ -407,6 +448,80 @@ var Confing = {
             }
         })
     },
+    getChannel: function () {
+        $("#cbAllChannel").prop("checked", false);
+        $("#formatContainer").html("");
+        
+        $.ajax({
+            type: "get",
+            url: "AssignConfig.ashx?type=getChannel",
+            cache: false,
+            success: function (data) {
+                if (data != "") {
+                    var json = eval(data);
+                    var div = "";
+                    var flag = false;
+                    var arr = [];
+                    if ($.trim(currChannel) != "") {
+                        arr = currChannel.split(',');
+                    }
+                    for (var i = 0; i < json.length; i++) {
+                        var checked = "";
+                        $.each(arr, function (key, val) {
+                            if (val== json[i].Channel) {
+                                checked = "checked='checked'";
+                                flag = true;
+                            }
+                        })
+
+                        div += "<div style='float:left;'><input type='checkbox' name='cbChannel' value='" + json[i].Channel + "' " + checked + "/>" + json[i].Channel + "&nbsp;&nbsp;</div>";
+                    }
+                    $("#channelContainer").html(div);
+                    if (flag) {
+                        Confing.getFormat();
+                    }
+                }
+            }
+        })
+    },
+    getFormat: function () {
+        $("#formatContainer").html("");
+        $("#cbAllFormat").prop("checked", false);
+        var channels = "";
+        $("input[name='cbChannel']:checked").each(function () {
+            channels += $(this).val() + ",";
+        })
+
+        $.ajax({
+            type: "get",
+            url: "AssignConfig.ashx?type=getFormat&channel=" + channels,
+            cache: false,
+            success: function (data) {
+                if (data != "") {
+                    var json = eval(data);
+                    var div = "";
+
+                    var arr = [];
+                    if ($.trim(currFormat) != "") {
+                        arr = currFormat.split(',');
+                    }
+                    for (var i = 0; i < json.length; i++) {
+                        var checked = "";
+                        $.each(arr, function (key, val) {
+                            if (val == json[i].Format) {
+                                checked = "checked='checked'";
+
+                            }
+                        })
+
+                        div += "<div style='float:left;'><input type='checkbox' name='cbFormat' value='" + json[i].Format + "' " + checked + "/>" + json[i].Format + "&nbsp;&nbsp;</div>";
+                    }
+                    $("#formatContainer").html(div);
+
+                }
+            }
+        })
+    },
     submit: function () {
         if (CheckVal()) {
             var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"ConfigTypeId":' + this.model.ConfigTypeId + ',"MaterialName":"' + this.model.MaterialName + '","ProductOutsourctId":' + this.model.ProductOutsourctId + ',"Region":"' + this.model.Region + '","ProvinceId":"' + this.model.ProvinceId + '","CityId":"' + this.model.CityId + '","Channel":"' + this.model.Channel + '","Format":"' + this.model.Format + '"}';
@@ -434,9 +549,19 @@ function CheckVal() {
     var typeId = $("#seleConfigType").val();
     var materialName = $.trim($("#txtMaterialName").val());
     var outsourceId = $("#seleOutsource").val();
-    var channel = $.trim($("#txtChannel").val());
-    var format = $.trim($("#txtFormat").val());
-    var region = $("input[name='rdRegion']:checked").val()||"";
+    //var channel = $.trim($("#txtChannel").val());
+    //var format = $.trim($("#txtFormat").val());
+    var region = $("input[name='rdRegion']:checked").val() || "";
+
+    var channel = "";
+    $("input[name='cbChannel']:checked").each(function () {
+        channel += $(this).val() + ",";
+    })
+    var format = "";
+    $("input[name='cbFormat']:checked").each(function () {
+        format += $(this).val() + ",";
+    })
+
     var proviceId = "";
     $("input[name='cbProvince']:checked").each(function () {
         proviceId += $(this).val() + ",";

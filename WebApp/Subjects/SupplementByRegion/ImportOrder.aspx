@@ -31,6 +31,42 @@
             补单导入
         </p>
     </div>
+    <div class="tr">
+        >>项目信息</div>
+    <table class="table">
+        <tr class="tr_bai">
+            <td style="width: 120px;">
+                项目编号
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <asp:Label ID="labSubjectNo" runat="server" Text=""></asp:Label>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td class="style1">
+                项目名称
+            </td>
+            <td style="text-align: left; padding-left: 5px;" class="style1">
+                <asp:Label ID="labSubjectName" runat="server" Text=""></asp:Label>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td>
+                订单类型
+            </td>
+            <td style="text-align: left; padding-left: 5px;">
+                <asp:Label ID="labSubjectType" runat="server" Text=""></asp:Label>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td class="style1">
+                是否二次安装
+            </td>
+            <td style="text-align: left; padding-left: 5px;" class="style1">
+                <asp:Label ID="labIsSecondInstall" runat="server" Text=""></asp:Label>
+            </td>
+        </tr>
+    </table>
     <div class="tr" style="margin-top: 20px;">
         >>导入订单</div>
         <table class="table">

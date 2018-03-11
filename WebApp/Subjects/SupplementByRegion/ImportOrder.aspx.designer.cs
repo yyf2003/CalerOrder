@@ -31,6 +31,42 @@ namespace WebApp.Subjects.SupplementByRegion {
         protected global::System.Web.UI.WebControls.HiddenField hfHasErrorMaterialSupport;
         
         /// <summary>
+        /// labSubjectNo 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labSubjectNo;
+        
+        /// <summary>
+        /// labSubjectName 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labSubjectName;
+        
+        /// <summary>
+        /// labSubjectType 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labSubjectType;
+        
+        /// <summary>
+        /// labIsSecondInstall 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labIsSecondInstall;
+        
+        /// <summary>
         /// FileUpload1 控件。
         /// </summary>
         /// <remarks>

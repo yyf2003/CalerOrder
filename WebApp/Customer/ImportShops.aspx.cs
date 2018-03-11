@@ -191,6 +191,7 @@ namespace WebApp.Customer
                 int csUserId = 0;
                 int outsourceId = 0;//外协
                 string shopNo = string.Empty;
+                string newShopNo = string.Empty;
                 string shopName = string.Empty;
                 string region = string.Empty;
                 string province = string.Empty;
@@ -235,6 +236,7 @@ namespace WebApp.Customer
                     csUserId = 0;
                     outsourceId = 0;
                     shopNo = string.Empty;
+                    newShopNo = string.Empty;
                     shopName = string.Empty;
                     region = string.Empty;
                     province = string.Empty;
@@ -274,6 +276,9 @@ namespace WebApp.Customer
                         shopNo = StringHelper.ReplaceSpecialChar(dr["POSCode"].ToString().Trim());
                     else if (cols.Contains("店铺编号"))
                         shopNo = StringHelper.ReplaceSpecialChar(dr["店铺编号"].ToString().Trim());
+
+                    if (cols.Contains("新店铺编号"))
+                        newShopNo = StringHelper.ReplaceSpecialChar(dr["新店铺编号"].ToString().Trim());
 
                     if (cols.Contains("客服名称"))
                         csUserName = StringHelper.ReplaceSpecialChar(dr["客服名称"].ToString().Trim());
@@ -472,7 +477,11 @@ namespace WebApp.Customer
                         canSave = false;
                         errorMsg.Append("店铺编号重复 ；");
                     }
-
+                    if (!string.IsNullOrWhiteSpace(newShopNo) && CheckNewShopNo(newShopNo))
+                    {
+                        canSave = false;
+                        errorMsg.Append("新店铺编号已存在 ；");
+                    }
                     if (string.IsNullOrWhiteSpace(shopName))
                     {
                         //canSave = false;
@@ -637,6 +646,8 @@ namespace WebApp.Customer
                             shopModel.AreaName = county;
                         }
 
+                        if (!string.IsNullOrWhiteSpace(newShopNo))
+                            shopModel.ShopNo = newShopNo.ToUpper();
 
                         if (!string.IsNullOrWhiteSpace(angentCode))
                             shopModel.AgentCode = angentCode;
@@ -2121,6 +2132,13 @@ namespace WebApp.Customer
             }
             return false;
         }
+
+        bool CheckNewShopNo(string newShopNo)
+        {
+            var list = shopBll.GetList(s => s.ShopNo.ToUpper() == newShopNo.ToUpper() && (s.IsDelete==null || s.IsDelete==false));
+            return list.Any();
+        }
+
 
         bool ShopNameIsExist(string shopName)
         {

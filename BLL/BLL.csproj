@@ -103,6 +103,8 @@
     <Compile Include="MachineFrameBlackListBLL.cs" />
     <Compile Include="MachineFrameBLL.cs" />
     <Compile Include="MachineFrameCornerTypeBLL.cs" />
+    <Compile Include="MachineFrameSizeBLL.cs" />
+    <Compile Include="MachineFrameTypeBLL.cs" />
     <Compile Include="MaterialBLL.cs" />
     <Compile Include="MaterialBrandBLL.cs" />
     <Compile Include="MaterialCategoryBLL.cs" />

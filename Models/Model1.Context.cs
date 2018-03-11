@@ -74,6 +74,8 @@ namespace Models
         public DbSet<MachineFrame> MachineFrame { get; set; }
         public DbSet<MachineFrameBlackList> MachineFrameBlackList { get; set; }
         public DbSet<MachineFrameCornerType> MachineFrameCornerType { get; set; }
+        public DbSet<MachineFrameSize> MachineFrameSize { get; set; }
+        public DbSet<MachineFrameType> MachineFrameType { get; set; }
         public DbSet<Material> Material { get; set; }
         public DbSet<MaterialBrand> MaterialBrand { get; set; }
         public DbSet<MaterialCategory> MaterialCategory { get; set; }

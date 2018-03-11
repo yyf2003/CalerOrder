@@ -89,7 +89,10 @@
                     店铺Channel
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtChannel" runat="server" MaxLength="30" style="width:300px;"></asp:TextBox>
+                   <%-- <asp:TextBox ID="txtChannel" runat="server" MaxLength="30" style="width:300px;"></asp:TextBox>--%>
+                   <input type="checkbox" id="cbAllChannel"  style=" margin-left:5px;"/><span style="color:Blue;">全选</span>
+                   <div id="channelContainer" style="margin-left: 0px; padding-left: 5px; text-align: left;">
+                   </div>
                 </td>
             </tr>
             <tr class="tr_bai">
@@ -97,7 +100,10 @@
                     店铺类型
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtFormat" runat="server" MaxLength="30" style="width:300px;"></asp:TextBox>
+                    <%--<asp:TextBox ID="txtFormat" runat="server" MaxLength="30" style="width:300px;"></asp:TextBox>--%>
+                    <input type="checkbox" id="cbAllFormat"  style=" margin-left:5px;"/><span style="color:Blue;">全选</span>
+                   <div id="formatContainer" style="margin-left: 0px; padding-left: 5px; text-align: left;">
+                   </div>
                 </td>
             </tr>
             <tr class="tr_bai">

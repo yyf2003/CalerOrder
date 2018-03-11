@@ -2525,6 +2525,7 @@ namespace WebApp
         /// </summary>
         public void SaveSecondInstallPrice(int subjectId, int subjectType)
         {
+            int realSubjectId = subjectId;
             Subject subjectModel = new SubjectBLL().GetModel(subjectId);
             if (subjectModel != null)
             {
@@ -2536,6 +2537,7 @@ namespace WebApp
                 if (subjectType == (int)SubjectTypeEnum.HC订单 || subjectType == (int)SubjectTypeEnum.分区补单)
                 {
                     orderList = new FinalOrderDetailTempBLL().GetList(s => s.RegionSupplementId == subjectId && (s.IsDelete == null || s.IsDelete == false));
+                    realSubjectId = subjectModel.HandMakeSubjectId??0;
                 }
                 else
                 {
@@ -2547,8 +2549,8 @@ namespace WebApp
                 }
                 //删除
                 installPriceTempBll.Delete(s => s.GuidanceId == (subjectModel.GuidanceId ?? 0) && shopIdList0.Contains(s.ShopId ?? 0) && s.AddType == 2);
-                installPriceShopInfoBll.Delete(s => s.GuidanceId == (subjectModel.GuidanceId ?? 0) && shopIdList0.Contains(s.ShopId ?? 0) && s.SubjectId == subjectId && s.AddType == 2);
-                installPriceBll.Delete(s => s.GuidanceId == (subjectModel.GuidanceId ?? 0) && s.SubjectId == subjectId && s.AddType == 2);
+                installPriceShopInfoBll.Delete(s => s.GuidanceId == (subjectModel.GuidanceId ?? 0) && shopIdList0.Contains(s.ShopId ?? 0)  && s.AddType == 2);
+                //installPriceBll.Delete(s => s.GuidanceId == (subjectModel.GuidanceId ?? 0) && s.SubjectId == subjectId && s.AddType == 2);
                 var allOrderlist = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                                     join shop in CurrentContext.DbContext.Shop
                                     on order.ShopId equals shop.Id
@@ -2579,31 +2581,25 @@ namespace WebApp
                     List<string> cityCierList = new List<string>() { "T1", "T2", "T3" };
                     //List<string> BCSInstallCityTierList = new List<string>();
                     decimal basicPrice = 150;//三叶草t1-t3安装费
-                    //if (!BCSInstallCityTierList.Any())
-                    //{
-                    //    string BCSInstallCityTier = string.Empty;
-                    //    try
-                    //    {
-                    //        BCSInstallCityTier = ConfigurationManager.AppSettings["BCSBasicInstallPrice"];
-                    //        if (!string.IsNullOrWhiteSpace(BCSInstallCityTier))
-                    //        {
-                    //            string[] str = BCSInstallCityTier.Split(':');
-                    //            BCSInstallCityTierList = StringHelper.ToStringList(str[0], ',', LowerUpperEnum.ToUpper);
-                    //            bcsBasicInstallPrice = StringHelper.IsDecimal(str[1]);
-                    //        }
-                    //    }
-                    //    catch
-                    //    {
-
-                    //    }
-                    //}
+                    
                     List<Shop> shopList = allOrderlist.Select(s => s.shop).Distinct().ToList();
                     List<int> shopIdList = shopList.Select(s => s.Id).ToList();
                     var oohPOPList = new POPBLL().GetList(s => shopIdList.Contains(s.ShopId ?? 0) && (s.Sheet.ToLower() == "ooh" || s.Sheet == "户外") && (s.OOHInstallPrice ?? 0) > 0);
 
                     InstallPriceTemp installPriceTempModel;
                     InstallPriceShopInfo installPriceShopInfoModel;
-                    InstallPriceDetail installPriceDetailModel;
+                    InstallPriceDetail installPriceDetailModel = installPriceBll.GetList(s => s.GuidanceId == subjectModel.GuidanceId && s.AddType==2).FirstOrDefault();
+                    if (installPriceDetailModel == null)
+                    {
+                        installPriceDetailModel = new InstallPriceDetail();
+                        installPriceDetailModel.AddType = 2;
+                        installPriceDetailModel.AddDate = DateTime.Now;
+                        installPriceDetailModel.GuidanceId = subjectModel.GuidanceId;
+                        installPriceDetailModel.SelectSubjectId = realSubjectId.ToString();
+                        installPriceDetailModel.SubjectId = realSubjectId;
+                        installPriceBll.Add(installPriceDetailModel);
+                    }
+
                     shopList.ForEach(shop =>
                     {
 
@@ -2734,13 +2730,7 @@ namespace WebApp
                             installPriceTempModel.AddType = 2;
                             installPriceTempBll.Add(installPriceTempModel);
 
-                            installPriceDetailModel = new InstallPriceDetail();
-                            installPriceDetailModel.AddType = 2;
-                            installPriceDetailModel.AddDate = DateTime.Now;
-                            installPriceDetailModel.GuidanceId = subjectModel.GuidanceId; ;
-                            installPriceDetailModel.SelectSubjectId = subjectId.ToString();
-                            installPriceDetailModel.SubjectId = subjectId;
-                            installPriceBll.Add(installPriceDetailModel);
+                            
 
                             installPriceShopInfoModel = new InstallPriceShopInfo();
                             installPriceShopInfoModel.AddType = 2;
@@ -2751,7 +2741,7 @@ namespace WebApp
                             installPriceShopInfoModel.OOHPrice = oohInstallPrice;
                             installPriceShopInfoModel.POSScale = POSScale;
                             installPriceShopInfoModel.ShopId = shop.Id;
-                            installPriceShopInfoModel.SubjectId = subjectId;
+                            installPriceShopInfoModel.SubjectId = installPriceDetailModel.SubjectId??0;
                             installPriceShopInfoModel.WindowPrice = windowInstallPrice;
                             installPriceShopInfoBll.Add(installPriceShopInfoModel);
 
@@ -2771,9 +2761,9 @@ namespace WebApp
             InstallPriceTempBLL installPriceTempBll = new InstallPriceTempBLL();
             InstallPriceShopInfoBLL installPriceShopInfoBll = new InstallPriceShopInfoBLL();
             InstallPriceDetailBLL installPriceBll = new InstallPriceDetailBLL();
-            installPriceTempBll.Delete(s=>s.GuidanceId==guidanceId && s.AddType==2);
+            //installPriceTempBll.Delete(s=>s.GuidanceId==guidanceId && s.AddType==2);
             installPriceShopInfoBll.Delete(s => s.GuidanceId == guidanceId && s.AddType == 2);
-            installPriceBll.Delete(s => s.GuidanceId == guidanceId && s.AddType == 2);
+            //installPriceBll.Delete(s => s.GuidanceId == guidanceId && s.AddType == 2);
             var allOrderlist = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                                 join shop in CurrentContext.DbContext.Shop
                                 on order.ShopId equals shop.Id
@@ -2807,11 +2797,24 @@ namespace WebApp
                 List<int> shopIdList = shopList.Select(s => s.Id).ToList();
                 var oohPOPList = new POPBLL().GetList(s => shopIdList.Contains(s.ShopId ?? 0) && (s.Sheet.ToLower() == "ooh" || s.Sheet == "户外") && (s.OOHInstallPrice ?? 0) > 0);
 
+                int subjectId = allOrderlist[0].subject.Id;
                 
 
                 InstallPriceTemp installPriceTempModel;
                 InstallPriceShopInfo installPriceShopInfoModel;
-                InstallPriceDetail installPriceDetailModel;
+                //InstallPriceDetail installPriceDetailModel;
+                InstallPriceDetail installPriceDetailModel = installPriceBll.GetList(s => s.GuidanceId == guidanceId && s.AddType == 2).FirstOrDefault();
+                if (installPriceDetailModel == null)
+                {
+                    installPriceDetailModel = new InstallPriceDetail();
+                    installPriceDetailModel.AddType = 2;
+                    installPriceDetailModel.AddDate = DateTime.Now;
+                    installPriceDetailModel.GuidanceId = guidanceId;
+                    installPriceDetailModel.SelectSubjectId = subjectId.ToString();
+                    installPriceDetailModel.SubjectId = subjectId;
+                    installPriceBll.Add(installPriceDetailModel);
+                }
+
                 shopList.ForEach(shop =>
                 {
 
@@ -2830,7 +2833,8 @@ namespace WebApp
                     if (oneShopOrderList.Any())
                     {
                         int SecondBasicInstallPriceType = oneShopOrderList[0].subject.SecondBasicInstallPriceType ?? 1;
-                        int subjectId = oneShopOrderList[0].subject.Id;
+                        
+                        
                         oneShopOrderList.ForEach(s =>
                         {
                             if (!string.IsNullOrWhiteSpace(s.order.InstallPriceMaterialSupport) && !materialSupportList.Contains(s.order.InstallPriceMaterialSupport.ToLower()))
@@ -2841,12 +2845,10 @@ namespace WebApp
                                 POSScale = s.order.InstallPricePOSScale;
                             if (s.subject.CornerType != "三叶草")
                                 isBCSSubject = false;
-                            //if (!s.CategoryName.Contains("常规-非活动"))
-                            //isGeneric = false;
+                            
                         });
                         List<FinalOrderDetailTemp> oohOrderList = oneShopOrderList.Where(s => s.order.ShopId == shop.Id && s.order.Sheet != null && (s.order.Sheet.ToLower() == "ooh" || s.order.Sheet == "户外")).Select(s => s.order).ToList();
-                        //List<FinalOrderDetailTemp> windowOrderList = oneShopOrderList.Where(s => s.order.ShopId == shop.Id && s.order.Sheet != null && (s.order.Sheet.ToLower().Contains("橱窗") || s.order.Sheet.ToLower().Contains("window"))).Select(s => s.order).ToList();
-
+                       
 
                         #region 店内安装费
                         if (isBCSSubject)
@@ -2933,13 +2935,13 @@ namespace WebApp
                         installPriceTempModel.AddType = 2;
                         installPriceTempBll.Add(installPriceTempModel);
 
-                        installPriceDetailModel = new InstallPriceDetail();
-                        installPriceDetailModel.AddType = 2;
-                        installPriceDetailModel.AddDate = DateTime.Now;
-                        installPriceDetailModel.GuidanceId = guidanceId; ;
-                        installPriceDetailModel.SelectSubjectId = subjectId.ToString();
-                        installPriceDetailModel.SubjectId = subjectId;
-                        installPriceBll.Add(installPriceDetailModel);
+                        //installPriceDetailModel = new InstallPriceDetail();
+                        //installPriceDetailModel.AddType = 2;
+                        //installPriceDetailModel.AddDate = DateTime.Now;
+                        //installPriceDetailModel.GuidanceId = guidanceId; ;
+                        //installPriceDetailModel.SelectSubjectId = subjectId.ToString();
+                        //installPriceDetailModel.SubjectId = subjectId;
+                        //installPriceBll.Add(installPriceDetailModel);
 
                         installPriceShopInfoModel = new InstallPriceShopInfo();
                         installPriceShopInfoModel.AddType = 2;
@@ -2950,7 +2952,7 @@ namespace WebApp
                         installPriceShopInfoModel.OOHPrice = oohInstallPrice;
                         installPriceShopInfoModel.POSScale = POSScale;
                         installPriceShopInfoModel.ShopId = shop.Id;
-                        installPriceShopInfoModel.SubjectId = subjectId;
+                        installPriceShopInfoModel.SubjectId = installPriceDetailModel.SubjectId??0;
                         installPriceShopInfoModel.WindowPrice = windowInstallPrice;
                         installPriceShopInfoBll.Add(installPriceShopInfoModel);
 
@@ -6977,7 +6979,7 @@ namespace WebApp
         QuoteOrderDetail quoteOrderModel;
         QuoteOrderSettingBLL quoteOrderSettingBll = new QuoteOrderSettingBLL();
         List<QuoteOrderSetting> settingList = new List<QuoteOrderSetting>();
-        public void SaveQuotationOrder123(FinalOrderDetailTemp order, bool? orderSetting = true)
+        public void SaveQuotationOrder(FinalOrderDetailTemp order, bool? orderSetting = true)
         {
             if (order != null)
             {
@@ -7152,7 +7154,7 @@ namespace WebApp
 
 
 
-        public void SaveQuotationOrder(FinalOrderDetailTemp order, bool? orderSetting = true)
+        public void SaveQuotationOrder123(FinalOrderDetailTemp order, bool? orderSetting = true)
         { }
 
 

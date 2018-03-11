@@ -202,12 +202,18 @@ namespace WebApp.Subjects
                 try
                 {
                     SubjectGuidance model = new SubjectGuidance();
+                    bool hasInstallFee = false;
+                    bool hasExpressFee = false;
                     bool isUpDate = false;
                     if (id > 0)
                     {
                         model = bll.GetModel(id);
                         if (model != null)
+                        {
                             isUpDate = true;
+                            hasInstallFee = model.HasInstallFees ?? false;
+                            hasExpressFee = model.HasExperssFees ?? false;
+                        }
                         else
                             model = new SubjectGuidance();
                     }
@@ -227,7 +233,7 @@ namespace WebApp.Subjects
                     model.CustomerId = int.Parse(ddlCustomer.SelectedValue);
                     if (rblActivityType.SelectedValue != null)
                     {
-                        int activityId=int.Parse(rblActivityType.SelectedValue);;
+                        int activityId=int.Parse(rblActivityType.SelectedValue);
                         model.ActivityTypeId = activityId;
                         if (activityId == (int)GuidanceTypeEnum.Promotion)
                         {
@@ -252,9 +258,24 @@ namespace WebApp.Subjects
                     }
                     model.SubjectNames = SubjectNames;
                     model.PriceItemId = priceItemId;
-                    
+
                     if (isUpDate)
+                    {
                         bll.Update(model);
+                        if ((model.ActivityTypeId == (int)GuidanceTypeEnum.Install) && !(model.HasInstallFees ?? false) && hasInstallFee)
+                        { 
+                            //如果原来有安装费，修改后没有的话，就自动删除安装费
+                            new InstallPriceShopInfoBLL().Delete(s => s.GuidanceId == id);
+                            new InstallPriceTempBLL().Delete(s => s.GuidanceId == id);
+                            new OutsourceOrderDetailBLL().Delete(s => s.GuidanceId == id && s.OrderType==(int)OrderTypeEnum.安装费 && s.SubjectId==0);
+                        }
+                        else if ((model.ActivityTypeId == (int)GuidanceTypeEnum.Promotion) && !(model.HasExperssFees ?? false) && hasExpressFee)
+                        {
+                            //如果原来有快递费，修改后没有的话，就自动删除快递费
+                            new ExpressPriceDetailBLL().Delete(s => s.GuidanceId == id);
+                            new OutsourceOrderDetailBLL().Delete(s => s.GuidanceId == id && s.OrderType == (int)OrderTypeEnum.发货费 && s.SubjectId == 0);
+                        }
+                    }
                     else
                     {
                         model.AddDate = DateTime.Now;

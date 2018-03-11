@@ -328,20 +328,41 @@ namespace WebApp.Subjects.RegionSubject
                             if (shopIdList.Any() && model.SubjectType != (int)SubjectTypeEnum.二次安装 && model.SubjectType != (int)SubjectTypeEnum.费用订单)
                             {
                                 SubjectGuidance guianceModel = new SubjectGuidanceBLL().GetModel(model.GuidanceId ?? 0);
+                                //if (guianceModel != null && guianceModel.ActivityTypeId != (int)GuidanceTypeEnum.Others)
+                                //{
+                                    //if ((guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guianceModel.HasInstallFees ?? true)))
+                                    //{
+                                    //    RecountInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算活动安装费
+                                    //    ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费
+                                    //}
+                                    //else if (guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guianceModel.HasExperssFees ?? true))
+                                    //{
+                                    //    ReSaveExpressPrice(model.GuidanceId ?? 0);//重新计算活动快递费
+                                    //    ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费
+                                    //}
+                                   
+                                //}
                                 if (guianceModel != null && guianceModel.ActivityTypeId != (int)GuidanceTypeEnum.Others)
                                 {
                                     if ((guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guianceModel.HasInstallFees ?? true)))
                                     {
-                                        RecountInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算活动安装费
-                                        ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费
+                                        if ((model.IsSecondInstall ?? false))
+                                        {
+                                            ReSaveSecondInstallPrice(model.GuidanceId ?? 0);//重新计算活动安装费(二次安装)
+                                            ResetOutsourceSecondInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费(二次安装)
+                                        }
+                                        else
+                                        {
+                                            RecountInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算活动安装费
+                                            ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费
+                                        }
                                     }
-                                    else if (guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guianceModel.HasExperssFees ?? true))
-                                    {
-                                        ReSaveExpressPrice(model.GuidanceId ?? 0);//重新计算活动快递费
-                                        ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费
-                                    }
+                                    //else if (guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guianceModel.HasExperssFees ?? true))
+                                    //{
+                                    //    ReSaveExpressPrice(model.GuidanceId ?? 0);//重新计算活动快递费
+                                    //    ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);//重新计算外协安装费
+                                    //}
                                 }
-
                             }
                             tran.Complete();
                         }

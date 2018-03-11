@@ -108,7 +108,8 @@ namespace WebApp.Subjects.InstallPrice
                                    && subject.SubjectType != (int)SubjectTypeEnum.费用订单
                                    && (subject.IsSecondInstall??false)==false
                                    && ((order.IsInstall == "Y" && (subject.CornerType == null || subject.CornerType == "" || subject.CornerType != "三叶草")) || (subject.CornerType == "三叶草" && order.BCSIsInstall == "Y"))
-                                   select order).ToList();
+                                   && (subject.IsSecondInstall??false)==false
+                                    select order).ToList();
             installPriceShopList = InstallPriceShopInfoBll.GetList(s => currPageGuidanceIdList.Contains(s.GuidanceId ?? 0));
             gv.DataSource = list.OrderByDescending(s => s.ItemId).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
             gv.DataBind();
@@ -153,11 +154,11 @@ namespace WebApp.Subjects.InstallPrice
                     Label labInstallShopCount = (Label)e.Row.FindControl("labInstallShopCount");
                     Label labFinishCount = (Label)e.Row.FindControl("labFinishCount");
                     
-                    List<int> myInstallShopIdList = installShopOrderList.Where(s => s.GuidanceId == Id).Select(s => s.ShopId ?? 0).Distinct().ToList();
+                    List<int> myInstallShopIdList = installShopOrderList.Where(s => s.GuidanceId == Id && (s.InstallPriceAddType??1)==1).Select(s => s.ShopId ?? 0).Distinct().ToList();
                     labInstallShopCount.Text = myInstallShopIdList.Count().ToString();
                     if (installPriceShopList.Any())
                     {
-                        int finishShopCount = installPriceShopList.Where(s => s.GuidanceId == Id && myInstallShopIdList.Contains(s.ShopId ?? 0)).Select(s => s.ShopId ?? 0).Distinct().Count();
+                        int finishShopCount = installPriceShopList.Where(s => s.GuidanceId == Id && myInstallShopIdList.Contains(s.ShopId ?? 0) && (s.AddType??1)==1).Select(s => s.ShopId ?? 0).Distinct().Count();
                         labFinishCount.Text = finishShopCount.ToString();
                     }
                     if (!myInstallShopIdList.Any())

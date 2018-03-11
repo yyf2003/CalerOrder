@@ -307,16 +307,16 @@
                 <td style="width: 120px; text-align: right;">
                     项目数量：
                 </td>
-                <td style="text-align: left; width: 150px; padding-left: 5px;">
+                <td style="text-align: left; width: 280px; padding-left: 5px;">
                     <asp:Label ID="labSubjectCount" runat="server" Text="0"></asp:Label>
                 </td>
-                <td style="text-align: right; width: 150px;">
+                <td style="text-align: right; width: 120px;">
                     店铺数量：
                 </td>
                 <td style="text-align: left; padding-left: 5px; width: 150px;">
                     <asp:Label ID="labShopCount" runat="server" Text="0"></asp:Label>
                 </td>
-                <td style="text-align: right; width: 200px;">
+                <td style="text-align: right; width: 150px;">
                     总面积：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
@@ -329,6 +329,7 @@
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labPOPPrice" runat="server" Text="0"></asp:Label>
+                    <asp:Label ID="labPOPPriceDetail" runat="server" Text=""></asp:Label>
                 </td>
                 <td style="text-align: right;">
                     活动安装费合计：

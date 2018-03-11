@@ -65,6 +65,21 @@ namespace WebApp.Subjects.SupplementByRegion
                     int customerId=model.CustomerId??0;
                     hfCustomerId.Value = customerId.ToString();
                     hfGuidanceId.Value = (model.GuidanceId ?? 0).ToString();
+                    labSubjectName.Text = model.SubjectName;
+                    labSubjectNo.Text = model.SubjectNo;
+                    int subjectType = model.SubjectType ?? 1;
+                    labSubjectType.Text = CommonMethod.GeEnumName<SubjectTypeEnum>(subjectType.ToString());
+                    if (model.IsSecondInstall ?? false)
+                    {
+                        labIsSecondInstall.Text = "是";
+                        ViewState["IsSecondInstall"] = "1";
+                    }
+                    else
+                    {
+                        labIsSecondInstall.Text = "否";
+                        ViewState["IsSecondInstall"] = "0";
+                    }
+               
                 }
                 BindOrder();
                 DataTable errorTB = null;
@@ -90,6 +105,7 @@ namespace WebApp.Subjects.SupplementByRegion
             }
         }
 
+       
 
         /// <summary>
         /// 模板下载
@@ -1225,7 +1241,7 @@ namespace WebApp.Subjects.SupplementByRegion
         bool CheckSubject(string subjectName, out int supplementSubjectId)
         {
             supplementSubjectId = 0;
-            bool flag = true;
+           
             subjectName = subjectName.Trim().ToLower();
             if (subjectList.Keys.Contains(subjectName))
             {
@@ -1240,13 +1256,23 @@ namespace WebApp.Subjects.SupplementByRegion
                 var model = subjectBll.GetList(s => s.SubjectName.Trim().ToLower() == subjectName && (((s.SubjectType ?? 1) == (int)SubjectTypeEnum.POP订单) || ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.正常单) || ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.手工订单)) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && s.GuidanceId == guidanceId).FirstOrDefault();
                 if (model != null)
                 {
-                    supplementSubjectId = model.Id;
+                    if (ViewState["IsSecondInstall"] != null && ViewState["IsSecondInstall"].ToString() == "1")
+                    {
+                        //判断是否二次安装项目
+                        if (model.IsSecondInstall ?? false)
+                        {
+                            supplementSubjectId = model.Id;
+                        }
+                    }
+                    else if (!(model.IsSecondInstall ?? false))
+                    {
+                        supplementSubjectId = model.Id;
+                    }
 
                 }
-                else
-                    flag = false;
+                
             }
-            return flag;
+            return supplementSubjectId>0;
         }
 
         //提交

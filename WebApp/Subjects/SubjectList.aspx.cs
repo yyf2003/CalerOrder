@@ -503,7 +503,7 @@ namespace WebApp.Subjects
                                         });
                                     }
                                     //从报价订单表删除
-                                    //new QuoteOrderDetailBLL().Delete(s => s.RegionSupplementId == id);
+                                    new QuoteOrderDetailBLL().Delete(s => s.RegionSupplementId == id);
                                     //从外协订单表删除
                                     outsourceOrderBll.Delete(s => s.RegionSupplementId == id);
                                 }
@@ -523,7 +523,7 @@ namespace WebApp.Subjects
 
                                     }
                                     //从报价订单表删除
-                                    //new QuoteOrderDetailBLL().Delete(s => s.SubjectId == id);
+                                    new QuoteOrderDetailBLL().Delete(s => s.SubjectId == id);
                                     //从外协订单表删除
                                     outsourceOrderBll.Delete(s => s.SubjectId == id);
                                 }

@@ -68,6 +68,17 @@ namespace WebApp.OutsourcingOrder.handler
                     }
                     result = Edit(jsonString);
                     break;
+                case "getChannel":
+                    result = GetChannelList();
+                    break;
+                case "getFormat":
+                    string channels = string.Empty;
+                    if (context.Request.QueryString["channel"] != null)
+                    {
+                        channels = context.Request.QueryString["channel"].ToString();
+                    }
+                    result = GetFormatList(channels);
+                    break;
                 case "delete":
                     string ids = context.Request["ids"];
                     result = Delete(ids);
@@ -339,6 +350,56 @@ namespace WebApp.OutsourcingOrder.handler
                 return "ok";
             }
             return "删除失败";
+        }
+
+        string GetChannelList()
+        {
+            List<string> list = new ShopBLL().GetList(s => s.IsDelete == null || s.IsDelete == false).Select(s=>s.Channel).Distinct().OrderBy(s=>s).ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s =>
+                {
+                    if (!string.IsNullOrWhiteSpace(s))
+                    {
+                        json.Append("{\"Channel\":\""+s+"\"},");
+                    }
+                });
+                return "["+json.ToString().TrimEnd(',')+"]";
+            }
+            else
+                return "";
+        }
+
+        string GetFormatList(string channels)
+        {
+            if (!string.IsNullOrWhiteSpace(channels))
+            {
+                channels = channels.Replace("，", ",");
+                List<string> channelList = StringHelper.ToStringList(channels, ',', LowerUpperEnum.ToUpper);
+                if (channelList.Any())
+                {
+                    List<string> list = new ShopBLL().GetList(s => (s.IsDelete == null || s.IsDelete == false) && s.Channel!=null && channelList.Contains(s.Channel.ToUpper())).Select(s => s.Format).Distinct().OrderBy(s => s).ToList();
+                    if (list.Any())
+                    {
+                        StringBuilder json = new StringBuilder();
+                        list.ForEach(s =>
+                        {
+                            if (!string.IsNullOrWhiteSpace(s))
+                            {
+                                json.Append("{\"Format\":\"" + s + "\"},");
+                            }
+                        });
+                        return "[" + json.ToString().TrimEnd(',') + "]";
+                    }
+                    else
+                        return "";
+                }
+                else
+                    return "";
+            }
+            else
+                return "";
         }
 
         public bool IsReusable

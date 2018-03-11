@@ -86,8 +86,8 @@ namespace WebApp.QuoteOrderManager
                              join guidance in CurrentContext.DbContext.SubjectGuidance
                              on order.GuidanceId equals guidance.ItemId
                              where (subject.IsDelete == null || subject.IsDelete == false)
+                             && (order.IsDelete == null || order.IsDelete == false)
                              && subject.ApproveState == 1
-
                              select new { order, shop, subject, guidance }).ToList();
             if (orderList.Any())
             {
@@ -1958,6 +1958,8 @@ namespace WebApp.QuoteOrderManager
             decimal expressPrice = 0;//促销快递费
             decimal area = 0;//面积
             decimal popPrice = 0;//POP制作费
+            decimal originalPOPPrice = 0;//原始订单POP费用
+            decimal autoAddPOPPrice = 0;//系统报价自动增加POP费用
             decimal newShopInstallPrice = 0;//新开店安装费
             decimal freightPrice = 0;//运费
             decimal otherPrice = 0;//其他费用
@@ -1979,13 +1981,19 @@ namespace WebApp.QuoteOrderManager
             if (orderList.Any())
             {
 
+                //统计实际订单费用和调整后的费用（POP）
+                originalPOPPrice = orderList.Sum(s => s.order.DefaultTotalPrice ?? 0);
+                autoAddPOPPrice = orderList.Sum(s => s.order.AutoAddTotalPrice ?? 0);
+
                 shopIdList = orderList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
                 labSubjectCount.Text = (subjectIdList.Count).ToString();
                 StatisticQuotePOPTotalPrice(orderList.Select(s => s.order), out popPrice, out area);
                 labArea.Text = area > 0 ? (area + "平方米") : "0";
                 if (popPrice > 0)
                 {
+                    string popPriceStr = string.Format("（原始订单费用：{0}  自动增加费用：{1}）",Math.Round(originalPOPPrice, 2), Math.Round(autoAddPOPPrice, 2));
                     labPOPPrice.Text = Math.Round(popPrice, 2) + "元";
+                    labPOPPriceDetail.Text = popPriceStr;
                     labPOPPrice.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
                     labPOPPrice.Attributes.Add("name", "checkMaterial");
                 }
