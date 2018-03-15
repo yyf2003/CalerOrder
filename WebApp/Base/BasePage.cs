@@ -587,86 +587,7 @@ namespace WebApp
             return src;
         }
 
-        /// <summary>
-        /// 统计订单pop的价格和面积
-        /// </summary>
-        /// <param name="orderList"></param>
-        /// <param name="popPrice"></param>
-        /// <param name="popArea"></param>
-        //public void StatisticPOPPrice(IEnumerable<FinalOrderDetailTemp> orderList, out decimal popPrice, out decimal popArea)
-        //{
-        //    popPrice = 0;
-        //    popArea = 0;
-        //    if (orderList.Any())
-        //    {
-        //        decimal totalPrice = 0;
-        //        decimal totalArea = 0;
-        //        string unitName = string.Empty;
-        //        orderList.ToList().ForEach(s =>
-        //        {
-        //            decimal newPOPArea = 0;
-        //            if (s.GraphicLength != null && s.GraphicWidth != null)
-        //            {
-        //                newPOPArea = ((s.GraphicLength ?? 0) * (s.GraphicWidth ?? 0)) / 1000000;
-        //            }
-        //            if (!string.IsNullOrWhiteSpace(s.GraphicMaterial))
-        //            {
-        //                unitName = string.Empty;
-        //                decimal defaultUnitPrice = GetMaterialPrice(s.GraphicMaterial, out unitName);//这个是材质数据库单价（会变更）
-        //                defaultUnitPrice = s.UnitPrice ?? 0;//取下订单时候的单价
-        //                if (s.GraphicMaterial.IndexOf("挂轴") != -1)
-        //                {
-        //                    string material0 = s.GraphicMaterial.Replace("+挂轴", "").Replace("+上挂轴", "").Replace("+下挂轴", "");
-        //                    decimal unitPrice0 = GetMaterialPrice(material0, out unitName);
-        //                    decimal unitPrice1 = GetMaterialPrice("挂轴", out unitName);
-        //                    decimal popPrice0 = newPOPArea * unitPrice0 * (s.Quantity ?? 1);
-        //                    decimal popPrice1 = (s.GraphicWidth ?? 0) / 1000 * 2 * unitPrice1 * (s.Quantity ?? 1);
-        //                    if (s.GraphicMaterial.IndexOf("上挂轴") != -1 || s.GraphicMaterial.IndexOf("下挂轴") != -1)
-        //                    {
-        //                        popPrice1 = (s.GraphicWidth ?? 0) / 1000  * unitPrice1 * (s.Quantity ?? 1);
-        //                    }
-        //                    totalPrice += (popPrice0 + popPrice1);
-        //                    totalArea += newPOPArea * (s.Quantity ?? 1);
-        //                }
-        //                else
-        //                {
-        //                    //if (s.UnitPrice != null && s.UnitPrice > 0)
-        //                    //{
-
-        //                    //    if (unitName == "个")
-        //                    //    {
-        //                    //        totalPrice += (s.UnitPrice ?? 0) * (s.Quantity ?? 1);
-        //                    //    }
-        //                    //    else
-        //                    //    {
-        //                    //        totalArea += (s.Area ?? 0) * (s.Quantity ?? 1);
-        //                    //        totalPrice += (s.Area ?? 0) * (s.UnitPrice ?? 0) * (s.Quantity ?? 1);
-        //                    //    }
-        //                    //}
-        //                    //else
-        //                    //{
-
-
-        //                    //}
-        //                    if (unitName == "个")
-        //                    {
-        //                        totalPrice += defaultUnitPrice * (s.Quantity ?? 1);
-        //                    }
-        //                    else
-        //                    {
-        //                        totalArea += newPOPArea * (s.Quantity ?? 1);
-        //                        totalPrice += newPOPArea * defaultUnitPrice * (s.Quantity ?? 1);
-        //                    }
-
-        //                }
-
-
-        //            }
-        //        });
-        //        popPrice = totalPrice;
-        //        popArea = totalArea;
-        //    }
-        //}
+       
 
 
         /// <summary>
@@ -2474,9 +2395,12 @@ namespace WebApp
                         }
                         #endregion
                         #region 橱窗安装
-                        if (windowOrderList.Any())
+                        if (!isGeneric)
                         {
-                            windowInstallPrice = GetWindowInstallPrice(materialSupport);
+                            if (windowOrderList.Any())
+                            {
+                                windowInstallPrice = GetWindowInstallPrice(materialSupport);
+                            }
                         }
                         #endregion
                         #region OOH安装费
@@ -2569,6 +2493,7 @@ namespace WebApp
                                     && subject.SubjectType != (int)SubjectTypeEnum.二次安装
                                     && subject.SubjectType != (int)SubjectTypeEnum.费用订单
                                     && (subject.IsSecondInstall ?? false) == true
+                                    && ((subject.SecondBasicInstallPriceType ?? 1) != (int)SecondInstallInstallTypeEnum.thirdLevel)
                                     select new
                                     {
                                         subject,
@@ -2743,6 +2668,8 @@ namespace WebApp
                             installPriceShopInfoModel.ShopId = shop.Id;
                             installPriceShopInfoModel.SubjectId = installPriceDetailModel.SubjectId??0;
                             installPriceShopInfoModel.WindowPrice = windowInstallPrice;
+                            installPriceShopInfoModel.AddDate = DateTime.Now;
+                            installPriceShopInfoModel.AddUserId = CurrentUser.UserId;
                             installPriceShopInfoBll.Add(installPriceShopInfoModel);
 
                             #endregion
@@ -2781,6 +2708,7 @@ namespace WebApp
                                 && subject.SubjectType != (int)SubjectTypeEnum.二次安装
                                 && subject.SubjectType != (int)SubjectTypeEnum.费用订单
                                 && (subject.IsSecondInstall ?? false) == true
+                                && ((subject.SecondBasicInstallPriceType ?? 1) != (int)SecondInstallInstallTypeEnum.thirdLevel)
                                 select new
                                 {
                                     subject,
@@ -4609,7 +4537,11 @@ namespace WebApp
                 }
                 if (orderList0.Any())
                 {
-
+                    bool isProductInNorth = false;
+                    if (subjectModel.subject.PriceBlongRegion != null && subjectModel.subject.PriceBlongRegion.ToLower() == "north")
+                    {
+                        isProductInNorth = true;
+                    }
                     List<ExpressPriceConfig> expressPriceConfigList = new ExpressPriceConfigBLL().GetList(s => s.Id > 0);
                     ExpressPriceDetailBLL expressPriceDetailBll = new ExpressPriceDetailBLL();
                     ExpressPriceDetail expressPriceDetailModel;
@@ -5462,7 +5394,6 @@ namespace WebApp
                                         }
                                         else
                                             outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
-
                                         outsourceOrderDetailModel.AssignType = assignType;
                                         if (s.order.OrderType == (int)OrderTypeEnum.安装费 || s.order.OrderType == (int)OrderTypeEnum.测量费 || s.order.OrderType == (int)OrderTypeEnum.其他费用)
                                         {
@@ -5492,6 +5423,11 @@ namespace WebApp
                                                 outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                                                 promotionInstallPrice = 150;
                                             }
+                                        }
+                                        if (isProductInNorth && shop.RegionName != null && shop.RegionName.ToLower() != subjectModel.subject.PriceBlongRegion.ToLower())
+                                        {
+                                            outsourceOrderDetailModel.OutsourceId = calerOutsourceId;
+                                            outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
                                         }
                                         outsourceOrderDetailModel.FinalOrderId = s.order.Id;
                                         outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
@@ -6265,7 +6201,7 @@ namespace WebApp
                             outsourceOrderDetailModel = new OutsourceOrderDetail();
                             outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                             outsourceOrderDetailModel.AddDate = DateTime.Now;
-                            outsourceOrderDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                            outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
                             outsourceOrderDetailModel.AgentCode = oneShopOrderList[0].order.AgentCode;
                             outsourceOrderDetailModel.AgentName = oneShopOrderList[0].order.AgentName;
                             outsourceOrderDetailModel.BusinessModel = oneShopOrderList[0].order.BusinessModel;
@@ -6556,7 +6492,7 @@ namespace WebApp
                                 outsourceOrderDetailModel = new OutsourceOrderDetail();
                                 outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                                 outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                outsourceOrderDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
                                 outsourceOrderDetailModel.AgentCode = oneShopOrderList[0].order.AgentCode;
                                 outsourceOrderDetailModel.AgentName = oneShopOrderList[0].order.AgentName;
                                 outsourceOrderDetailModel.BusinessModel = oneShopOrderList[0].order.BusinessModel;
@@ -6614,7 +6550,7 @@ namespace WebApp
                             outsourceOrderDetailModel = new OutsourceOrderDetail();
                             outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                             outsourceOrderDetailModel.AddDate = DateTime.Now;
-                            outsourceOrderDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                            outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
                             outsourceOrderDetailModel.AgentCode = oneShopOrderList[0].order.AgentCode;
                             outsourceOrderDetailModel.AgentName = oneShopOrderList[0].order.AgentName;
                             outsourceOrderDetailModel.BusinessModel = oneShopOrderList[0].order.BusinessModel;
@@ -6907,9 +6843,12 @@ namespace WebApp
                         }
                         #endregion
                         #region 橱窗安装
-                        if (windowOrderList.Any())
+                        if (!isGeneric)
                         {
-                            windowInstallPrice = GetWindowInstallPrice(materialSupport);
+                            if (windowOrderList.Any())
+                            {
+                                windowInstallPrice = GetWindowInstallPrice(materialSupport);
+                            }
                         }
                         #endregion
                         #region OOH安装费
@@ -6987,9 +6926,8 @@ namespace WebApp
                 decimal length = order.GraphicLength ?? 0;
                 decimal widthAdd = 0;
                 decimal lengthAdd = 0;
-                decimal areaAdd = 0;
-
-                decimal addTotalPrice = 0;
+                decimal totalAreaAfterAdd = order.Area??0;
+                decimal totalPriceAfterAdd = order.TotalPrice??0;
 
                 bool useSetting = orderSetting ?? true;
                 if (string.IsNullOrWhiteSpace(order.Sheet) || string.IsNullOrWhiteSpace(order.GraphicMaterial))
@@ -7041,17 +6979,19 @@ namespace WebApp
                                     lengthAdd = (setting.POPLength ?? 0);
                                 }
                             }
+                            width += widthAdd;
+                            length += lengthAdd;
                             //order.Area = (order.GraphicWidth * order.GraphicLength) / 1000000;
-                            areaAdd = (widthAdd * lengthAdd) / 1000000;
+                            totalAreaAfterAdd = (width * length) / 1000000;
                             if (order.UnitName == "平米")
                             {
                                 //order.TotalPrice = order.Area * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
-                                addTotalPrice = areaAdd * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
+                                totalPriceAfterAdd = totalAreaAfterAdd * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
                             }
                             else if (order.UnitName == "米")
                             {
                                 //order.TotalPrice = (order.GraphicWidth / 1000) * 2 * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
-                                addTotalPrice = (widthAdd / 1000) * 2 * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
+                                totalPriceAfterAdd = (width / 1000) * 2 * (order.Quantity ?? 1) * (order.UnitPrice ?? 0);
                             }
                         }
                         else
@@ -7125,21 +7065,22 @@ namespace WebApp
                 quoteOrderModel.Tel = order.Tel;
 
                 //原始尺寸
-                quoteOrderModel.GraphicWidth = width;
-                quoteOrderModel.GraphicLength = length;
+                quoteOrderModel.GraphicWidth = order.GraphicWidth;
+                quoteOrderModel.GraphicLength = order.GraphicLength;
                 quoteOrderModel.Area = order.Area;
                 quoteOrderModel.DefaultTotalPrice = order.TotalPrice;
 
                 //增加的尺寸
                 quoteOrderModel.AutoAddGraphicWidth = widthAdd;
                 quoteOrderModel.AutoAddGraphicLength = lengthAdd;
-                quoteOrderModel.AutoAddArea = areaAdd;
-                quoteOrderModel.AutoAddTotalPrice = addTotalPrice;
+                //quoteOrderModel.AutoAddArea = areaAdd;
+                //quoteOrderModel.AutoAddTotalPrice = addTotalPrice;
+
                 //增加后尺寸
-                quoteOrderModel.TotalGraphicWidth = width + widthAdd;
-                quoteOrderModel.TotalGraphicLength = length + lengthAdd;
-                quoteOrderModel.TotalArea = order.Area + areaAdd;
-                quoteOrderModel.TotalPrice = order.TotalPrice + addTotalPrice;
+                quoteOrderModel.TotalGraphicWidth = width;
+                quoteOrderModel.TotalGraphicLength = length;
+                quoteOrderModel.TotalPrice = totalPriceAfterAdd;
+                quoteOrderModel.TotalArea = totalAreaAfterAdd;
 
                 quoteOrderModel.UnitPrice = order.UnitPrice;
                 quoteOrderModel.UnitName = order.UnitName;

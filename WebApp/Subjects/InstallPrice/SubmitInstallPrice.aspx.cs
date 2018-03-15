@@ -1568,9 +1568,12 @@ namespace WebApp.Subjects.InstallPrice
                                 //}
                                 #endregion
                                 #region 橱窗安装
-                                if (windowOrderList.Any())
+                                if (!isGeneric)
                                 {
-                                    windowInstallPrice = GetWindowInstallPrice(materialSupport);
+                                    if (windowOrderList.Any())
+                                    {
+                                        windowInstallPrice = GetWindowInstallPrice(materialSupport);
+                                    }
                                 }
                                 #endregion
                                 #region OOH安装费
@@ -1611,6 +1614,8 @@ namespace WebApp.Subjects.InstallPrice
                                     installPriceShopModel.MaterialSupport = materialSupport;
                                     installPriceShopModel.POSScale = POSScale;
                                     installPriceShopModel.AddType = 1;
+                                    installPriceShopModel.AddDate = DateTime.Now;
+                                    installPriceShopModel.AddUserId = CurrentUser.UserId;
                                     installShopBll.Add(installPriceShopModel);
                                 }
                                 #endregion

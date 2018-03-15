@@ -118,7 +118,7 @@ namespace WebApp.OrderChangeManage.js
         {
             cblGuidanceList.Items.Clear();
             int customerId = int.Parse(ddlCustomer.SelectedValue);
-            
+            DateTime endDate = DateTime.Now;
             var list = (from guidance in CurrentContext.DbContext.SubjectGuidance
                         join subject in CurrentContext.DbContext.Subject
                         on guidance.ItemId equals subject.GuidanceId
@@ -126,6 +126,8 @@ namespace WebApp.OrderChangeManage.js
                         && (subject.IsDelete == null || subject.IsDelete == false)
                         && subject.ApproveState == 1
                         && (guidance.IsDelete == null || guidance.IsDelete == false)
+                        && (guidance.IsFinish == null || guidance.IsFinish == false)
+                        && guidance.EndDate >= endDate
                         select new
                         {
                             guidance

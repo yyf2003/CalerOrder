@@ -320,7 +320,10 @@ namespace Common
         [Description("全部150")]
         basic = 1,
         [Description("T1-T3级别150，T4-T7按实际算")]
-        highLevel = 2,
+        secondLevel = 2,
+        [Description("无安装费/或单独导入")]
+        thirdLevel=3
+
     }
 }
 

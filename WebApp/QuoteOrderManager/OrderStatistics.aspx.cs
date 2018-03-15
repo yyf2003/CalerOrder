@@ -1960,6 +1960,7 @@ namespace WebApp.QuoteOrderManager
             decimal popPrice = 0;//POP制作费
             decimal originalPOPPrice = 0;//原始订单POP费用
             decimal autoAddPOPPrice = 0;//系统报价自动增加POP费用
+            //decimal POPPriceAfterAdd = 0;//总POP费用
             decimal newShopInstallPrice = 0;//新开店安装费
             decimal freightPrice = 0;//运费
             decimal otherPrice = 0;//其他费用
@@ -1983,11 +1984,12 @@ namespace WebApp.QuoteOrderManager
 
                 //统计实际订单费用和调整后的费用（POP）
                 originalPOPPrice = orderList.Sum(s => s.order.DefaultTotalPrice ?? 0);
-                autoAddPOPPrice = orderList.Sum(s => s.order.AutoAddTotalPrice ?? 0);
-
+                popPrice = orderList.Sum(s => s.order.TotalPrice ?? 0);
+                autoAddPOPPrice = popPrice - originalPOPPrice;
+                area = orderList.Sum(s => (s.order.TotalArea ?? 0)*(s.order.Quantity??1));
                 shopIdList = orderList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
                 labSubjectCount.Text = (subjectIdList.Count).ToString();
-                StatisticQuotePOPTotalPrice(orderList.Select(s => s.order), out popPrice, out area);
+                //StatisticQuotePOPTotalPrice(orderList.Select(s => s.order), out popPrice, out area);
                 labArea.Text = area > 0 ? (area + "平方米") : "0";
                 if (popPrice > 0)
                 {

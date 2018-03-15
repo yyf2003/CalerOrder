@@ -66,21 +66,22 @@ namespace WebApp.Subjects.RegionSubject
 
                 RegionOrderPriceBLL priceOrderBll = new RegionOrderPriceBLL();
 
-                var orderList = orderBll.GetList(s => s.SubjectId == SubjectId && (s.IsSubmit == null || s.IsSubmit == 0));
+                var orderList = orderBll.GetList(s => s.SubjectId == SubjectId);
                 if (orderList.Any())
                 {
                     orderList.ForEach(s =>
                     {
                         orderModel = s;
                         orderModel.IsSubmit = 1;
+                        orderModel.ApproveState = 0;
                         orderBll.Update(orderModel);
                     });
                     model.Status = 4;
                     model.ApproveState = 0;
                     subjectBll.Update(model);
-                    submitIsValid = true;
+                    //submitIsValid = true;
                 }
-                var priceOrderList = priceOrderBll.GetList(s => s.SubjectId == SubjectId && (s.IsSubmit == null || s.IsSubmit == 0));
+                var priceOrderList = priceOrderBll.GetList(s => s.SubjectId == SubjectId);
                 if (priceOrderList.Any())
                 {
                     RegionOrderPrice priceModel;
@@ -88,26 +89,27 @@ namespace WebApp.Subjects.RegionSubject
                     {
                         priceModel = s;
                         priceModel.IsSubmit = 1;
+                        priceModel.ApproveState = 0;
                         priceOrderBll.Update(priceModel);
                     });
                     model.Status = 4;
                     model.ApproveState = 0;
                     subjectBll.Update(model);
-                    submitIsValid = true;
+                    //submitIsValid = true;
                 }
-                if (!submitIsValid)
-                {
-                    var orderList0 = orderBll.GetList(s => s.SubjectId == SubjectId && s.IsSubmit == 1);
-                    if (orderList0.Any())
-                    {
-                        orderList0 = orderList0.Where(s => s.ApproveState == null || s.ApproveState == 0).ToList();
-                        if (!orderList0.Any())
-                        {
-                            model.ApproveState = 1;
-                            subjectBll.Update(model);
-                        }
-                    }
-                }
+                //if (!submitIsValid)
+                //{
+                //    var orderList0 = orderBll.GetList(s => s.SubjectId == SubjectId && s.IsSubmit == 1);
+                //    if (orderList0.Any())
+                //    {
+                //        orderList0 = orderList0.Where(s => s.ApproveState == null || s.ApproveState == 0).ToList();
+                //        if (!orderList0.Any())
+                //        {
+                //            model.ApproveState = 1;
+                //            subjectBll.Update(model);
+                //        }
+                //    }
+                //}
                 Alert("提交成功", "List.aspx");
             }
             else

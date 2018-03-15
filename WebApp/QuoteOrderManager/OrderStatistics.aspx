@@ -281,22 +281,40 @@
             <img id="loadingImg" style="display: none;" src="../image/WaitImg/loadingA.gif" />
         </div>
     </div>
-     <div style="margin-top: 10px;">
+    <div class="tr" style="margin-top: 10px;">
+      >>导出
+    </div>
+     <div >
         <table class="table">
             <tr class=" tr_hui">
-                <td style="width: 120px; height: 30px;">
+                <td style="width: 120px; height: 30px; text-align:right;">
                     导出明细：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:CheckBox ID="cbInstallPrice" runat="server" />安装费 &nbsp;&nbsp;
+                    
                     <input type="button" id="btnExport" value="导 出" class="easyui-linkbutton" style="width: 65px;
                         height: 26px;" />
                     <img id="exportWaiting" style="display: none;" src="../image/WaitImg/loadingA.gif" />
+                    
+
+                </td>
+            </tr>
+            <tr class=" tr_hui">
+              <td style="height: 30px;text-align:right;">
+                    导出报价单：
+               </td>
+               <td style="text-align: left; padding-left: 5px;">
+                   <span style="color:Blue;">请选择导出模板：</span>
+                   <asp:RadioButtonList ID="rblExportType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                      <asp:ListItem Value="1">大货&nbsp;&nbsp;</asp:ListItem>
+                      <asp:ListItem Value="2">三叶草&nbsp;&nbsp;</asp:ListItem>
+                      <asp:ListItem Value="3">童店&nbsp;&nbsp;</asp:ListItem>
+                      <asp:ListItem Value="4">Terrex</asp:ListItem>
+                   </asp:RadioButtonList>
                     <input type="button" id="btnExportQuote" value="导出报价单" class="easyui-linkbutton" style="width: 80px;
                         height: 26px; margin-left:30px;" />
                     <img id="exportWaiting1" style="display: none;" src="../image/WaitImg/loadingA.gif" />
-
-                </td>
+               </td>
             </tr>
         </table>
     </div>

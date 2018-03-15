@@ -253,7 +253,32 @@ namespace WebApp.QuoteOrderManager.handler
 
 
                     //鞋墙区域订单
-                    var ftwOrderList = popOrderList.Where(s => s.Sheet.Contains("鞋墙")).ToList();
+                    //var ftwOrderList = popOrderList.Where(s => s.Sheet.Contains("鞋墙") || s.Sheet.Contains("凹槽")).ToList();
+                    List<QuoteOrderDetail> ftwOrderList = new List<QuoteOrderDetail>();
+                    List<string> shoeWareSheetList = new List<string>() { "鞋墙", "凹槽", "圆吧", "弧形", "鞋吧", "圆桌", "吧台", "鞋砖", "鞋柱" };
+                    string shoeSheetStr = string.Empty;
+                    try
+                    {
+                        shoeSheetStr = ConfigurationManager.AppSettings["QuoteOrderTemplateShoeSheet"];
+                    }
+                    catch
+                    {
+
+                    }
+                    if (!string.IsNullOrWhiteSpace(shoeSheetStr))
+                    {
+                        shoeWareSheetList = StringHelper.ToStringList(shoeSheetStr, ',');
+                    }
+                    if (shoeWareSheetList.Any())
+                    {
+                        shoeWareSheetList.ForEach(sh => {
+                            var ftwOrderList0 = popOrderList.Where(s => s.Sheet.Contains(sh)).ToList();
+                            if (ftwOrderList0.Any())
+                            {
+                                ftwOrderList.AddRange(ftwOrderList0);
+                            }
+                        });
+                    }
                     if (ftwOrderList.Any())
                     {
                         
@@ -261,7 +286,7 @@ namespace WebApp.QuoteOrderManager.handler
                         var frameMachineTypeList = new MachineFrameTypeBLL().GetList(s=>s.Id>0);
                         if (frameMachineTypeList.Any())
                         {
-                            var sizeTotalList = new MachineFrameSizeBLL().GetList(s => s.Id > 0);
+                            
                             //HC
                             var HCList = ftwOrderList.Where(s => s.Channel != null && (s.Channel.ToUpper() == "HC" || s.Channel.ToUpper() == "HOMECOURT")).ToList();
                             List<int> hcOrderIdList = new List<int>();
@@ -269,56 +294,63 @@ namespace WebApp.QuoteOrderManager.handler
                             if (HCList.Any())
                             {
                                 hcOrderIdList = HCList.Select(s => s.Id).ToList();
-                                var frameMachineTypeList1 = frameMachineTypeList.Where(s => s.MachineFrameTypeName.Contains("HC")).ToList();
-                                frameMachineTypeList1.ForEach(frameType =>
+                                List<int> hcNormalIdList = new List<int>();
+                                //主KV
+                                List<QuoteOrderDetail> ftwQuoteOrderListKV = HCList.Where(s=>s.Sheet.Contains("鞋墙")).ToList();
+                                if (ftwQuoteOrderListKV.Any())
                                 {
-                                    List<QuoteOrderDetail> ftwQuoteOrderList = new List<QuoteOrderDetail>();
-                                    //主KV
-                                    var sizelist1 = sizeTotalList.Where(s => s.MachineFrameTypeId == frameType.Id && s.FrameType == 1).ToList();
-                                    sizelist1.ForEach(size =>
+                                    hcNormalIdList = ftwQuoteOrderListKV.Select(s => s.Id).ToList();
+                                    List<QuoteModel> ftwList = new List<QuoteModel>();//
+                                    StatisticMaterial(ftwQuoteOrderListKV, ref ftwList);
+                                    if (ftwList.Any())
                                     {
-                                        List<QuoteOrderDetail> order1 = HCList.Where(s => s.GraphicLength == size.Height && s.GraphicWidth == size.Width).ToList();
-                                        if (order1.Any())
+                                        ftwList.ForEach(s =>
                                         {
-                                            ftwQuoteOrderList.AddRange(order1);
-                                        }
-                                    });
+                                            sheet.Cells[ftwWallStartRow, 2].Value = "HC鞋墙主KV";
+                                            sheet.Cells[ftwWallStartRow, 3].Value = s.QuoteGraphicMaterial;
+                                            sheet.Cells[ftwWallStartRow, 5].Value = s.Amount;
+                                            ftwWallStartRow++;
+                                        });
+                                    }
+                                }
+                                //主灯槽
+                                List<QuoteOrderDetail> ftwQuoteOrderList = HCList.Where(s => s.Sheet.Contains("凹槽") || s.Sheet.Contains("灯槽")).ToList();
+                                if (ftwQuoteOrderList.Any())
+                                {
+                                    var hcNormalIdList0 = ftwQuoteOrderList.Select(s => s.Id).ToList();
+                                    if (hcNormalIdList0.Any())
+                                    {
+                                        hcNormalIdList.AddRange(hcNormalIdList0);
+                                    }
                                     List<QuoteModel> ftwList = new List<QuoteModel>();//
                                     StatisticMaterial(ftwQuoteOrderList, ref ftwList);
                                     if (ftwList.Any())
                                     {
                                         ftwList.ForEach(s =>
                                         {
-                                            sheet.Cells[ftwWallStartRow, 2].Value = frameType + "鞋墙主KV";
+                                            sheet.Cells[ftwWallStartRow, 2].Value = "HC鞋墙灯槽";
                                             sheet.Cells[ftwWallStartRow, 3].Value = s.QuoteGraphicMaterial;
                                             sheet.Cells[ftwWallStartRow, 5].Value = s.Amount;
                                             ftwWallStartRow++;
                                         });
                                     }
-
-                                    //灯槽
-                                    var sizelist2 = sizeTotalList.Where(s => s.MachineFrameTypeId == frameType.Id && s.FrameType == 2).ToList();
-                                    sizelist1.ForEach(size =>
-                                    {
-                                        List<QuoteOrderDetail> order1 = HCList.Where(s => s.GraphicLength == size.Height && s.GraphicWidth == size.Width).ToList();
-                                        if (order1.Any())
-                                        {
-                                            ftwQuoteOrderList.AddRange(order1);
-                                        }
-                                    });
-                                    ftwList = new List<QuoteModel>();//
-                                    StatisticMaterial(ftwQuoteOrderList, ref ftwList);
+                                }
+                                //鞋吧，弧形吧的其他位置
+                                List<QuoteOrderDetail> ftwQuoteOrderListOthers = HCList.Where(s => !hcNormalIdList.Contains(s.Id)).ToList();
+                                if (ftwQuoteOrderListOthers.Any()) {
+                                    List<QuoteModel> ftwList = new List<QuoteModel>();//
+                                    StatisticMaterial(ftwQuoteOrderListOthers, ref ftwList);
                                     if (ftwList.Any())
                                     {
                                         ftwList.ForEach(s =>
                                         {
-                                            sheet.Cells[ftwWallStartRow, 2].Value = frameType + "灯槽";
+                                            sheet.Cells[ftwWallStartRow, 2].Value = "HC圆桌+科技+鞋吧";
                                             sheet.Cells[ftwWallStartRow, 3].Value = s.QuoteGraphicMaterial;
                                             sheet.Cells[ftwWallStartRow, 5].Value = s.Amount;
                                             ftwWallStartRow++;
                                         });
                                     }
-                                });
+                                }
                             }
                             #endregion
 
@@ -326,6 +358,7 @@ namespace WebApp.QuoteOrderManager.handler
                             var notHCList = ftwOrderList.Where(s => !hcOrderIdList.Contains(s.Id)).ToList();
                             if (notHCList.Any())
                             {
+                                var sizeTotalList = new MachineFrameSizeBLL().GetList(s => s.Id > 0);
                                 var frameMachineTypeList2 = frameMachineTypeList.Where(s => !s.MachineFrameTypeName.Contains("HC")).ToList();
                                 frameMachineTypeList2.ForEach(frameType =>
                                 {
@@ -345,7 +378,7 @@ namespace WebApp.QuoteOrderManager.handler
                                     {
                                         ftwList.ForEach(s =>
                                         {
-                                            sheet.Cells[ftwWallStartRow, 2].Value = frameType+"鞋墙主KV";
+                                            sheet.Cells[ftwWallStartRow, 2].Value = frameType.MachineFrameTypeName+"鞋墙主KV";
                                             sheet.Cells[ftwWallStartRow, 3].Value = s.QuoteGraphicMaterial;
                                             sheet.Cells[ftwWallStartRow, 5].Value = s.Amount;
                                             ftwWallStartRow++;
@@ -353,8 +386,9 @@ namespace WebApp.QuoteOrderManager.handler
                                     }
 
                                     //灯槽
+                                    ftwQuoteOrderList.Clear();
                                     var sizelist2 = sizeTotalList.Where(s => s.MachineFrameTypeId == frameType.Id && s.FrameType ==2).ToList();
-                                    sizelist1.ForEach(size =>
+                                    sizelist2.ForEach(size =>
                                     {
                                         List<QuoteOrderDetail> order1 = notHCList.Where(s => s.GraphicLength == size.Height && s.GraphicWidth == size.Width).ToList();
                                         if (order1.Any())
@@ -362,13 +396,13 @@ namespace WebApp.QuoteOrderManager.handler
                                             ftwQuoteOrderList.AddRange(order1);
                                         }
                                     });
-                                    ftwList = new List<QuoteModel>();//
+                                    ftwList.Clear();//
                                     StatisticMaterial(ftwQuoteOrderList, ref ftwList);
                                     if (ftwList.Any())
                                     {
                                         ftwList.ForEach(s =>
                                         {
-                                            sheet.Cells[ftwWallStartRow, 2].Value = frameType + "灯槽";
+                                            sheet.Cells[ftwWallStartRow, 2].Value = frameType.MachineFrameTypeName + "灯槽";
                                             sheet.Cells[ftwWallStartRow, 3].Value = s.QuoteGraphicMaterial;
                                             sheet.Cells[ftwWallStartRow, 5].Value = s.Amount;
                                             ftwWallStartRow++;
@@ -397,6 +431,7 @@ namespace WebApp.QuoteOrderManager.handler
                             });
                         }
                     }
+                    //中岛
                     var zdOrderList = popOrderList.Where(s => s.Sheet.ToLower().Contains("中岛")).ToList();
                     if (zdOrderList.Any())
                     {

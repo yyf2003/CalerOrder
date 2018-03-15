@@ -933,6 +933,8 @@
           <Property Name="BasicPrice" Type="decimal" Scale="2" />
           <Property Name="WindowPrice" Type="decimal" Scale="2" />
           <Property Name="OOHPrice" Type="decimal" Scale="2" />
+          <Property Name="AddDate" Type="datetime" />
+          <Property Name="AddUserId" Type="int" />
         </EntityType>
         <EntityType Name="InstallPriceTemp">
           <Key>
@@ -3728,6 +3730,8 @@
           <Property Type="Decimal" Name="BasicPrice" Precision="18" Scale="2" />
           <Property Type="Decimal" Name="WindowPrice" Precision="18" Scale="2" />
           <Property Type="Decimal" Name="OOHPrice" Precision="18" Scale="2" />
+          <Property Type="DateTime" Name="AddDate" />
+          <Property Type="Int32" Name="AddUserId" />
         </EntityType>
         <EntityType Name="InstallPriceTemp">
           <Key>
@@ -6401,6 +6405,8 @@
           <EntitySetMapping Name="InstallPriceShopInfo">
             <EntityTypeMapping TypeName="KalerOrderDBModel.InstallPriceShopInfo">
               <MappingFragment StoreEntitySet="InstallPriceShopInfo">
+                <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+                <ScalarProperty Name="AddDate" ColumnName="AddDate" />
                 <ScalarProperty Name="OOHPrice" ColumnName="OOHPrice" />
                 <ScalarProperty Name="WindowPrice" ColumnName="WindowPrice" />
                 <ScalarProperty Name="BasicPrice" ColumnName="BasicPrice" />

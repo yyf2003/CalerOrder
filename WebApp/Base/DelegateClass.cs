@@ -68,12 +68,12 @@ namespace WebApp.Base
                 {
                     try
                     {
+
                         if ((subjectType != (int)SubjectTypeEnum.二次安装 && subjectType != (int)SubjectTypeEnum.费用订单))
                         {
                             if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
                             {
                                 new BasePage().SaveSecondInstallPrice(subjectId, subjectType);
-
                             }
                             //else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
                             //{

@@ -576,7 +576,7 @@ namespace WebApp.Subjects
             {
                 orderType = int.Parse(rblSubjectType.SelectedValue);
             }
-            if (orderType == (int)SubjectTypeEnum.POP订单)
+            if (orderType == (int)SubjectTypeEnum.POP订单 || orderType == (int)SubjectTypeEnum.手工订单)
             {
                 cbNoOrderList.Enabled = true;
                 rblRegion.Enabled = true;

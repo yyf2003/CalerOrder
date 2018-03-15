@@ -64,10 +64,10 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function (sender, e
 
     var val = $("#hfIsFinishEdit").val() || 0;
     var leftShopCount = $("#labTotalShopCount").html();
-    if (val == 0 && leftShopCount > 0) {
-        CheckEmpty();
-        $("#hfIsFinishEdit").val("1");
-    }
+    //if (val == 0 && leftShopCount > 0) {
+        //CheckEmpty();
+        //$("#hfIsFinishEdit").val("1");
+    //}
 
 
     $("img[name='loadImg']").hide();
