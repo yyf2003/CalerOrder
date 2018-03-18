@@ -519,6 +519,9 @@
                         项目编号
                     </td>
                     <td>
+                        项目类型
+                    </td>
+                    <td>
                         订单类型
                     </td>
                     <td>
@@ -571,6 +574,9 @@
                 </td>
                 <td>
                     <%#Eval("subject.SubjectNo")%>
+                </td>
+                <td>
+                    <%#Eval("CategoryName")%>
                 </td>
                 <td>
                     <asp:Label ID="labSubjectType" runat="server" Text=""></asp:Label>

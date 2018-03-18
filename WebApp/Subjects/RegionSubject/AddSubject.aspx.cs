@@ -290,6 +290,7 @@ namespace WebApp.Subjects.RegionSubject
             if (subjectId > 0)
             {
                 subjectModel = subjectBll.GetModel(subjectId);
+                
             }
             else
             {
@@ -300,26 +301,27 @@ namespace WebApp.Subjects.RegionSubject
                 subjectModel.AddDate = DateTime.Now;
                 subjectModel.IsDelete = false;
                 subjectModel.Status = 3;
-                
                 subjectModel.SubjectNo = CreateSubjectNo();
                 subjectModel.CompanyId = CurrentUser.CompanyId;
                 subjectModel.ApproveState = 0;
-                if (subjectType == (int)SubjectTypeEnum.正常单)
+                
+            }
+
+            if (subjectType == (int)SubjectTypeEnum.正常单)
+            {
+                if (subjectId==0)
+                   subjectModel.Status = 1;
+                Subject oldSubjectModel = subjectBll.GetModel(realSubjectId);
+                if (oldSubjectModel != null)
                 {
-                    subjectModel.Status = 1;
-                    Subject oldSubjectModel = subjectBll.GetModel(realSubjectId);
-                    if (oldSubjectModel != null)
-                    {
-                        subjectModel.ActivityId = oldSubjectModel.ActivityId;
-                        subjectModel.AddOrderType = oldSubjectModel.AddOrderType;
-                        subjectModel.SubjectCategoryId = oldSubjectModel.SubjectCategoryId;
-                        subjectModel.SubjectTypeId = oldSubjectModel.SubjectTypeId;
-                        subjectModel.CornerType = oldSubjectModel.CornerType;
-                    }
-
-
+                    subjectModel.ActivityId = oldSubjectModel.ActivityId;
+                    subjectModel.AddOrderType = oldSubjectModel.AddOrderType;
+                    subjectModel.SubjectCategoryId = oldSubjectModel.SubjectCategoryId;
+                    subjectModel.SubjectTypeId = oldSubjectModel.SubjectTypeId;
+                    subjectModel.CornerType = oldSubjectModel.CornerType;
                 }
             }
+
             subjectModel.BeginDate = DateTime.Parse(txtBeginDate.Text.Trim());
 
             subjectModel.CustomerId = int.Parse(ddlCustomer.SelectedValue);

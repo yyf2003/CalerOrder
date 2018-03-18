@@ -540,9 +540,16 @@ namespace WebApp.Subjects.ModifyOrder.handler
                     try
                     {
                         int currSubjectId = 0;
+                        bool isPriceOrder = false;
                         FinalOrderDetailTemp orderModel = JsonConvert.DeserializeObject<FinalOrderDetailTemp>(jsonStr);
                         if (orderModel != null)
                         {
+                            int orderType= orderModel.OrderType ?? 1;
+                            string orderTypeDes = CommonMethod.GetEnumDescription<OrderTypeEnum>(orderType.ToString());
+                            if (orderTypeDes.Contains("费用订单"))
+                            {
+                                isPriceOrder = true;
+                            }
                             currSubjectId = (orderModel.RegionSupplementId ?? 0) > 0 ? orderModel.RegionSupplementId ?? 0 : (orderModel.SubjectId ?? 0);
                             Subject subjectModel0 = new SubjectBLL().GetModel(currSubjectId);
 
@@ -886,19 +893,22 @@ namespace WebApp.Subjects.ModifyOrder.handler
                                     logModel.UnitName = newOrderModel.UnitName;
                                     logModel.UnitPrice = newOrderModel.UnitPrice;
                                     logBll.Add(logModel);
-                                    if (guidanceModel != null && (subjectModel0.SubjectType != (int)SubjectTypeEnum.二次安装 && subjectModel0.SubjectType != (int)SubjectTypeEnum.费用订单 && subjectModel0.SubjectType != (int)SubjectTypeEnum.新开店安装费))
+                                    if (!isPriceOrder)
                                     {
-                                        if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
+                                        if (guidanceModel != null && (subjectModel0.SubjectType != (int)SubjectTypeEnum.二次安装 && subjectModel0.SubjectType != (int)SubjectTypeEnum.费用订单 && subjectModel0.SubjectType != (int)SubjectTypeEnum.新开店安装费))
                                         {
-                                            new BasePage().RecountInstallPrice(guidanceModel.ItemId, new List<int>() { shopModel.Id});
-                                        }
-                                        else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
-                                        {
-                                            new BasePage().SaveExpressPrice(guidanceModel.ItemId, subjectId, subjectModel0.SubjectType ?? 1);
-                                        }
-                                        else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
-                                        {
-                                            new BasePage().SaveExpressPriceForDelivery(guidanceModel.ItemId, subjectId, subjectModel0.SubjectType ?? 1, guidanceModel.ExperssPrice);
+                                            if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
+                                            {
+                                                new BasePage().RecountInstallPrice(guidanceModel.ItemId, new List<int>() { shopModel.Id });
+                                            }
+                                            else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
+                                            {
+                                                new BasePage().SaveExpressPrice(guidanceModel.ItemId, subjectId, subjectModel0.SubjectType ?? 1);
+                                            }
+                                            else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
+                                            {
+                                                new BasePage().SaveExpressPriceForDelivery(guidanceModel.ItemId, subjectId, subjectModel0.SubjectType ?? 1, guidanceModel.ExperssPrice);
+                                            }
                                         }
                                     }
                                 }

@@ -606,8 +606,9 @@ namespace WebApp.Statistics
 
 
         //统计
-        //项目安装费字典：<项目Id，费用合计>
+        //项目安装费字典：<项目Id，费用合计>(按店铺统计)
         Dictionary<int, decimal> subjectInstallPriceDic = new Dictionary<int, decimal>();
+       
         //二次安装费字典：<项目Id，费用合计>
         Dictionary<int, decimal> secondInstallPriceDic = new Dictionary<int, decimal>();
         //二次发货费字典：<项目Id，费用合计>
@@ -900,7 +901,7 @@ namespace WebApp.Statistics
 
 
 
-
+            //Dictionary<int, List<int>> installShopIdDic = new Dictionary<int, List<int>>(); 
             #region 正常安装费
             guidanceIdList.ForEach(gid =>
             {
@@ -938,10 +939,13 @@ namespace WebApp.Statistics
                         if (!subjectInstallPriceDic.Keys.Contains(s.installShop.SubjectId ?? 0))
                         {
                             subjectInstallPriceDic.Add(s.installShop.SubjectId ?? 0, installPrice0);
+                            //List<int> list0 = new List<int>() { s.installShop.ShopId??0};
+                            //installShopIdDic.Add(s.installShop.SubjectId ?? 0, list0);
                         }
                         else
                         {
                             subjectInstallPriceDic[s.installShop.SubjectId ?? 0] = subjectInstallPriceDic[s.installShop.SubjectId ?? 0] + installPrice0;
+
                         }
                     });
                 }
@@ -1644,7 +1648,7 @@ namespace WebApp.Statistics
                 object item = e.Item.DataItem;
                 if (item != null)
                 {
-
+                    
                     object subjectIdObj = item.GetType().GetProperty("Id").GetValue(item, null);
                     int subjectId = subjectIdObj != null ? int.Parse(subjectIdObj.ToString()) : 0;
                     object subjectTypeObj = item.GetType().GetProperty("SubjectType").GetValue(item, null);
@@ -3109,16 +3113,21 @@ namespace WebApp.Statistics
             var list = (from subject in subjectList
                         join customer in CurrentContext.DbContext.Customer
                         on subject.CustomerId equals customer.Id
+                        join subjectCategory1 in CurrentContext.DbContext.ADSubjectCategory
+                        on subject.SubjectCategoryId equals subjectCategory1.Id into subjectCategoryTemp
+                        from subjectCategory in subjectCategoryTemp.DefaultIfEmpty()
                         where subjectIds.Contains(subject.Id)
                         select new
                         {
                             subject,
                             subject.Id,
                             subject.SubjectType,
+                            subject.SubjectCategoryId,
                             customer.CustomerName,
                             subject.SubjectName,
                             subject.Remark,
-                            subject.PriceBlongRegion
+                            subject.PriceBlongRegion,
+                            subjectCategory.CategoryName
                         }
                             ).ToList();
             gvList.DataSource = list;
