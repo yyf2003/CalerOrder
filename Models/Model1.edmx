@@ -1029,6 +1029,7 @@
           </Key>
           <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="MachineFrameTypeId" Type="int" />
+          <Property Name="Channel" Type="nvarchar" MaxLength="100" />
           <Property Name="FrameType" Type="int" />
           <Property Name="Width" Type="decimal" />
           <Property Name="Height" Type="decimal" />
@@ -1038,6 +1039,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Sheet" Type="nvarchar" MaxLength="50" />
           <Property Name="MachineFrameTypeName" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Material">
@@ -3829,6 +3831,7 @@
           <Property Type="Int32" Name="FrameType" />
           <Property Type="Decimal" Name="Width" Precision="18" Scale="0" />
           <Property Type="Decimal" Name="Height" Precision="18" Scale="0" />
+          <Property Type="String" Name="Channel" MaxLength="100" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="MachineFrameType">
           <Key>
@@ -3836,6 +3839,7 @@
           </Key>
           <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Type="String" Name="MachineFrameTypeName" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Material">
           <Key>
@@ -6517,6 +6521,7 @@
           <EntitySetMapping Name="MachineFrameSize">
             <EntityTypeMapping TypeName="KalerOrderDBModel.MachineFrameSize">
               <MappingFragment StoreEntitySet="MachineFrameSize">
+                <ScalarProperty Name="Channel" ColumnName="Channel" />
                 <ScalarProperty Name="Height" ColumnName="Height" />
                 <ScalarProperty Name="Width" ColumnName="Width" />
                 <ScalarProperty Name="FrameType" ColumnName="FrameType" />
@@ -6528,6 +6533,7 @@
           <EntitySetMapping Name="MachineFrameType">
             <EntityTypeMapping TypeName="KalerOrderDBModel.MachineFrameType">
               <MappingFragment StoreEntitySet="MachineFrameType">
+                <ScalarProperty Name="Sheet" ColumnName="Sheet" />
                 <ScalarProperty Name="MachineFrameTypeName" ColumnName="MachineFrameTypeName" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>

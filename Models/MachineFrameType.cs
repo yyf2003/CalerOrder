@@ -16,5 +16,6 @@ namespace Models
     {
         public int Id { get; set; }
         public string MachineFrameTypeName { get; set; }
+        public string Sheet { get; set; }
     }
 }

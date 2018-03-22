@@ -314,6 +314,11 @@
                     <input type="button" id="btnExportQuote" value="导出报价单" class="easyui-linkbutton" style="width: 80px;
                         height: 26px; margin-left:30px;" />
                     <img id="exportWaiting1" style="display: none;" src="../image/WaitImg/loadingA.gif" />
+                  <%-- <asp:Button ID="Button1" runat="server" Text="生成报价订单" 
+                       OnClientClick="return showLoading();" style=" margin-left:30px;" 
+                       onclick="Button1_Click"/>
+                   <img id="Img2" style="display: none;" src="../image/WaitImg/loadingA.gif" />
+                   <asp:Label ID="Label1" runat="server" Text=""></asp:Label>--%>
                </td>
             </tr>
         </table>
@@ -635,3 +640,9 @@
 </html>
 
 <script src="js/orderStatistics.js" type="text/javascript"></script>
+<script type="text/javascript">
+    function showLoading() {
+        $("#Img2").show();
+        return true;
+    }
+</script>

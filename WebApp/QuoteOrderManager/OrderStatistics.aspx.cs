@@ -2817,6 +2817,32 @@ namespace WebApp.QuoteOrderManager
 
         }
 
+        //protected void Button1_Click(object sender, EventArgs e)
+        //{
+            //List<int> guidanceIdList = new List<int>() { 186, 183, 180 };
+            //var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+            //                 join subject in CurrentContext.DbContext.Subject
+            //                 on order.SubjectId equals subject.Id
+            //                 where (order.IsDelete == false || order.IsDelete == null)
+            //                 && (subject.IsDelete == null || subject.IsDelete == false)
+            //                 && subject.ApproveState == 1
+            //                 && guidanceIdList.Contains(order.GuidanceId ?? 0)
+            //                 select order).ToList();
+            //orderList.ForEach(s =>
+            //{
+                //if (s.OrderType == (int)OrderTypeEnum.物料)
+                //{
+                //    new BasePage().SaveQuotationOrder(s, false);
+                //}
+                //else
+                //{
+                //    new BasePage().SaveQuotationOrder(s);
+                //}
+                //new BasePage().SaveQuotationOrder(s, false);
+            //});
+            //Label1.Text = "操作成功！";
+        //}
+
         
     }
 }

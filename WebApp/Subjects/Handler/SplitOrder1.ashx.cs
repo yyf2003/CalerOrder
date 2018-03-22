@@ -2165,8 +2165,7 @@ namespace WebApp.Subjects.Handler
                                                         finalOrderTempModel.CSUserId = shop1.shop.CSUserId;
                                                         finalOrderTempModel.UnitName = unitName;
                                                         finalOrderTempBll.Add(finalOrderTempModel);
-                                                        //保存报价订单
-                                                        //new BasePage().SaveQuotationOrder(finalOrderTempModel);
+                                                        
                                                     });
                                                     
                                                 }
@@ -2319,10 +2318,7 @@ namespace WebApp.Subjects.Handler
                                                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                             finalOrderTempModel.UnitName = unitName;
                                                             finalOrderTempBll.Add(finalOrderTempModel);
-                                                            //保存报价订单
-                                                            
-                                                            //new BasePage().SaveQuotationOrder(finalOrderTempModel);
-                                                            //keepId.Add(o.order.Id);
+                                                           
                                                         }
                                                         #endregion
                                                         #region
@@ -2429,8 +2425,7 @@ namespace WebApp.Subjects.Handler
                                                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                                     finalOrderTempModel.UnitName = unitName;
                                                                     finalOrderTempBll.Add(finalOrderTempModel);
-                                                                    //保存报价订单
-                                                                    //new BasePage().SaveQuotationOrder(finalOrderTempModel);
+                                                                   
                                                                 }
                                                             }
                                                             #endregion
@@ -2608,8 +2603,7 @@ namespace WebApp.Subjects.Handler
                                                                 {
                                                                     finalOrderTempBll.Add(finalOrderTempModel);
                                                                     FinishOrderList.Add(finalOrderTempModel);
-                                                                    //保存报价订单
-                                                                    //new BasePage().SaveQuotationOrder(finalOrderTempModel);
+                                                                   
                                                                 }
                                                             }
                                                             finishSplitId.Add(o.order.Id);
@@ -2721,8 +2715,7 @@ namespace WebApp.Subjects.Handler
                                             finalOrderTempModel.UnitName = unitName;
                                             finalOrderTempBll.Add(finalOrderTempModel);
 
-                                            //保存报价订单
-                                            //new BasePage().SaveQuotationOrder(finalOrderTempModel);
+                                           
                                             keepId.Add(o.order.Id);
                                         }
 
@@ -2827,8 +2820,7 @@ namespace WebApp.Subjects.Handler
                                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                     finalOrderTempModel.UnitName = unitName;
                                                     finalOrderTempBll.Add(finalOrderTempModel);
-                                                    //保存报价订单
-                                                    //new BasePage().SaveQuotationOrder(finalOrderTempModel);
+                                                   
                                                 }
                                             }
                                             else
@@ -3007,18 +2999,12 @@ namespace WebApp.Subjects.Handler
                                                 finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                 finalOrderTempModel.UnitName = unitName;
                                                 bool isOk = true;
-                                                //if (FinishOrderList.Any())
-                                                //{
-                                                //    var tempList = FinishOrderList.Where(fo => fo.SubjectId == finalOrderTempModel.SubjectId && fo.ShopId == finalOrderTempModel.ShopId && fo.Sheet == finalOrderTempModel.Sheet && fo.Gender == finalOrderTempModel.Gender && fo.GraphicLength == finalOrderTempModel.GraphicLength && fo.GraphicWidth == finalOrderTempModel.GraphicWidth && (finalOrderTempModel.Sheet == "鞋墙" || (fo.PositionDescription == finalOrderTempModel.PositionDescription)));
-                                                //    if (tempList.Any())
-                                                //        isOk = false;
-                                                //}
+                                               
                                                 if (isOk)
                                                 {
                                                     finalOrderTempBll.Add(finalOrderTempModel);
                                                     FinishOrderList.Add(finalOrderTempModel);
-                                                    //保存报价订单
-                                                    //new BasePage().SaveQuotationOrder(finalOrderTempModel);
+                                                   
                                                 }
                                             }
 
@@ -3129,8 +3115,7 @@ namespace WebApp.Subjects.Handler
                             try
                             {
                                 finalOrderTempBll.Add(finalOrderTempModel);
-                                //保存报价订单
-                                //new BasePage().SaveQuotationOrder(finalOrderTempModel);
+                               
                             }
                             catch (Exception ex)
                             {
@@ -3215,8 +3200,7 @@ namespace WebApp.Subjects.Handler
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                             finalOrderTempModel.UnitName = unitName;
                             finalOrderTempBll.Add(finalOrderTempModel);
-                            //保存报价订单
-                            //new BasePage().SaveQuotationOrder(finalOrderTempModel,false);
+                            
                         });
                     }
 

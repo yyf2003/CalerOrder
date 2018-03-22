@@ -64,8 +64,8 @@ namespace WebApp.Base
             {
                 bool isSave = true;
                 string errorMsg = string.Empty;
-                using (TransactionScope tran = new TransactionScope())
-                {
+                //using (TransactionScope tran = new TransactionScope())
+                //{
                     try
                     {
 
@@ -1463,14 +1463,14 @@ namespace WebApp.Base
 
                             }
                         }
-                        tran.Complete();
+                        //tran.Complete();
                     }
                     catch (Exception ex)
                     {
                         errorMsg = ex.Message;
                         isSave = false;
                     }
-                }
+                //}
                 if (!isSave)
                 {
                     OutsourceOrderSavingLogBLL logBll = new OutsourceOrderSavingLogBLL();

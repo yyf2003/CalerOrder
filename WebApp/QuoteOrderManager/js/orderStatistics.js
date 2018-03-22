@@ -165,7 +165,8 @@ $(function () {
                 subjectIds += $(this).val() + ",";
             })
         }
-        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&subjectIds=" + subjectIds;
+        var templateType = $("input[name='rblExportType']:checked").val() || 1;
+        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&subjectIds=" + subjectIds + "&templateType=" + templateType;
         $("#exportFrame").attr("src", url);
     })
 

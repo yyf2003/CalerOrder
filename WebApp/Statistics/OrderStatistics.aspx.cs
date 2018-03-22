@@ -2926,212 +2926,219 @@ namespace WebApp.Statistics
 
         void BindSubjectList()
         {
-            guidanceIdList = GetGuidanceSelected();
-            subjectIdList = GetSubjectSelected();
-            priceSubjectIdList = GetPriceSubjectSelected();
+            //try
+            //{
+                guidanceIdList = GetGuidanceSelected();
+                subjectIdList = GetSubjectSelected();
+                priceSubjectIdList = GetPriceSubjectSelected();
 
-            foreach (ListItem li in cblShopType.Items)
-            {
-                if (li.Selected)
+                foreach (ListItem li in cblShopType.Items)
                 {
-                    shopTypeList.Add(li.Value);
-                }
-            }
-            foreach (ListItem li in cblAddUser.Items)
-            {
-                if (li.Selected)
-                    addUserList.Add(int.Parse(li.Value));
-            }
-
-            foreach (ListItem li in cblSubjectCategory.Items)
-            {
-                if (li.Selected)
-                    subjectCategoryList.Add(int.Parse(li.Value));
-            }
-            foreach (ListItem li in cblRegion.Items)
-            {
-                if (li.Selected && !regionList.Contains(li.Value.ToLower()))
-                {
-                    regionList.Add(li.Value.ToLower());
-                }
-            }
-            foreach (ListItem li in cblProvince.Items)
-            {
-                if (li.Selected && !provinceList.Contains(li.Value.Trim()))
-                {
-                    provinceList.Add(li.Value.Trim());
-                }
-            }
-            foreach (ListItem li in cblCity.Items)
-            {
-                if (li.Selected && !cityList.Contains(li.Value.Trim()))
-                {
-                    cityList.Add(li.Value.Trim());
-                }
-            }
-            foreach (ListItem li in cblCustomerService.Items)
-            {
-                if (li.Selected)
-                    customerServiceIds.Add(int.Parse(li.Value));
-            }
-            if (!regionList.Any() && GetResponsibleRegion.Any())
-            {
-                GetResponsibleRegion.ForEach(s =>
-                {
-                    regionList.Add(s.ToLower());
-                });
-            }
-
-            foreach (ListItem li in cblSubjectChannel.Items)
-            {
-                if (li.Selected)
-                {
-                    subjectChannel = int.Parse(li.Value);
-                    break;
-                }
-            }
-            List<FinalOrderDetailTemp> finalOrderDetailTempList = new List<FinalOrderDetailTemp>();
-            List<Shop> shopList = new List<Shop>();
-            List<Subject> subjectList = new List<Subject>();
-            if (Session["orderDetailStatistics"] != null)
-                finalOrderDetailTempList = Session["orderDetailStatistics"] as List<FinalOrderDetailTemp>;
-            if (Session["shopStatistics"] != null)
-                shopList = Session["shopStatistics"] as List<Shop>;
-            if (Session["subjectStatistics"] != null)
-                subjectList = Session["subjectStatistics"] as List<Subject>;
-
-            var orderList0 = (from order in finalOrderDetailTempList
-                              join shop in shopList
-                              on order.ShopId equals shop.Id
-                              join subject in subjectList
-                              on order.SubjectId equals subject.Id
-                              select new
-                              {
-                                  order,
-                                  shop,
-                                  subject
-
-                              }).ToList();
-
-            if (addUserList.Any())
-            {
-                orderList0 = orderList0.Where(s => addUserList.Contains(s.subject.AddUserId ?? 0)).ToList();
-            }
-
-            if (subjectCategoryList.Any())
-            {
-                if (subjectCategoryList.Contains(0))
-                {
-                    subjectCategoryList.Remove(0);
-                    if (subjectCategoryList.Any())
+                    if (li.Selected)
                     {
-                        orderList0 = orderList0.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0) || (s.subject.SubjectCategoryId == null || s.subject.SubjectCategoryId == 0)).ToList();
-                    }
-                    else
-                        orderList0 = orderList0.Where(s => s.subject.SubjectCategoryId == null || s.subject.SubjectCategoryId == 0).ToList();
-                }
-                else
-                    orderList0 = orderList0.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0)).ToList();
-            }
-            if (subjectChannel == 1)
-            {
-                //上海系统单
-                orderList0 = orderList0.Where(s => s.order.IsFromRegion == null || s.order.IsFromRegion == false).ToList();
-            }
-            else if (subjectChannel == 2)
-            {
-                //分区订单
-                orderList0 = orderList0.Where(s => s.order.IsFromRegion == true).ToList();
-            }
-            if (regionList.Any())
-            {
-                orderList0 = orderList0.Where(s => regionList.Contains(s.shop.RegionName.ToLower())).ToList();
-                if (provinceList.Any())
-                {
-                    orderList0 = orderList0.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();
-                    if (cityList.Any())
-                        orderList0 = orderList0.Where(s => cityList.Contains(s.shop.CityName)).ToList();
-                }
-            }
-            string begin = txtSubjectBegin.Text.Trim();
-            string end = txtSubjectEnd.Text.Trim();
-            if (!string.IsNullOrWhiteSpace(begin))
-            {
-                DateTime beginDate = DateTime.Parse(begin);
-                orderList0 = orderList0.Where(s => s.subject.AddDate >= beginDate).ToList();
-                if (!string.IsNullOrWhiteSpace(end))
-                {
-                    DateTime endDate = DateTime.Parse(end).AddDays(1);
-                    orderList0 = orderList0.Where(s => s.subject.AddDate < endDate).ToList();
-                }
-            }
-            if ((subjectIdList.Any() || priceSubjectIdList.Any()) == false)
-            {
-                foreach (ListItem li in cblSubjects.Items)
-                    subjectIdList.Add(int.Parse(li.Value));
-
-                foreach (ListItem li in cblPriceSubjects.Items)
-                    priceSubjectIdList.Add(int.Parse(li.Value));
-            }
-
-            orderList0 = orderList0.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
-            if (customerServiceIds.Any())
-            {
-                if (customerServiceIds.Contains(0))
-                {
-                    customerServiceIds.Remove(0);
-                    if (customerServiceIds.Any())
-                    {
-                        orderList0 = orderList0.Where(s => customerServiceIds.Contains(s.shop.CSUserId ?? 0) || (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
-
-                    }
-                    else
-                    {
-                        orderList0 = orderList0.Where(s => (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
-
+                        shopTypeList.Add(li.Value);
                     }
                 }
-                else
+                foreach (ListItem li in cblAddUser.Items)
                 {
-                    orderList0 = orderList0.Where(s => customerServiceIds.Contains(s.shop.CSUserId ?? 0)).ToList();
-
+                    if (li.Selected)
+                        addUserList.Add(int.Parse(li.Value));
                 }
-            }
-            List<int> subjectIds = new List<int>();
-            subjectIds = orderList0.Select(s => s.subject.Id).Distinct().ToList();
-            if (priceSubjectIdList.Any())
-            {
-                subjectIds.AddRange(priceSubjectIdList);
-            }
 
-            subjectIdList.ForEach(s =>
-            {
-                if (!subjectIds.Contains(s))
-                    subjectIds.Add(s);
-            });
+                foreach (ListItem li in cblSubjectCategory.Items)
+                {
+                    if (li.Selected)
+                        subjectCategoryList.Add(int.Parse(li.Value));
+                }
+                foreach (ListItem li in cblRegion.Items)
+                {
+                    if (li.Selected && !regionList.Contains(li.Value.ToLower()))
+                    {
+                        regionList.Add(li.Value.ToLower());
+                    }
+                }
+                foreach (ListItem li in cblProvince.Items)
+                {
+                    if (li.Selected && !provinceList.Contains(li.Value.Trim()))
+                    {
+                        provinceList.Add(li.Value.Trim());
+                    }
+                }
+                foreach (ListItem li in cblCity.Items)
+                {
+                    if (li.Selected && !cityList.Contains(li.Value.Trim()))
+                    {
+                        cityList.Add(li.Value.Trim());
+                    }
+                }
+                foreach (ListItem li in cblCustomerService.Items)
+                {
+                    if (li.Selected)
+                        customerServiceIds.Add(int.Parse(li.Value));
+                }
+                if (!regionList.Any() && GetResponsibleRegion.Any())
+                {
+                    GetResponsibleRegion.ForEach(s =>
+                    {
+                        regionList.Add(s.ToLower());
+                    });
+                }
 
-            var list = (from subject in subjectList
-                        join customer in CurrentContext.DbContext.Customer
-                        on subject.CustomerId equals customer.Id
-                        join subjectCategory1 in CurrentContext.DbContext.ADSubjectCategory
-                        on subject.SubjectCategoryId equals subjectCategory1.Id into subjectCategoryTemp
-                        from subjectCategory in subjectCategoryTemp.DefaultIfEmpty()
-                        where subjectIds.Contains(subject.Id)
-                        select new
+                foreach (ListItem li in cblSubjectChannel.Items)
+                {
+                    if (li.Selected)
+                    {
+                        subjectChannel = int.Parse(li.Value);
+                        break;
+                    }
+                }
+                List<FinalOrderDetailTemp> finalOrderDetailTempList = new List<FinalOrderDetailTemp>();
+                List<Shop> shopList = new List<Shop>();
+                List<Subject> subjectList = new List<Subject>();
+                if (Session["orderDetailStatistics"] != null)
+                    finalOrderDetailTempList = Session["orderDetailStatistics"] as List<FinalOrderDetailTemp>;
+                if (Session["shopStatistics"] != null)
+                    shopList = Session["shopStatistics"] as List<Shop>;
+                if (Session["subjectStatistics"] != null)
+                    subjectList = Session["subjectStatistics"] as List<Subject>;
+
+                var orderList0 = (from order in finalOrderDetailTempList
+                                  join shop in shopList
+                                  on order.ShopId equals shop.Id
+                                  join subject in subjectList
+                                  on order.SubjectId equals subject.Id
+                                  select new
+                                  {
+                                      order,
+                                      shop,
+                                      subject
+
+                                  }).ToList();
+
+                if (addUserList.Any())
+                {
+                    orderList0 = orderList0.Where(s => addUserList.Contains(s.subject.AddUserId ?? 0)).ToList();
+                }
+
+                if (subjectCategoryList.Any())
+                {
+                    if (subjectCategoryList.Contains(0))
+                    {
+                        subjectCategoryList.Remove(0);
+                        if (subjectCategoryList.Any())
                         {
-                            subject,
-                            subject.Id,
-                            subject.SubjectType,
-                            subject.SubjectCategoryId,
-                            customer.CustomerName,
-                            subject.SubjectName,
-                            subject.Remark,
-                            subject.PriceBlongRegion,
-                            subjectCategory.CategoryName
+                            orderList0 = orderList0.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0) || (s.subject.SubjectCategoryId == null || s.subject.SubjectCategoryId == 0)).ToList();
                         }
-                            ).ToList();
-            gvList.DataSource = list;
-            gvList.DataBind();
+                        else
+                            orderList0 = orderList0.Where(s => s.subject.SubjectCategoryId == null || s.subject.SubjectCategoryId == 0).ToList();
+                    }
+                    else
+                        orderList0 = orderList0.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0)).ToList();
+                }
+                if (subjectChannel == 1)
+                {
+                    //上海系统单
+                    orderList0 = orderList0.Where(s => s.order.IsFromRegion == null || s.order.IsFromRegion == false).ToList();
+                }
+                else if (subjectChannel == 2)
+                {
+                    //分区订单
+                    orderList0 = orderList0.Where(s => s.order.IsFromRegion == true).ToList();
+                }
+                if (regionList.Any())
+                {
+                    orderList0 = orderList0.Where(s => regionList.Contains(s.shop.RegionName.ToLower())).ToList();
+                    if (provinceList.Any())
+                    {
+                        orderList0 = orderList0.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();
+                        if (cityList.Any())
+                            orderList0 = orderList0.Where(s => cityList.Contains(s.shop.CityName)).ToList();
+                    }
+                }
+                string begin = txtSubjectBegin.Text.Trim();
+                string end = txtSubjectEnd.Text.Trim();
+                if (!string.IsNullOrWhiteSpace(begin))
+                {
+                    DateTime beginDate = DateTime.Parse(begin);
+                    orderList0 = orderList0.Where(s => s.subject.AddDate >= beginDate).ToList();
+                    if (!string.IsNullOrWhiteSpace(end))
+                    {
+                        DateTime endDate = DateTime.Parse(end).AddDays(1);
+                        orderList0 = orderList0.Where(s => s.subject.AddDate < endDate).ToList();
+                    }
+                }
+                if ((subjectIdList.Any() || priceSubjectIdList.Any()) == false)
+                {
+                    foreach (ListItem li in cblSubjects.Items)
+                        subjectIdList.Add(int.Parse(li.Value));
+
+                    foreach (ListItem li in cblPriceSubjects.Items)
+                        priceSubjectIdList.Add(int.Parse(li.Value));
+                }
+
+                orderList0 = orderList0.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
+                if (customerServiceIds.Any())
+                {
+                    if (customerServiceIds.Contains(0))
+                    {
+                        customerServiceIds.Remove(0);
+                        if (customerServiceIds.Any())
+                        {
+                            orderList0 = orderList0.Where(s => customerServiceIds.Contains(s.shop.CSUserId ?? 0) || (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
+
+                        }
+                        else
+                        {
+                            orderList0 = orderList0.Where(s => (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
+
+                        }
+                    }
+                    else
+                    {
+                        orderList0 = orderList0.Where(s => customerServiceIds.Contains(s.shop.CSUserId ?? 0)).ToList();
+
+                    }
+                }
+                List<int> subjectIds = new List<int>();
+                subjectIds = orderList0.Select(s => s.subject.Id).Distinct().ToList();
+                if (priceSubjectIdList.Any())
+                {
+                    subjectIds.AddRange(priceSubjectIdList);
+                }
+
+                subjectIdList.ForEach(s =>
+                {
+                    if (!subjectIds.Contains(s))
+                        subjectIds.Add(s);
+                });
+
+                var list = (from subject in subjectList
+                            join customer in CurrentContext.DbContext.Customer
+                            on subject.CustomerId equals customer.Id
+                            join subjectCategory1 in CurrentContext.DbContext.ADSubjectCategory
+                            on subject.SubjectCategoryId equals subjectCategory1.Id into subjectCategoryTemp
+                            from subjectCategory in subjectCategoryTemp.DefaultIfEmpty()
+                            where subjectIds.Contains(subject.Id)
+                            select new
+                            {
+                                subject,
+                                subject.Id,
+                                subject.SubjectType,
+                                subject.SubjectCategoryId,
+                                customer.CustomerName,
+                                subject.SubjectName,
+                                subject.Remark,
+                                subject.PriceBlongRegion,
+                                CategoryName = subjectCategory!=null?subjectCategory.CategoryName:"空"
+                            }
+                                ).ToList();
+                gvList.DataSource = list;
+                gvList.DataBind();
+            //}
+            //catch (Exception ex)
+            //{ 
+            
+            //}
         }
 
         void ShowSubjectList()

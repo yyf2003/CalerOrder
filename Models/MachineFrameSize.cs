@@ -19,5 +19,6 @@ namespace Models
         public Nullable<int> FrameType { get; set; }
         public Nullable<decimal> Width { get; set; }
         public Nullable<decimal> Height { get; set; }
+        public string Channel { get; set; }
     }
 }
