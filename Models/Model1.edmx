@@ -1033,6 +1033,7 @@
           <Property Name="FrameType" Type="int" />
           <Property Name="Width" Type="decimal" />
           <Property Name="Height" Type="decimal" />
+          <Property Name="Remark" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="MachineFrameType">
           <Key>
@@ -2411,6 +2412,7 @@
           <Property Name="BCSIsInstall" Type="varchar" MaxLength="50" />
           <Property Name="OOHInstallOutsourceId" Type="int" />
           <Property Name="BCSOutsourceId" Type="int" />
+          <Property Name="ProductOutsourceId" Type="int" />
         </EntityType>
         <EntityType Name="ShopChangeDetail">
           <Key>
@@ -3832,6 +3834,7 @@
           <Property Type="Decimal" Name="Width" Precision="18" Scale="0" />
           <Property Type="Decimal" Name="Height" Precision="18" Scale="0" />
           <Property Type="String" Name="Channel" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Remark" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="MachineFrameType">
           <Key>
@@ -5204,6 +5207,7 @@
           <Property Type="String" Name="BCSIsInstall" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Type="Int32" Name="OOHInstallOutsourceId" />
           <Property Type="Int32" Name="BCSOutsourceId" />
+          <Property Type="Int32" Name="ProductOutsourceId" />
         </EntityType>
         <EntityType Name="ShopChangeDetail">
           <Key>
@@ -6521,6 +6525,7 @@
           <EntitySetMapping Name="MachineFrameSize">
             <EntityTypeMapping TypeName="KalerOrderDBModel.MachineFrameSize">
               <MappingFragment StoreEntitySet="MachineFrameSize">
+                <ScalarProperty Name="Remark" ColumnName="Remark" />
                 <ScalarProperty Name="Channel" ColumnName="Channel" />
                 <ScalarProperty Name="Height" ColumnName="Height" />
                 <ScalarProperty Name="Width" ColumnName="Width" />
@@ -7915,6 +7920,7 @@
           <EntitySetMapping Name="Shop">
             <EntityTypeMapping TypeName="KalerOrderDBModel.Shop">
               <MappingFragment StoreEntitySet="Shop">
+                <ScalarProperty Name="ProductOutsourceId" ColumnName="ProductOutsourceId" />
                 <ScalarProperty Name="BCSOutsourceId" ColumnName="BCSOutsourceId" />
                 <ScalarProperty Name="OOHInstallOutsourceId" ColumnName="OOHInstallOutsourceId" />
                 <ScalarProperty Name="BCSIsInstall" ColumnName="BCSIsInstall" />

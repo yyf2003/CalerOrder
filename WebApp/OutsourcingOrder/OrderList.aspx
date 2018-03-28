@@ -15,6 +15,26 @@
     <script src="/easyui1.4/locale/easyui-lang-zh_CN.js" type="text/javascript"></script>
     <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
     <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
+    <style type="text/css">
+        .inputClass
+        {
+            width: 180px;
+        }
+        #editDiv li
+        {
+            margin-bottom: 2px;
+            height: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            padding-left: 5px;
+            color: Blue;
+        }
+        #editDiv li:hover
+        {
+            background-color: #f0f1f2;
+            text-decoration: underline;
+        }
+        </style>
 </head>
 <body class="easyui-layout" data-options="fit:true">
     <form id="form1" runat="server">
@@ -118,7 +138,6 @@
                         </asp:CheckBoxList>
                     </td>
                 </tr>
-                
                 <tr class="tr_bai">
                     <td>
                     </td>
@@ -130,10 +149,13 @@
                 </tr>
             </table>
             <div>
+                <div style=" margin-top:10px; color:Blue; font-weight:bolder; padding-left:10px;">
+                提示：红色行已删除
+                </div>
                 <div class="layui-tab layui-tab-card">
                     <ul class="layui-tab-title">
                         <li class="layui-this" lay-id="1">订单信息</li>
-                        <li lay-id="2">店铺信息</li>
+                        <%--<li lay-id="2">店铺信息</li>--%>
                     </ul>
                     <div id="divContent1" class="layui-tab-content" data-options="fit:false" style="padding: 0px;
                         height: 100%;">
@@ -142,7 +164,13 @@
                             </table>
                             <div id="toolbar" style="height: 28px; padding-top: 3px;">
                                 <a id="btnRefresh" style="float: left;" class="easyui-linkbutton" plain="true" icon="icon-reload">
-                                    刷新</a>
+                                    刷新</a> <a id="btnEditOrder" onclick="editOrder()" style="float: left; display: ;"
+                                        class="easyui-linkbutton" plain="true" icon="icon-edit">编辑</a> <a id="btnDeleteOrder"
+                                            onclick="deleteOrder()" style="float: left; display: ;" class="easyui-linkbutton"
+                                            plain="true" icon="icon-remove">删除</a>
+                                            <a id="btnRecoverOrder"
+                                            onclick="recoverOrder()" style="float: left; display: ;" class="easyui-linkbutton"
+                                            plain="true" icon="icon-redo">恢复</a>
                                 <div class='datagrid-btn-separator'>
                                 </div>
                                 <a id="btnExport350" style="float: left;" class="easyui-linkbutton" plain="true"
@@ -154,8 +182,8 @@
                                 <input type="text" id="txtSearchOrderShopNo" />
                             </div>
                         </div>
-                        <div id="divContent2" class="layui-tab-item">
-                        </div>
+                       <%-- <div id="divContent2" class="layui-tab-item">
+                        </div>--%>
                     </div>
                 </div>
             </div>
@@ -164,6 +192,178 @@
             <iframe id="exportFrame" name="exportFrame" src=""></iframe>
         </div>
     </div>
+
+
+
+
+     <div id="editDiv" title="编辑POP信息" style="display: none;">
+        <table id="POPtable" class="table" style="width: 750px; text-align: center; margin-bottom: 50px;">
+            <tr>
+                <td style="height: 30px;width: 100px; ">
+                    订单类型
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                     <asp:RadioButtonList ID="rblOrderType" runat="server" RepeatDirection="Horizontal"
+                        RepeatLayout="Flow">
+                    </asp:RadioButtonList>
+                </td>
+            </tr>
+            <tr>
+                <td style="width: 100px; height: 30px;">
+                    店铺编号
+                </td>
+                <td style="text-align: left; width: 250px; padding-left: 5px;">
+                    <asp:TextBox ID="txtShopNo" runat="server" MaxLength="20" CssClass="inputClass"></asp:TextBox>
+                    <span style="color: Red;">*</span>
+                </td>
+                <td style="width: 100px; height: 30px;">
+                    POP位置
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <div style="position: relative;">
+                        <input type="text" id="txtSheet" class="inputClass" />
+                        <div id="divSheetMenu" class="inputClass" style="display: none; position: absolute;
+                            height: 150px; overflow: auto; background-color: White; border: 1px solid #ccc;
+                            padding-top: 2px; z-index: 100;">
+                            <ul id="ddlSheetMenu" class="inputClass" style="margin-top: 5; margin-left: 0px;
+                                list-style: none;">
+                            </ul>
+                        </div>
+                        <span style="color: Red;">*</span>
+                    </div>
+                </td>
+            </tr>
+            <tr class="pop">
+                <td style="height: 30px;">
+                    店铺规模大小
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtPOSScale" runat="server" MaxLength="20" CssClass="inputClass"></asp:TextBox>
+                    <span style="color: Red;">*</span>
+                </td>
+                <td style="height: 30px;">
+                    物料支持级别
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:DropDownList ID="ddlMaterialSupport" runat="server">
+                        <asp:ListItem Value="">--请选择--</asp:ListItem>
+                        <asp:ListItem Value="Basic">Basic</asp:ListItem>
+                        <asp:ListItem Value="Premium">Premium</asp:ListItem>
+                        <asp:ListItem Value="VVIP">VVIP</asp:ListItem>
+                        <asp:ListItem Value="MCS">MCS</asp:ListItem>
+                        <asp:ListItem Value="Generic">Generic</asp:ListItem>
+                        <asp:ListItem Value="Others">其他</asp:ListItem>
+                    </asp:DropDownList>
+                    <span style="color: Red;">*</span>
+                </td>
+            </tr>
+            <tr class="pop">
+                <td style="height: 30px;">
+                    器架名称
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:DropDownList ID="ddlMachineFrame" runat="server">
+                        <asp:ListItem Value="">--请选择--</asp:ListItem>
+                    </asp:DropDownList>
+                </td>
+                <td style="height: 30px;">
+                    位置描述
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtPositionDescription" runat="server" MaxLength="20" CssClass="inputClass"></asp:TextBox>
+                    <span style="color: Red;">*</span>
+                </td>
+            </tr>
+            <tr class="pop">
+                <td style="height: 30px;">
+                    性别
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <div style="position: relative;">
+                        <input type="text" id="txtGender" style="width: 120px;" />
+                        <div id="divGenderMenu" style="display: none; position: absolute; width: 125px; background-color: White;
+                            border: 1px solid #ccc; padding-top: 2px; z-index: 100;">
+                            <ul id="ddlGenderMenu" style="margin-top: 0; width: 125px; margin-left: 0px; list-style: none;">
+                                <li>男</li>
+                                <li>女</li>
+                                <li>男女不限</li>
+                                <li>无</li>
+                            </ul>
+                        </div>
+                        <span style="color: Red;">*</span>
+                    </div>
+                </td>
+                <td style="height: 30px;">
+                    数量
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtQuantity" runat="server" MaxLength="3"></asp:TextBox>
+                    <span style="color: Red;">*</span>
+                </td>
+            </tr>
+            <tr class="pop">
+                <td style="height: 30px;">
+                    POP宽
+                </td>
+                <td style="text-align: left; padding-left: 5px;width: 250px;">
+                    <asp:TextBox ID="txtGraphicWidth" runat="server" MaxLength="8" CssClass="inputClass"></asp:TextBox>(mm)
+                    <span style="color: Red;">*</span>
+                </td>
+                <td style="height: 30px;">
+                    POP高
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtGraphicLength" runat="server" MaxLength="8" CssClass="inputClass"></asp:TextBox>(mm)
+                    <span style="color: Red;">*</span>
+                </td>
+            </tr>
+            <tr class="pop">
+                <td style="height: 30px;">
+                    POP材质
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    <asp:DropDownList ID="ddlMaterialCategory" runat="server">
+                        <asp:ListItem Value="0">--请选择--</asp:ListItem>
+                    </asp:DropDownList>
+                    <asp:DropDownList ID="ddlMaterial" runat="server">
+                        <asp:ListItem Value="">--请选择--</asp:ListItem>
+                    </asp:DropDownList>
+                </td>
+            </tr>
+            <tr class="pop">
+                <td style="height: 30px;">
+                    选图
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtChooseImg" runat="server" MaxLength="20" CssClass="inputClass"></asp:TextBox>
+                </td>
+                <td>
+                    备注
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtRemark" runat="server" MaxLength="50" Style="width: 200px;"></asp:TextBox>
+                </td>
+            </tr>
+            <tr class="price" style=" display:none;">
+                <td style="height: 30px;width: 100px;">
+                    应付费用
+                </td>
+                <td style="text-align: left;width: 250px; padding-left: 5px;">
+                    <asp:TextBox ID="txtPayPrice" runat="server" MaxLength="20" CssClass="inputClass"></asp:TextBox>
+                    <span style="color: Red;">*</span>
+                </td>
+                <td style="width: 100px;">
+                    费用备注
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtPriceRemark" runat="server" MaxLength="100" Style="width: 200px;"></asp:TextBox>
+                </td>
+            </tr>
+            
+        </table>
+    </div>
+
+
     </form>
 </body>
 </html>

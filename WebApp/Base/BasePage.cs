@@ -5227,11 +5227,11 @@ namespace WebApp
                                                 outsourceOrderDetailModel.Gender = (s.order.OrderGender != null && s.order.OrderGender != "") ? s.order.OrderGender : (s.order.Gender ?? "");
                                                 outsourceOrderDetailModel.GraphicLength = s.order.GraphicLength;
                                                 outsourceOrderDetailModel.OrderGraphicMaterial = s.order.GraphicMaterial;
-                                                //string material = string.Empty;
+                                                //string material2 = string.Empty;
                                                 //if (!string.IsNullOrWhiteSpace(material0))
-                                                //    material = new BasePage().GetBasicMaterial(material0);
-                                                //if (string.IsNullOrWhiteSpace(material))
-                                                //    material = s.order.GraphicMaterial;
+                                                //    material2 = new BasePage().GetBasicMaterial(material0);
+                                                //if (string.IsNullOrWhiteSpace(material2))
+                                                //    material2 = s.order.GraphicMaterial;
                                                 outsourceOrderDetailModel.GraphicMaterial = material;
                                                 outsourceOrderDetailModel.GraphicNo = s.order.GraphicNo;
                                                 outsourceOrderDetailModel.GraphicWidth = s.order.GraphicWidth;
@@ -5425,11 +5425,17 @@ namespace WebApp
                                                 promotionInstallPrice = 150;
                                             }
                                         }
+                                        if ((shop.ProductOutsourceId ?? 0) > 0)
+                                        {
+                                            outsourceOrderDetailModel.OutsourceId = shop.ProductOutsourceId;
+                                            outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                        }
                                         if (isProductInNorth && shop.RegionName != null && shop.RegionName.ToLower() != subjectModel.subject.PriceBlongRegion.ToLower())
                                         {
                                             outsourceOrderDetailModel.OutsourceId = calerOutsourceId;
                                             outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
                                         }
+                                        
                                         outsourceOrderDetailModel.FinalOrderId = s.order.Id;
                                         outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
                                     }

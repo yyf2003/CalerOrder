@@ -20,5 +20,6 @@ namespace Models
         public Nullable<decimal> Width { get; set; }
         public Nullable<decimal> Height { get; set; }
         public string Channel { get; set; }
+        public string Remark { get; set; }
     }
 }

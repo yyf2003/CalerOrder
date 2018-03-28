@@ -2914,6 +2914,7 @@ namespace WebApp.Statistics
             BindAddUser();
             BindSubjectCategory();
             BindProvince();
+            CustomerService();
             //BindPriceSubjects();
             //BindSubjects();
             BindSubjectNameList();

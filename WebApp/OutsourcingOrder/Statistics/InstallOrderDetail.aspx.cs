@@ -88,6 +88,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                                   on orderDetail.GuidanceId equals guidance.ItemId
                                   where outsourceIdList.Contains(orderDetail.OutsourceId ?? 0)
                                   && orderDetail.GuidanceId == gid
+                                  && (orderDetail.IsDelete == null || orderDetail.IsDelete == false)
                                   select new
                                   {
                                       orderDetail,

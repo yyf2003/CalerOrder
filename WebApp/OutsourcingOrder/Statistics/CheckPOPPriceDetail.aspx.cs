@@ -92,8 +92,8 @@ namespace WebApp.OutsourcingOrder.Statistics
                 assignTypeList = StringHelper.ToIntList(assignType, ',');
             }
 
-            
-            var assignShopList = new OutsourceOrderDetailBLL().GetList(s => outsourceIdList.Contains(s.OutsourceId ?? 0) && guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.OrderType == (int)OrderTypeEnum.POP || s.OrderType == (int)OrderTypeEnum.道具));
+
+            var assignShopList = new OutsourceOrderDetailBLL().GetList(s => outsourceIdList.Contains(s.OutsourceId ?? 0) && guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.OrderType == (int)OrderTypeEnum.POP || s.OrderType == (int)OrderTypeEnum.道具) && (s.IsDelete == null || s.IsDelete == false));
 
             //var assignShopList = new OutsourceAssignShopBLL().GetList(s => s.OutsourceId == outsourceId && guidanceIdList.Contains(s.GuidanceId ?? 0));
             if (subjectIdList.Any())

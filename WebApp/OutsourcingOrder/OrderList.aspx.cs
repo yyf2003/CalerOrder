@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Common;
 
 namespace WebApp.OutsourcingOrder
 {
@@ -16,7 +17,18 @@ namespace WebApp.OutsourcingOrder
                 BindCustomerList(ddlCustomer);
                 DateTime date = DateTime.Now;
                 txtMonth.Text = date.ToString("yyyy-MM");
+
+                var orderTypeList = CommonMethod.GetEnumList<OrderTypeEnum>().ToList();
+
+                orderTypeList.ForEach(s =>
+                {
+                    ListItem li = new ListItem();
+                    li.Text = s.Name + "&nbsp;";
+                    li.Value = s.Value.ToString();
+                    rblOrderType.Items.Add(li);
+                });
             }
+
         }
     }
 }

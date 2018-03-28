@@ -570,6 +570,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                                      join company in CurrentContext.DbContext.Company
                                      on order.OutsourceId equals company.Id
                                      where guidanceIdList.Contains(order.GuidanceId ?? 0)
+                                     && (order.IsDelete == null || order.IsDelete==false)
                                      select new {
                                          order,
                                          subject,

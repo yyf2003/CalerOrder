@@ -164,7 +164,7 @@ namespace WebApp.Subjects.PriceOrder
                                     finalOrderTempModel.GraphicMaterial = "";
                                     finalOrderTempModel.GraphicWidth = width;
                                     //finalOrderTempModel.UnitPrice = GetMaterialPrice(o.order.GraphicMaterial);
-                                    finalOrderTempModel.PositionDescription = "";
+                                    finalOrderTempModel.PositionDescription = o.order.Remark;
                                     finalOrderTempModel.Area = (width * length) / 1000000;
                                     finalOrderTempModel.InstallPositionDescription = "";
                                     finalOrderTempModel.RegionSupplementId = 0;

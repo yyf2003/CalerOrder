@@ -141,6 +141,7 @@ namespace WebApp.OutsourcingOrder
                             && (shopNoList.Any() ? (shopNoList.Contains(shop.ShopNo.ToLower())) : 1 == 1)
                             //&& (assignOrder.OrderType != (int)OrderTypeEnum.物料)
                             && assignOrder.SubjectId>0
+                            && (assignOrder.IsDelete == null || assignOrder.IsDelete==false)
                             select new {
                                 assignOrder,
                                 //order,
@@ -702,6 +703,7 @@ namespace WebApp.OutsourcingOrder
                              && (shopNoList.Any() ? (shopNoList.Contains(shop.ShopNo.ToLower())) : 1 == 1)
                              && (order.OrderType!=(int)OrderTypeEnum.物料)
                              && order.SubjectId > 0
+                             && (order.IsDelete == null || order.IsDelete == false)
                              select new
                              {
                                 
@@ -1260,6 +1262,7 @@ namespace WebApp.OutsourcingOrder
                              && (outsourceTypeList.Any() ? (outsourceTypeList.Contains(order.AssignType ?? 0)) : 1 == 1)
                              && (shopNoList.Any() ? (shopNoList.Contains(shop.ShopNo.ToLower())) : 1 == 1)
                              && (order.OrderType<3)
+                             && (order.IsDelete == null || order.IsDelete == false)
                              select new
                              {
                                  

@@ -118,7 +118,8 @@ namespace WebApp.OutsourcingOrder.Statistics
                                  where outsourceList.Contains(order.OutsourceId ?? 0)
                                  && order.GuidanceId==gid
                                  && ((order.OrderType == (int)OrderTypeEnum.POP && order.GraphicLength!=null && order.GraphicLength>1 && order.GraphicWidth!=null && order.GraphicWidth>1) || order.OrderType>1)
-                                 select new
+                                 && (order.IsDelete == null || order.IsDelete == false)
+                                  select new
                                  {
                                      order,
                                      //assign,
@@ -626,6 +627,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                               where (subject.IsDelete == null || subject.IsDelete == false)
                               && order.OutsourceId == outsourceId
                               && subject.CustomerId == customerId
+                              && (order.IsDelete == null || order.IsDelete == false)
                               select new
                               {
                                   order,

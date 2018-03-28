@@ -142,7 +142,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                                   where outsourceList.Contains(order.OutsourceId ?? 0)
                                   
                                   && gid==order.GuidanceId
-                                  //&& (subject.IsDelete==null || subject.IsDelete==false)
+                                  && (order.IsDelete == null || order.IsDelete == false)
                                   && ((order.OrderType == (int)OrderTypeEnum.POP && order.GraphicLength!=null && order.GraphicLength>1 && order.GraphicWidth!=null && order.GraphicWidth>1) || order.OrderType > 1)
                                   select new
                                   {
@@ -387,6 +387,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                                   && order.OutsourceId == outsourceId
                                   && subject.CustomerId == customerId
                                   && subject.AddDate >= beginDate
+                                   && (order.IsDelete == null || order.IsDelete == false)
                                   select new
                                   {
                                       order,
@@ -467,6 +468,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                                   where (subject.IsDelete == null || subject.IsDelete == false)
                                   && order.OutsourceId == outsourceId
                                   && subject.CustomerId == customerId
+                                  && (order.IsDelete == null || order.IsDelete == false)
                                   select new
                                   {
                                       order,
@@ -589,6 +591,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                               && order.OutsourceId == outsourceId
                               && subject.CustomerId == customerId
                               && ((order.OrderType == (int)OrderTypeEnum.POP && order.GraphicLength != null && order.GraphicLength > 1 && order.GraphicWidth != null && order.GraphicWidth > 1) || order.OrderType > 1)
+                              && (order.IsDelete == null || order.IsDelete == false)
                               select new
                               {
                                   order,

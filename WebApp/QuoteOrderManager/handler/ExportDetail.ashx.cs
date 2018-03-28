@@ -75,7 +75,9 @@ namespace WebApp.QuoteOrderManager.handler
                     sheet.Cells[6, 6].Value = vvipShopList.Count.ToString();
                     sheet.Cells[8, 6].Value = notVVIPShopList.Count.ToString();
 
-                    //订单统计
+                    List<Shop> OOHInstallPriceList = new List<Shop>();
+
+                    #region POP订单统计
                     int windowStartRow = 13;
                     int tableStartRow = windowStartRow + 20;
                     int appWallStartRow = tableStartRow + 20;
@@ -89,13 +91,6 @@ namespace WebApp.QuoteOrderManager.handler
                         #region 大货格式
 
                         List<int> selectedIdList = new List<int>();
-
-                        
-
-                       
-
-                        
-                        
                        
                         #region 橱窗区域
                         List<QuoteModel> windowList = new List<QuoteModel>();//橱窗背景
@@ -176,10 +171,7 @@ namespace WebApp.QuoteOrderManager.handler
                         }
                         #endregion
                         #region 陈列桌区域
-                        //List<QuoteModel> tableList = new List<QuoteModel>();//HC陈列桌
-                        //List<QuoteModel> tableTKList = new List<QuoteModel>();//陈列桌台卡
-                        //List<QuoteModel> tableJTZList = new List<QuoteModel>();//陈列桌静态展
-                        //List<QuoteModel> tableModuleList = new List<QuoteModel>();//陈列桌模特阵
+                        
                         //陈列桌订单
                         var tableOrderList = popOrderList.Where(s => s.Sheet.Contains("陈列桌") || s.Sheet.Contains("展桌")).ToList();
                         if (tableOrderList.Any())
@@ -255,123 +247,114 @@ namespace WebApp.QuoteOrderManager.handler
                                        });
                                    }
                                }
-
+                               //陈列桌模特阵订单
+                               var tableModuleOrderList = tableOrderList.Where(s => s.Sheet.Contains("模特阵") || s.PositionDescription.Contains("模特阵")).ToList();
+                               if (tableModuleOrderList.Any())
+                               {
+                                   otherTBIdList.AddRange(tableModuleOrderList.Select(s => s.Id).ToList());
+                                   selectedIdList.AddRange(tableModuleOrderList.Select(s => s.Id).ToList());
+                                   List<QuoteModel> tableModuleList = new List<QuoteModel>();
+                                   StatisticMaterial(tableJTZOrderList, ref tableModuleList);
+                                   if (tableModuleList.Any())
+                                   {
+                                       tableModuleList.ForEach(s =>
+                                       {
+                                           sheet.Cells[tableStartRow, 2].Value = "陈列桌模特阵";
+                                           sheet.Cells[tableStartRow, 3].Value = s.QuoteGraphicMaterial;
+                                           sheet.Cells[tableStartRow, 5].Value = s.Amount;
+                                           tableStartRow++;
+                                       });
+                                   }
+                               }
+                               //陈列桌桌铺
+                               var tableList = otherTBOrderList.Where(s => !otherTBIdList.Contains(s.Id)).ToList();
+                               if (tableList.Any())
+                               {
+                                   selectedIdList.AddRange(tableList.Select(s => s.Id).ToList());
+                                   List<QuoteModel> tbList = new List<QuoteModel>();//
+                                   StatisticMaterial(tableList, ref tbList);
+                                   if (tbList.Any())
+                                   {
+                                       tbList.ForEach(s =>
+                                       {
+                                           sheet.Cells[tableStartRow, 2].Value = "陈列桌桌铺";
+                                           sheet.Cells[tableStartRow, 3].Value = s.QuoteGraphicMaterial;
+                                           sheet.Cells[tableStartRow, 5].Value = s.Amount;
+                                           tableStartRow++;
+                                       });
+                                   }
+                               }
                            }
                         }
-                        #region
-                        //var tableOrderList = popOrderList.Where(s => s.Sheet.Contains("陈列桌") && !s.Sheet.Contains("静态展") && !s.Sheet.Contains("台卡") && !s.Sheet.Contains("模特阵") && !s.PositionDescription.Contains("台卡") && !s.PositionDescription.Contains("静态展") && !s.PositionDescription.Contains("模特阵")).ToList();
-                        //if (tableOrderList.Any())
-                        //{
-                        //    selectedIdList.AddRange(tableOrderList.Select(s => s.Id).ToList());
-                        //    StatisticMaterial(tableOrderList, ref tableList);
-                        //}
-                        ////陈列桌台卡订单
-                        //var tableTKOrderList = popOrderList.Where(s => (s.Sheet.Contains("陈列桌") && s.PositionDescription.Contains("台卡")) || (s.Sheet.Contains("陈列桌") && s.Sheet.Contains("台卡"))).ToList();
-                        //if (tableTKOrderList.Any())
-                        //{
-                        //    selectedIdList.AddRange(tableTKOrderList.Select(s => s.Id).ToList());
-                        //    StatisticMaterial(tableTKOrderList, ref tableTKList);
-                        //}
-                        ////陈列桌静态展订单
-                        //var tableJTZOrderList = popOrderList.Where(s => (s.Sheet.Contains("陈列桌") && s.PositionDescription.Contains("静态展")) || (s.Sheet.Contains("陈列桌") && s.Sheet.Contains("静态展"))).ToList();
-                        //if (tableJTZOrderList.Any())
-                        //{
-                        //    selectedIdList.AddRange(tableJTZOrderList.Select(s => s.Id).ToList());
-                        //    StatisticMaterial(tableJTZOrderList, ref tableJTZList);
-                        //}
-                        ////陈列桌模特阵订单
-                        //var tableModuleOrderList = popOrderList.Where(s => (s.Sheet.Contains("陈列桌") && s.PositionDescription.Contains("模特阵")) || (s.Sheet.Contains("陈列桌") && s.Sheet.Contains("模特阵"))).ToList();
-                        //if (tableModuleOrderList.Any())
-                        //{
-                        //    selectedIdList.AddRange(tableModuleOrderList.Select(s => s.Id).ToList());
-                        //    StatisticMaterial(tableModuleOrderList, ref tableModuleList);
-                        //}
-                       
-                        //if (tableList.Any())
-                        //{
-                        //    tableList.ForEach(s =>
-                        //    {
-                        //        sheet.Cells[tableStartRow, 2].Value = "陈列桌";
-                        //        sheet.Cells[tableStartRow, 3].Value = s.QuoteGraphicMaterial;
-                        //        sheet.Cells[tableStartRow, 5].Value = s.Amount;
-                        //        tableStartRow++;
-                        //    });
-                        //}
-                        //if (tableTKList.Any())
-                        //{
-                        //    tableTKList.ForEach(s =>
-                        //    {
-                        //        sheet.Cells[tableStartRow, 2].Value = "陈列桌台卡";
-                        //        sheet.Cells[tableStartRow, 3].Value = s.QuoteGraphicMaterial;
-                        //        sheet.Cells[tableStartRow, 5].Value = s.Amount;
-                        //        tableStartRow++;
-                        //    });
-                        //}
-                        //if (tableJTZList.Any())
-                        //{
-                        //    tableJTZList.ForEach(s =>
-                        //    {
-                        //        sheet.Cells[tableStartRow, 2].Value = "陈列桌静态展";
-                        //        sheet.Cells[tableStartRow, 3].Value = s.QuoteGraphicMaterial;
-                        //        sheet.Cells[tableStartRow, 5].Value = s.Amount;
-                        //        tableStartRow++;
-                        //    });
-                        //}
-                        //if (tableModuleList.Any())
-                        //{
-                        //    tableModuleList.ForEach(s =>
-                        //    {
-                        //        sheet.Cells[tableStartRow, 2].Value = "陈列桌模特阵";
-                        //        sheet.Cells[tableStartRow, 3].Value = s.QuoteGraphicMaterial;
-                        //        sheet.Cells[tableStartRow, 5].Value = s.Amount;
-                        //        tableStartRow++;
-                        //    });
-                        //}
-                        #endregion
+                        
                         #endregion
                         #region 服装墙区域订单
-                        var appOrderList = popOrderList.Where(s => s.Sheet.Contains("服装墙") && !s.Sheet.Contains("台卡") && !s.PositionDescription.Contains("台卡")).ToList();
+                        var appOrderList = popOrderList.Where(s => s.Sheet.Contains("服装墙")).ToList();
                         if (appOrderList.Any())
                         {
-                            selectedIdList.AddRange(appOrderList.Select(s => s.Id).ToList());
-                            List<string> shopChannelList = appOrderList.Select(s => s.Channel).Distinct().ToList();
-                            List<QuoteModel> channelQuoteModelList = new List<QuoteModel>();//
-                            foreach (string channel in shopChannelList)
+                            List<int> appSelectedIdList = new List<int>();
+                            //List<string> channelList = appOrderList.Select(s => s.Channel != null ? s.Channel.ToUpper() : "").ToList();
+                            var frameMachineTypeList = new MachineFrameTypeBLL().GetList(s => s.Sheet == "台卡").ToList();
+                            if (frameMachineTypeList.Any())
                             {
-                                if (!string.IsNullOrWhiteSpace(channel))
+                                List<QuoteOrderDetail> appQuoteOrderList = new List<QuoteOrderDetail>();
+                                List<int> frameMachineTypeIdList = frameMachineTypeList.Select(s => s.Id).ToList();
+                                var sizeTotalList = new MachineFrameSizeBLL().GetList(s => frameMachineTypeIdList.Contains(s.MachineFrameTypeId ?? 0)).ToList();
+
+                                //台卡
+                                if (frameMachineTypeList.Any())
                                 {
-                                    var channelOrderList = appOrderList.Where(s => s.Channel == channel).ToList();
-                                    channelQuoteModelList = new List<QuoteModel>();
-                                    StatisticMaterial(channelOrderList, ref channelQuoteModelList);
-                                    if (channelQuoteModelList.Any())
+                                    frameMachineTypeList.ForEach(ft =>
                                     {
-                                        channelQuoteModelList.ForEach(s =>
+                                        var sizeList = sizeTotalList.Where(s => s.MachineFrameTypeId == ft.Id).ToList();
+                                        if (sizeList.Any())
                                         {
-                                            sheet.Cells[appWallStartRow, 2].Value = channel + "服装墙";
-                                            sheet.Cells[appWallStartRow, 3].Value = s.QuoteGraphicMaterial;
-                                            sheet.Cells[appWallStartRow, 5].Value = s.Amount;
-                                            appWallStartRow++;
-                                        });
-                                    }
+                                            sizeList.ForEach(size =>
+                                            {
+                                                if (string.IsNullOrWhiteSpace(size.Channel))
+                                                {
+                                                    List<QuoteOrderDetail> order1 = appOrderList.Where(s => s.GraphicLength == size.Height && s.GraphicWidth == size.Width).ToList();
+                                                    if (order1.Any())
+                                                    {
+                                                        appSelectedIdList.AddRange(order1.Select(s => s.Id).ToList());
+                                                        selectedIdList.AddRange(order1.Select(s => s.Id).ToList());
+                                                        appQuoteOrderList.AddRange(order1);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                        List<QuoteModel> appList = new List<QuoteModel>();//
+                                        StatisticMaterial(appQuoteOrderList, ref appList);
+                                        if (appList.Any())
+                                        {
+                                            appList.ForEach(s =>
+                                            {
+                                                sheet.Cells[appWallStartRow, 2].Value = ft.MachineFrameTypeName;
+                                                sheet.Cells[appWallStartRow, 3].Value = s.QuoteGraphicMaterial;
+                                                sheet.Cells[appWallStartRow, 5].Value = s.Amount;
+                                                appWallStartRow++;
+                                            });
+                                        }
+                                    });
                                 }
                             }
-                        }
-                        //服装墙台卡区域订单
-                        var appTKOrderList = popOrderList.Where(s => s.Sheet.Contains("服装墙") && (s.PositionDescription.Contains("台卡") || s.Sheet.Contains("台卡"))).ToList();
-                        if (appTKOrderList.Any())
-                        {
-                            selectedIdList.AddRange(appTKOrderList.Select(s => s.Id).ToList());
-                            List<QuoteModel> appTKList = new List<QuoteModel>();//
-                            StatisticMaterial(appTKOrderList, ref appTKList);
-                            if (appTKList.Any())
+                            //除了台卡以外的
+                            var otherOrderList = appOrderList.Where(s => !appSelectedIdList.Contains(s.Id)).ToList();
+                            if (otherOrderList.Any())
                             {
-                                appTKList.ForEach(s =>
+                                selectedIdList.AddRange(otherOrderList.Select(s => s.Id).ToList());
+                                List<QuoteModel> oList = new List<QuoteModel>();//
+                                StatisticMaterial(otherOrderList, ref oList);
+                                if (oList.Any())
                                 {
-                                    sheet.Cells[appWallStartRow, 2].Value = "服装墙台卡";
-                                    sheet.Cells[appWallStartRow, 3].Value = s.QuoteGraphicMaterial;
-                                    sheet.Cells[appWallStartRow, 5].Value = s.Amount;
-                                    appWallStartRow++;
-                                });
+                                    oList.ForEach(s =>
+                                    {
+                                        sheet.Cells[appWallStartRow, 2].Value = "服装墙";
+                                        sheet.Cells[appWallStartRow, 3].Value = s.QuoteGraphicMaterial;
+                                        sheet.Cells[appWallStartRow, 5].Value = s.Amount;
+                                        appWallStartRow++;
+                                    });
+                                }
                             }
                         }
                         #endregion
@@ -405,7 +388,7 @@ namespace WebApp.QuoteOrderManager.handler
                         if (ftwOrderList.Any())
                         {
 
-                            selectedIdList.AddRange(ftwOrderList.Select(s => s.Id).ToList());
+                            
                             var frameMachineTypeList = new MachineFrameTypeBLL().GetList(s => s.Sheet == "鞋墙");
                             if (frameMachineTypeList.Any())
                             {
@@ -423,6 +406,7 @@ namespace WebApp.QuoteOrderManager.handler
                                     if (ftwQuoteOrderListKV.Any())
                                     {
                                         hcNormalIdList = ftwQuoteOrderListKV.Select(s => s.Id).ToList();
+                                        selectedIdList.AddRange(ftwQuoteOrderListKV.Select(s => s.Id).ToList());
                                         List<QuoteModel> ftwList = new List<QuoteModel>();//
                                         StatisticMaterial(ftwQuoteOrderListKV, ref ftwList);
                                         if (ftwList.Any())
@@ -441,6 +425,7 @@ namespace WebApp.QuoteOrderManager.handler
                                     if (ftwQuoteOrderList.Any())
                                     {
                                         var hcNormalIdList0 = ftwQuoteOrderList.Select(s => s.Id).ToList();
+                                        selectedIdList.AddRange(ftwQuoteOrderList.Select(s => s.Id).ToList());
                                         if (hcNormalIdList0.Any())
                                         {
                                             hcNormalIdList.AddRange(hcNormalIdList0);
@@ -462,6 +447,7 @@ namespace WebApp.QuoteOrderManager.handler
                                     List<QuoteOrderDetail> ftwQuoteOrderListOthers = HCList.Where(s => !hcNormalIdList.Contains(s.Id)).ToList();
                                     if (ftwQuoteOrderListOthers.Any())
                                     {
+                                        selectedIdList.AddRange(ftwQuoteOrderListOthers.Select(s => s.Id).ToList());
                                         List<QuoteModel> ftwList = new List<QuoteModel>();//
                                         StatisticMaterial(ftwQuoteOrderListOthers, ref ftwList);
                                         if (ftwList.Any())
@@ -494,6 +480,7 @@ namespace WebApp.QuoteOrderManager.handler
                                             List<QuoteOrderDetail> order1 = notHCList.Where(s => s.GraphicLength == size.Height && s.GraphicWidth == size.Width).ToList();
                                             if (order1.Any())
                                             {
+                                                selectedIdList.AddRange(order1.Select(s => s.Id).ToList());
                                                 ftwQuoteOrderList.AddRange(order1);
                                             }
                                         });
@@ -518,6 +505,7 @@ namespace WebApp.QuoteOrderManager.handler
                                             List<QuoteOrderDetail> order1 = notHCList.Where(s => s.GraphicLength == size.Height && s.GraphicWidth == size.Width).ToList();
                                             if (order1.Any())
                                             {
+                                                selectedIdList.AddRange(order1.Select(s => s.Id).ToList());
                                                 ftwQuoteOrderList.AddRange(order1);
                                             }
                                         });
@@ -617,13 +605,13 @@ namespace WebApp.QuoteOrderManager.handler
                         #endregion
 
                         #region 除了以上常规位置外的其他位置
-                        var otherOrderList = popOrderList.Where(s => !selectedIdList.Contains(s.Id)).ToList();
-                        if (otherOrderList.Any())
+                        var otherSheetOrderList = popOrderList.Where(s => !selectedIdList.Contains(s.Id)).ToList();
+                        if (otherSheetOrderList.Any())
                         {
-                            List<string> sheets = otherOrderList.Select(s=>s.Sheet).Distinct().ToList();
+                            List<string> sheets = otherSheetOrderList.Select(s => s.Sheet).Distinct().ToList();
                             string sheetStr = StringHelper.ListToString(sheets,"/");
                             List<QuoteModel> smuList = new List<QuoteModel>();//
-                            StatisticMaterial(otherOrderList, ref smuList);
+                            StatisticMaterial(otherSheetOrderList, ref smuList);
                             if (smuList.Any())
                             {
                                 smuList.ForEach(s =>
@@ -914,7 +902,6 @@ namespace WebApp.QuoteOrderManager.handler
                         #region 鞋墙区域
                         
                         #endregion
-
                         #region SMU区域订单
                         var smuOrderList = popOrderList.Where(s => s.Sheet.ToLower().Contains("smu")).ToList();
                         if (smuOrderList.Any())
@@ -1339,7 +1326,9 @@ namespace WebApp.QuoteOrderManager.handler
 
                         #endregion
                     }
-                    //安装费
+                    #endregion
+
+                    #region 安装费
                     List<string> cityTierList = new List<string>() { "T1", "T2", "T3" };
                     InstallPriceShopInfoBLL installShopBll = new InstallPriceShopInfoBLL();
                     int oohInstallLevelOne = 0;//5000级别
@@ -1361,6 +1350,9 @@ namespace WebApp.QuoteOrderManager.handler
                     int basicInstallLevelThree = 0;
 
                     decimal otherBasicInstallPrice = 0;
+
+                    int kidsWindowInstall = 0;
+                    int kidsNoWindowInstall = 0;
 
                     List<ExpressPriceDetail> expressPriceList = new List<ExpressPriceDetail>();
                     //快递费订单
@@ -1405,71 +1397,99 @@ namespace WebApp.QuoteOrderManager.handler
                     {
                         //安装费
                         List<int> installShopIdList = orderList.Where(s => s.GuidanceId == gid && cityTierList.Contains(s.CityTier)).Select(s => s.ShopId ?? 0).Distinct().ToList();
-                        var installPriceList = installShopBll.GetList(s => s.GuidanceId == gid && installShopIdList.Contains(s.ShopId ?? 0)).ToList();
+                        //var installPriceList = installShopBll.GetList(s => s.GuidanceId == gid && installShopIdList.Contains(s.ShopId ?? 0)).ToList();
+                        var installPriceList = (from install in CurrentContext.DbContext.InstallPriceShopInfo
+                                                join shop in CurrentContext.DbContext.Shop
+                                                on install.ShopId equals shop.Id
+                                                where install.GuidanceId == gid
+                                                && installShopIdList.Contains(install.ShopId ?? 0)
+                                                select new
+                                                {
+                                                    install,
+                                                    shop
+                                                }).ToList();
                         if (installPriceList.Any())
                         {
                             installPriceList.ForEach(s =>
                             {
-                                //OOH
-                                if ((s.OOHPrice ?? 0) > 0)
+                                if (s.install.MaterialSupport != "others")
                                 {
-                                    if (s.OOHPrice == 5000)
+                                    //OOH
+                                    if ((s.install.OOHPrice ?? 0) > 0)
                                     {
-                                        oohInstallLevelOne++;
+                                        Shop shop = new Shop();
+                                        shop = s.shop;
+                                        shop.OOHInstallPrice = s.install.OOHPrice??0;
+                                        OOHInstallPriceList.Add(shop);
+                                        if (s.install.OOHPrice == 5000)
+                                        {
+                                            oohInstallLevelOne++;
+                                        }
+                                        else if (s.install.OOHPrice == 2700)
+                                        {
+                                            oohInstallLevelTwo++;
+                                        }
+                                        else if (s.install.OOHPrice == 1800)
+                                        {
+                                            oohInstallLevelThree++;
+                                        }
+                                        else if (s.install.OOHPrice == 600)
+                                        {
+                                            oohInstallLevelFour++;
+                                        }
+                                        else
+                                            otherOOHInstallPrice += (s.install.OOHPrice ?? 0);
                                     }
-                                    else if (s.OOHPrice == 2700)
+                                    if ((s.install.WindowPrice ?? 0) > 0)
                                     {
-                                        oohInstallLevelTwo++;
-                                    }
-                                    else if (s.OOHPrice == 1800)
-                                    {
-                                        oohInstallLevelThree++;
-                                    }
-                                    else if (s.OOHPrice == 600)
-                                    {
-                                        oohInstallLevelFour++;
-                                    }
-                                    else
-                                        otherOOHInstallPrice += (s.OOHPrice ?? 0);
-                                }
-                                if ((s.WindowPrice ?? 0) > 0)
-                                {
-                                    //橱窗
-                                    if (s.WindowPrice == 1000)
-                                    {
-                                        windowInstallLevelOne++;
-                                    }
-                                    else if (s.WindowPrice == 500)
-                                    {
-                                        windowInstallLevelTwo++;
-                                    }
-                                    else if (s.WindowPrice == 200)
-                                    {
-                                        windowInstallLevelThree++;
-                                    }
-                                    else if (s.WindowPrice == 350)
-                                    {
-                                        windowInstallKidsLevel++;
-                                    }
+                                        //橱窗
+                                        if (s.install.WindowPrice == 1000)
+                                        {
+                                            windowInstallLevelOne++;
+                                        }
+                                        else if (s.install.WindowPrice == 500)
+                                        {
+                                            windowInstallLevelTwo++;
+                                        }
+                                        else if (s.install.WindowPrice == 200)
+                                        {
+                                            windowInstallLevelThree++;
+                                        }
+                                        else if (s.install.WindowPrice == 350)
+                                        {
+                                            windowInstallKidsLevel++;
+                                        }
 
+                                    }
+                                    if ((s.install.BasicPrice ?? 0) > 0)
+                                    {
+                                        //店内
+                                        if (s.install.BasicPrice == 800)
+                                        {
+                                            basicInstallLevelOne++;
+                                        }
+                                        else if (s.install.BasicPrice == 400)
+                                        {
+                                            basicInstallLevelTwo++;
+                                        }
+                                        else if (s.install.BasicPrice == 150)
+                                        {
+                                            basicInstallLevelThree++;
+                                        }
+                                        else
+                                            otherBasicInstallPrice += (s.install.BasicPrice ?? 0);
+                                    }
                                 }
-                                if ((s.BasicPrice ?? 0) > 0)
+                                else//童店安装费
                                 {
-                                    //店内
-                                    if (s.BasicPrice == 800)
+                                    if ((s.install.WindowPrice ?? 0) > 0)
                                     {
-                                        basicInstallLevelOne++;
+                                        kidsWindowInstall++;
                                     }
-                                    else if (s.BasicPrice == 400)
+                                    else if ((s.install.BasicPrice ?? 0) > 0)
                                     {
-                                        basicInstallLevelTwo++;
+                                        kidsNoWindowInstall++;
                                     }
-                                    else if (s.BasicPrice == 150)
-                                    {
-                                        basicInstallLevelThree++;
-                                    }
-                                    else
-                                        otherBasicInstallPrice += (s.BasicPrice ?? 0);
                                 }
                             });
                         }
@@ -1513,6 +1533,11 @@ namespace WebApp.QuoteOrderManager.handler
                     if (basicInstallLevelThree > 0)
                         sheet.Cells[105, 7].Value = basicInstallLevelThree.ToString();
 
+                    if (kidsWindowInstall > 0)
+                        sheet.Cells[106, 7].Value = kidsWindowInstall.ToString();
+                    if (kidsNoWindowInstall > 0)
+                        sheet.Cells[107, 7].Value = kidsNoWindowInstall.ToString();
+
                     if (otherBasicInstallPrice > 0)
                     {
                         //如果不在正常的级别（T4-T7）
@@ -1520,9 +1545,9 @@ namespace WebApp.QuoteOrderManager.handler
                            
                         }
                     }
+                    #endregion
 
-
-                    //第二张表
+                    #region 第二张表(快递费，物料，其他费用)
                     ExcelWorksheet sheet2 = package.Workbook.Worksheets[2];
                     int secondSheetRowIndex = 13;
                     //快递费
@@ -1568,10 +1593,46 @@ namespace WebApp.QuoteOrderManager.handler
                             secondSheetRowIndex++;
                         });
                     }
-                    //第三张表
-                    ExcelWorksheet sheet3 = package.Workbook.Worksheets[3];
-                    int thirdSheetRowIndex = 12;
 
+                    //其他费用
+                    var otherPriceOrderList = orderList.Where(s => s.OrderType == (int)OrderTypeEnum.其他费用).ToList();
+                    if (otherPriceOrderList.Any())
+                    {
+                        var mgroupList = (from order in otherPriceOrderList
+                                          group order by new
+                                          {
+                                              order.OrderPrice,
+                                              order.Remark
+                                          } into g
+                                          select new
+                                          {
+                                              MaterialName = g.Key.Remark,
+                                              UnitPrice = g.Key.OrderPrice,
+                                              Count = g.Sum(s => s.Quantity ?? 0)
+                                          }).ToList();
+                        mgroupList.ForEach(s =>
+                        {
+                            sheet2.Cells[secondSheetRowIndex, 1].Value = s.MaterialName;
+                            sheet2.Cells[secondSheetRowIndex, 10].Value = s.Count;
+                            sheet2.Cells[secondSheetRowIndex, 12].Value = s.UnitPrice;
+                            secondSheetRowIndex++;
+                        });
+                    }
+                    #endregion
+
+                    #region 第三张表（高空安装费）
+                    if (OOHInstallPriceList.Any())
+                    {
+                        ExcelWorksheet sheet3 = package.Workbook.Worksheets[3];
+                        int thirdSheetRowIndex = 12;
+                        OOHInstallPriceList.ForEach(shop => {
+                            sheet3.Cells[thirdSheetRowIndex, 2].Value = shop.ShopNo;
+                            sheet3.Cells[thirdSheetRowIndex, 3].Value = shop.ShopName;
+                            sheet3.Cells[thirdSheetRowIndex, 4].Value = shop.OOHInstallPrice;
+                            thirdSheetRowIndex++;
+                        });
+                    }
+                    #endregion
 
                     using (MemoryStream ms = new MemoryStream())
                     {

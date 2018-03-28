@@ -79,6 +79,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                                   where outsourceIdList.Contains(order.OutsourceId ?? 0)
                                   && guidanceIdList.Contains(order.GuidanceId ?? 0)
                                   && order.OrderType == (int)OrderTypeEnum.其他费用
+                                  && (order.IsDelete == null || order.IsDelete == false)
                                   select new { order, shop }).ToList();
 
             //var assignShopList = new OutsourceAssignShopBLL().GetList(s => s.OutsourceId == outsourceId && guidanceIdList.Contains(s.GuidanceId ?? 0));

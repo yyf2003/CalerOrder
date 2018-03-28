@@ -565,6 +565,14 @@
             </tr>
             <tr>
                 <td style="height: 30px;">
+                    生产外协
+                </td>
+                <td colspan="5" style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labProductOutsourceName" runat="server" Text=""></asp:Label>
+                </td>
+            </tr>
+            <tr>
+                <td style="height: 30px;">
                     备注
                 </td>
                 <td colspan="5" style="text-align: left; padding-left: 5px;">
@@ -842,7 +850,7 @@
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <select id="seleOutsource">
-                        <option value="0">--请选择客服--</option>
+                        <option value="0">--请选择外协--</option>
                     </select>
                 </td>
                 <td style="height: 30px;">
@@ -850,7 +858,7 @@
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <select id="seleOOHInstallOutsource">
-                        <option value="0">--请选择客服--</option>
+                        <option value="0">--请选择外协--</option>
                     </select>
                 </td>
                  <td style="height: 30px;">
@@ -858,7 +866,17 @@
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <select id="seleBCSOutsource">
-                        <option value="0">--请选择客服--</option>
+                        <option value="0">--请选择外协--</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td style="height: 30px;">
+                    生产外协
+                </td>
+                <td colspan="5" style="text-align: left; padding-left: 5px;">
+                    <select id="seleProductOutsource">
+                        <option value="0">--请选择外协--</option>
                     </select>
                 </td>
             </tr>

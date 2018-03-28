@@ -4,6 +4,7 @@ var CSUserId = 0;
 var outsourceId = 0;
 var oohInstallOutsourceId = 0
 var bcsOutsourceId = 0;
+var productOutsourceId = 0;
 var currShopId = 0;
 var currRegion = "";
 var currProvinceId = 0;
@@ -232,7 +233,18 @@ var shop = {
                             var option = "<option value='" + json[i].Id + "' " + selected1 + ">" + json[i].OutsourceName + "</option>";
                             $("#seleBCSOutsource").append(option);
 
-                           
+
+
+                        }
+                        var obj2 = $("#seleProductOutsource").find("option[value='" + json[i].Id + "']");
+                        if (($(obj2).val() || "") == "") {
+                            var selected1 = "";
+                            if (productOutsourceId == json[i].Id)
+                                selected1 = "selected='selected'";
+                            var option = "<option value='" + json[i].Id + "' " + selected1 + ">" + json[i].OutsourceName + "</option>";
+                            $("#seleProductOutsource").append(option);
+
+
 
                         }
                     }
@@ -349,10 +361,11 @@ var shop = {
                     $("#labOutsourceName").html(shop[0].OutsourceName);
                     $("#labOOHOutsourceName").html(shop[0].OOHOutsourceName);
                     $("#labBCSOutsourceName").html(shop[0].BCSOutsourctName);
+                    $("#labProductOutsourceName").html(shop[0].ProductOutsourctName);
                     $("#checkDiv").show().dialog({
                         modal: true,
                         width: 820,
-                        height: 564,
+                        height: 595,
                         iconCls: 'icon-add',
                         resizable: false
                     })
@@ -421,12 +434,13 @@ var shop = {
                     outsourceId = shopJson[0].OutsourceId;
                     oohInstallOutsourceId = shopJson[0].OOHInstallOutsourceId;
                     bcsOutsourceId = shopJson[0].BCSOutsourceId;
+                    productOutsourceId = shopJson[0].ProductOutsourceId;
                     shop.getOutsourceList();
                     //shop.getOOHInstallOutsourceList();
                     $("#editDiv").show().dialog({
                         modal: true,
                         width: 870,
-                        height: 571,
+                        height: 602,
                         iconCls: 'icon-add',
                         resizable: false,
                         buttons: [
@@ -592,7 +606,7 @@ var shop = {
         $("#editDiv").show().dialog({
             modal: true,
             width: 870,
-            height: 571,
+            height: 602,
             iconCls: 'icon-add',
             resizable: false,
             buttons: [
@@ -781,9 +795,10 @@ function CheckVal() {
     var osInstallPrice = $.trim($("#txtOutsourceInstallPrice").val());
     var osBCSInstallPrice = $.trim($("#txtOutsourceBCSInstallPrice").val());
     var shopType = $.trim($("#txtShopType").val());
-    var outsourceId = $("#seleOutsource").val();
-    var oohOutsourceId = $("#seleOOHInstallOutsource").val();
-    var bcsOutsourceId = $("#seleBCSOutsource").val();
+    var outsourceId0 = $("#seleOutsource").val();
+    var oohOutsourceId0 = $("#seleOOHInstallOutsource").val();
+    var bcsOutsourceId0 = $("#seleBCSOutsource").val();
+    var productOutsourceId0 = $("#seleProductOutsource").val();
     jsonStr = "";
     if (RegionId == "0") {
         alert("请填写客户");
@@ -833,7 +848,7 @@ function CheckVal() {
     bcsInstallPrice = bcsInstallPrice.length > 0 ? bcsInstallPrice : 0;
     osInstallPrice = osInstallPrice.length > 0 ? osInstallPrice : 0;
     osBCSInstallPrice = osBCSInstallPrice.length > 0 ? osBCSInstallPrice : 0;
-    jsonStr = '{"Id":' + currShopId + ',"CustomerId":' + customerId + ',"ShopName":"' + POSName + '","ShopNo":"' + POSCode + '","RegionId":' + RegionId + ',"RegionName":"' + RegionName + '","ProvinceId":' + ProvinceId + ',"ProvinceName":"' + ProvinceName + '","CityId":' + CityId + ',"CityName":"' + CityName + '","AreaId":' + AreaId + ',"AreaName":"' + AreaName + '","CityTier":"' + CityTier + '","IsInstall":"' + IsInstall + '","AgentCode":"' + AgentNo + '","AgentName":"' + AgentName + '","POPAddress":"' + POPAddress + '","Contact1":"' + Contact1 + '","Tel1":"' + Tel1 + '","Contact2":"' + Contact2 + '","Tel2":"' + Tel2 + '","Channel":"' + Channel + '","Format":"' + Format + '","LocationType":"' + LocationType + '","BusinessModel":"' + BusinessModel + '","OpeningDate":"' + OpeningDate + '","Status":"' + Status + '","CSUserId":' + csUserId + ',"Remark":"' + remark + '","BasicInstallPrice":' + basicInstallPrice + ',"ShopType":"' + shopType + '","BCSInstallPrice":' + bcsInstallPrice + ',"OutsourceInstallPrice":' + osInstallPrice + ',"OutsourceBCSInstallPrice":' + osBCSInstallPrice + ',"OutsourceId":' + outsourceId + ',"OOHInstallOutsourceId":' + oohOutsourceId + ',"BCSIsInstall":"' + BCSIsInstall + '","BCSOutsourceId":"' + bcsOutsourceId + '"}';
+    jsonStr = '{"Id":' + currShopId + ',"CustomerId":' + customerId + ',"ShopName":"' + POSName + '","ShopNo":"' + POSCode + '","RegionId":' + RegionId + ',"RegionName":"' + RegionName + '","ProvinceId":' + ProvinceId + ',"ProvinceName":"' + ProvinceName + '","CityId":' + CityId + ',"CityName":"' + CityName + '","AreaId":' + AreaId + ',"AreaName":"' + AreaName + '","CityTier":"' + CityTier + '","IsInstall":"' + IsInstall + '","AgentCode":"' + AgentNo + '","AgentName":"' + AgentName + '","POPAddress":"' + POPAddress + '","Contact1":"' + Contact1 + '","Tel1":"' + Tel1 + '","Contact2":"' + Contact2 + '","Tel2":"' + Tel2 + '","Channel":"' + Channel + '","Format":"' + Format + '","LocationType":"' + LocationType + '","BusinessModel":"' + BusinessModel + '","OpeningDate":"' + OpeningDate + '","Status":"' + Status + '","CSUserId":' + csUserId + ',"Remark":"' + remark + '","BasicInstallPrice":' + basicInstallPrice + ',"ShopType":"' + shopType + '","BCSInstallPrice":' + bcsInstallPrice + ',"OutsourceInstallPrice":' + osInstallPrice + ',"OutsourceBCSInstallPrice":' + osBCSInstallPrice + ',"OutsourceId":' + outsourceId0 + ',"OOHInstallOutsourceId":' + oohOutsourceId0 + ',"BCSIsInstall":"' + BCSIsInstall + '","BCSOutsourceId":"' + bcsOutsourceId0 + '","ProductOutsourceId":"' + productOutsourceId0 + '"}';
 
     return true;
 }
@@ -938,6 +953,8 @@ function ClearVal() {
     CSUserId = 0;
     outsourceId = 0;
     oohInstallOutsourceId = 0;
+    bcsOutsourceId = 0;
+    productOutsourceId = 0;
     $("#editDiv input").not("input:radio[name='rblStatus']").val("");
     $("#ddlChannelEditMenu,#ddlFormatEditMenu").html("");
 }

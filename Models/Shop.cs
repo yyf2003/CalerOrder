@@ -64,5 +64,6 @@ namespace Models
         public string BCSIsInstall { get; set; }
         public Nullable<int> OOHInstallOutsourceId { get; set; }
         public Nullable<int> BCSOutsourceId { get; set; }
+        public Nullable<int> ProductOutsourceId { get; set; }
     }
 }
