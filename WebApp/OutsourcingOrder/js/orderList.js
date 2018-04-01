@@ -12,6 +12,8 @@ var exportType = "";
 var materialName = "";
 
 $(function () {
+    CheckPrimissionWithMoreBtn(url, null, null, new Array($("#btnEditOrder"), $("#btnChangeOS")), new Array($("#btnDeleteOrder")), new Array($("#btnRecoverOrder")), null);
+
     GetOutsourceList();
     //Order.getOrderList(orderPageIndex, orderPageSize);
 
@@ -63,7 +65,7 @@ $(function () {
     });
 
     $("#txtSearchOrderShopNo").searchbox({
-        width: 300,
+        width: 200,
         searcher: doSearchOrder,
         prompt: '请输入店铺编号,可以输入多个,逗号分隔'
     })
@@ -155,6 +157,7 @@ var Order = {
             method: 'get',
             url: 'handler/OrderList.ashx',
             columns: [[
+                        { field: 'checked', checkbox: true },
                         { field: 'rowIndex', title: '序号' },
                         { field: 'Id', title: '序号', hidden: true },
                         { field: 'OrderType', title: '类型' },
@@ -183,7 +186,7 @@ var Order = {
             pageList: [20],
             striped: true,
             border: false,
-            singleSelect: true,
+            singleSelect: false,
             pagination: true,
             pageNumber: pageIndex,
             pageSize: pageSize,
@@ -192,11 +195,14 @@ var Order = {
 
             emptyMsg: '没有相关记录',
             rowStyler: function (index, row) {
-                if (row.IsDelete==1) {
+                if (row.IsDelete == 1) {
                     return 'color:red';
                 }
-            }    
+            },
+            onClickRow: function (rowIndex, rowData) {
+                $(this).datagrid("unselectRow", rowIndex);
 
+            }
         });
         var p = $("#tbOrderList").datagrid('getPager');
         $(p).pagination({
@@ -374,9 +380,22 @@ var Order = {
 
 function GetOutsourceList() {
 
+    //    $.ajax({
+    //        type: 'get',
+    //        url: 'handler/OrderList.ashx?type=getOutsource',
+    //        success: function (data) {
+    //            if (data != "") {
+    //                var json = eval(data);
+
+    //                
+    //                
+    //            }
+    //        }
+    //    })
     $("#tbOutsource").datagrid({
         method: 'get',
         url: 'handler/OrderList.ashx?type=getOutsource',
+        //data: json,
         columns: [[
                     { field: 'Id', hidden: true },
                     { field: 'CompanyName', title: '外协名称' }
@@ -641,12 +660,16 @@ $(function () {
 
 function editOrder() {
     //ClearVal();
-    var row = $("#tbOrderList").datagrid("getSelected");
-    if (row == null) {
+    //var row = $("#tbOrderList").datagrid("getSelected");
+    var row = $("#tbOrderList").datagrid("getSelections");
+    if (row == null || row.length == 0) {
         layer.msg("请选择要编辑的行");
     }
+    else if (row.length > 1) {
+        layer.msg("只能选择一行");
+    }
     else {
-        var orderId = row.Id;
+        var orderId = row[0].Id;
         Order.model.Id = orderId;
         Order.bindSheet();
         $.ajax({
@@ -723,20 +746,28 @@ function editOrder() {
             }
         })
     }
-   
+
 }
 
 function deleteOrder() {
-    var row = $("#tbOrderList").datagrid("getSelected");
-    if (row == null) {
+    var row = $("#tbOrderList").datagrid("getSelections");
+    var ids = "";
+    if (row == null || row.length == 0) {
         layer.msg("请选择要编辑的行");
     }
-    else if (row.IsDelete == 0) {
-        var orderId = row.Id;
+    else {
+        for (var i = 0; i < row.length; i++) {
+            if (row[i].IsDelete == 0) {
+                ids += row[i].Id + ",";
+            }
+        }
+    }
+    if (ids.length > 0) {
+        //var orderId = row[0].Id;
         $.ajax({
             type: "get",
             url: "handler/OrderList.ashx",
-            data: { type: 'delete', orderId: orderId },
+            data: { type: 'delete', orderId: ids },
             success: function (data) {
                 if (data == "ok") {
                     Order.getOrderList(orderPageIndex, orderPageSize);
@@ -747,36 +778,124 @@ function deleteOrder() {
             }
         });
     }
-    else {
-        layer.msg("已删除");
-    }
+
 }
 
 function recoverOrder() {
-    var row = $("#tbOrderList").datagrid("getSelected");
-    if (row == null) {
+    var row = $("#tbOrderList").datagrid("getSelections");
+    if (row == null || row.length == 0) {
+        layer.msg("请选择要编辑的行");
+    }
+    var ids = "";
+    if (row == null || row.length == 0) {
         layer.msg("请选择要编辑的行");
     }
     else {
-      
-        if (row.IsDelete == 1) {
-            var orderId = row.Id;
+        for (var i = 0; i < row.length; i++) {
+            if (row[i].IsDelete == 1) {
+                ids += row[i].Id + ",";
+            }
+        }
+    }
+    if (ids.length > 0) {
+        var orderId = row[0].Id;
+        $.ajax({
+            type: "get",
+            url: "handler/OrderList.ashx",
+            data: { type: 'recover', orderId: ids },
+            success: function (data) {
+                if (data == "ok") {
+                    Order.getOrderList(orderPageIndex, orderPageSize);
+                }
+                else {
+                    layer.msg(data);
+                }
+            }
+        });
+    }
+
+}
+
+//修改外协
+var changeIds = "";
+function changeOutsource() {
+    changeIds = "";
+    var row = $("#tbOrderList").datagrid("getSelections");
+    if (row == null || row.length == 0) {
+        layer.msg("请选择要编辑的行");
+    }
+    else {
+        for (var i = 0; i < row.length; i++) {
+            changeIds += row[i].Id + ",";
+        }
+    }
+    if (changeIds.length > 0) {
+        document.getElementById("seleOutsource").length = 1;
+        var json = $("#tbOutsource").datagrid('getData').rows;
+        //alert(JSON.stringify(json));
+        //alert(json.length);
+        if (json.length > 0) {
+            
+            for (var i = 0; i < json.length; i++) {
+                if (currOutsourceId != json[i].Id) {
+                    var option = "<option value='" + json[i].Id + "'>" + json[i].CompanyName + "</option>";
+                    $("#seleOutsource").append(option);
+                }
+            }
+        }
+        layer.open({
+            type: 1,
+            time: 0,
+            title: '修改外协',
+            skin: 'layui-layer-rim', //加上边框
+            area: ['380px', '200px'],
+            content: $("#divOutsource"),
+            id: 'outsourceLayer',
+            btn: ['提 交'],
+            btnAlign: 'c',
+            yes: function () {
+
+                layer.confirm('确定修改外协吗？', {
+                    btn: ['确定的', '取消'] //按钮
+                }, function () {
+                    submitNewOutsource();
+                }, function () {
+                    $("#divOutsource").hide();
+                    layer.closeAll();
+                });
+            },
+            cancel: function () {
+                $("#divOutsource").hide();
+                layer.closeAll();
+            }
+
+        });
+    }
+
+}
+
+function submitNewOutsource() {
+    if (changeIds.length > 0) {
+        var newOutsourceId = $("#seleOutsource").val()||0;
+        if (newOutsourceId > 0) {
             $.ajax({
                 type: "get",
                 url: "handler/OrderList.ashx",
-                data: { type: 'recover', orderId: orderId },
+                data: { type: 'changeOutsource', orderId: changeIds, newOutsourceId: newOutsourceId },
                 success: function (data) {
                     if (data == "ok") {
                         Order.getOrderList(orderPageIndex, orderPageSize);
+                        changeIds = "";
+                        newOutsourceId = 0;
+                        $("#divOutsource").hide();
+                        layer.closeAll();
+                        $("#seleOutsource").val("0");
                     }
                     else {
                         layer.msg(data);
                     }
                 }
             });
-        }
-        else {
-            layer.msg("该订单没删除，不能恢复");
         }
     }
 }

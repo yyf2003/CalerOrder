@@ -35,6 +35,9 @@
             text-decoration: underline;
         }
         </style>
+    <script type="text/javascript">
+        var url = '<%=url %>';  
+    </script>
 </head>
 <body class="easyui-layout" data-options="fit:true">
     <form id="form1" runat="server">
@@ -164,13 +167,15 @@
                             </table>
                             <div id="toolbar" style="height: 28px; padding-top: 3px;">
                                 <a id="btnRefresh" style="float: left;" class="easyui-linkbutton" plain="true" icon="icon-reload">
-                                    刷新</a> <a id="btnEditOrder" onclick="editOrder()" style="float: left; display: ;"
+                                    刷新</a> <a id="btnEditOrder" onclick="editOrder()" style="float: left; display:none ;"
                                         class="easyui-linkbutton" plain="true" icon="icon-edit">编辑</a> <a id="btnDeleteOrder"
-                                            onclick="deleteOrder()" style="float: left; display: ;" class="easyui-linkbutton"
+                                            onclick="deleteOrder()" style="float: left; display:none ;" class="easyui-linkbutton"
                                             plain="true" icon="icon-remove">删除</a>
                                             <a id="btnRecoverOrder"
-                                            onclick="recoverOrder()" style="float: left; display: ;" class="easyui-linkbutton"
+                                            onclick="recoverOrder()" style="float: left; display:none ;" class="easyui-linkbutton"
                                             plain="true" icon="icon-redo">恢复</a>
+                                             <a id="btnChangeOS" onclick="changeOutsource()" style="float: left; display:none ;"
+                                        class="easyui-linkbutton" plain="true" icon="icon-edit">修改外协</a>
                                 <div class='datagrid-btn-separator'>
                                 </div>
                                 <a id="btnExport350" style="float: left;" class="easyui-linkbutton" plain="true"
@@ -363,6 +368,21 @@
         </table>
     </div>
 
+     <div id="divOutsource" style="display:none; width:380px; height:90px; margin:0px;">
+       <table class="table">
+           <tr>
+             <td style=" width:100px; height:35px;">
+               请选择新外协：
+             </td>
+             <td style=" text-align:left; padding-left:10px;">
+                <select id="seleOutsource">
+                   <option value="0">--请选择--</option>
+                </select>
+             </td>
+           </tr>
+           
+       </table>
+     </div>
 
     </form>
 </body>

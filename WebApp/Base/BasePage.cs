@@ -6625,12 +6625,16 @@ namespace WebApp
         //分配外协费用订单
         public void AutoAssignPriceOrder(int subjectId)
         {
+
+            List<int> priceOrderTypeList = CommonMethod.GetEnumList<OrderTypeEnum>().Where(s => s.Desction.Contains("费用订单")).Select(s=>s.Value).ToList();
+           
             var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                              join shop in CurrentContext.DbContext.Shop
                              on order.ShopId equals shop.Id
                              where order.SubjectId == subjectId
                              && (order.IsDelete == null || order.IsDelete == false)
-                             && (order.OrderType == (int)OrderTypeEnum.安装费 || order.OrderType == (int)OrderTypeEnum.测量费 || order.OrderType == (int)OrderTypeEnum.发货费 || order.OrderType == (int)OrderTypeEnum.其他费用)
+                             //&& (order.OrderType == (int)OrderTypeEnum.安装费 || order.OrderType == (int)OrderTypeEnum.测量费 || order.OrderType == (int)OrderTypeEnum.发货费 || order.OrderType == (int)OrderTypeEnum.其他费用)
+                             && priceOrderTypeList.Contains(order.OrderType??1)
                              select new
                              {
                                  order,
@@ -6638,6 +6642,7 @@ namespace WebApp
                              }).ToList();
             OutsourceOrderDetail outsourceOrderDetailModel;
             OutsourceOrderDetailBLL outsourceOrderDetailBll = new OutsourceOrderDetailBLL();
+            outsourceOrderDetailBll.Delete(s => s.SubjectId == subjectId);
             orderList.ForEach(s =>
             {
                 int Quantity = s.order.Quantity ?? 1;

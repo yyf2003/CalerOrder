@@ -12,6 +12,8 @@
     <link href="../easyui1.4/themes/bootstrap/layout.css" rel="stylesheet" />
     <link href="../easyui1.4/themes/icon.css" rel="stylesheet" />
     <script src="../Scripts/jquery-1.7.2.js" type="text/javascript"></script>
+     <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
+    <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
     <script type="text/javascript">
         function SubmitFail(msg) {
             alert("提交失败："+msg);
@@ -65,6 +67,10 @@
     <asp:HiddenField ID="hfCustomerId" runat="server" />
     <asp:HiddenField ID="hfSubjectId" runat="server" />
     <asp:HiddenField ID="hfPlanIds" runat="server" />
+    <div id="approveLoading" style=" display:none;color:Red; font-size:18px; height:130px; width:420px; line-height:120px; text-align:center;">
+       提示：正在审批，请稍等...
+      
+    </div>
     </form>
 </body>
 </html>

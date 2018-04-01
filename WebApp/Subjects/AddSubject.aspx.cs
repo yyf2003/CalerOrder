@@ -51,13 +51,13 @@ namespace WebApp.Subjects
 
         void BindRegion()
         {
-            rblPriceBlong.Items.Clear();
+            //rblPriceBlong.Items.Clear();
             rblRegion.Items.Clear();
             ListItem li0 = new ListItem();
             li0.Value = "";
             li0.Text = "默认&nbsp;&nbsp;";
             li0.Selected = true;
-            rblPriceBlong.Items.Add(li0);
+            //rblPriceBlong.Items.Add(li0);
             int customerId = int.Parse(ddlCustomer.SelectedValue);
             List<string> regions = new RegionBLL().GetList(s => s.CustomerId == customerId).Select(s => s.RegionName).Distinct().ToList();
 
@@ -68,7 +68,7 @@ namespace WebApp.Subjects
                     ListItem li = new ListItem();
                     li.Value = s;
                     li.Text = s + "&nbsp;&nbsp;";
-                    rblPriceBlong.Items.Add(li);
+                    //rblPriceBlong.Items.Add(li);
 
                     rblRegion.Items.Add(li);
                 });
@@ -235,11 +235,11 @@ namespace WebApp.Subjects
                     //rblIsInstall.SelectedValue = subjectModel.IsInstall.ToString();
                     if (subjectModel.SubjectType != null)
                         rblSubjectType.SelectedValue = subjectModel.SubjectType.ToString();
-                    if (subjectModel.PriceBlongRegion != null)
-                    {
-                        rblPriceBlong.SelectedValue = subjectModel.PriceBlongRegion;
+                    //if (subjectModel.PriceBlongRegion != null)
+                    //{
+                    //    rblPriceBlong.SelectedValue = subjectModel.PriceBlongRegion;
 
-                    }
+                    //}
                     if ((subjectModel.IsSecondInstall ?? false))
                     {
                         cbIsSecondInstall.Checked = true;
@@ -299,7 +299,7 @@ namespace WebApp.Subjects
             else
                 subjectModel.CornerType = string.Empty;
             subjectModel.SubjectTypeId = int.Parse(ddlSubjectType.SelectedValue);
-            subjectModel.PriceBlongRegion = rblPriceBlong.SelectedValue;
+            //subjectModel.PriceBlongRegion = rblPriceBlong.SelectedValue;
             if (!string.IsNullOrWhiteSpace(rblSubjectType.SelectedValue))
                 subjectModel.SubjectType = int.Parse(rblSubjectType.SelectedValue);
             else

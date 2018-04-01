@@ -13,6 +13,8 @@
     <link href="/easyui1.4/themes/icon.css" rel="stylesheet" />
     <script src="/Scripts/jquery-1.7.2.js" type="text/javascript"></script>
     <script src="/easyui1.4/jquery.easyui.min.js"></script>
+       <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
+    <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -492,6 +494,10 @@
         <img src="../../image/WaitImg/loading1.gif" />
     </div>
     <asp:HiddenField ID="hfSubjectType" runat="server" />
+    <div id="approveLoading" style=" display:none;color:Red; font-size:18px; height:130px; width:420px; line-height:120px; text-align:center;">
+       提示：正在审批，请稍等...
+      
+    </div>
     </form>
 </body>
 </html>
@@ -521,7 +527,18 @@
         //return confirm("确定提交吗？");
         if (confirm("确定提交吗？")) {
             $("#btnDiv").hide();
-            $("#loading").show();
+            //$("#loading").show();
+            layer.open({
+                type: 1,
+                time: 0,
+                title: '提示信息',
+                skin: 'layui-layer-rim', //加上边框
+                area: ['450px', '200px'],
+                content: $("#approveLoading"),
+                id: 'loadLayer',
+                closeBtn: 0
+
+            });
             return true;
         }
         else

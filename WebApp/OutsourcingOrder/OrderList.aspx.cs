@@ -10,8 +10,10 @@ namespace WebApp.OutsourcingOrder
 {
     public partial class OrderList :BasePage
     {
+        public string url = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
         {
+            url = Request.FilePath;
             if (!IsPostBack)
             {
                 BindCustomerList(ddlCustomer);

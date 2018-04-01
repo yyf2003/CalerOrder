@@ -170,7 +170,7 @@
                                                 </tr>
                                                 <tr class="tr_bai">
                                                     <td>
-                                                        快递费：
+                                                        快递费/运费：
                                                     </td>
                                                     <td style="text-align: left; padding-left: 5px;">
                                                         <asp:Label ID="labExpressPrice" runat="server" Text="0"></asp:Label>
@@ -227,7 +227,7 @@
                                                 </tr>
                                                 <tr class="tr_bai">
                                                     <td>
-                                                        快递费：
+                                                        快递费/运费：
                                                     </td>
                                                     <td style="text-align: left; padding-left: 5px;">
                                                         <asp:Label ID="labRExpressPrice" runat="server" Text="0"></asp:Label>

@@ -301,11 +301,12 @@ namespace WebApp.Subjects.RegionSubject
             string msg = string.Empty;
             int subjectType = 1;
             int guidanceId = 0;
+            Models.Subject model = subjectBll.GetModel(subjectId);
             using (TransactionScope tran = new TransactionScope())
             {
                 try
                 {
-                    Models.Subject model = subjectBll.GetModel(subjectId);
+                    
                     SubjectGuidance guidanceModel = null;
                     int newSubjectId = subjectId;
                     if (model != null)
@@ -483,16 +484,7 @@ namespace WebApp.Subjects.RegionSubject
 
                         
 
-                        model.ApproveState = result;
-                        model.ApproveDate = DateTime.Now;
-                        model.ApproveUserId = CurrentUser.UserId;
-                        subjectBll.Update(model);
-                        if (!string.IsNullOrWhiteSpace(remark))
-                        {
-                            remark = remark.Replace("\r\n", "<br/>");
-                        }
-                        ApproveInfo approveModel = new ApproveInfo() { AddDate = DateTime.Now, AddUserId = CurrentUser.UserId, Remark = remark, Result = result, SubjectId = subjectId };
-                        new ApproveInfoBLL().Add(approveModel);
+                        
                         // && (model.SubjectType == (int)SubjectTypeEnum.HC订单 || model.SubjectType == (int)SubjectTypeEnum.分区补单 || model.SubjectType == (int)SubjectTypeEnum.正常单)
                         if (result == 1)
                         {
@@ -505,25 +497,19 @@ namespace WebApp.Subjects.RegionSubject
                                 changeModel.FinishUserId = CurrentUser.UserId;
                                 changeApplicationBll.Update(changeModel);
                             }
-                            //if (guidanceModel != null && (model.SubjectType != (int)SubjectTypeEnum.二次安装 && model.SubjectType != (int)SubjectTypeEnum.费用订单 && model.SubjectType != (int)SubjectTypeEnum.新开店安装费))
-                            //{
-                            //    if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
-                            //    {
-                            //        SaveInstallPrice(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1);
-                            //    }
-                            //    else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
-                            //    {
-                            //        SaveExpressPrice(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1);
-                            //    }
-                            //    else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
-                            //    {
-                            //        SaveExpressPriceForDelivery(guidanceModel.ItemId, subjectId, model.SubjectType ?? 1, guidanceModel.ExperssPrice);
-                            //    }
-                            //}
-                            ////外协自动分单
-                            //AutoAssignOutsourceOrder(subjectId, model.SubjectType ?? 1);
+                            
                         }
-                        
+                        model.ApproveState = result;
+                        model.ApproveDate = DateTime.Now;
+                        model.ApproveUserId = CurrentUser.UserId;
+                        subjectBll.Update(model);
+                        if (!string.IsNullOrWhiteSpace(remark))
+                        {
+                            remark = remark.Replace("\r\n", "<br/>");
+                        }
+                        ApproveInfo approveModel = new ApproveInfo() { AddDate = DateTime.Now, AddUserId = CurrentUser.UserId, Remark = remark, Result = result, SubjectId = subjectId };
+                        new ApproveInfoBLL().Add(approveModel);
+
                         tran.Complete();
                         isApproveOk = true;
                     }
@@ -535,12 +521,7 @@ namespace WebApp.Subjects.RegionSubject
             }
             if (isApproveOk)
             {
-                //if (subjectType!=2)
-                //Sent();
-                //if (result == 1)
-                //{
-                //    new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId);
-                //}
+               
                 if (result == 1 && subjectType != (int)SubjectTypeEnum.新开店安装费 && subjectType != (int)SubjectTypeEnum.运费)
                 {
                     new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId);

@@ -74,7 +74,7 @@ namespace WebApp.Statistics
                         join subject in CurrentContext.DbContext.Subject
                         on order.SubjectId equals subject.Id
                         where subjectIdList.Contains(order.SubjectId ?? 0)
-                        && (subject.SubjectType == (int)SubjectTypeEnum.新开店安装费 || subject.SubjectType == (int)SubjectTypeEnum.运费)
+                        && (subject.SubjectType == (int)SubjectTypeEnum.新开店安装费 || subject.SubjectType == (int)SubjectTypeEnum.运费 || order.OrderType==(int)OrderTypeEnum.运费)
                         && (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
                         select new
                         {

@@ -112,17 +112,17 @@
                         (POP订单必选)
                     </td>
                 </tr>
-                <tr class="tr_bai">
+               <%-- <tr class="tr_bai">
                     <td>
                         实施区域：
                     </td>
                     <td colspan="3" style="text-align: left; padding-left: 5px;">
                         <asp:RadioButtonList ID="rblPriceBlong" runat="server" RepeatDirection="Horizontal"
                             RepeatLayout="Flow">
-                            <%--<asp:ListItem Value="" Selected="True">默认&nbsp;</asp:ListItem>--%>
+                          
                         </asp:RadioButtonList>
                     </td>
-                </tr>
+                </tr>--%>
                 <tr class="tr_bai" id="subjectTypeTr">
                     <td>
                         类型：

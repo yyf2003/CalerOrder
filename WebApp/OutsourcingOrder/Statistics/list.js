@@ -98,7 +98,13 @@ $(function () {
 
 
                     $("#labTotalPrice").html(json[0].TotalPrice);
-                    $("#labExpressPrice").html(json[0].ExpressPrice);
+
+                    var expressPriceTxt="0";
+                    if(json[0].ExpressPrice>0)
+                    {
+                       expressPriceTxt="<a href='javascript:void(0)' onclick='CheckExpressPrice()' style='text-decoration:underline;color:blue;'>" + json[0].ExpressPrice + "</a>";
+                    }
+                    $("#labExpressPrice").html(expressPriceTxt);
 
                     $("#labRPOPPrice").html(json[0].ReceivePOPPrice);
                     var labRInstallPrice = "0";
@@ -540,6 +546,18 @@ function CheckInstallPrice() {
     var layer1 = layer.open({
         type: 2,
         title: '安装费明细',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['95%', '90%'],
+        content: url
+    });
+}
+
+function CheckExpressPrice() {
+    var url = "ExpressPriceDetail.aspx?outsourceId=" + currOutsourceId + "&guidanceId=" + guidanceId + "&province=" + province + "&city=" + city + "&subjectId=" + subjectId;
+    var layer1 = layer.open({
+        type: 2,
+        title: "快递费明细",
         shadeClose: true,
         shade: 0.8,
         area: ['95%', '90%'],

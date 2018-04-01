@@ -67,6 +67,9 @@ namespace WebApp.OutsourcingOrder.handler
                 case "recover":
                     result = RecoverOrder();
                     break;
+                case "changeOutsource":
+                    result = ChangeOutsource();
+                    break;
                 default:
                     break;
             }
@@ -753,22 +756,33 @@ namespace WebApp.OutsourcingOrder.handler
         string DeleteOrder()
         {
             string result = "ok";
-            int orderId = 0;
+            string orderId = string.Empty;
             if (context1.Request.QueryString["orderId"] != null)
             {
-                orderId = int.Parse(context1.Request.QueryString["orderId"]);
+                orderId = context1.Request.QueryString["orderId"];
             }
             try
             {
-                 OutsourceOrderDetail orderModel = new OutsourceOrderDetailBLL().GetModel(orderId);
-                 if (orderModel != null)
-                 {
-                     orderModel.IsDelete = true;
-                     orderModel.ModifyType = "删除";
-                     orderModel.ModifyUserId = new BasePage().CurrentUser.UserId;
-                     orderModel.ModifyDate = DateTime.Now;
-                     new OutsourceOrderDetailBLL().Update(orderModel);
-                 }
+                if (!string.IsNullOrWhiteSpace(orderId))
+                {
+                    List<int> idList = StringHelper.ToIntList(orderId, ',');
+                    OutsourceOrderDetailBLL bll = new OutsourceOrderDetailBLL();
+                    var list = bll.GetList(s => idList.Contains(s.Id));
+                    if (list.Any())
+                    {
+                        OutsourceOrderDetail model = null;
+                        list.ForEach(s => {
+                            model = new OutsourceOrderDetail();
+                            model = s;
+                            model.IsDelete = true;
+                            model.ModifyType = "删除";
+                            model.ModifyUserId = new BasePage().CurrentUser.UserId;
+                            model.ModifyDate = DateTime.Now;
+                            bll.Update(s);
+                        });
+                    }
+
+                }
             }
             catch (Exception ex)
             {
@@ -780,26 +794,78 @@ namespace WebApp.OutsourcingOrder.handler
         string RecoverOrder()
         {
             string result = "ok";
-            int orderId = 0;
+            string orderId = string.Empty;
             if (context1.Request.QueryString["orderId"] != null)
             {
-                orderId = int.Parse(context1.Request.QueryString["orderId"]);
+                orderId = context1.Request.QueryString["orderId"];
             }
             try
             {
-                OutsourceOrderDetail orderModel = new OutsourceOrderDetailBLL().GetModel(orderId);
-                if (orderModel != null)
+                if (!string.IsNullOrWhiteSpace(orderId))
                 {
-                    orderModel.IsDelete = false;
-                    orderModel.ModifyType = "恢复";
-                    orderModel.ModifyUserId = new BasePage().CurrentUser.UserId;
-                    orderModel.ModifyDate = DateTime.Now;
-                    new OutsourceOrderDetailBLL().Update(orderModel);
+                    List<int> idList = StringHelper.ToIntList(orderId, ',');
+                    OutsourceOrderDetailBLL bll = new OutsourceOrderDetailBLL();
+                    var list = bll.GetList(s => idList.Contains(s.Id));
+                    if (list.Any())
+                    {
+                        OutsourceOrderDetail model = null;
+                        list.ForEach(s =>
+                        {
+                            model = new OutsourceOrderDetail();
+                            model = s;
+                            model.IsDelete = false;
+                            model.ModifyType = "恢复";
+                            model.ModifyUserId = new BasePage().CurrentUser.UserId;
+                            model.ModifyDate = DateTime.Now;
+                            bll.Update(s);
+                        });
+                    }
+
                 }
             }
             catch (Exception ex)
             {
-                result = "恢复失败："+ex.Message;
+                result = "恢复失败：" + ex.Message;
+            }
+            return result;
+        }
+
+        string ChangeOutsource() {
+            string result = "ok";
+            string orderId = string.Empty;
+            int newOutsourceId = 0;
+            if (context1.Request.QueryString["orderId"] != null)
+            {
+                orderId = context1.Request.QueryString["orderId"];
+            }
+            if (context1.Request.QueryString["newOutsourceId"] != null)
+            {
+                newOutsourceId = int.Parse(context1.Request.QueryString["newOutsourceId"]);
+            }
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(orderId) && newOutsourceId>0)
+                {
+                    List<int> idList = StringHelper.ToIntList(orderId, ',');
+                    OutsourceOrderDetailBLL bll = new OutsourceOrderDetailBLL();
+                    var list = bll.GetList(s => idList.Contains(s.Id));
+                    if (list.Any())
+                    {
+                        OutsourceOrderDetail model = null;
+                        list.ForEach(s =>
+                        {
+                            model = new OutsourceOrderDetail();
+                            model = s;
+                            model.OutsourceId = newOutsourceId;
+                            bll.Update(s);
+                        });
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                result = "更新失败：" + ex.Message;
             }
             return result;
         }

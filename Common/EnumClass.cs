@@ -38,7 +38,7 @@ namespace Common
     {
         正常 = 1,
         关闭,
-        装修,
+        //装修,
     }
 
     public enum FileCodeEnum

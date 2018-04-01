@@ -784,7 +784,7 @@ function CheckVal() {
     var OpeningDate = $.trim($("#txtOpenDate").val());
     //var Status = $.trim($("#txtStatus").val());
 
-    var Status = $("input:radio[name='rblStatus']:checked").val();
+    var Status = $("input:radio[name='rblStatus']:checked").val()||"正常";
     var POPAddress = $.trim($("#txtAddress").val());
     var csUserId = $("#selCSUser").val();
     var remark = $.trim($("#txtRemark").val());
@@ -842,6 +842,10 @@ function CheckVal() {
     }
     if (osInstallPrice != "" && isNaN(osInstallPrice)) {
         alert("外协安装费必须是数字");
+        return false;
+    }
+    if (RegionName.toLowerCase() != 'west' && outsourceId0 == 0) {
+        alert("请选择主外协名称");
         return false;
     }
     basicInstallPrice = basicInstallPrice.length > 0 ? basicInstallPrice : 0;

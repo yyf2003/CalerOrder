@@ -1301,19 +1301,20 @@ namespace WebApp.Statistics
                             freightDic[(s.order.SubjectId ?? 0)] += price0;
                         }
                     }
-                    //else if (s.order.OrderType == (int)OrderTypeEnum.运费)
-                    //{
-                    //    freightPrice += price0;
-                    //    if (!freightDic.Keys.Contains((s.order.SubjectId ?? 0)))
-                    //    {
-                    //        freightDic.Add((s.order.SubjectId ?? 0), price0);
-                    //    }
-                    //    else
-                    //    {
-                    //        freightDic[(s.order.SubjectId ?? 0)] += price0;
-                    //    }
+                    else if (s.order.OrderType == (int)OrderTypeEnum.运费)
+                    {
+                        //运费和新开的费用放一起
+                        newShopInstallPrice += price0;
+                        if (!newShopInstallPriceDic.Keys.Contains((s.order.SubjectId ?? 0)))
+                        {
+                            newShopInstallPriceDic.Add((s.order.SubjectId ?? 0), price0);
+                        }
+                        else
+                        {
+                            newShopInstallPriceDic[(s.order.SubjectId ?? 0)] += price0;
+                        }
 
-                    //}
+                    }
                 });
             }
             Session["freightDicStatistics"] = freightDic;
