@@ -237,6 +237,7 @@ var Order = {
         this.Format = "";
         this.CityTier = "";
         this.PayOrderPrice = 0;
+        this.ReceiveOrderPrice = 0; 
 
 
     },
@@ -355,7 +356,7 @@ var Order = {
     },
     submit: function () {
         if (CheckVal()) {
-            jsonStr = '{"Id":' + (this.model.Id || 0) + ',"OrderType":' + this.model.OrderType + ',"ShopNo":"' + this.model.ShopNo + '","PositionDescription":"' + this.model.PositionDescription + '","Sheet":"' + this.model.Sheet + '","POSScale":"' + this.model.POSScale + '","MaterialSupport":"' + this.model.MaterialSupport + '","MachineFrame":"' + this.model.MachineFrame + '","Gender":"' + this.model.Gender + '","Quantity":' + this.model.Quantity + ',"GraphicWidth":"' + this.model.GraphicWidth + '","GraphicLength":"' + this.model.GraphicLength + '","OrderGraphicMaterial":"' + this.model.OrderGraphicMaterial + '","Remark":"' + this.model.Remark + '","ChooseImg":"' + this.model.ChooseImg + '","PayOrderPrice":' + this.model.PayOrderPrice + '}';
+            jsonStr = '{"Id":' + (this.model.Id || 0) + ',"OrderType":' + this.model.OrderType + ',"ShopNo":"' + this.model.ShopNo + '","PositionDescription":"' + this.model.PositionDescription + '","Sheet":"' + this.model.Sheet + '","POSScale":"' + this.model.POSScale + '","MaterialSupport":"' + this.model.MaterialSupport + '","MachineFrame":"' + this.model.MachineFrame + '","Gender":"' + this.model.Gender + '","Quantity":' + this.model.Quantity + ',"GraphicWidth":"' + this.model.GraphicWidth + '","GraphicLength":"' + this.model.GraphicLength + '","OrderGraphicMaterial":"' + this.model.OrderGraphicMaterial + '","Remark":"' + this.model.Remark + '","ChooseImg":"' + this.model.ChooseImg + '","PayOrderPrice":' + this.model.PayOrderPrice + ',"ReceiveOrderPrice":' + this.model.ReceiveOrderPrice + '}';
             var loadIndex = layer.load(0, { shade: false });
             $.ajax({
                 type: "post",
@@ -711,8 +712,8 @@ function editOrder() {
                         if (json[0].OrderType > 3) {
                             $("tr.pop").hide();
                             $("tr.price").show();
-                            $("#txtReceivePrice").val(json[0].OrderPrice);
                             $("#txtPayPrice").val(json[0].PayOrderPrice);
+                            $("#txtReceivePrice").val(json[0].ReceiveOrderPrice);
                             $("#txtSheet").val("").attr("disabled", "disabled");
                         }
                         else {
@@ -958,6 +959,7 @@ function ClearVal() {
     Order.model.Remark = "";
 
     Order.model.PayOrderPrice = 0;
+    Order.model.ReceiveOrderPrice = 0;
     Order.model.SubjectId = 0;
     Order.model.RegionSupplementId = 0;
 }
@@ -980,7 +982,7 @@ function CheckVal() {
     var ChooseImg = $.trim($("#txtChooseImg").val());
     var Remark = $.trim($("#txtRemark").val());
     var PayPrice = $.trim($("#txtPayPrice").val()) || 0;
-
+    var ReceivePrice = $.trim($("#txtReceivePrice").val()) || 0;
     if (ShopNo == "") {
         layer.msg("请填写店铺编号");
         return false;
@@ -992,6 +994,14 @@ function CheckVal() {
         }
         if (isNaN(PayPrice) || parseFloat(PayPrice) == 0) {
             layer.msg("应付费用填写不正确");
+            return false;
+        }
+        if (ReceivePrice == "") {
+            layer.msg("请填写应收费用");
+            return false;
+        }
+        if (isNaN(ReceivePrice) || parseFloat(ReceivePrice) == 0) {
+            layer.msg("应收费用填写不正确");
             return false;
         }
         Remark = $.trim($("#txtPriceRemark").val());
@@ -1061,7 +1071,7 @@ function CheckVal() {
     Order.model.ChooseImg = ChooseImg;
     Order.model.Remark = Remark;
     Order.model.PayOrderPrice = PayPrice;
-
+    Order.model.ReceiveOrderPrice = ReceivePrice;
     return true;
 }
 

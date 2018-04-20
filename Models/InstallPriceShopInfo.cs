@@ -27,5 +27,7 @@ namespace Models
         public Nullable<decimal> OOHPrice { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
         public Nullable<int> AddUserId { get; set; }
+        public string Remark { get; set; }
+        public Nullable<int> SubjectType { get; set; }
     }
 }

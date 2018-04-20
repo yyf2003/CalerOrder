@@ -152,10 +152,18 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
 $(function () {
 
     $("#btnExportQuote").click(function () {
+        var btn = $(this);
+        btn.attr("disabled", true).next("img").show();
+        checkExport(btn);
         var guidanceIds = "";
         var subjectIds = "";
+        var region = "";
+
         $("input[name^='cblGuidanceList']:checked").each(function () {
             guidanceIds += $(this).val() + ",";
+        })
+        $("input[name^='cblRegion']:checked").each(function () {
+            region += $(this).val() + ",";
         })
         $("input[name^='cblSubjects']:checked").each(function () {
             subjectIds += $(this).val() + ",";
@@ -166,7 +174,7 @@ $(function () {
             })
         }
         var templateType = $("input[name='rblExportType']:checked").val() || 1;
-        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&subjectIds=" + subjectIds + "&templateType=" + templateType;
+        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&region=" + region + "&subjectIds=" + subjectIds + "&templateType=" + templateType;
         $("#exportFrame").attr("src", url);
     })
 
@@ -174,3 +182,26 @@ $(function () {
         $("#loadSubjectList").show();
     })
 })
+
+var timer;
+function checkExport(obj) {
+    timer = setInterval(function () {
+        $.ajax({
+            type: "get",
+            url: "handler/CheckExport.ashx",
+            cache: false,
+            success: function (data) {
+                if (data == "ok") {
+                    $(obj).attr("disabled", false).next("img").hide();
+                    clearInterval(timer);
+                }
+                else if (data == "empty") {
+                    alert("没有数据可以导出");
+                    $(obj).attr("disabled", false).next("img").hide();
+                    clearInterval(timer);
+                }
+            }
+        })
+
+    }, 1000);
+}

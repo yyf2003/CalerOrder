@@ -1747,7 +1747,7 @@ namespace WebApp.QuoteOrderManager
         Dictionary<int, decimal> regionOtherPriceDic = new Dictionary<int, decimal>();
         void StatisticData()
         {
-            
+            CleanLab();
             guidanceIdList = GetGuidanceSelected();
             subjectIdList = GetSubjectSelected();
             priceSubjectIdList = GetPriceSubjectSelected();
@@ -2843,6 +2843,51 @@ namespace WebApp.QuoteOrderManager
             //Label1.Text = "操作成功！";
         //}
 
-        
+        void CleanLab()
+        {
+            labSubjectCount.Text = "0";
+            labShopCount.Text = "0";
+            labShopCount.Attributes.Remove("style");
+            labShopCount.Attributes.Remove("name");
+
+            labArea.Text = "0";
+
+            labPOPPrice.Text = "0";
+            labPOPPrice.Attributes.Remove("style");
+            labPOPPrice.Attributes.Remove("name");
+            labPOPPriceDetail.Text = "";
+
+            labExpressPrice.Text = "0";
+            labExpressPrice.Attributes.Remove("style");
+            labExpressPrice.Attributes.Remove("name");
+
+            labInstallPrice.Text = "0";
+            labInstallPrice.Attributes.Remove("style");
+            labInstallPrice.Attributes.Remove("name");
+
+            labSecondInstallPrice.Text = "0";
+            labMaterialPrice.Text = "0";
+            labNewShopInstallPrice.Text = "0";
+
+            labSecondExpressPrice.Text = "0";
+
+            labMeasurePrice.Text = "0";
+            labRegionInstallPrice.Text = "0";
+            labFreight.Text = "0";
+            labRegionExpressPrice.Text = "0";
+            labRegionOtherPrice.Text = "0";
+            labTotalPrice.Text = "0";
+
+            labShopCount1.Text = "0";
+            labArea1.Text = "0";
+            labPOPPrice1.Text = "0";
+            labExpressPrice1.Text = "0";
+            labInstallPrice1.Text = "0";
+
+            labMaterialPrice1.Text = "0";
+            labTotalPrice1.Text = "0";
+            
+
+        }
     }
 }

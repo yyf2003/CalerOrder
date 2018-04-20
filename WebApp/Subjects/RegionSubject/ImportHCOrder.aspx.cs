@@ -116,7 +116,7 @@ namespace WebApp.Subjects.RegionSubject
                         errorTB = CommonMethod.CreateErrorTB(cols);
                         if (!cbKeep.Checked)
                         {
-                            orderDetailBll.Delete(s => s.SubjectId == subjectId && s.ApproveState != 1);
+                            orderDetailBll.Delete(s => s.SubjectId == subjectId);
                         }
                         int shopId = 0;
                         string orderType = string.Empty;
@@ -410,7 +410,18 @@ namespace WebApp.Subjects.RegionSubject
                             if (!string.IsNullOrWhiteSpace(length))
                                 length1 = StringHelper.IsDecimal(length);
                             area = (width1 * length1) / 1000000;
-                            
+                            if (guidanceType != (int)GuidanceTypeEnum.Promotion)
+                            {
+
+                                if (shopFromDB != null && shopFromDB.IsInstall != null && shopFromDB.IsInstall.ToLower() == "y" && sheet.ToLower().Contains("ooh"))
+                                {
+                                    if (!CheckOOH(shopId, "", width1, length1))
+                                    {
+                                        canSave = false;
+                                        msg.Append("该尺寸的OOH POP不存在，请更新数据库；");
+                                    }
+                                }
+                            }
 
                             if (canSave)
                             {

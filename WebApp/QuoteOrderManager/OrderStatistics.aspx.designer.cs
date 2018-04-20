@@ -436,15 +436,6 @@ namespace WebApp.QuoteOrderManager {
         protected global::System.Web.UI.WebControls.Label labExpressPrice;
         
         /// <summary>
-        /// labSecondInstallPrice 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labSecondInstallPrice;
-        
-        /// <summary>
         /// labMaterialPrice 控件。
         /// </summary>
         /// <remarks>
@@ -454,13 +445,13 @@ namespace WebApp.QuoteOrderManager {
         protected global::System.Web.UI.WebControls.Label labMaterialPrice;
         
         /// <summary>
-        /// labNewShopInstallPrice 控件。
+        /// labSecondInstallPrice 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labNewShopInstallPrice;
+        protected global::System.Web.UI.WebControls.Label labSecondInstallPrice;
         
         /// <summary>
         /// labSecondExpressPrice 控件。
@@ -472,6 +463,15 @@ namespace WebApp.QuoteOrderManager {
         protected global::System.Web.UI.WebControls.Label labSecondExpressPrice;
         
         /// <summary>
+        /// labNewShopInstallPrice 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labNewShopInstallPrice;
+        
+        /// <summary>
         /// labMeasurePrice 控件。
         /// </summary>
         /// <remarks>
@@ -481,15 +481,6 @@ namespace WebApp.QuoteOrderManager {
         protected global::System.Web.UI.WebControls.Label labMeasurePrice;
         
         /// <summary>
-        /// labRegionInstallPrice 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labRegionInstallPrice;
-        
-        /// <summary>
         /// labFreight 控件。
         /// </summary>
         /// <remarks>
@@ -497,6 +488,15 @@ namespace WebApp.QuoteOrderManager {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label labFreight;
+        
+        /// <summary>
+        /// labRegionInstallPrice 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labRegionInstallPrice;
         
         /// <summary>
         /// labRegionExpressPrice 控件。

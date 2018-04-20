@@ -589,7 +589,7 @@ function CheckPOPPrice() {
     layer.open({
         type: 2,
         time: 0,
-        title: '其他费用信息',
+        title: 'POP费用明细',
         skin: 'layui-layer-rim', //加上边框
         area: ['95%', '90%'],
         content: url,

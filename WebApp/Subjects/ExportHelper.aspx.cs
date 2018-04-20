@@ -2777,6 +2777,7 @@ namespace WebApp.Subjects
                         {
                             area = (((item.order.GraphicWidth ?? 0) * (item.order.GraphicLength ?? 0)) / 1000000) * (item.order.Quantity ?? 1);
                         }
+                        model.AddDate = item.subject.AddDate;
                         model.Area = double.Parse(area.ToString());
                         //model.Area = item.order.Area != null ? double.Parse(StringHelper.IsDecimal(item.order.Area.ToString()).ToString()) : 0;
                         model.Category = item.order.Category;
@@ -2820,138 +2821,15 @@ namespace WebApp.Subjects
                         if (item.supplimentsubject != null)
                             model.SupplimentSubjectName = ("分区订单(" + item.supplimentsubject.SubjectName + ")");
                         model.OrderType = CommonMethod.GeEnumName<OrderTypeEnum>((item.order.OrderType ?? 1).ToString());
-                        model.ReceivePrice = double.Parse((item.order.OrderPrice ?? 0).ToString());
+                        if ((item.order.OrderPrice ?? 0) > 0)
+                            model.ReceivePrice = double.Parse((item.order.OrderPrice ?? 0).ToString());
+                        else
+                            model.ReceivePrice = double.Parse((item.order.TotalPrice ?? 0).ToString());
                         orderList.Add(model);
                     }
                 }
-                #region 物料导出
+  
 
-                var orderMaterialList = (from material in CurrentContext.DbContext.OrderMaterial
-                                         join subject in CurrentContext.DbContext.Subject
-                                         on material.SubjectId equals subject.Id
-                                         join shop in CurrentContext.DbContext.Shop
-                                         on material.ShopId equals shop.Id
-                                         where subjectIdList.Contains(material.SubjectId ?? 0)
-                                         
-                                         select new
-                                         {
-                                             material,
-                                             subject,
-                                             shop
-                                         }).ToList();
-
-                if (regionList.Any())
-                {
-                    //orderMaterialList = orderMaterialList.Where(s => regionList.Contains(s.shop.RegionName.ToLower())).ToList();
-                    if (regionList.Contains("空"))
-                    {
-                        List<string> regionList0 = regionList;
-                        regionList0.Remove("空");
-                        if (regionList0.Any())
-                        {
-                            orderMaterialList = orderMaterialList.Where(s => regionList0.Contains(s.shop.RegionName.ToLower()) || s.shop.RegionName == null || s.shop.RegionName == "").ToList();
-                        }
-                        else
-                            orderMaterialList = orderMaterialList.Where(s => s.shop.RegionName == null || s.shop.RegionName == "").ToList();
-                    }
-                    else
-                        orderMaterialList = orderMaterialList.Where(s => regionList.Contains(s.shop.RegionName.ToLower())).ToList();
-                }
-
-                if (provinceList.Any())
-                {
-                    //orderMaterialList = orderMaterialList.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();
-                    if (provinceList.Contains("空"))
-                    {
-                        List<string> provinceList0 = provinceList;
-                        provinceList0.Remove("空");
-                        if (provinceList0.Any())
-                        {
-                            orderMaterialList = orderMaterialList.Where(s => provinceList0.Contains(s.shop.ProvinceName) || s.shop.ProvinceName == null || s.shop.ProvinceName == "").ToList();
-
-                        }
-                        else
-                        {
-                            orderMaterialList = orderMaterialList.Where(s => s.shop.ProvinceName == null || s.shop.ProvinceName == "").ToList();
-
-                        }
-                    }
-                    else
-                    {
-                        orderMaterialList = orderMaterialList.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();
-
-                    }
-                }
-
-                if (cityList.Any())
-                {
-                    //orderMaterialList = orderMaterialList.Where(s => cityList.Contains(s.shop.CityName)).ToList();
-                    if (cityList.Contains("空"))
-                    {
-                        List<string> cityList0 = cityList;
-                        cityList0.Remove("空");
-                        if (cityList0.Any())
-                        {
-                            orderMaterialList = orderMaterialList.Where(s => cityList0.Contains(s.shop.CityName) || s.shop.CityName == null || s.shop.CityName == "").ToList();
-
-                        }
-                        else
-                        {
-                            orderMaterialList = orderMaterialList.Where(s => s.shop.CityName == null || s.shop.CityName == "").ToList();
-
-                        }
-                    }
-                    else
-                    {
-                        orderMaterialList = orderMaterialList.Where(s => cityList.Contains(s.shop.CityName)).ToList();
-
-                    }
-                }
-                if (orderMaterialList.Any())
-                {
-                    orderMaterialList.ForEach(s =>
-                    {
-                        Order350Model model = new Order350Model();
-                        model.Area = 0;
-                        model.Category = "";
-                        model.ChooseImg = "";
-                        model.City = s.shop.CityName;
-                        model.County = s.shop.AreaName;
-                        model.CityTier = s.shop.CityTier;
-                        model.Contacts = s.shop.Contact1 + "/" + s.shop.Contact2;
-                        model.Format = s.shop.Format;
-                        model.Gender = "";
-                        model.GraphicLength = 0;
-                        model.GraphicMaterial = "";
-                        model.GraphicWidth = 0;
-                        model.POPAddress = s.shop.POPAddress;
-                        StringBuilder size = new StringBuilder();
-                        if (s.material.MaterialLength != null && s.material.MaterialLength > 0 && s.material.MaterialWidth != null && s.material.MaterialWidth > 0)
-                        {
-                            size.AppendFormat("({0}*{1}", s.material.MaterialLength, s.material.MaterialWidth);
-                            if (s.material.MaterialHigh != null && s.material.MaterialHigh > 0)
-                                size.AppendFormat("*{0}", s.material.MaterialHigh);
-                            size.Append(")");
-                        }
-                        model.PositionDescription = size.ToString();
-                        model.Province = s.shop.ProvinceName;
-                        model.Quantity = s.material.MaterialCount != null ? double.Parse(s.material.MaterialCount.ToString()) : 0;
-                        model.Sheet = s.material.MaterialName ;
-                        model.ShopName = s.shop.ShopName;
-                        model.ShopNo = s.shop.ShopNo;
-                        model.SubjectName = s.subject.SubjectName;
-                        model.Tels = s.shop.Tel1 + "/" + s.shop.Tel2;
-                        model.OtherRemark = s.material.Remark;
-                        model.ShopLevel = s.shop.ShopLevel;
-                        model.IsInstall = s.shop.IsInstall;
-                        model.UnitPrice = double.Parse((s.material.Price??0).ToString());
-                        orderList.Add(model);
-                    });
-                }
-
-
-
-                #endregion
                 if (orderList.Any())
                 {
                     orderList = orderList.OrderBy(s => s.ShopNo).ToList();
@@ -2979,40 +2857,42 @@ namespace WebApp.Subjects
 
                         }
                         dataRow.GetCell(0).SetCellValue(item.OrderType);
-                        dataRow.GetCell(1).SetCellValue(item.ShopNo);
-                        dataRow.GetCell(2).SetCellValue(item.ShopName);
-                        dataRow.GetCell(3).SetCellValue(item.Province);
-                        dataRow.GetCell(4).SetCellValue(item.City);
-                        dataRow.GetCell(5).SetCellValue(item.CityTier);
-                        dataRow.GetCell(6).SetCellValue(item.Format);
-                        dataRow.GetCell(7).SetCellValue(item.POPAddress);
-                        dataRow.GetCell(8).SetCellValue(item.Contacts);
-                        dataRow.GetCell(9).SetCellValue(item.Tels);
+                        if (item.AddDate!=null)
+                            dataRow.GetCell(1).SetCellValue(DateTime.Parse(item.AddDate.ToString()).ToShortDateString());
+                        dataRow.GetCell(2).SetCellValue(item.ShopNo);
+                        dataRow.GetCell(3).SetCellValue(item.ShopName);
+                        dataRow.GetCell(4).SetCellValue(item.Province);
+                        dataRow.GetCell(5).SetCellValue(item.City);
+                        dataRow.GetCell(6).SetCellValue(item.CityTier);
+                        dataRow.GetCell(7).SetCellValue(item.Format);
+                        dataRow.GetCell(8).SetCellValue(item.POPAddress);
+                        dataRow.GetCell(9).SetCellValue(item.Contacts);
+                        dataRow.GetCell(10).SetCellValue(item.Tels);
 
-                        dataRow.GetCell(10).SetCellValue(item.POSScale);
-                        dataRow.GetCell(11).SetCellValue(item.MaterialSupport);
-                        dataRow.GetCell(12).SetCellValue(item.SubjectName);
-                        dataRow.GetCell(13).SetCellValue(item.Gender);
-                        dataRow.GetCell(14).SetCellValue(item.ChooseImg);
+                        dataRow.GetCell(11).SetCellValue(item.POSScale);
+                        dataRow.GetCell(12).SetCellValue(item.MaterialSupport);
+                        dataRow.GetCell(13).SetCellValue(item.SubjectName);
+                        dataRow.GetCell(14).SetCellValue(item.Gender);
+                        dataRow.GetCell(15).SetCellValue(item.ChooseImg);
 
 
                         //dataRow.GetCell(12).SetCellValue(item.Category);
-                        dataRow.GetCell(15).SetCellValue(item.Sheet);
-                        dataRow.GetCell(16).SetCellValue(item.MachineFrame);
-                        dataRow.GetCell(17).SetCellValue(item.PositionDescription);
-                        dataRow.GetCell(18).SetCellValue(item.Quantity);
-                        dataRow.GetCell(19).SetCellValue(item.GraphicMaterial);
-                        dataRow.GetCell(20).SetCellValue(item.QuoteGraphicMaterial);
-                        dataRow.GetCell(21).SetCellValue(item.UnitPrice);
-                        dataRow.GetCell(22).SetCellValue(item.GraphicWidth);
-                        dataRow.GetCell(23).SetCellValue(item.GraphicLength);
-                        dataRow.GetCell(24).SetCellValue(item.Area);
+                        dataRow.GetCell(16).SetCellValue(item.Sheet);
+                        dataRow.GetCell(17).SetCellValue(item.MachineFrame);
+                        dataRow.GetCell(18).SetCellValue(item.PositionDescription);
+                        dataRow.GetCell(19).SetCellValue(item.Quantity);
+                        dataRow.GetCell(20).SetCellValue(item.GraphicMaterial);
+                        dataRow.GetCell(21).SetCellValue(item.QuoteGraphicMaterial);
+                        dataRow.GetCell(22).SetCellValue(item.UnitPrice);
+                        dataRow.GetCell(23).SetCellValue(item.GraphicWidth);
+                        dataRow.GetCell(24).SetCellValue(item.GraphicLength);
+                        dataRow.GetCell(25).SetCellValue(item.Area);
                         if (item.ReceivePrice>0)
-                          dataRow.GetCell(25).SetCellValue(item.ReceivePrice);
+                          dataRow.GetCell(26).SetCellValue(item.ReceivePrice);
                         //其他备注
-                        dataRow.GetCell(26).SetCellValue(item.OtherRemark);
-                        dataRow.GetCell(27).SetCellValue(item.IsInstall);
-                        dataRow.GetCell(28).SetCellValue(item.SupplimentSubjectName);
+                        dataRow.GetCell(27).SetCellValue(item.OtherRemark);
+                        dataRow.GetCell(28).SetCellValue(item.IsInstall);
+                        dataRow.GetCell(29).SetCellValue(item.SupplimentSubjectName);
                         //dataRow.GetCell(27).SetCellValue(item.NewFormat);
                         startRow++;
 
@@ -3088,7 +2968,8 @@ namespace WebApp.Subjects
                 {
                     StringHelper.ToUpperOrLowerList(ref myRegionList, LowerUpperEnum.ToLower);
                 }
-                
+
+                List<int> priceOrderTypeList = CommonMethod.GetEnumList<OrderTypeEnum>().Where(s => s.Desction.Contains("费用订单")).Select(s => s.Value).ToList();
 
                 var list = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                             join shop in CurrentContext.DbContext.Shop
@@ -3105,6 +2986,7 @@ namespace WebApp.Subjects
                             && (order.ShopStatus == null || order.ShopStatus == "" || order.ShopStatus == ShopStatusEnum.正常.ToString())
                             && (myRegionList.Any()?((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? myRegionList.Contains(subject.PriceBlongRegion.ToLower()) : myRegionList.Contains(shop.RegionName.ToLower())):1==1)
                             && (order.OrderType!=(int)OrderTypeEnum.物料)
+                            && !priceOrderTypeList.Contains(order.OrderType??1)//不导出费用订单
                             select new
                             {
                                 subject,

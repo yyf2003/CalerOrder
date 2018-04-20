@@ -48,5 +48,6 @@ namespace Models
         public string GuidanceName { get; set; }
         public double ReceivePrice { get; set; }
         public double PayPrice { get; set; }
+        public DateTime? AddDate { get; set; }
     }
 }

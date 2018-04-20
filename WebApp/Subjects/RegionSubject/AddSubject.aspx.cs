@@ -100,15 +100,7 @@ namespace WebApp.Subjects.RegionSubject
                     list = list.Where(s => s.ActivityTypeId != (int)GuidanceTypeEnum.Others).ToList();
                 }
             }
-            //if (subjectId == 0)
-            //{
-                //DateTime date = DateTime.Now;
-                //DateTime newDate = new DateTime(date.Year, date.Month, 1);
-                //DateTime beginDate = newDate.AddMonths(-5);
-                //DateTime endDate = newDate.AddMonths(2);
-                //list = list.Where(s => s.EndDate >= date).ToList();
-                //list = list.Where(s => s.BeginDate >= beginDate && s.BeginDate < endDate).ToList();
-            //}
+           
             DateTime date = DateTime.Now;
             list = list.Where(s => s.EndDate >= date).ToList();
             if (list.Any())
@@ -119,26 +111,10 @@ namespace WebApp.Subjects.RegionSubject
                 ddlGuidance.DataBind();
                 ddlGuidance.Items.Insert(0, new ListItem("请选择", "0"));
 
-                //if (subjectId > 0)
-                //    ddlGuidance.Enabled = false;
+               
             }
 
-            //rblSubjectType.Items.Clear();
-            //List<EnumEntity> list1 = CommonMethod.GetEnumList<SubjectTypeEnum>().Where(s => s.Desction == OrderChannelEnum.分区订单.ToString()).ToList();
-            //if (list1.Any())
-            //{
-            //    int index = 0;
-            //    list1.ForEach(s =>
-            //    {
-            //        ListItem li = new ListItem();
-            //        li.Value = s.Value.ToString();
-            //        li.Text = s.Name + "&nbsp;";
-            //        if (index == 0)
-            //            li.Selected = true;
-            //        rblSubjectType.Items.Add(li);
-            //        index++;
-            //    });
-            //}
+            
         }
 
         void BindSBCInstallType()

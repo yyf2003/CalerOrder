@@ -126,7 +126,14 @@ namespace WebApp.Statistics
             {
                 Session["orderDetailStatistics"] = orderList.Select(s => s.order).ToList();
                 Session["shopStatistics"] = orderList.Select(s => s.shop).Distinct().ToList();
-                Session["subjectStatistics"] = orderList.Select(s => s.subject).Distinct().ToList();
+                List<Subject> subjectList = orderList.Select(s => s.subject).Distinct().ToList();
+                List<int> subjectIdList = subjectList.Select(s=>s.Id).ToList();
+                List<Subject> subjectList1 = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && !subjectIdList.Contains(s.Id));
+                if (subjectList1.Any())
+                {
+                    subjectList.AddRange(subjectList1);
+                }
+                Session["subjectStatistics"] = subjectList;
                 Session["guidanceStatistics"] = orderList.Select(s => s.guidance).Distinct().ToList();
             }
             else
@@ -620,8 +627,8 @@ namespace WebApp.Statistics
         Dictionary<int, decimal> materialPriceDic = new Dictionary<int, decimal>();
         //新开店安装费
         Dictionary<int, decimal> newShopInstallPriceDic = new Dictionary<int, decimal>();
-        //运费
-        Dictionary<int, decimal> freightDic = new Dictionary<int, decimal>();
+        //其他费用
+        Dictionary<int, decimal> otherPriceDic = new Dictionary<int, decimal>();
         //分区活动安装费
         Dictionary<int, decimal> regionInstallPriceDic = new Dictionary<int, decimal>();
         //分区活动发货费
@@ -724,7 +731,8 @@ namespace WebApp.Statistics
                              on order.SubjectId equals subject.Id
                              join guidance in guidanceList
                              on order.GuidanceId equals guidance.ItemId
-                             where (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                             //where (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                             where (regionList.Any() ? regionList.Contains(order.Region.ToLower()) : 1 == 1)
 
                              select new
                              {
@@ -845,7 +853,7 @@ namespace WebApp.Statistics
             decimal area = 0;//面积
             decimal popPrice = 0;//POP制作费
             decimal newShopInstallPrice = 0;//新开店安装费
-            decimal freightPrice = 0;//运费
+            //decimal freightPrice = 0;//运费
             decimal otherPrice = 0;//其他费用
             decimal measurePrice = 0;//新开店测量费
             decimal regionInstallPrice = 0;//增补/新开店安装费
@@ -987,14 +995,14 @@ namespace WebApp.Statistics
                     }
                    
                     decimal otherPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.其他费用 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
-                    freightPrice += otherPrice0;
-                    if (!freightDic.Keys.Contains(s))
+                    otherPrice += otherPrice0;
+                    if (!otherPriceDic.Keys.Contains(s))
                     {
-                        freightDic.Add(s, otherPrice0);
+                        otherPriceDic.Add(s, otherPrice0);
                     }
                     else
                     {
-                        freightDic[s] += otherPrice0;
+                        otherPriceDic[s] += otherPrice0;
                     }
 
                     decimal regionExpressPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.发货费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
@@ -1149,7 +1157,7 @@ namespace WebApp.Statistics
             Session["secondInstallPriceDicStatistics"] = secondInstallPriceDic;
             //Session["secondExperssDicStatistics"] = secondExperssPrice;
             #endregion
-            #region 统计其他费用（新开安装费）
+            #region 统计其他费用（新开安装费/运费）
             var orderDetailList = new PriceOrderDetailBLL().GetList(s => priceSubjectIdList.Contains(s.SubjectId ?? 0) && ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.新开店安装费 || (s.SubjectType ?? 1) == (int)SubjectTypeEnum.运费));
             if (regionList.Any())
             {
@@ -1176,35 +1184,9 @@ namespace WebApp.Statistics
                     newShopInstallPrice += (s.Amount ?? 0);
                 });
             }
+            Session["newShopInstallDicStatistics"] = newShopInstallPriceDic;
             #endregion
-            #region 运费
-            //if (priceSubjectIdList.Any())
-            //{
-
-            //    var freightOrderList = new PriceOrderDetailBLL().GetList(s => priceSubjectIdList.Contains(s.SubjectId ?? 0) && (s.SubjectType ?? 1) == (int)SubjectTypeEnum.运费);
-            //    if (regionList.Any())
-            //    {
-            //        freightOrderList = freightOrderList.Where(s => regionList.Contains(s.Region.ToLower())).ToList();
-
-            //    }
-            //    if (freightOrderList.Any())
-            //    {
-            //        freightOrderList.ForEach(s =>
-            //        {
-            //            if (!freightDic.Keys.Contains((s.SubjectId ?? 0)))
-            //            {
-            //                freightDic.Add((s.SubjectId ?? 0), (s.Amount ?? 0));
-            //            }
-            //            else
-            //            {
-            //                freightDic[(s.SubjectId ?? 0)] += (s.Amount ?? 0);
-            //            }
-            //            freightPrice += (s.Amount ?? 0);
-            //        });
-            //    }
-
-            //}
-            #endregion
+           
             #region 分区活动费（安装费，测量费，其他费用）
             var regionPriceOrderList = orderList.Where(s => (s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Others && (s.order.OrderType ?? 1) > 1).ToList();
             if (regionPriceOrderList.Any())
@@ -1291,14 +1273,14 @@ namespace WebApp.Statistics
                     }
                     else if (s.order.OrderType == (int)OrderTypeEnum.其他费用)
                     {
-                        freightPrice += price0;
-                        if (!freightDic.Keys.Contains((s.order.SubjectId ?? 0)))
+                        otherPrice += price0;
+                        if (!otherPriceDic.Keys.Contains((s.order.SubjectId ?? 0)))
                         {
-                            freightDic.Add((s.order.SubjectId ?? 0), price0);
+                            otherPriceDic.Add((s.order.SubjectId ?? 0), price0);
                         }
                         else
                         {
-                            freightDic[(s.order.SubjectId ?? 0)] += price0;
+                            otherPriceDic[(s.order.SubjectId ?? 0)] += price0;
                         }
                     }
                     else if (s.order.OrderType == (int)OrderTypeEnum.运费)
@@ -1317,7 +1299,7 @@ namespace WebApp.Statistics
                     }
                 });
             }
-            Session["freightDicStatistics"] = freightDic;
+            Session["otherPriceDicStatistics"] = otherPriceDic;
             #endregion
             #endregion
 
@@ -1406,9 +1388,9 @@ namespace WebApp.Statistics
                 labNewShopInstallPrice.Attributes.Add("name", "checkNewShopInstallPrice");
 
             }
-            if (freightPrice > 0)
+            if (otherPrice > 0)
             {
-                labFreight.Text = Math.Round(freightPrice, 2) + "元";
+                labFreight.Text = Math.Round(otherPrice, 2) + "元";
                 labFreight.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
                 labFreight.Attributes.Add("name", "checkOtherPrice");
             }
@@ -1440,7 +1422,7 @@ namespace WebApp.Statistics
             //decimal regionExpressPrice = 0;//分区活动快递/发货装费
 
 
-            decimal total = popPrice + installPrice + expressPrice + secondInstallPrice + materialPrice + newShopInstallPrice + freightPrice + measurePrice + regionInstallPrice + regionOtherPrice + regionExpressPrice + secondExperssPrice;
+            decimal total = popPrice + installPrice + expressPrice + secondInstallPrice + materialPrice + newShopInstallPrice + otherPrice + measurePrice + regionInstallPrice + regionOtherPrice + regionExpressPrice + secondExperssPrice;
             labTotalPrice.Text = total > 0 ? (Math.Round(total, 2) + "元") : "0";
 
 
@@ -1705,7 +1687,9 @@ namespace WebApp.Statistics
                                          join subject in subjectList
                                          on order.SubjectId equals subject.Id
                                          where subject.Id == subjectId
-                                         && (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                                         //&& (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                                         && (regionList.Any() ?  regionList.Contains(order.Region.ToLower()) : 1 == 1)
+                                         
                                          select new
                                          {
                                              order,
@@ -1889,35 +1873,47 @@ namespace WebApp.Statistics
 
                         }
                     }
-                    //新开店安装费
-                    if (newShopInstallPriceDic.Keys.Count > 0 && newShopInstallPriceDic.Keys.Contains(subjectId))
+                    ////新开店安装费
+                    //if (newShopInstallPriceDic.Keys.Count > 0 && newShopInstallPriceDic.Keys.Contains(subjectId))
+                    //{
+                    //    Label labNewShopInstallPrice = (Label)e.Item.FindControl("labNewShopInstallPrice");
+                    //    if (newShopInstallPriceDic[subjectId] > 0)
+                    //    {
+
+                    //        labNewShopInstallPrice.Text = Math.Round(newShopInstallPriceDic[subjectId], 2).ToString();
+
+                    //    }
+                    //}
+                    ////运费
+                    //Dictionary<int, decimal> freightDicNew = new Dictionary<int, decimal>();
+                    //if (Session["freightDicStatistics"] != null)
+                    //{
+                    //    freightDicNew = Session["freightDicStatistics"] as Dictionary<int, decimal>;
+                    //}
+
+                    //if (freightDicNew.Keys.Count > 0 && freightDicNew.Keys.Contains(subjectId))
+                    //{
+                    //    Label labFreight = (Label)e.Item.FindControl("labFreight");
+                    //    if (freightDicNew[subjectId] > 0)
+                    //    {
+
+                    //        labFreight.Text = Math.Round(freightDicNew[subjectId], 2).ToString();
+
+                    //    }
+                    //}
+                    //新开店安装费/运费
+                    Dictionary<int, decimal> newShopInstallPriceDicNew = new Dictionary<int, decimal>();
+                    if (Session["newShopInstallDicStatistics"] != null)
+                    {
+                        newShopInstallPriceDicNew = Session["newShopInstallDicStatistics"] as Dictionary<int, decimal>;
+                    }
+                    if (newShopInstallPriceDicNew.Keys.Count > 0 && newShopInstallPriceDicNew.Keys.Contains(subjectId))
                     {
                         Label labNewShopInstallPrice = (Label)e.Item.FindControl("labNewShopInstallPrice");
-                        if (newShopInstallPriceDic[subjectId] > 0)
-                        {
-
-                            labNewShopInstallPrice.Text = Math.Round(newShopInstallPriceDic[subjectId], 2).ToString();
-
-                        }
-                    }
-                    //运费
-                    Dictionary<int, decimal> freightDicNew = new Dictionary<int, decimal>();
-                    if (Session["freightDicStatistics"] != null)
-                    {
-                        freightDicNew = Session["freightDicStatistics"] as Dictionary<int, decimal>;
+                        labNewShopInstallPrice.Text = newShopInstallPriceDicNew[subjectId].ToString();
                     }
 
-                    if (freightDicNew.Keys.Count > 0 && freightDicNew.Keys.Contains(subjectId))
-                    {
-                        Label labFreight = (Label)e.Item.FindControl("labFreight");
-                        if (freightDicNew[subjectId] > 0)
-                        {
-
-                            labFreight.Text = Math.Round(freightDicNew[subjectId], 2).ToString();
-
-                        }
-                    }
-                    
+                    //二次安装费
                     Dictionary<int, decimal> secondInstallPriceDicNew = new Dictionary<int, decimal>();
                     if (Session["secondInstallPriceDicStatistics"] != null)
                     {
@@ -1927,6 +1923,18 @@ namespace WebApp.Statistics
                     {
                         Label labSecondInstallPrice = (Label)e.Item.FindControl("labSecondInstallPrice");
                         labSecondInstallPrice.Text = secondInstallPriceDicNew[subjectId].ToString();
+                    }
+
+                    //其他费用
+                    Dictionary<int, decimal> otherPriceDicNew = new Dictionary<int, decimal>();
+                    if (Session["otherPriceDicStatistics"] != null)
+                    {
+                        otherPriceDicNew = Session["otherPriceDicStatistics"] as Dictionary<int, decimal>;
+                    }
+                    if (otherPriceDicNew.Keys.Count > 0 && otherPriceDicNew.Keys.Contains(subjectId))
+                    {
+                        Label labOtherPrice = (Label)e.Item.FindControl("labOtherPrice");
+                        labOtherPrice.Text = otherPriceDicNew[subjectId].ToString();
                     }
                 }
             }
@@ -2056,7 +2064,8 @@ namespace WebApp.Statistics
                              on order.ShopId equals shop.Id
                              join subject in subjectList
                              on order.SubjectId equals subject.Id
-                             where ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower()))
+                             //where ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower()))
+                             where regionList.Contains(order.Region.ToLower())
 
                              select new
                              {
@@ -2229,8 +2238,9 @@ namespace WebApp.Statistics
                              on order.ShopId equals shop.Id
                              join subject in subjectList
                              on order.SubjectId equals subject.Id
-                             where ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower()))
-                             //             
+                             //where ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower()))
+                             where regionList.Contains(order.Region.ToLower())
+                                          
                              select new
                              {
                                  order,
@@ -2344,6 +2354,13 @@ namespace WebApp.Statistics
                     regionList.Add(li.Value.ToLower());
                 }
             }
+            if (!regionList.Any() && GetResponsibleRegion.Any())
+            {
+                GetResponsibleRegion.ForEach(s =>
+                {
+                    regionList.Add(s.ToLower());
+                });
+            }
             List<string> provinceList = new List<string>();
             foreach (ListItem li in cblProvince.Items)
             {
@@ -2408,7 +2425,9 @@ namespace WebApp.Statistics
                          join user in CurrentContext.DbContext.UserInfo
                          on order.CSUserId equals user.UserId into userTemp
                          from customerService in userTemp.DefaultIfEmpty()
-                         where (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                         //where (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                         where (regionList.Any() ? regionList.Contains(order.Region.ToLower()) : 1 == 1)
+                        
                          select new
                          {
                              order,
@@ -3319,7 +3338,9 @@ namespace WebApp.Statistics
                 }
                 if (regions.Any())
                 {
-                    orderList = orderList.Where(s => (s.subject.PriceBlongRegion != null && s.subject.PriceBlongRegion != "") ? regions.Contains(s.subject.PriceBlongRegion.ToLower()) : regions.Contains(s.order.Region.ToLower())).ToList();
+                    //orderList = orderList.Where(s => (s.subject.PriceBlongRegion != null && s.subject.PriceBlongRegion != "") ? regions.Contains(s.subject.PriceBlongRegion.ToLower()) : regions.Contains(s.order.Region.ToLower())).ToList();
+                    orderList = orderList.Where(s => regions.Contains(s.order.Region.ToLower())).ToList();
+                    
                     if (provinces.Any())
                     {
                         orderList = orderList.Where(s => provinces.Contains(s.order.Province)).ToList();
@@ -3375,10 +3396,47 @@ namespace WebApp.Statistics
                     cblPriceSubjects.Items.Add(li);
                 });
 
-                var newShopInstallPriceSList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && (s.SubjectType == (int)SubjectTypeEnum.新开店安装费 || s.SubjectType == (int)SubjectTypeEnum.运费) && s.ApproveState == 1);
-                if (newShopInstallPriceSList.Any())
+                var newShopInstallPriceOrderList = (from order in CurrentContext.DbContext.PriceOrderDetail
+                                                   join subject in CurrentContext.DbContext.Subject
+                                                   on order.SubjectId equals subject.Id
+                                                   where guidanceIdList.Contains(subject.GuidanceId ?? 0)
+                                                   && (subject.IsDelete == null || subject.IsDelete == false)
+                                                   && (subject.SubjectType == (int)SubjectTypeEnum.新开店安装费 || subject.SubjectType == (int)SubjectTypeEnum.运费)
+                                                   && subject.ApproveState == 1
+                                                   select new {
+                                                       order,
+                                                       subject
+                                                   }).ToList();
+
+                if (regions.Any())
                 {
-                    newShopInstallPriceSList.ForEach(s => {
+                    //newShopInstallPriceOrderList = newShopInstallPriceOrderList.Where(s => (s.subject.PriceBlongRegion != null && s.subject.PriceBlongRegion != "") ? regions.Contains(s.subject.PriceBlongRegion.ToLower()) : regions.Contains(s.order.Region.ToLower())).ToList();
+                    newShopInstallPriceOrderList = newShopInstallPriceOrderList.Where(s => regions.Contains(s.order.Region.ToLower())).ToList();
+                    
+                    if (provinces.Any())
+                    {
+                        newShopInstallPriceOrderList = newShopInstallPriceOrderList.Where(s => provinces.Contains(s.order.Province)).ToList();
+                        if (citys.Any())
+                            newShopInstallPriceOrderList = newShopInstallPriceOrderList.Where(s => citys.Contains(s.order.City)).ToList();
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(begin))
+                {
+                    DateTime beginDate = DateTime.Parse(begin);
+                    newShopInstallPriceOrderList = newShopInstallPriceOrderList.Where(s => s.subject.AddDate >= beginDate).ToList();
+                    if (!string.IsNullOrWhiteSpace(end))
+                    {
+                        DateTime endDate = DateTime.Parse(end).AddDays(1);
+                        newShopInstallPriceOrderList = newShopInstallPriceOrderList.Where(s => s.subject.AddDate < endDate).ToList();
+                    }
+                }
+
+                //var newShopInstallPriceSList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && (s.SubjectType == (int)SubjectTypeEnum.新开店安装费 || s.SubjectType == (int)SubjectTypeEnum.运费) && s.ApproveState == 1);
+                var newShopInstallPriceSubjectList = newShopInstallPriceOrderList.Select(s=>s.subject).Distinct().ToList();
+                if (newShopInstallPriceSubjectList.Any())
+                {
+                    newShopInstallPriceSubjectList.ForEach(s =>
+                    {
                         ListItem li = new ListItem();
                         li.Value = s.Id.ToString();
                         string subjectName = s.SubjectName;
@@ -3542,7 +3600,9 @@ namespace WebApp.Statistics
                 }
                 if (regions.Any())
                 {
-                    orderList = orderList.Where(s => (s.subject.PriceBlongRegion != null && s.subject.PriceBlongRegion != "") ? regions.Contains(s.subject.PriceBlongRegion.ToLower()) : regions.Contains(s.order.Region.ToLower())).ToList();
+                    //orderList = orderList.Where(s => (s.subject.PriceBlongRegion != null && s.subject.PriceBlongRegion != "") ? regions.Contains(s.subject.PriceBlongRegion.ToLower()) : regions.Contains(s.order.Region.ToLower())).ToList();
+                    orderList = orderList.Where(s => regions.Contains(s.order.Region.ToLower())).ToList();
+                    
                     if (provinces.Any())
                     {
                         orderList = orderList.Where(s => provinces.Contains(s.order.Province)).ToList();

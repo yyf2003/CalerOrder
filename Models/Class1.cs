@@ -253,6 +253,7 @@ namespace Models
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal TotalPrice { get; set; }
+        public string UnitName { get; set; }
     }
     /// <summary>
     /// 报价模板导出模型
@@ -262,7 +263,9 @@ namespace Models
         public string PositionDescription { get; set; }
         public string QuoteGraphicMaterial { get; set; }
         public decimal Amount { get; set; }
-
+        public decimal UnitPrice { get; set; }
+        public string UnitName { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 
 

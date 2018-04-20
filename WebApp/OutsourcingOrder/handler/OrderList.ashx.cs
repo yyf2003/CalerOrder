@@ -360,13 +360,15 @@ namespace WebApp.OutsourcingOrder.handler
                     string gender = s.Gender;
                     string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.OrderType ?? 1).ToString());
                     string orderPrice = string.Empty;
+                    string receiveOrderPrice = string.Empty;
                     int Quantity = s.Quantity ?? 1;
                     if ((s.PayOrderPrice ?? 0) > 0)
                     {
                         orderPrice = (s.PayOrderPrice ?? 0).ToString();
+                        receiveOrderPrice = (s.ReceiveOrderPrice ?? 0).ToString();
                         Quantity = 1;
                     }
-                    json.Append("{\"rowIndex\":\"" + index + "\",\"OrderType\":\"" + orderType + "\",\"Id\":\"" + s.Id + "\",\"ShopNo\":\"" + s.ShopNo + "\",\"ShopName\":\"" + s.ShopName + "\",\"Region\":\"" + s.Region + "\",\"Province\":\"" + s.Province + "\",\"City\":\"" + s.City + "\",\"CityTier\":\"" + s.CityTier + "\",\"Channel\":\"" + s.Channel + "\",\"Format\":\"" + s.Format + "\",\"Sheet\":\"" + s.Sheet + "\",\"Gender\":\"" + gender + "\",\"Quantity\":\"" + Quantity + "\",\"PositionDescription\":\"" + s.PositionDescription + "\",\"GraphicLength\":\"" + s.GraphicLength + "\",\"GraphicWidth\":\"" + s.GraphicWidth + "\",\"GraphicMaterial\":\"" + s.OrderGraphicMaterial + "\",\"ChooseImg\":\"" + s.ChooseImg + "\",\"OrderPrice\":\"" + orderPrice + "\",\"IsDelete\":\""+((s.IsDelete??false)?1:0)+"\"},");
+                    json.Append("{\"rowIndex\":\"" + index + "\",\"OrderType\":\"" + orderType + "\",\"Id\":\"" + s.Id + "\",\"ShopNo\":\"" + s.ShopNo + "\",\"ShopName\":\"" + s.ShopName + "\",\"Region\":\"" + s.Region + "\",\"Province\":\"" + s.Province + "\",\"City\":\"" + s.City + "\",\"CityTier\":\"" + s.CityTier + "\",\"Channel\":\"" + s.Channel + "\",\"Format\":\"" + s.Format + "\",\"Sheet\":\"" + s.Sheet + "\",\"Gender\":\"" + gender + "\",\"Quantity\":\"" + Quantity + "\",\"PositionDescription\":\"" + s.PositionDescription + "\",\"GraphicLength\":\"" + s.GraphicLength + "\",\"GraphicWidth\":\"" + s.GraphicWidth + "\",\"GraphicMaterial\":\"" + s.OrderGraphicMaterial + "\",\"ChooseImg\":\"" + s.ChooseImg + "\",\"OrderPrice\":\"" + orderPrice + "\",\"ReceiveOrderPrice\":\"" + receiveOrderPrice + "\",\"IsDelete\":\"" + ((s.IsDelete ?? false) ? 1 : 0) + "\"},");
                     index++;
                 });
                 if (json.Length > 0)
@@ -606,7 +608,7 @@ namespace WebApp.OutsourcingOrder.handler
                 }
                 int orderType = orderModel.OrderType ?? 1;
                 string orderTypeName = CommonMethod.GeEnumName<OrderTypeEnum>(orderType.ToString());
-                json.Append("{\"Id\":\"" + orderId + "\",\"OrderType\":\"" + orderType + "\",\"OrderTypeName\":\"" + orderTypeName + "\",\"SubjectId\":\"" + orderModel.SubjectId + "\",\"ShopId\":\"" + orderModel.ShopId + "\",\"ShopName\":\"" + orderModel.ShopName + "\",\"ShopNo\":\"" + orderModel.ShopNo + "\",\"Sheet\":\"" + orderModel.Sheet + "\",\"POSScale\":\"" + orderModel.POSScale + "\",\"MaterialSupport\":\"" + orderModel.MaterialSupport + "\",\"MachineFrame\":\"" + orderModel.MachineFrame + "\",\"PositionDescription\":\"" + orderModel.PositionDescription + "\",\"Gender\":\"" + (!string.IsNullOrWhiteSpace(orderModel.OrderGender) ? orderModel.OrderGender : orderModel.Gender) + "\",\"Quantity\":\"" + orderModel.Quantity + "\",\"GraphicLength\":\"" + orderModel.GraphicLength + "\",\"GraphicWidth\":\"" + orderModel.GraphicWidth + "\",\"MaterialCategoryId\":\"" + materialCategoryId + "\",\"GraphicMaterial\":\"" + orderModel.OrderGraphicMaterial + "\",\"ChooseImg\":\"" + orderModel.ChooseImg + "\",\"Remark\":\"" + orderModel.Remark + "\",\"Channel\":\"" + orderModel.Channel + "\",\"Format\":\"" + orderModel.Format + "\",\"CityTier\":\"" + orderModel.CityTier + "\",\"IsInstall\":\"" + orderModel.IsInstall + "\",\"PayOrderPrice\":\"" + (orderModel.PayOrderPrice ?? 0) + "\"}");
+                json.Append("{\"Id\":\"" + orderId + "\",\"OrderType\":\"" + orderType + "\",\"OrderTypeName\":\"" + orderTypeName + "\",\"SubjectId\":\"" + orderModel.SubjectId + "\",\"ShopId\":\"" + orderModel.ShopId + "\",\"ShopName\":\"" + orderModel.ShopName + "\",\"ShopNo\":\"" + orderModel.ShopNo + "\",\"Sheet\":\"" + orderModel.Sheet + "\",\"POSScale\":\"" + orderModel.POSScale + "\",\"MaterialSupport\":\"" + orderModel.MaterialSupport + "\",\"MachineFrame\":\"" + orderModel.MachineFrame + "\",\"PositionDescription\":\"" + orderModel.PositionDescription + "\",\"Gender\":\"" + (!string.IsNullOrWhiteSpace(orderModel.OrderGender) ? orderModel.OrderGender : orderModel.Gender) + "\",\"Quantity\":\"" + orderModel.Quantity + "\",\"GraphicLength\":\"" + orderModel.GraphicLength + "\",\"GraphicWidth\":\"" + orderModel.GraphicWidth + "\",\"MaterialCategoryId\":\"" + materialCategoryId + "\",\"GraphicMaterial\":\"" + orderModel.OrderGraphicMaterial + "\",\"ChooseImg\":\"" + orderModel.ChooseImg + "\",\"Remark\":\"" + orderModel.Remark + "\",\"Channel\":\"" + orderModel.Channel + "\",\"Format\":\"" + orderModel.Format + "\",\"CityTier\":\"" + orderModel.CityTier + "\",\"IsInstall\":\"" + orderModel.IsInstall + "\",\"PayOrderPrice\":\"" + (orderModel.PayOrderPrice ?? 0) + "\",\"ReceiveOrderPrice\":\"" + (orderModel.ReceiveOrderPrice ?? 0) + "\"}");
                 result = "[" + json.ToString() + "]";
             }
             return result;
@@ -662,7 +664,7 @@ namespace WebApp.OutsourcingOrder.handler
                                 
                                 if (isPriceOrder)
                                 {
-                                    
+                                    newOrderModel.ReceiveOrderPrice = orderModel.ReceiveOrderPrice;
                                     newOrderModel.PayOrderPrice = orderModel.PayOrderPrice;
                                 }
                                 else

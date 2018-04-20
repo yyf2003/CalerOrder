@@ -115,5 +115,10 @@ namespace WebApp.Subjects.RegionSubject
             else
                 Alert("提交失败！");
         }
+
+        protected void btnBack_Click(object sender, EventArgs e)
+        {
+            Response.Redirect(string.Format("AddSubject.aspx?subjectId={0}", SubjectId),false);
+        }
     }
 }

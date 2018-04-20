@@ -17,6 +17,20 @@
     <form id="form1" runat="server">
     <div>
         <table class="table">
+            <tr>
+               <td>店铺编号：</td>
+               <td colspan="5" style=" text-align:left; padding-left:5px; height:35px;">
+                   <asp:TextBox ID="txtShopNo" runat="server"></asp:TextBox>
+                   &nbsp;&nbsp;
+                   <asp:Button ID="btnSearch" runat="server" Text="查 询" class="easyui-linkbutton" OnClientClick="return check()"
+                        Style="width: 65px; height: 26px;"
+                       onclick="btnSearch_Click" />
+
+               </td>
+               <td>
+                   
+               </td>
+            </tr>
             <tr class="tr_bai">
                 <td style="text-align: center; width: 120px;">
                     店铺数量：

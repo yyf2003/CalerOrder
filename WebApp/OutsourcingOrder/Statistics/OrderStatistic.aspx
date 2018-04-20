@@ -12,7 +12,7 @@
     <script src="/Scripts/jquery-1.7.2.js" type="text/javascript"></script>
     <script src="/easyui1.4/jquery.easyui.min.js"></script>
     <script src="/My97DatePicker/WdatePicker.js" type="text/javascript"></script>
-        <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
+    <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
     <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
 </head>
 <body>
@@ -158,8 +158,8 @@
                             <div runat="server" id="loadOutsource" style="display: none;">
                                 <img src="/image/WaitImg/loadingA.gif" />
                             </div>
-                            <asp:CheckBoxList ID="cblOutsource" runat="server" CssClass="cbl" CellSpacing="20"
-                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
+                            <asp:CheckBoxList ID="cblOutsourceId" runat="server" CssClass="cbl" CellSpacing="20"
+                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="8" AutoPostBack="true"
                                 OnSelectedIndexChanged="cblOutspurce_SelectedIndexChanged">
                             </asp:CheckBoxList>
                         </td>
@@ -187,137 +187,146 @@
                     </tr>
                 </table>
             </div>
-            <div style=" margin-top:15px;">
-                <table class="table">
-                    <tr class="tr_hui">
-                        <td style="width: 100px;">
-                            店铺数量：
-                        </td>
-                        <td style="width: 280px; text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labShopCount" runat="server" Text="0"></asp:Label>
-                        </td>
-                        <td style="width: 120px;">
-                            总面积：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labArea" runat="server" Text="0"></asp:Label>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div style="margin-top: 10px;">
-                <span id="btnNo" class="layui-btn layui-btn-small"><i class="layui-icon">&#xe629;</i>应付</span>
-                <table class="table">
-                    <tr class="tr_bai">
-                        <td style="width: 100px;">
-                            POP金额：
-                        </td>
-                        <td style="width: 280px; text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labPOPPrice" runat="server" Text="0"></asp:Label>
-                        </td>
-                        <td style="width: 120px;">
-                            安装费：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labInstall" runat="server" Text="0"></asp:Label>
-                        </td>
-                    </tr>
-                    <tr class="tr_bai">
-                        <td>
-                            快递费：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labExpressPrice" runat="server" Text="0"></asp:Label>
-                        </td>
-                        <td>
-                            测量费：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labMeasurePrice" runat="server" Text="0"></asp:Label>
-                        </td>
-                    </tr>
-                    <tr class="tr_bai">
-                        <td>
-                            其他费用：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labOtherPrice" runat="server" Text="0"></asp:Label>
-                        </td>
-                        <td>
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                        </td>
-                    </tr>
-                    <tr class="tr_bai">
-                        <td>
-                        </td>
-                        <td>
-                        </td>
-                        <td>
-                            总金额：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labTotalPrice" runat="server" Text="0"></asp:Label>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div style="margin-top: 20px; margin-bottom :30px;">
-                <span id="Span1" class="layui-btn layui-btn-small"><i class="layui-icon">&#xe629;</i>应收</span>
-                <table class="table">
-                    <tr class="tr_bai">
-                        <td style="width: 100px;">
-                            POP金额：
-                        </td>
-                        <td style="width: 280px; text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labRPOPPrice" runat="server" Text="0"></asp:Label>
-                        </td>
-                        <td style="width: 120px;">
-                            安装费：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labRInstall" runat="server" Text="0"></asp:Label>
-                        </td>
-                    </tr>
-                    <tr class="tr_bai">
-                        <td>
-                            快递费：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labRExpressPrice" runat="server" Text="0"></asp:Label>
-                        </td>
-                        <td>
-                            测量费：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labRMeasurePrice" runat="server" Text="0"></asp:Label>
-                        </td>
-                    </tr>
-                    <tr class="tr_bai">
-                        <td>
-                            其他费用：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labROtherPrice" runat="server" Text="0"></asp:Label>
-                        </td>
-                        <td>
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                        </td>
-                    </tr>
-                    <tr class="tr_bai">
-                        <td>
-                        </td>
-                        <td>
-                        </td>
-                        <td>
-                            总金额：
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:Label ID="labRTotalPrice" runat="server" Text="0"></asp:Label>
-                        </td>
-                    </tr>
-                </table>
+            <div class="layui-tab layui-tab-card">
+                <ul class="layui-tab-title">
+                    <li class="layui-this" lay-id="1">统计信息</li>
+                </ul>
+                <div id="divContent1" class="layui-tab-content" style="padding:0px 10px;">
+                
+                    <div style="margin-top: 15px;">
+                        <table class="table">
+                            <tr class="tr_hui">
+                                <td style="width: 100px;">
+                                    店铺数量：
+                                </td>
+                                <td style="width: 280px; text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labShopCount" runat="server" Text="0"></asp:Label>
+                                </td>
+                                <td style="width: 120px;">
+                                    总面积：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labArea" runat="server" Text="0"></asp:Label>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <span id="btnNo" class="layui-btn layui-btn-small"><i class="layui-icon">&#xe629;</i>应付</span>
+                        <table class="table">
+                            <tr class="tr_bai">
+                                <td style="width: 100px;">
+                                    POP金额：
+                                </td>
+                                <td style="width: 280px; text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labPOPPrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                                <td style="width: 120px;">
+                                    安装费：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labInstallPrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                            </tr>
+                            <tr class="tr_bai">
+                                <td>
+                                    快递费：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labExpressPrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                                <td>
+                                    测量费：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labMeasurePrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                            </tr>
+                            <tr class="tr_bai">
+                                <td>
+                                    其他费用：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labOtherPrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                                <td>
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                </td>
+                            </tr>
+                            <tr class="tr_bai">
+                                <td>
+                                </td>
+                                <td>
+                                </td>
+                                <td>
+                                    总金额：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labTotalPrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="margin-top: 20px; margin-bottom: 30px;">
+                        <span id="Span1" class="layui-btn layui-btn-small"><i class="layui-icon">&#xe629;</i>应收</span>
+                        <table class="table">
+                            <tr class="tr_bai">
+                                <td style="width: 100px;">
+                                    POP金额：
+                                </td>
+                                <td style="width: 280px; text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labRPOPPrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                                <td style="width: 120px;">
+                                    安装费：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labRInstallPrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                            </tr>
+                            <tr class="tr_bai">
+                                <td>
+                                    快递费：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labRExpressPrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                                <td>
+                                    测量费：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labRMeasurePrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                            </tr>
+                            <tr class="tr_bai">
+                                <td>
+                                    其他费用：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labROtherPrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                                <td>
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                </td>
+                            </tr>
+                            <tr class="tr_bai">
+                                <td>
+                                </td>
+                                <td>
+                                </td>
+                                <td>
+                                    总金额：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labRTotalPrice" runat="server" Text="0"></asp:Label>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                
+                </div>
             </div>
         </ContentTemplate>
     </asp:UpdatePanel>

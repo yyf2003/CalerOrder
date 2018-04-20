@@ -358,13 +358,22 @@
                     <span style="color: Red;">*</span>
                 </td>
                 <td style="width: 100px;">
-                    费用备注
+                    应收费用
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtPriceRemark" runat="server" MaxLength="100" Style="width: 200px;"></asp:TextBox>
+                    <asp:TextBox ID="txtReceivePrice" runat="server" MaxLength="20" CssClass="inputClass"></asp:TextBox>
+                    <span style="color: Red;">*</span>
                 </td>
             </tr>
-            
+            <tr class="price" style=" display:none;">
+                <td style="height: 30px;width: 100px;">
+                    费用备注
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtPriceRemark" runat="server" MaxLength="100" Style="width: 200px;"></asp:TextBox>
+                </td>
+                
+            </tr>
         </table>
     </div>
 

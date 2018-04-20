@@ -184,13 +184,13 @@ namespace WebApp.OutsourcingOrder.Statistics {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl loadOutsource;
         
         /// <summary>
-        /// cblOutsource 控件。
+        /// cblOutsourceId 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList cblOutsource;
+        protected global::System.Web.UI.WebControls.CheckBoxList cblOutsourceId;
         
         /// <summary>
         /// cblOutsourceType 控件。
@@ -238,13 +238,13 @@ namespace WebApp.OutsourcingOrder.Statistics {
         protected global::System.Web.UI.WebControls.Label labPOPPrice;
         
         /// <summary>
-        /// labInstall 控件。
+        /// labInstallPrice 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labInstall;
+        protected global::System.Web.UI.WebControls.Label labInstallPrice;
         
         /// <summary>
         /// labExpressPrice 控件。
@@ -292,13 +292,13 @@ namespace WebApp.OutsourcingOrder.Statistics {
         protected global::System.Web.UI.WebControls.Label labRPOPPrice;
         
         /// <summary>
-        /// labRInstall 控件。
+        /// labRInstallPrice 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labRInstall;
+        protected global::System.Web.UI.WebControls.Label labRInstallPrice;
         
         /// <summary>
         /// labRExpressPrice 控件。

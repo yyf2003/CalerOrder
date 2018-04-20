@@ -337,6 +337,14 @@ namespace Common
         TongDian = 3,
         Terrex = 4
     }
+
+    //安装费项目类型
+    public enum InstallPriceSubjectTypeEnum
+    {
+        活动安装费 = 1,
+        常规安装费=2,
+        
+    }
 }
 
 public class EnumEntity

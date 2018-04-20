@@ -19,6 +19,7 @@ namespace WebApp.OutsourcingOrder.Statistics
         string outsourceId=string.Empty;
         string guidanceId = string.Empty;
         string subjectId = string.Empty;
+        string region = string.Empty;
         string province = string.Empty;
         string city = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
@@ -34,6 +35,10 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (Request.QueryString["subjectId"] != null)
             {
                 subjectId = Request.QueryString["subjectId"];
+            }
+            if (Request.QueryString["region"] != null)
+            {
+                region = Request.QueryString["region"];
             }
             if (Request.QueryString["province"] != null)
             {
@@ -55,6 +60,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             List<int> outsourceIdList = new List<int>();
             List<int> guidanceIdList = new List<int>();
             List<int> subjectIdList = new List<int>();
+            List<string> regionList = new List<string>();
             List<string> provinceList = new List<string>();
             List<string> cityList = new List<string>();
             if (!string.IsNullOrWhiteSpace(outsourceId))
@@ -68,6 +74,10 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (!string.IsNullOrWhiteSpace(subjectId))
             {
                 subjectIdList = StringHelper.ToIntList(subjectId, ',');
+            }
+            if (!string.IsNullOrWhiteSpace(region))
+            {
+                regionList = StringHelper.ToStringList(region, ',', LowerUpperEnum.ToLower);
             }
             if (!string.IsNullOrWhiteSpace(province))
             {
@@ -94,6 +104,18 @@ namespace WebApp.OutsourcingOrder.Statistics
                                       orderDetail,
                                       guidance
                                   }).ToList();
+                if (regionList.Any())
+                {
+                    orderList0 = orderList0.Where(s => s.orderDetail.Region != null && regionList.Contains(s.orderDetail.Region.ToLower())).ToList();
+                }
+                if (provinceList.Any())
+                {
+                    orderList0 = orderList0.Where(s => provinceList.Contains(s.orderDetail.Province)).ToList();
+                }
+                if (cityList.Any())
+                {
+                    orderList0 = orderList0.Where(s => cityList.Contains(s.orderDetail.City)).ToList();
+                }
                 var orderList = orderList0.Where(s => s.orderDetail.SubjectId > 0).ToList();
                 if (subjectIdList.Any())
                 {
@@ -101,14 +123,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                     var NotBCSSubjectList = new SubjectBLL().GetList(s => subjectIdList.Contains(s.Id) && (s.CornerType == null || !s.CornerType.Contains("三叶草")));
                     isBCSSubject = !NotBCSSubjectList.Any();
                 }
-                if (provinceList.Any())
-                {
-                    orderList = orderList.Where(s => provinceList.Contains(s.orderDetail.Province)).ToList();
-                }
-                if (cityList.Any())
-                {
-                    orderList = orderList.Where(s => cityList.Contains(s.orderDetail.City)).ToList();
-                }
+                
                 List<int> shopIdList = orderList.Select(s => s.orderDetail.ShopId ?? 0).ToList();
                 List<int> installShopIdList = shopIdList;
                 if (isBCSSubject)
@@ -123,6 +138,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                                                       && (subject.IsDelete == null || subject.IsDelete == false)
                                                       && (order.IsDelete == null || order.IsDelete == false)
                                                       && (order.ShopStatus == null || order.ShopStatus == "" || order.ShopStatus == ShopStatusEnum.正常.ToString())
+                                                      && (regionList.Any()?(order.Region!=null && regionList.Contains(order.Region)):1==1)
                                                       select order.ShopId ?? 0).Distinct().ToList();
                     installShopIdList = installShopIdList.Except(totalOrderShopIdList).ToList();
 
@@ -149,7 +165,10 @@ namespace WebApp.OutsourcingOrder.Statistics
                                               shop,
                                               guidance
                                           }).ToList();
-
+                    if (regionList.Any())
+                    {
+                        assignShopList = assignShopList.Where(s => s.shop.RegionName != null && regionList.Contains(s.shop.RegionName.ToLower())).ToList();
+                    }
                     assignShopList.ForEach(s =>
                     {
 
@@ -199,7 +218,9 @@ namespace WebApp.OutsourcingOrder.Statistics
 
                     });
                 }
-                var orderList3 = orderList0.Where(s => (shopIdList.Any() ? installShopIdList.Contains(s.orderDetail.ShopId ?? 0) : 1 == 1) && s.orderDetail.SubjectId == 0 && s.orderDetail.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                //var orderList3 = orderList0.Where(s => (shopIdList.Any() ? installShopIdList.Contains(s.orderDetail.ShopId ?? 0) : 1 == 1) && s.orderDetail.SubjectId == 0 && s.orderDetail.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                var orderList3 = orderList0.Where(s => s.orderDetail.SubjectId == 0 && s.orderDetail.OrderType == (int)OrderTypeEnum.安装费).ToList();
+               
                 if (orderList3.Any())
                 {
                     orderList3.ForEach(s =>

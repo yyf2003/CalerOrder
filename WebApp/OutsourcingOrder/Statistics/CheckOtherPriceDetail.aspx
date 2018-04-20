@@ -104,7 +104,7 @@
             <%if (gvList.Items.Count == 0)
               {%>
             <tr class="tr_bai">
-                <td colspan="10" style="text-align: center;">
+                <td colspan="11" style="text-align: center;">
                     --无数据--
                 </td>
             </tr>

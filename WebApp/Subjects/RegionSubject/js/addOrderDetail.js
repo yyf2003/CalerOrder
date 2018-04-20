@@ -13,7 +13,7 @@ var isChangeOrder = 0;
 $(function () {
     Order.getShopList();
     Order.getMaterialList();
-
+    //首页添加POP
     $("#btnAdd").click(function () {
         layerIndex = 0;
         $("#txtShopNo").val("").prop("readonly", false);
@@ -42,6 +42,7 @@ $(function () {
         });
     })
 
+    //查询和获取pop信息
     $("#btnGetPOP").click(function () {
         var shopNo = $.trim($("#txtShopNo").val());
         if (shopNo != "") {
@@ -348,14 +349,14 @@ var Order = {
                         var tr = "";
                         for (var i in json) {
                             tr += "<tr>";
-
+                            tr += "<td><input type='checkbox' name='cbOneOrder' value='" + json[i].Id + "'></td>";
                             if (json[i].IsApprove == 1) {
-                                tr += "<td><input type='checkbox' name='0' disabled='disabled'></td>";
+                                //tr += "<td><input type='checkbox' name='0' disabled='disabled'></td>";
                                 tr += "<td>" + (parseInt(i) + 1) + "</td>";
                                 tr += "<td style='color:green'>审批通过</td>";
                             }
                             else {
-                                tr += "<td><input type='checkbox' name='cbOneOrder' value='" + json[i].Id + "'></td>";
+                                //tr += "<td><input type='checkbox' name='cbOneOrder' value='" + json[i].Id + "'></td>";
                                 if (json[i].IsApprove == 2) {
                                     tr += "<td>" + (parseInt(i) + 1) + "</td>";
                                     tr += "<td style='color:red'>审批不通过</td>";
@@ -476,6 +477,7 @@ var Order = {
                     var orderJsonStr = data.split('|')[0];
                     var subjectJsonStr = data.split('|')[1];
                     var orderJson = eval(orderJsonStr);
+                    
                     if (orderJson.length > 0) {
                         $("#labOrderTypeEdit").html(orderJson[0].OrderType);
                         $("#labGraphicNoEdit").html(orderJson[0].GraphicNo);

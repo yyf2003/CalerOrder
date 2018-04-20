@@ -14,6 +14,7 @@ namespace WebApp.OutsourcingOrder.Statistics
     {
         string outsourceId = string.Empty;
         string guidanceId = string.Empty;
+        string region = string.Empty;
         string province = string.Empty;
         string city = string.Empty;
         string assignType = string.Empty;
@@ -26,6 +27,10 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (Request.QueryString["guidanceId"] != null)
             {
                 guidanceId = Request.QueryString["guidanceId"];
+            }
+            if (Request.QueryString["region"] != null)
+            {
+                region = Request.QueryString["region"];
             }
             if (Request.QueryString["province"] != null)
             {
@@ -48,6 +53,7 @@ namespace WebApp.OutsourcingOrder.Statistics
         void BindData()
         {
             List<int> guidanceIdList = new List<int>();
+            List<string> regionList = new List<string>();
             List<string> provinceList = new List<string>();
             List<string> cityList = new List<string>();
             List<int> assignTypeList = new List<int>();
@@ -59,6 +65,10 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (!string.IsNullOrWhiteSpace(guidanceId))
             {
                 guidanceIdList = StringHelper.ToIntList(guidanceId, ',');
+            }
+            if (!string.IsNullOrWhiteSpace(region))
+            {
+                regionList = StringHelper.ToStringList(region, ',', LowerUpperEnum.ToLower);
             }
             if (!string.IsNullOrWhiteSpace(province))
             {
@@ -83,6 +93,10 @@ namespace WebApp.OutsourcingOrder.Statistics
                                   select new { order, shop }).ToList();
 
             //var assignShopList = new OutsourceAssignShopBLL().GetList(s => s.OutsourceId == outsourceId && guidanceIdList.Contains(s.GuidanceId ?? 0));
+            if (regionList.Any())
+            {
+                assignShopList = assignShopList.Where(s => s.shop.RegionName != null && regionList.Contains(s.shop.RegionName.ToLower())).ToList();
+            }
             if (provinceList.Any())
             {
                 assignShopList = assignShopList.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();

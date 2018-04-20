@@ -16,6 +16,7 @@ namespace WebApp.OutsourcingOrder.Statistics
         string outsourceId = string.Empty;
         string guidanceId = string.Empty;
         string subjectId = string.Empty;
+        string region = string.Empty;
         string province = string.Empty;
         string city = string.Empty;
         string assignType = string.Empty;
@@ -33,6 +34,10 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (Request.QueryString["subjectId"] != null)
             {
                 subjectId = Request.QueryString["subjectId"];
+            }
+            if (Request.QueryString["region"] != null)
+            {
+                region = Request.QueryString["region"];
             }
             if (Request.QueryString["province"] != null)
             {
@@ -63,10 +68,12 @@ namespace WebApp.OutsourcingOrder.Statistics
         void BindData() {
             List<int> guidanceIdList = new List<int>();
             List<int> subjectIdList = new List<int>();
+            List<string> regionList = new List<string>();
             List<string> provinceList = new List<string>();
             List<string> cityList = new List<string>();
             List<int> assignTypeList = new List<int>();
             List<int> outsourceIdList = new List<int>();
+            
             if (!string.IsNullOrWhiteSpace(outsourceId))
             {
                 outsourceIdList = StringHelper.ToIntList(outsourceId, ',');
@@ -78,6 +85,10 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (!string.IsNullOrWhiteSpace(subjectId))
             {
                 subjectIdList = StringHelper.ToIntList(subjectId, ',');
+            }
+            if (!string.IsNullOrWhiteSpace(region))
+            {
+                regionList = StringHelper.ToStringList(region, ',', LowerUpperEnum.ToLower);
             }
             if (!string.IsNullOrWhiteSpace(province))
             {
@@ -91,7 +102,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             {
                 assignTypeList = StringHelper.ToIntList(assignType, ',');
             }
-
+            
 
             var assignShopList = new OutsourceOrderDetailBLL().GetList(s => outsourceIdList.Contains(s.OutsourceId ?? 0) && guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.OrderType == (int)OrderTypeEnum.POP || s.OrderType == (int)OrderTypeEnum.道具) && (s.IsDelete == null || s.IsDelete == false));
 
@@ -99,6 +110,10 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (subjectIdList.Any())
             {
                 assignShopList = assignShopList.Where(s => subjectIdList.Contains(s.SubjectId??0)).ToList();
+            }
+            if (regionList.Any())
+            {
+                assignShopList = assignShopList.Where(s =>s.Region!=null && regionList.Contains(s.Region.ToLower())).ToList();
             }
             if (provinceList.Any())
             {
@@ -111,6 +126,11 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (assignTypeList.Any())
             {
                 assignShopList = assignShopList.Where(s => assignTypeList.Contains(s.AssignType ?? 0)).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(txtShopNo.Text))
+            {
+                string shopNo = txtShopNo.Text.Trim().ToUpper();
+                assignShopList = assignShopList.Where(s => s.ShopNo.ToUpper().Contains(shopNo)).ToList();
             }
             if (!IsPostBack)
             {
@@ -152,6 +172,11 @@ namespace WebApp.OutsourcingOrder.Statistics
         }
 
         protected void AspNetPager1_PageChanged(object sender, EventArgs e)
+        {
+            BindData();
+        }
+
+        protected void btnSearch_Click(object sender, EventArgs e)
         {
             BindData();
         }

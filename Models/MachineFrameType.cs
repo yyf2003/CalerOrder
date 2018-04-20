@@ -15,7 +15,7 @@ namespace Models
     public partial class MachineFrameType
     {
         public int Id { get; set; }
-        public string MachineFrameTypeName { get; set; }
         public string Sheet { get; set; }
+        public string MachineFrameTypeName { get; set; }
     }
 }

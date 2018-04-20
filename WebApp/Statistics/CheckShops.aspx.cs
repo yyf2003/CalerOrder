@@ -132,8 +132,10 @@ namespace WebApp.Statistics
                               && (order.IsDelete == null || order.IsDelete == false)
                               //&& ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || (order.OrderType == 2))
                               //&& (shop.Status == null || shop.Status == "" || shop.Status == "正常")
-                              && (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
-                                select new { order, shop, subject }).ToList();
+                              //&& (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                              && (regionList.Any() ? regionList.Contains(order.Region.ToLower()) : 1 == 1)
+                              
+                              select new { order, shop, subject }).ToList();
                if (subjectChannel == 1)
                {
                    //上海系统单

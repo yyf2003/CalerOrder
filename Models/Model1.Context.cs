@@ -131,6 +131,7 @@ namespace Models
         public DbSet<QuotationBlongs> QuotationBlongs { get; set; }
         public DbSet<QuotationCategory> QuotationCategory { get; set; }
         public DbSet<QuotationClassification> QuotationClassification { get; set; }
+        public DbSet<QuotationItem> QuotationItem { get; set; }
         public DbSet<Quotations> Quotations { get; set; }
         public DbSet<QuotationTaxRate> QuotationTaxRate { get; set; }
         public DbSet<QuoteMaterial> QuoteMaterial { get; set; }
@@ -153,6 +154,8 @@ namespace Models
         public DbSet<ShopMaterialSupport> ShopMaterialSupport { get; set; }
         public DbSet<SmallMaterial> SmallMaterial { get; set; }
         public DbSet<SmallMaterialMapping> SmallMaterialMapping { get; set; }
+        public DbSet<SpecialPriceQuoteDetail> SpecialPriceQuoteDetail { get; set; }
+        public DbSet<SpecialPriceQuoteItem> SpecialPriceQuoteItem { get; set; }
         public DbSet<SplitOrderDetailPerShop> SplitOrderDetailPerShop { get; set; }
         public DbSet<SplitOrderPlanDetail> SplitOrderPlanDetail { get; set; }
         public DbSet<Subject> Subject { get; set; }

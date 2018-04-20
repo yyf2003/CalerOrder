@@ -49,7 +49,7 @@
                         项目名称
                     </td>
                     <td>
-                        订单类型
+                        费用类型
                     </td>
                     <td>
                         店铺名称
@@ -84,7 +84,7 @@
                     <%#Eval("subject.SubjectName")%>
                 </td>
                  <td>
-                     <asp:Label ID="labSubjectType" runat="server" Text=""></asp:Label>
+                     <asp:Label ID="labOrderType" runat="server" Text=""></asp:Label>
                 </td>
                 <td>
                     <%#Eval("order.ShopName")%>

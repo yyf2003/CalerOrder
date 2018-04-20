@@ -77,10 +77,12 @@ namespace WebApp.Statistics
                        join subject in CurrentContext.DbContext.Subject
                        on order.SubjectId equals subject.Id
                        where 
-                       subjectIdList.Any()?(subjectIdList.Contains(order.SubjectId ?? 0)&& (order.OrderType == (int)OrderTypeEnum.运费 || order.OrderType == (int)OrderTypeEnum.其他费用)):order.SubjectId==subjectId
+                       subjectIdList.Any()?(subjectIdList.Contains(order.SubjectId ?? 0)&& order.OrderType == (int)OrderTypeEnum.其他费用):order.SubjectId==subjectId
                        && (order.IsDelete == null || order.IsDelete == false)
-                       && (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
-                       select new {
+                       //&& (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                       && (regionList.Any() ?regionList.Contains(order.Region.ToLower()) : 1 == 1)
+                       
+                        select new {
                            order,
                            order.OrderType,
                            subject

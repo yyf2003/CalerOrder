@@ -16,10 +16,10 @@ namespace Models
     {
         public int Id { get; set; }
         public Nullable<int> MachineFrameTypeId { get; set; }
+        public string Channel { get; set; }
         public Nullable<int> FrameType { get; set; }
         public Nullable<decimal> Width { get; set; }
         public Nullable<decimal> Height { get; set; }
-        public string Channel { get; set; }
         public string Remark { get; set; }
     }
 }

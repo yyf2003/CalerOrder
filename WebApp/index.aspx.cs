@@ -79,6 +79,7 @@ namespace WebApp
                                     where application.AddUserId == CurrentUser.UserId
                                     && (application.IsDelete == null || application.IsDelete == false)
                                     && (detail.State ?? 0) < 2
+                                    && application.ManagerApperoveState==1
                                     select detail;
                         if (list2.Any())
                             div.Append("<span class='badge1'>" + list2.Count() + "</span>");//

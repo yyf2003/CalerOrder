@@ -33,6 +33,7 @@ namespace WebApp.OrderChangeManage
                        where application.AddUserId == CurrentUser.UserId
                        && (application.IsDelete == null || application.IsDelete==false)
                        && (detail.State ?? 0) < 2
+                       && application.ManagerApperoveState==1
                        select new {
                            guidance,
                            application,

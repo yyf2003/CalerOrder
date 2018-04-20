@@ -17,6 +17,7 @@ namespace WebApp.OutsourcingOrder.Statistics
     {
         string outsourceId = string.Empty;
         string guidanceId = string.Empty;
+        string region = string.Empty;
         string subjectId = string.Empty;
         string province = string.Empty;
         string city = string.Empty;
@@ -33,6 +34,10 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (Request.QueryString["subjectId"] != null)
             {
                 subjectId = Request.QueryString["subjectId"];
+            }
+            if (Request.QueryString["region"] != null)
+            {
+                region = Request.QueryString["region"];
             }
             if (Request.QueryString["province"] != null)
             {
@@ -54,6 +59,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             List<int> outsourceIdList = new List<int>();
             List<int> guidanceIdList = new List<int>();
             List<int> subjectIdList = new List<int>();
+            List<string> regionList = new List<string>();
             List<string> provinceList = new List<string>();
             List<string> cityList = new List<string>();
             if (!string.IsNullOrWhiteSpace(outsourceId))
@@ -67,6 +73,10 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (!string.IsNullOrWhiteSpace(subjectId))
             {
                 subjectIdList = StringHelper.ToIntList(subjectId, ',');
+            }
+            if (!string.IsNullOrWhiteSpace(region))
+            {
+                regionList = StringHelper.ToStringList(region, ',', LowerUpperEnum.ToLower);
             }
             if (!string.IsNullOrWhiteSpace(province))
             {
@@ -83,7 +93,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                               where outsourceIdList.Contains(orderDetail.OutsourceId ?? 0)
                               && guidanceIdList.Contains(orderDetail.GuidanceId ?? 0)
                               && (orderDetail.IsDelete == null || orderDetail.IsDelete == false)
-                              && (orderDetail.OrderType == (int)OrderTypeEnum.发货费 || orderDetail.OrderType == (int)OrderTypeEnum.运费)
+                              //&& (orderDetail.OrderType == (int)OrderTypeEnum.发货费 || orderDetail.OrderType == (int)OrderTypeEnum.运费)
                               select new
                               {
                                   orderDetail,
@@ -95,6 +105,10 @@ namespace WebApp.OutsourcingOrder.Statistics
                 orderList = orderList.Where(s => subjectIdList.Contains(s.orderDetail.SubjectId ?? 0)).ToList();
 
             }
+            if (regionList.Any())
+            {
+                orderList = orderList.Where(s => s.orderDetail.Region != null && regionList.Contains(s.orderDetail.Region.ToLower())).ToList();
+            }
             if (provinceList.Any())
             {
                 orderList = orderList.Where(s => provinceList.Contains(s.orderDetail.Province)).ToList();
@@ -105,8 +119,10 @@ namespace WebApp.OutsourcingOrder.Statistics
             }
             if (orderList.Any())
             {
+                List<int> shopIdList = orderList.Select(s => s.orderDetail.ShopId ?? 0).ToList();
+                var experssOrderList = orderList0.Where(s => shopIdList.Contains(s.orderDetail.ShopId ?? 0) && (s.orderDetail.OrderType == (int)OrderTypeEnum.发货费 || s.orderDetail.OrderType == (int)OrderTypeEnum.运费)).ToList();
                 int shopid = 1;
-                orderList.ForEach(s =>
+                experssOrderList.ForEach(s =>
                      {
                          decimal pPrice = s.orderDetail.PayOrderPrice ?? 0;
                          decimal rlPrice = s.orderDetail.ReceiveOrderPrice ?? 0;

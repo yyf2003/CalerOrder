@@ -393,6 +393,9 @@
     <Compile Include="QuotationClassification.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="QuotationItem.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="Quotations.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
@@ -457,6 +460,12 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="SmallMaterialMapping.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialPriceQuoteDetail.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialPriceQuoteItem.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="SplitOrderDetailPerShop.cs">

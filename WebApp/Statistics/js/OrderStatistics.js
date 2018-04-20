@@ -500,7 +500,7 @@ $(function () {
         })
 
         var url = "SubjectStatistics.aspx";
-        if (subjectType == 2) {
+        if (subjectType == 2 || subjectType == 9) {
             //新开店安装费用订单明细
             url = "NewShopInstallPriceDetail.aspx";
         }

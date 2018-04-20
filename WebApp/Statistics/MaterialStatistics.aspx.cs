@@ -190,7 +190,9 @@ namespace WebApp.Statistics
                                  && (order.IsDelete == null || order.IsDelete == false)
                                  //&& ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || (order.OrderType == 2))
                                  //&& (shop.Status == null || shop.Status == "" || shop.Status == "正常")
-                                 && (regionList1.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList1.Contains(subject.PriceBlongRegion.ToLower()) : regionList1.Contains(order.Region.ToLower())) : 1 == 1)
+                                 //&& (regionList1.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList1.Contains(subject.PriceBlongRegion.ToLower()) : regionList1.Contains(order.Region.ToLower())) : 1 == 1)
+                                 && (regionList1.Any() ?  regionList1.Contains(order.Region.ToLower()) : 1 == 1)
+                                 
                                  select new
                                  {
                                      order,

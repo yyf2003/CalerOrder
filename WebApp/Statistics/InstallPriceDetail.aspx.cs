@@ -113,7 +113,9 @@ namespace WebApp.Statistics
                                        && (subject.IsDelete==null || subject.IsDelete==false)
                                        && subject.ApproveState==1
                                        //&& subject.SubjectType!=(int)SubjectTypeEnum.费用订单
-                                       && (regionList1.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList1.Contains(subject.PriceBlongRegion.ToLower()) : regionList1.Contains(order.Region.ToLower())) : 1 == 1)
+                                       //&& (regionList1.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList1.Contains(subject.PriceBlongRegion.ToLower()) : regionList1.Contains(order.Region.ToLower())) : 1 == 1)
+                                       && (regionList1.Any() ? regionList1.Contains(order.Region.ToLower()) : 1 == 1)
+                                       
                                        select new
                                        {
                                            order,

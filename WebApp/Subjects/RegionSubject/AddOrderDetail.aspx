@@ -48,14 +48,16 @@
         }
     </script>
 </head>
-<body class="tab">
+<body >
     <form id="form1" runat="server">
+    
     <div class="nav_title">
         <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" /><p
             class="nav_table_p">
             添加订单信息
         </p>
     </div>
+    <div class="tab">
     <blockquote class="layui-elem-quote" style=" height:15px;font-weight:bold; padding-top :7px; padding-left:5px;">
         项目信息</blockquote>
     <table class="layui-table" style=" margin-top:-10px;">
@@ -613,6 +615,7 @@
         </div>
     </div>
     <asp:HiddenField ID="hfIsChange" runat="server" />
+     </div>
     </form>
 </body>
 </html>

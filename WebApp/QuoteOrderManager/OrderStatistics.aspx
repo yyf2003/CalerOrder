@@ -350,12 +350,16 @@
                 <td style="text-align: right;">
                     POP金额合计：
                 </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labPOPPrice" runat="server" Text="0"></asp:Label>
-                    <asp:Label ID="labPOPPriceDetail" runat="server" Text=""></asp:Label>
+                <td colspan="5" style="text-align: left; padding-left: 5px;">
+                   <asp:Label ID="labPOPPrice" runat="server" Text="0"></asp:Label>
+                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                   <asp:Label ID="labPOPPriceDetail" runat="server" Text=""></asp:Label>
                 </td>
+               
+            </tr>
+            <tr class="tr_bai">
                 <td style="text-align: right;">
-                    活动安装费合计：
+                   活动安装费合计：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labInstallPrice" runat="server" Text="0"></asp:Label>
@@ -364,9 +368,16 @@
                     快递费合计：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labExpressPrice" runat="server" Text="0"></asp:Label>
+                     <asp:Label ID="labExpressPrice" runat="server" Text="0"></asp:Label>
+                </td>
+                <td style="text-align: right;">
+                    物料费(道具)：
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                   <asp:Label ID="labMaterialPrice" runat="server" Text="0"></asp:Label>
                 </td>
             </tr>
+
             <tr class="tr_bai">
                 <td style="text-align: right;">
                     二次安装费合计：
@@ -375,10 +386,10 @@
                     <asp:Label ID="labSecondInstallPrice" runat="server" Text="0"></asp:Label>
                 </td>
                 <td style="text-align: right;">
-                    物料费(道具)：
+                    二次发货费合计：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labMaterialPrice" runat="server" Text="0"></asp:Label>
+                     <asp:Label ID="labSecondExpressPrice" runat="server" Text="0"></asp:Label>
                 </td>
                 <td style="text-align: right;">
                     新开店装修费：
@@ -389,16 +400,16 @@
             </tr>
             <tr class="tr_bai">
                 <td style="text-align: right;">
-                    二次发货费合计：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labSecondExpressPrice" runat="server" Text="0"></asp:Label>
-                </td>
-                <td style="text-align: right;">
                     新开店测量费：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labMeasurePrice" runat="server" Text="0"></asp:Label>
+                   <asp:Label ID="labMeasurePrice" runat="server" Text="0"></asp:Label>
+                </td>
+                <td style="text-align: right;">
+                    运费/其他费用：
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labFreight" runat="server" Text="0"></asp:Label>
                 </td>
                 <td style="text-align: right;">
                     分区增补/新开店安装费：
@@ -408,12 +419,6 @@
                 </td>
             </tr>
             <tr class="tr_bai">
-                <td style="text-align: right;">
-                    运费/其他费用：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labFreight" runat="server" Text="0"></asp:Label>
-                </td>
                 <td style="text-align: right;">
                     分区增补发货费：
                 </td>
@@ -425,6 +430,12 @@
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labRegionOtherPrice" runat="server" Text="0"></asp:Label>
+                </td>
+                <td style="text-align: right;">
+                    
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    
                 </td>
             </tr>
             <tr class="tr_bai">

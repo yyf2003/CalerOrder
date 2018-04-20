@@ -3326,6 +3326,11 @@ namespace WebApp.Subjects.ADOrders
         /// <param name="ds"></param>
         void ImportPriceOrder(DataSet ds)
         {
+            int guidanceId = 0;
+            if (!string.IsNullOrWhiteSpace(hfGuidanceId.Value))
+            {
+                guidanceId = int.Parse(hfGuidanceId.Value);
+            }
             int subjectType = 0;
             if (!string.IsNullOrWhiteSpace(hfSubjectType.Value))
                 subjectType = int.Parse(hfSubjectType.Value);
@@ -3364,7 +3369,7 @@ namespace WebApp.Subjects.ADOrders
                 DataColumnCollection cols = ds.Tables[0].Columns;
                 DataTable errorTB = CommonMethod.CreateErrorTB(cols);
                 int shopId = 0;
-
+                int orderType = 0;
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
                     StringBuilder msg = new StringBuilder();
@@ -3412,8 +3417,29 @@ namespace WebApp.Subjects.ADOrders
                     if (string.IsNullOrWhiteSpace(ShopName))
                     {
                         canSave = false;
-                        msg.Append("店铺名称 为空；");
+                        msg.Append("店铺名称不能空；");
                     }
+                    if (string.IsNullOrWhiteSpace(Region))
+                    {
+                        canSave = false;
+                        msg.Append("区域不能空；");
+                    }
+                    if (string.IsNullOrWhiteSpace(Province))
+                    {
+                        canSave = false;
+                        msg.Append("省份不能空；");
+                    }
+                    else
+                    {
+                        int provinceId = GetProvinceId(Province);
+                        if (provinceId == 0)
+                        {
+                            canSave = false;
+                            msg.Append("省份填写不正确；");
+                        }
+
+                    }
+                    
                     if (string.IsNullOrWhiteSpace(price))
                     {
                         canSave = false;
@@ -3444,6 +3470,7 @@ namespace WebApp.Subjects.ADOrders
                         order.Amount = StringHelper.IsDecimal(price);
                         order.Remark = remark;
                         order.ShopId = shopId;
+                        order.GuidanceId = guidanceId;
                         order.SubjectId = subjectId;
                         order.Address = Address;
                         order.City = City;

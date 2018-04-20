@@ -159,6 +159,7 @@
     <Compile Include="QuotationBlongsBLL.cs" />
     <Compile Include="QuotationCategoryBLL.cs" />
     <Compile Include="QuotationClassificationBLL.cs" />
+    <Compile Include="QuotationItemBLL.cs" />
     <Compile Include="QuotationsBLL.cs" />
     <Compile Include="QuotationTaxRateBLL.cs" />
     <Compile Include="QuoteMaterialBLL.cs" />
@@ -181,6 +182,8 @@
     <Compile Include="ShopMaterialSupportBLL.cs" />
     <Compile Include="SmallMaterialBLL.cs" />
     <Compile Include="SmallMaterialMappingBLL.cs" />
+    <Compile Include="SpecialPriceQuoteDetailBLL.cs" />
+    <Compile Include="SpecialPriceQuoteItemBLL.cs" />
     <Compile Include="SplitOrderDetailPerShopBLL.cs" />
     <Compile Include="SplitOrderPlanDetailBLL.cs" />
     <Compile Include="SubjectBLL.cs" />

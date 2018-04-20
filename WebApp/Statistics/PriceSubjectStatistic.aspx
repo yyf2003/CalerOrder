@@ -15,7 +15,7 @@
     <div class="nav_title">
         <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" /><p
             class="nav_table_p">
-            <asp:Label ID="labTitle" runat="server" Text="运费/其他费用明细"></asp:Label>
+            <asp:Label ID="labTitle" runat="server" Text="其他费用明细"></asp:Label>
         </p>
     </div>
     <div style="margin: 0px;">
@@ -48,11 +48,12 @@
                     <td style="width: 40px;">
                         序号
                     </td>
-                    <td>
-                        费用类型
-                    </td>
+                    
                     <td>
                         项目名称
+                    </td>
+                    <td>
+                        费用类型
                     </td>
                     <td>
                         店铺编号
@@ -86,11 +87,12 @@
                 <td style="width: 40px;">
                     <%#(AspNetPager1.CurrentPageIndex-1)*AspNetPager1.PageSize+ Container.ItemIndex + 1%>
                 </td>
-                <td>
-                    <asp:Label ID="labOrderType" runat="server" Text=""></asp:Label>
-                </td>
+                
                 <td>
                     <%#Eval("subject.SubjectName")%>
+                </td>
+                <td>
+                    <asp:Label ID="labOrderType" runat="server" Text=""></asp:Label>
                 </td>
                 <td>
                     <%#Eval("order.ShopNo") %>

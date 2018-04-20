@@ -433,14 +433,10 @@ namespace WebApp.Subjects.RegionSubject
                                     if (!CheckOOH(shopId, popNo, width1, length1))
                                     {
                                         canSave = false;
-                                        msg.Append("该尺寸的POP不存在，请更新数据库；");
+                                        msg.Append("该尺寸的OOH POP不存在，请更新数据库；");
                                     }
                                 }
-                                //if (!CheckHandMakeOrder(shopId, sheet, width1, length1))
-                                //{
-                                //    canSave = false;
-                                //    msg.Append("该尺寸的POP不存在，请更新数据库；");
-                                //}
+                               
                             }
                             if (canSave)
                             {

@@ -252,15 +252,14 @@
                     </tr>
                 </table>
                 <div class="tr">
-                >>项目名称 &nbsp;&nbsp;&nbsp;&nbsp;
-                <asp:CheckBox ID="cbShowSubjectNameList" runat="server" AutoPostBack="true" 
-                        oncheckedchanged="cbShowSubjectNameList_CheckedChanged" />显示
-                 <img id="loadSubjectNames" style="display: none;" src="../image/WaitImg/loadingA.gif" />
+                    >>项目名称 &nbsp;&nbsp;&nbsp;&nbsp;
+                    <asp:CheckBox ID="cbShowSubjectNameList" runat="server" AutoPostBack="true" OnCheckedChanged="cbShowSubjectNameList_CheckedChanged" />显示
+                    <img id="loadSubjectNames" style="display: none;" src="../image/WaitImg/loadingA.gif" />
                 </div>
-               <%-- <asp:Panel ID="Panel_SubjectNameList" runat="server" Visible="false">
+                <%-- <asp:Panel ID="Panel_SubjectNameList" runat="server" Visible="false">
                    
                 </asp:Panel>--%>
-                <div id="Panel_SubjectNameList" runat="server" style=" display:none;">
+                <div id="Panel_SubjectNameList" runat="server" style="display: none;">
                     <table class="table">
                         <tr class="tr_bai">
                             <td style="width: 120px;">
@@ -301,7 +300,6 @@
                     </table>
                 </div>
             </ContentTemplate>
-            
         </asp:UpdatePanel>
         <div style="text-align: right; padding-right: 25px; margin-top: 8px;">
             <asp:Button ID="Button1" runat="server" Text="查 询" class="easyui-linkbutton" Style="width: 65px;
@@ -504,62 +502,99 @@
         <asp:CheckBox ID="cbShopSubjectList" runat="server" OnCheckedChanged="cbShopSubjectList_CheckedChanged"
             AutoPostBack="true" />显示项目明细
     </div>
+    <div style=" width:100%; overflow:auto;">
     <asp:Repeater ID="gvList" Visible="false" runat="server" OnItemDataBound="gvList_ItemDataBound"
         OnItemCommand="gvList_ItemCommand">
         <HeaderTemplate>
-            <table class="table1" style="width: 100%;">
+            <table class="table1" style="width: 2000px;">
                 <tr class="tr_hui">
-                    <td style="width: 40px;">
+                    <td rowspan="2" style="width: 40px;">
                         序号
                     </td>
-                    <td>
+                    <td rowspan="2">
                         项目名称
                     </td>
-                    <td>
-                        项目编号
-                    </td>
-                    <td>
+                    <td rowspan="2">
                         项目类型
                     </td>
-                    <td>
+                    <td rowspan="2">
                         订单类型
                     </td>
-                    <td>
+                    <td rowspan="2">
                         所属客户
                     </td>
-                    <td>
+                    <td rowspan="2">
                         下单时间
                     </td>
-                    <td>
+                    <td colspan="2">
                         店铺数量
                     </td>
-                    <td>
+                    <td colspan="2">
                         POP总面积(平米)
                     </td>
-                    <td>
+                    <td colspan="2">
                         POP金额
                     </td>
-                    <td>
+                    <td colspan="2">
                         安装费
                     </td>
-                    <%--<td>
-                        快递费
-                    </td>--%>
-                    <td>
-                        二次安装费
-                    </td>
-                    <td>
+                    <td colspan="2">
                         物料费
                     </td>
-                    <td>
+                    <td colspan="2">
                         运费/新开店安装费
                     </td>
-                    <td>
+                    <td colspan="2">
                         其他费用
                     </td>
-                    <td>
+                    <td rowspan="2">
                         查看
                     </td>
+                </tr>
+                <tr class="tr_hui" style="color:#000; font-weight:bold;">
+                    <td>
+                        系统(上海)
+                    </td>
+                    <td>
+                        分区
+                    </td>
+                    <td>
+                        系统(上海)
+                    </td>
+                    <td>
+                        分区
+                    </td>
+                    <td>
+                        系统(上海)
+                    </td>
+                    <td>
+                        分区
+                    </td>
+                    <td>
+                        系统(上海)
+                    </td>
+                    <td>
+                        分区
+                    </td>
+                    <td>
+                        系统(上海)
+                    </td>
+                    <td>
+                        分区
+                    </td>
+                    <td>
+                        系统(上海)
+                    </td>
+                    <td>
+                        分区
+                    </td>
+                    <td>
+                        系统(上海)
+                    </td>
+                    <td>
+                        分区
+                    </td>
+                   
                 </tr>
         </HeaderTemplate>
         <ItemTemplate>
@@ -572,9 +607,9 @@
                     <%--<%#Eval("subject.SubjectName")%>--%>
                     <asp:Label ID="labSubjectName" runat="server" Text=""></asp:Label>
                 </td>
-                <td>
+                <%--<td>
                     <%#Eval("subject.SubjectNo")%>
-                </td>
+                </td>--%>
                 <td>
                     <%#Eval("CategoryName")%>
                 </td>
@@ -592,30 +627,48 @@
                     <asp:Label ID="labShopCount" runat="server" Text=""></asp:Label>
                 </td>
                 <td>
+                    <%--店铺数量--%>
+                    <asp:Label ID="labShopCount1" runat="server" Text=""></asp:Label>
+                </td>
+                <td>
                     <%--POP平米数--%>
                     <asp:Label ID="labArea" runat="server" Text="0"></asp:Label>
+                </td>
+                <td>
+                    <%--POP平米数--%>
+                    <asp:Label ID="labArea1" runat="server" Text="0"></asp:Label>
                 </td>
                 <td>
                     <%--POP金额--%>
                     <asp:Label ID="labPOPPrice" runat="server" Text="0"></asp:Label>
                 </td>
                 <td>
+                    <%--POP金额--%>
+                    <asp:Label ID="labPOPPrice1" runat="server" Text="0"></asp:Label>
+                </td>
+                <td>
                     <asp:Label ID="labInstallPrice" runat="server" Text="0"></asp:Label>
                 </td>
-                <%--<td>
-                    <asp:Label ID="labExpressPrice" runat="server" Text="0"></asp:Label>
-                </td>--%>
                 <td>
-                    <asp:Label ID="labSecondInstallPrice" runat="server" Text="0"></asp:Label>
+                    <asp:Label ID="labInstallPrice1" runat="server" Text="0"></asp:Label>
                 </td>
                 <td>
                     <asp:Label ID="labMaterial" runat="server" Text="0"></asp:Label>
                 </td>
                 <td>
+                    <asp:Label ID="labMaterial1" runat="server" Text="0"></asp:Label>
+                </td>
+                <td>
                     <asp:Label ID="labNewShopInstallPrice" runat="server" Text="0"></asp:Label>
                 </td>
                 <td>
-                    <asp:Label ID="labFreight" runat="server" Text="0"></asp:Label>
+                    <asp:Label ID="labNewShopInstallPrice1" runat="server" Text="0"></asp:Label>
+                </td>
+                <td>
+                    <asp:Label ID="labOtherPrice" runat="server" Text="0"></asp:Label>
+                </td>
+                <td>
+                    <asp:Label ID="labOtherPrice1" runat="server" Text="0"></asp:Label>
                 </td>
                 <td>
                     <span name="spanCheckDetail" data-subjectid='<%#Eval("Id") %>' data-subjecttype='<%#Eval("SubjectType") %>'
@@ -627,7 +680,7 @@
             <%if (gvList.Items.Count == 0)
               {%>
             <tr class="tr_bai">
-                <td colspan="15" style="text-align: center;">
+                <td colspan="21" style="text-align: center;">
                     --无数据--
                 </td>
             </tr>
@@ -635,6 +688,7 @@
             </table>
         </FooterTemplate>
     </asp:Repeater>
+    </div>
     <div style="display: none;">
         <iframe id="exportFrame" name="exportFrame" src=""></iframe>
     </div>

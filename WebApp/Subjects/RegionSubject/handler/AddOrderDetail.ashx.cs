@@ -307,15 +307,17 @@ namespace WebApp.Subjects.RegionSubject.handler
                                                    && (((subject.SubjectType ?? 1) == (int)SubjectTypeEnum.POP订单) || ((subject.SubjectType ?? 1) == (int)SubjectTypeEnum.手工订单))
                                                    && (regionList.Any() ? (regionList.Contains(shop.RegionName.ToLower())) : 1 == 1)
                                                    select subject).Distinct().OrderBy(s => s.Id).ToList();
+                                List<int> selectSubjectIdList = new List<int>();
                                 if (subjectList.Any())
                                 {
+                                    selectSubjectIdList = subjectList.Select(s=>s.Id).ToList();
                                     subjectList.ForEach(s =>
                                     {
                                         subjectJson.Append("{\"ShopId\":\"" + shopId + "\",\"SubjectId\":\"" + s.Id + "\",\"SubjectName\":\"" + s.SubjectName + "\"},");
                                     });
 
                                 }
-                                var notPOPSubject = subjectBll.GetList(s => (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && s.RegionOrderType == 1 && s.GuidanceId == subjectModel.GuidanceId);
+                                var notPOPSubject = subjectBll.GetList(s => !selectSubjectIdList.Contains(s.Id) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && s.RegionOrderType == 1 && s.GuidanceId == subjectModel.GuidanceId);
                                 if (regionList.Any())
                                 {
                                     notPOPSubject = notPOPSubject.Where(s => (s.Region != null && s.Region != "") ? (regionList.Contains(s.Region.ToLower())) : 1 == 1).ToList();
@@ -713,15 +715,17 @@ namespace WebApp.Subjects.RegionSubject.handler
                                        && (subject.SubjectType ?? 1) == (int)SubjectTypeEnum.POP订单
                                        && (regionList.Any() ? (regionList.Contains(shop.RegionName.ToLower())) : 1 == 1)
                                        select subject).Distinct().OrderBy(s => s.Id).ToList();
+                    List<int> selectSubjectIdList = new List<int>();
                     if (subjectList.Any())
                     {
+                        selectSubjectIdList = subjectList.Select(s => s.Id).ToList();
                         subjectList.ForEach(s =>
                         {
                             subjectJson.Append("{\"SubjectId\":\"" + s.Id + "\",\"SubjectName\":\"" + s.SubjectName + "\"},");
                         });
                         result = "[" + json.ToString().TrimEnd(',') + "]";
                     }
-                    var notPOPSubject = subjectBll.GetList(s => (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && s.RegionOrderType == 1);
+                    var notPOPSubject = subjectBll.GetList(s => s.GuidanceId == subjectModel.GuidanceId && !selectSubjectIdList.Contains(s.Id) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && s.RegionOrderType == 1);
                     notPOPSubject.ForEach(s =>
                     {
                         subjectJson.Append("{\"SubjectId\":\"" + s.Id + "\",\"SubjectName\":\"" + s.SubjectName + "\"},");

@@ -203,8 +203,11 @@
             CssClass="layui-btn layui-btn-normal" />
         <%--<span id="spanSubmit" class="layui-btn layui-btn-normal">提 交</span>--%>
         <img id="imgLoading" style="display: none;" src='../../Image/WaitImg/loadingA.gif' />
-        <span id="spanReturn" onclick="javascript:window.history.go(-1)" class="layui-btn layui-btn-primary"
-            style="margin-left: 30px;">返 回</span>
+        <asp:Button ID="btnBack" runat="server" Text="返 回"
+            CssClass="layui-btn layui-btn-primary" style="margin-left: 30px;" 
+            onclick="btnBack_Click"/>
+       <%-- <span id="spanReturn" onclick="javascript:window.history.go(-1)" class="layui-btn layui-btn-primary"
+            style="margin-left: 30px;">返 回</span>--%>
     </div>
     <div id="popDetailDiv" style="display: none; padding-top: 10px; position: relative;
         z-index: 9999;">

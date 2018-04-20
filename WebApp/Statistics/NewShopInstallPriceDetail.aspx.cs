@@ -75,7 +75,9 @@ namespace WebApp.Statistics
                         on order.SubjectId equals subject.Id
                         where subjectIdList.Contains(order.SubjectId ?? 0)
                         && (subject.SubjectType == (int)SubjectTypeEnum.新开店安装费 || subject.SubjectType == (int)SubjectTypeEnum.运费 || order.OrderType==(int)OrderTypeEnum.运费)
-                        && (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                        //&& (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                        && (regionList.Any() ? regionList.Contains(order.Region.ToLower()) : 1 == 1)
+                        
                         select new
                         {
                             order,
@@ -116,8 +118,8 @@ namespace WebApp.Statistics
                 if (item != null)
                 {
                     object objSubjectType = item.GetType().GetProperty("SubjectType").GetValue(item, null);
-                    string subjectType = objSubjectType != null ? objSubjectType.ToString() : "0";
-                    ((Label)e.Item.FindControl("labSubjectType")).Text = CommonMethod.GeEnumName<SubjectTypeEnum>(subjectType);
+                    string orderType = objSubjectType != null ? objSubjectType.ToString() : "0";
+                    ((Label)e.Item.FindControl("labOrderType")).Text = CommonMethod.GeEnumName<SubjectTypeEnum>(orderType);
                 }
             }
         }

@@ -112,7 +112,7 @@
                         (POP订单必选)
                     </td>
                 </tr>
-               <%-- <tr class="tr_bai">
+                <tr class="tr_bai">
                     <td>
                         实施区域：
                     </td>
@@ -122,7 +122,7 @@
                           
                         </asp:RadioButtonList>
                     </td>
-                </tr>--%>
+                </tr>
                 <tr class="tr_bai" id="subjectTypeTr">
                     <td>
                         类型：

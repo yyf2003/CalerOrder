@@ -214,7 +214,9 @@ namespace WebApp.Statistics
             if (regionList1.Any())
             {
                 //orderList1 = orderList1.Where(s => regionList1.Contains(s.shop.RegionName.ToLower())).ToList();
-                orderList1 = orderList1.Where(s => (s.subject.PriceBlongRegion != null && s.subject.PriceBlongRegion != "") ? regionList1.Contains(s.subject.PriceBlongRegion.ToLower()) : regionList1.Contains(s.shop.RegionName.ToLower())).ToList();
+                //orderList1 = orderList1.Where(s => (s.subject.PriceBlongRegion != null && s.subject.PriceBlongRegion != "") ? regionList1.Contains(s.subject.PriceBlongRegion.ToLower()) : regionList1.Contains(s.shop.RegionName.ToLower())).ToList();
+                orderList1 = orderList1.Where(s => regionList1.Contains(s.shop.RegionName.ToLower())).ToList();
+                
                 if (provinceList1.Any())
                 {
                     orderList1 = orderList1.Where(s => provinceList1.Contains(s.shop.ProvinceName)).ToList();
@@ -457,8 +459,8 @@ namespace WebApp.Statistics
                           on order.SubjectId equals subject.Id
                             where order.SubjectId == subjectId
                             && (order.IsDelete == null || order.IsDelete == false)
-                            //&& regionList.Contains(shop.RegionName.ToLower())
-                            && ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(shop.RegionName.ToLower()))
+                            && regionList.Contains(shop.RegionName.ToLower())
+                            //&& ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(shop.RegionName.ToLower()))
                             select new { order,shop }).ToList();
                 if (subjectChannel == 1)
                 {

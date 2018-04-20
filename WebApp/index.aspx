@@ -20,7 +20,7 @@
         list-style:none;
         
        }
-       ul li{ float:left; margin-right:50px; margin-bottom:50px;}
+       ul li{ float:left; margin-right:50px; margin-bottom:20px;}
        #homeNav{ margin:0px;}
        #homeNav li{margin-right:5px; margin-bottom:0px; font-weight:bold;}
        .badge1
@@ -80,7 +80,7 @@
             
         </div>
         </div>
-        <div id="subjectContainer" style=" height:50%; width:99%;  margin:0 auto;overflow:hidden; display:none;  position:relative;">
+        <div id="subjectContainer" style=" height:46%; width:99%;  margin:0 auto;overflow:hidden; display:none;  position:relative; margin-top:20px;">
            
            <div id="subjectContainer1" style=" position:absolute; width:100%;background-color:White;">
            <div id="contentHeader">

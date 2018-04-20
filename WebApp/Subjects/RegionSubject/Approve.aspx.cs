@@ -57,7 +57,7 @@ namespace WebApp.Subjects.RegionSubject
                 labSubjectName.Text = model.subject.SubjectName;
                 labAddUserName.Text = model.RealName;
                 labCustomerName.Text = model.CustomerName;
-                int subjectType = model.subject.SubjectType ??1;
+                int subjectType = model.subject.SubjectType ?? 1;
                 hfSubjectType.Value = subjectType.ToString();
                 labSubjectType.Text = CommonMethod.GetEnumDescription<SubjectTypeEnum>(subjectType.ToString());
                 labRegion.Text = model.subject.SupplementRegion;
@@ -74,6 +74,10 @@ namespace WebApp.Subjects.RegionSubject
                     Panel2.Visible = false;
                     BindData();
                 }
+            }
+            else
+            {
+                btnSubmit.Enabled = false;
             }
         }
 

@@ -10,9 +10,10 @@ function CheckVal() {
         alert("请选择订单类型");
         return false;
     }
-    
+
     var guidanceId = $("#ddlGuidance").val();
-    if (guidanceId == 0) {
+
+    if (guidanceId == 0 || guidanceId == -1) {
         alert("请选择活动名称");
         return false;
     }
