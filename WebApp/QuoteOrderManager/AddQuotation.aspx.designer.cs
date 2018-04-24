@@ -22,6 +22,15 @@ namespace WebApp.QuoteOrderManager {
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
         
         /// <summary>
+        /// ScriptManager1 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.ScriptManager ScriptManager1;
+        
+        /// <summary>
         /// labGuidanceMonth 控件。
         /// </summary>
         /// <remarks>
@@ -157,6 +166,24 @@ namespace WebApp.QuoteOrderManager {
         protected global::System.Web.UI.WebControls.Label labOOHLevel4;
         
         /// <summary>
+        /// labWindowLevel1Count 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labWindowLevel1Count;
+        
+        /// <summary>
+        /// labWindowLevel1 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labWindowLevel1;
+        
+        /// <summary>
         /// labBasicLevel1Count 控件。
         /// </summary>
         /// <remarks>
@@ -173,6 +200,24 @@ namespace WebApp.QuoteOrderManager {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label labBasicLevel1;
+        
+        /// <summary>
+        /// labWindowLevel2Count 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labWindowLevel2Count;
+        
+        /// <summary>
+        /// labWindowLevel2 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labWindowLevel2;
         
         /// <summary>
         /// labBasicLevel2Count 控件。
@@ -193,6 +238,24 @@ namespace WebApp.QuoteOrderManager {
         protected global::System.Web.UI.WebControls.Label labBasicLevel2;
         
         /// <summary>
+        /// labWindowLevel3Count 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labWindowLevel3Count;
+        
+        /// <summary>
+        /// labWindowLevel3 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labWindowLevel3;
+        
+        /// <summary>
         /// labBasicLevel3Count 控件。
         /// </summary>
         /// <remarks>
@@ -211,111 +274,129 @@ namespace WebApp.QuoteOrderManager {
         protected global::System.Web.UI.WebControls.Label labBasicLevel3;
         
         /// <summary>
-        /// labBasicLevel4Count 控件。
+        /// labKidsWindowLevelCount 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel4Count;
+        protected global::System.Web.UI.WebControls.Label labKidsWindowLevelCount;
         
         /// <summary>
-        /// labBasicLevel4 控件。
+        /// labKidsWindowLevel 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel4;
+        protected global::System.Web.UI.WebControls.Label labKidsWindowLevel;
         
         /// <summary>
-        /// labBasicLevel5Count 控件。
+        /// labKidsBasicLevelCount 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel5Count;
+        protected global::System.Web.UI.WebControls.Label labKidsBasicLevelCount;
         
         /// <summary>
-        /// labBasicLevel5 控件。
+        /// labKidsBasicLevel 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel5;
+        protected global::System.Web.UI.WebControls.Label labKidsBasicLevel;
         
         /// <summary>
-        /// labBasicLevel6Count 控件。
+        /// labGenericLevelCount 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel6Count;
+        protected global::System.Web.UI.WebControls.Label labGenericLevelCount;
         
         /// <summary>
-        /// labBasicLevel6 控件。
+        /// labGenericLevel 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel6;
+        protected global::System.Web.UI.WebControls.Label labGenericLevel;
         
         /// <summary>
-        /// labBasicLevel7Count 控件。
+        /// labInstallPriceTotal 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel7Count;
+        protected global::System.Web.UI.WebControls.Label labInstallPriceTotal;
         
         /// <summary>
-        /// labBasicLevel7 控件。
+        /// expressPriceListRepeater 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel7;
+        protected global::System.Web.UI.WebControls.Repeater expressPriceListRepeater;
         
         /// <summary>
-        /// labBasicLevel8Count 控件。
+        /// labQuoteTotalPrice 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel8Count;
+        protected global::System.Web.UI.WebControls.Label labQuoteTotalPrice;
         
         /// <summary>
-        /// labBasicLevel8 控件。
+        /// hfQuoteTotalPrice 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel8;
+        protected global::System.Web.UI.WebControls.HiddenField hfQuoteTotalPrice;
         
         /// <summary>
-        /// labBasicLevel9Count 控件。
+        /// hfQuoteTotalArea 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel9Count;
+        protected global::System.Web.UI.WebControls.HiddenField hfQuoteTotalArea;
         
         /// <summary>
-        /// labBasicLevel9 控件。
+        /// hfQuoteTotalPrice1 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBasicLevel9;
+        protected global::System.Web.UI.WebControls.HiddenField hfQuoteTotalPrice1;
+        
+        /// <summary>
+        /// otherInstallPriceRepeater 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater otherInstallPriceRepeater;
+        
+        /// <summary>
+        /// btnSubmit 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSubmit;
     }
 }

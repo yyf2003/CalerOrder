@@ -15,7 +15,7 @@ namespace Models
     public partial class SpecialPriceQuoteDetail
     {
         public int Id { get; set; }
-        public Nullable<int> SPItemId { get; set; }
+        public Nullable<int> ItemId { get; set; }
         public Nullable<int> ChangeType { get; set; }
         public string Sheet { get; set; }
         public string PositionDescription { get; set; }

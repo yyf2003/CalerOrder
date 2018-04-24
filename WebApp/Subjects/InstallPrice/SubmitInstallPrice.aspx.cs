@@ -1716,7 +1716,7 @@ namespace WebApp.Subjects.InstallPrice
                                             installPriceShopModel.GuidanceId = guidanceId;
                                             installPriceShopModel.SubjectId = subjectId;
                                             installPriceShopModel.ShopId = shop.Id;
-                                            installPriceShopModel.MaterialSupport = materialSupport;
+                                            installPriceShopModel.MaterialSupport = "Generic";
                                             installPriceShopModel.POSScale = POSScale;
                                             installPriceShopModel.AddType = 1;
                                             installPriceShopModel.AddDate = DateTime.Now;

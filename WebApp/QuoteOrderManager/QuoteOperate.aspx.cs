@@ -219,20 +219,116 @@ namespace WebApp.QuoteOrderManager
                 DateTime date = DateTime.Parse(guidanceMonth);
                 int year = date.Year;
                 int month = date.Month;
-                var list = new QuotationItemBLL().GetList(s => s.CustomerId == customerId && s.GuidanceYear == year && s.GuidanceMonth == month && (s.IsDelete==null || s.IsDelete==false));
+                //var list = new QuotationItemBLL().GetList(s => s.CustomerId == customerId && s.GuidanceYear == year && s.GuidanceMonth == month && (s.IsDelete==null || s.IsDelete==false));
+                var list = (from order in CurrentContext.DbContext.QuotationItem
+                            join user in CurrentContext.DbContext.UserInfo
+                            on order.AddUserId equals user.UserId
+                            where order.CustomerId == customerId
+                            && order.GuidanceYear == year
+                            && order.GuidanceMonth == month
+                            && (order.IsDelete == null || order.IsDelete == false)
+                            select new {
+                                order,
+                                order.Id,
+                                order.CustomerId,
+                                order.GuidanceId,
+                                order.SubjectCategoryId,
+                                order.AddUserId,
+                                AddUserName= user.RealName
+                            }
+                         ).ToList();
                 gvList.DataSource = list;
                 gvList.DataBind();
             }
         }
 
+        SubjectGuidanceBLL guidanceBll = new SubjectGuidanceBLL();
+        ADSubjectCategoryBLL subjectCategoryBll = new ADSubjectCategoryBLL();
         protected void gvList_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
-
+            int id = int.Parse(e.CommandArgument.ToString());
+            if (e.CommandName == "deleteItem")
+            {
+                new SpecialPriceQuoteDetailBLL().Delete(s=>s.ItemId==id);
+                new QuotationItemBLL().Delete(s=>s.Id==id);
+                GetQuoteList();
+            }
         }
 
         protected void gvList_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
+            if (e.Item.ItemIndex != -1)
+            {
+                object item = e.Item.DataItem;
+                if (item != null)
+                {
+                    object guidanceIdObj = item.GetType().GetProperty("GuidanceId").GetValue(item, null);
+                    object subjectCategoryIdObj = item.GetType().GetProperty("SubjectCategoryId").GetValue(item, null);
+                    string guidanceId = guidanceIdObj != null ? guidanceIdObj.ToString() : string.Empty;
+                    string subjectCategoryId = subjectCategoryIdObj != null ? subjectCategoryIdObj.ToString() : string.Empty;
 
+
+
+
+                    if (!string.IsNullOrWhiteSpace(guidanceId))
+                    {
+                        List<int> guidanceIdList = StringHelper.ToIntList(guidanceId, ',');
+                        List<string> guidanceNameList = guidanceBll.GetList(s => guidanceIdList.Contains(s.ItemId)).Select(s => s.ItemName).ToList();
+                        if (guidanceNameList.Any())
+                        {
+                            ((Label)e.Item.FindControl("labGuidanceName")).Text = StringHelper.ListToString(guidanceNameList);
+                        }
+                    }
+                    if (!string.IsNullOrWhiteSpace(subjectCategoryId))
+                    {
+                        object customerIdObj = item.GetType().GetProperty("CustomerId").GetValue(item, null);
+                        int customerId = customerIdObj != null ? int.Parse(customerIdObj.ToString()) : 0;
+                        List<int> subjectCategoryIdList = StringHelper.ToIntList(subjectCategoryId, ',');
+                        List<string> categoryNameList = subjectCategoryBll.GetList(s => s.CustomerId == customerId && subjectCategoryIdList.Contains(s.Id)).Select(s => s.CategoryName).ToList();
+                        if (categoryNameList.Any())
+                        {
+                            ((Label)e.Item.FindControl("labSubjectCategory")).Text = StringHelper.ListToString(categoryNameList);
+                        }
+                    }
+
+                    LinkButton lbDelete = (LinkButton)e.Item.FindControl("lbDelete");
+                    LinkButton lbEdit = (LinkButton)e.Item.FindControl("lbEdit");
+
+                    object addUserIdObj = item.GetType().GetProperty("AddUserId").GetValue(item, null);
+                    int addUserId = addUserIdObj != null ? int.Parse(addUserIdObj.ToString()) : 0;
+
+                    object itemIdObj = item.GetType().GetProperty("Id").GetValue(item, null);
+                    int itemId = itemIdObj != null ? int.Parse(itemIdObj.ToString()) : 0;
+
+
+                    if (addUserId == CurrentUser.UserId)
+                    {
+                        lbEdit.Enabled = true;
+                        lbEdit.Style.Add("color", "blue");
+                        lbEdit.Attributes.Add("OnClick", "return editItem('" + itemId + "')");
+
+                        lbDelete.CommandName = "deleteItem";
+                        lbDelete.Enabled = true;
+                        lbDelete.Attributes.Add("OnClick", "javascript:return confirm('确定删除吗？')");
+                        lbDelete.Style.Add("color", "red");
+                    }
+                    else
+                    {
+                        lbDelete.CommandName = "";
+                        lbDelete.Enabled = false;
+                        lbDelete.Style.Add("color", "#ccc");
+
+                        lbEdit.Enabled = false;
+                        lbEdit.Style.Add("color", "#ccc");
+
+                    }
+                }
+            }
+        }
+
+        protected void btnRefresh_Click(object sender, EventArgs e)
+        {
+            GetQuoteList();
         }
 
        

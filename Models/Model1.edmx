@@ -2539,7 +2539,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
-          <Property Name="SPItemId" Type="int" />
+          <Property Name="ItemId" Type="int" />
           <Property Name="ChangeType" Type="int" />
           <Property Name="Sheet" Type="nvarchar" MaxLength="50" />
           <Property Name="PositionDescription" Type="nvarchar" MaxLength="50" />
@@ -5382,7 +5382,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="Int32" Name="SPItemId" />
+          <Property Type="Int32" Name="ItemId" />
           <Property Type="Int32" Name="ChangeType" />
           <Property Type="String" Name="Sheet" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="PositionDescription" MaxLength="50" FixedLength="false" Unicode="true" />
@@ -8207,7 +8207,7 @@
                 <ScalarProperty Name="PositionDescription" ColumnName="PositionDescription" />
                 <ScalarProperty Name="Sheet" ColumnName="Sheet" />
                 <ScalarProperty Name="ChangeType" ColumnName="ChangeType" />
-                <ScalarProperty Name="SPItemId" ColumnName="SPItemId" />
+                <ScalarProperty Name="ItemId" ColumnName="ItemId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -8610,7 +8610,7 @@
         <EntityTypeShape EntityType="KalerOrderDBModel.Install" Width="1.5" PointX="18.75" PointY="0.75" Height="3.2137866210937318" />
         <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceConfig" Width="1.5" PointX="18.75" PointY="4.75" Height="2.2898160807292243" />
         <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceDetail" Width="1.5" PointX="18.75" PointY="8.75" Height="3.2137866210937318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceShopInfo" Width="1.5" PointX="18.75" PointY="12.75" Height="3.583374837239603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceShopInfo" Width="1.5" PointX="18.75" PointY="12.75" Height="3.7681689453124818" />
         <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceTemp" Width="1.5" PointX="18.75" PointY="17.75" Height="2.8441984049479743" />
         <EntityTypeShape EntityType="KalerOrderDBModel.KidsNewShopProp" Width="1.5" PointX="20.75" PointY="0.75" Height="2.8441984049479743" />
         <EntityTypeShape EntityType="KalerOrderDBModel.ListOrderDetail" Width="1.5" PointX="20.75" PointY="4.75" Height="5.9856982421874818" />

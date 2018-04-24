@@ -345,6 +345,16 @@ namespace Common
         常规安装费=2,
         
     }
+
+    //安装费项目类型
+    public enum QuoteInstallPriceChangeTypeEnum
+    {
+        POP=1,
+        OOH=2,
+        Basic=3,
+        Others=4
+
+    }
 }
 
 public class EnumEntity

@@ -8,9 +8,21 @@
     <script src="/Scripts/jquery-1.7.2.js" type="text/javascript"></script>
     <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
     <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        function finish(msg) {
+            if (msg == "ok") {
+                window.parent.Finish();
+            }
+            else {
+                layer.msg("提交失败!");
+            }
+        }
+    </script>
 </head>
 <body>
     <form id="form1" runat="server">
+    <asp:ScriptManager ID="ScriptManager1" runat="server">
+    </asp:ScriptManager>
     <div>
         <table class="table">
             <tr class="tr_bai">
@@ -62,7 +74,8 @@
     <div class="tr" style="margin-top: 20px;">
         》POP订单统计
     </div>
-    <asp:Repeater ID="popList" runat="server">
+    
+    <asp:Repeater ID="popList" runat="server" OnItemDataBound="popList_ItemDataBound">
         <HeaderTemplate>
             <table class="table">
                 <tr class="tr_hui">
@@ -94,7 +107,8 @@
                 <td runat="server" id="sheet">
                     <%--画面位置--%>
                     <%--<asp:Label ID="labSheet" runat="server" Text=""></asp:Label>--%>
-                    <%#Eval("Sheet") %>
+                    
+                    <span name="popSheetSpan" style=" cursor:pointer; text-decoration:underline;color:Blue;"><%#Eval("Sheet") %></span>
                 </td>
                 <td>
                     <%--画面名称/描述--%>
@@ -136,6 +150,23 @@
                     --无数据--
                 </td>
             </tr>
+            <%}
+              else
+              {
+            %>
+            <tr class="tr_bai">
+                <td colspan="4" style="text-align: right;">
+                    合计：
+                </td>
+                <td style="text-align: center;">
+                    <asp:Label ID="labPOPTotalArea" runat="server" Text="0"></asp:Label>
+                </td>
+                <td>
+                </td>
+                <td style="text-align: center;">
+                    <asp:Label ID="labPOPTotalPrice" runat="server" Text="0"></asp:Label>
+                </td>
+            </tr>
             <%} %>
             </table>
         </FooterTemplate>
@@ -145,7 +176,7 @@
     </div>
     <table class="table">
         <tr class="tr_hui">
-            <td style=" width:180px;">
+            <td style="width: 180px;">
                 费用名称
             </td>
             <td>
@@ -163,7 +194,7 @@
             <td>
                 发生数量
             </td>
-            <td style=" min-width:60px;">
+            <td style="min-width: 60px;">
                 金额
             </td>
         </tr>
@@ -187,7 +218,7 @@
                 <asp:Label ID="labOOHLevel1Count" runat="server" Text="0"></asp:Label>
             </td>
             <td>
-               <asp:Label ID="labOOHLevel1" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labOOHLevel1" runat="server" Text="0"></asp:Label>
             </td>
         </tr>
         <tr class="tr_bai">
@@ -204,10 +235,10 @@
                 2700
             </td>
             <td>
-               <asp:Label ID="labOOHLevel2Count" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labOOHLevel2Count" runat="server" Text="0"></asp:Label>
             </td>
             <td>
-               <asp:Label ID="labOOHLevel2" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labOOHLevel2" runat="server" Text="0"></asp:Label>
             </td>
         </tr>
         <tr class="tr_bai">
@@ -224,10 +255,10 @@
                 1800
             </td>
             <td>
-              <asp:Label ID="labOOHLevel3Count" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labOOHLevel3Count" runat="server" Text="0"></asp:Label>
             </td>
             <td>
-              <asp:Label ID="labOOHLevel3" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labOOHLevel3" runat="server" Text="0"></asp:Label>
             </td>
         </tr>
         <tr class="tr_bai">
@@ -243,13 +274,12 @@
                 600
             </td>
             <td>
-              <asp:Label ID="labOOHLevel4Count" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labOOHLevel4Count" runat="server" Text="0"></asp:Label>
             </td>
             <td>
-              <asp:Label ID="labOOHLevel4" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labOOHLevel4" runat="server" Text="0"></asp:Label>
             </td>
         </tr>
-
         <tr class="tr_bai">
             <td rowspan="8">
                 店铺安装费
@@ -264,13 +294,13 @@
                 橱窗部分
             </td>
             <td>
-               1000
+                1000
             </td>
             <td>
-                <asp:Label ID="labBasicLevel1Count" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labWindowLevel1Count" runat="server" Text="0"></asp:Label>
             </td>
             <td>
-               <asp:Label ID="labBasicLevel1" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labWindowLevel1" runat="server" Text="0"></asp:Label>
             </td>
         </tr>
         <tr class="tr_bai">
@@ -284,18 +314,58 @@
                 店内其它
             </td>
             <td>
-               800
+                800
+            </td>
+            <td>
+                <asp:Label ID="labBasicLevel1Count" runat="server" Text="0"></asp:Label>
+            </td>
+            <td>
+                <asp:Label ID="labBasicLevel1" runat="server" Text="0"></asp:Label>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td>
+                Core-Premium店铺
+            </td>
+            <td>
+                店
+            </td>
+            <td>
+                橱窗部分
+            </td>
+            <td>
+                500
+            </td>
+            <td>
+                <asp:Label ID="labWindowLevel2Count" runat="server" Text="0"></asp:Label>
+            </td>
+            <td>
+                <asp:Label ID="labWindowLevel2" runat="server" Text="0"></asp:Label>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td>
+                Core-Premium店铺
+            </td>
+            <td>
+                店
+            </td>
+            <td>
+                店内其它
+            </td>
+            <td>
+                400
             </td>
             <td>
                 <asp:Label ID="labBasicLevel2Count" runat="server" Text="0"></asp:Label>
             </td>
             <td>
-               <asp:Label ID="labBasicLevel2" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labBasicLevel2" runat="server" Text="0"></asp:Label>
             </td>
         </tr>
         <tr class="tr_bai">
             <td>
-                Core-Premium店铺
+                Core-Basic店铺
             </td>
             <td>
                 店
@@ -304,73 +374,33 @@
                 橱窗部分
             </td>
             <td>
-               500
+                200
+            </td>
+            <td>
+                <asp:Label ID="labWindowLevel3Count" runat="server" Text="0"></asp:Label>
+            </td>
+            <td>
+                <asp:Label ID="labWindowLevel3" runat="server" Text="0"></asp:Label>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td>
+                Core-Basic店铺
+            </td>
+            <td>
+                店
+            </td>
+            <td>
+                店内其它
+            </td>
+            <td>
+                150
             </td>
             <td>
                 <asp:Label ID="labBasicLevel3Count" runat="server" Text="0"></asp:Label>
             </td>
             <td>
-               <asp:Label ID="labBasicLevel3" runat="server" Text="0"></asp:Label>
-            </td>
-        </tr>
-        <tr class="tr_bai">
-            <td>
-                Core-Premium店铺
-            </td>
-            <td>
-                店
-            </td>
-            <td>
-                店内其它
-            </td>
-            <td>
-               400
-            </td>
-            <td>
-                <asp:Label ID="labBasicLevel4Count" runat="server" Text="0"></asp:Label>
-            </td>
-            <td>
-               <asp:Label ID="labBasicLevel4" runat="server" Text="0"></asp:Label>
-            </td>
-        </tr>
-        <tr class="tr_bai">
-            <td>
-               Core-Basic店铺
-            </td>
-            <td>
-                店
-            </td>
-            <td>
-                橱窗部分
-            </td>
-            <td>
-               200
-            </td>
-            <td>
-                <asp:Label ID="labBasicLevel5Count" runat="server" Text="0"></asp:Label>
-            </td>
-            <td>
-               <asp:Label ID="labBasicLevel5" runat="server" Text="0"></asp:Label>
-            </td>
-        </tr>
-        <tr class="tr_bai">
-            <td>
-                 Core-Basic店铺
-            </td>
-            <td>
-                店
-            </td>
-            <td>
-                店内其它
-            </td>
-            <td>
-               150
-            </td>
-            <td>
-                <asp:Label ID="labBasicLevel6Count" runat="server" Text="0"></asp:Label>
-            </td>
-            <td>
-               <asp:Label ID="labBasicLevel6" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labBasicLevel3" runat="server" Text="0"></asp:Label>
             </td>
         </tr>
         <tr class="tr_bai">
@@ -384,13 +414,13 @@
                 橱窗+店内
             </td>
             <td>
-               500
+                500
             </td>
             <td>
-                <asp:Label ID="labBasicLevel7Count" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labKidsWindowLevelCount" runat="server" Text="0"></asp:Label>
             </td>
             <td>
-               <asp:Label ID="labBasicLevel7" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labKidsWindowLevel" runat="server" Text="0"></asp:Label>
             </td>
         </tr>
         <tr class="tr_bai">
@@ -404,13 +434,13 @@
                 橱窗+店内
             </td>
             <td>
-               150
+                150
             </td>
             <td>
-                <asp:Label ID="labBasicLevel8Count" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labKidsBasicLevelCount" runat="server" Text="0"></asp:Label>
             </td>
             <td>
-               <asp:Label ID="labBasicLevel8" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labKidsBasicLevel" runat="server" Text="0"></asp:Label>
             </td>
         </tr>
         <tr class="tr_bai">
@@ -418,25 +448,225 @@
                 Generic POP 更换安装
             </td>
             <td>
-               
             </td>
             <td>
                 店
             </td>
             <td>
-               
             </td>
             <td>
-               150
+                150
             </td>
             <td>
-                <asp:Label ID="labBasicLevel9Count" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labGenericLevelCount" runat="server" Text="0"></asp:Label>
             </td>
             <td>
-               <asp:Label ID="labBasicLevel9" runat="server" Text="0"></asp:Label>
+                <asp:Label ID="labGenericLevel" runat="server" Text="0"></asp:Label>
+            </td>
+        </tr>
+        <tr class="tr_bai">
+            <td colspan="6" style="text-align: right;">
+                合计：
+            </td>
+            <td>
+                <asp:Label ID="labInstallPriceTotal" runat="server" Text="0"></asp:Label>
             </td>
         </tr>
     </table>
+    <div class="tr" style="margin-top: 20px;">
+        》快递费/道具费统计
+    </div>
+    <asp:Repeater ID="expressPriceListRepeater" runat="server" OnItemDataBound="expressPriceListRepeater_ItemDataBound">
+        <HeaderTemplate>
+            <table class="table">
+                <tr class="tr_hui">
+                    <td>
+                        道具名称
+                    </td>
+                    <td>
+                        数量
+                    </td>
+                    <td>
+                        单价
+                    </td>
+                    <td>
+                        金额
+                    </td>
+                </tr>
+        </HeaderTemplate>
+        <ItemTemplate>
+            <tr class="tr_bai">
+                <td runat="server" id="sheet">
+                    <%--道具名称--%>
+                    <%#Eval("PriceType")%>
+                </td>
+                <td>
+                    <%--数量--%>
+                    <%#Eval("Count")%>
+                </td>
+                <td>
+                    <%--单价--%>
+                    <%#Eval("Price")%>
+                </td>
+                <td>
+                    <%--金额--%>
+                    <asp:Label ID="labSubPrice" runat="server" Text=""></asp:Label>
+                </td>
+            </tr>
+        </ItemTemplate>
+        <FooterTemplate>
+            <%if (expressPriceListRepeater.Items.Count == 0)
+              { %>
+            <tr class="tr_bai">
+                <td colspan="4" style="text-align: center;">
+                    --无数据--
+                </td>
+            </tr>
+            <%}
+              else
+              {
+            %>
+            <tr class="tr_bai">
+                <td colspan="3" style="text-align: right;">
+                    合计：
+                </td>
+                <td style="text-align: center;">
+                    <asp:Label ID="labExpressPriceTotal" runat="server" Text="0"></asp:Label>
+                </td>
+            </tr>
+            <%} %>
+            </table>
+        </FooterTemplate>
+    </asp:Repeater>
+    <table class="table">
+        <tr class="tr_hui">
+            <td style="width: 180px;">
+                合计报价金额：
+            </td>
+            <td style="text-align: left; padding-left: 5px; font-weight: bold; font-size: 18px;">
+                <asp:Label ID="labQuoteTotalPrice" runat="server" Text="0"></asp:Label>
+                <asp:HiddenField ID="hfQuoteTotalPrice" runat="server" Value="0" />
+                <asp:HiddenField ID="hfQuoteTotalArea" runat="server" Value="0" />
+                <asp:HiddenField ID="hfQuoteTotalPrice1" runat="server" Value="0" />
+            </td>
+        </tr>
+    </table>
+    <div class="tr" style="margin-top: 20px;">
+        》其他安装费统计
+    </div>
+    <asp:Repeater ID="otherInstallPriceRepeater" runat="server" OnItemDataBound="otherInstallPriceRepeater_ItemDataBound">
+        <HeaderTemplate>
+            <table class="table" id="otherInstallPriceTable">
+                <tr class="tr_hui">
+                    <td>
+                        费用名称
+                    </td>
+                    <td>
+                        单位
+                    </td>
+                    <td>
+                        单价
+                    </td>
+                    <td>
+                        发生数量
+                    </td>
+                    <td>
+                        金额
+                    </td>
+                    <td>
+                        合计
+                    </td>
+                    <td>
+                        操作
+                    </td>
+                </tr>
+        </HeaderTemplate>
+        <ItemTemplate>
+            <tr class="tr_hui">
+                <td id="priceType" runat="server">
+                    <%#Eval("PriceType")%>
+                </td>
+                <td>
+                    店
+                </td>
+                <td>
+                    <%#Eval("Price")%>
+                </td>
+                <td>
+                    <%#Eval("Count")%>
+                </td>
+                <td>
+                    <%--<%#decimal.Parse(Eval("Price").ToString()) * int.Parse(Eval("Count").ToString())%>--%>
+                    <asp:Label ID="labPrice" runat="server" Text=""></asp:Label>
+                </td>
+                <td id="subPrice" runat="server">
+                    <asp:Label ID="labSubPrice" runat="server" Text=""></asp:Label>
+                </td>
+                <td id="operatePrice" runat="server">
+                    <asp:Panel ID="PanelOOH" runat="server">
+                        5000:
+                        <input type="button" name="btnOOHDec" value="-" style="width: 20px;" />
+                        <asp:TextBox ID="txtOOHPriceCount1" runat="server" data-val="5000" Text="0" MaxLength="3"
+                            Style="width: 30px; text-align: center;"></asp:TextBox>
+                        <input type="button" name="btnOOHAdd" value="+" style="width: 20px;" />
+                        &nbsp;&nbsp;2700:
+                        <input type="button" name="btnOOHDec" value="-" style="width: 20px;" />
+                        <asp:TextBox ID="txtOOHPriceCount2" runat="server" data-val="2700" Text="0" MaxLength="3"
+                            Style="width: 30px; text-align: center;"></asp:TextBox>
+                        <input type="button" name="btnOOHAdd" value="+" style="width: 20px;" />
+                        &nbsp;&nbsp;1800:
+                        <input type="button" name="btnOOHDec" value="-" style="width: 20px;" />
+                        <asp:TextBox ID="txtOOHPriceCount3" runat="server" data-val="1800" Text="0" MaxLength="3"
+                            Style="width: 30px; text-align: center;"></asp:TextBox>
+                        <input type="button" name="btnOOHAdd" value="+" style="width: 20px;" />
+                        &nbsp;&nbsp;600:
+                        <input type="button" name="btnOOHDec" value="-" style="width: 20px;" />
+                        <asp:TextBox ID="txtOOHPriceCount4" runat="server" data-val="600" Text="0" MaxLength="3"
+                            Style="width: 30px; text-align: center;"></asp:TextBox>
+                        <input type="button" name="btnOOHAdd" value="+" style="width: 20px;" />
+                        &nbsp;&nbsp; 合计：
+                        <asp:Label ID="labOOHTotal" runat="server" Text="0"></asp:Label>
+                    </asp:Panel>
+                    <asp:Panel ID="PanelBasic" runat="server">
+                        800:
+                        <input type="button" name="btnBasicDec" value="-" style="width: 20px;" />
+                        <asp:TextBox ID="txtBasicPriceCount1" runat="server" Text="0" data-val="800" MaxLength="3"
+                            Style="width: 30px; text-align: center;"></asp:TextBox>
+                        <input type="button" name="btnBasicAdd" value="+" style="width: 20px;" />
+                        &nbsp;&nbsp;400:
+                        <input type="button" name="btnBasicDec" value="-" style="width: 20px;" />
+                        <asp:TextBox ID="txtBasicPriceCount2" runat="server" Text="0" data-val="400" MaxLength="3"
+                            Style="width: 30px; text-align: center;"></asp:TextBox>
+                        <input type="button" name="btnBasicAdd" value="+" style="width: 20px;" />
+                        &nbsp;&nbsp;150:
+                        <input type="button" name="btnBasicDec" value="-" style="width: 20px;" />
+                        <asp:TextBox ID="txtBasicPriceCount3" runat="server" Text="0" data-val="150" MaxLength="3"
+                            Style="width: 30px; text-align: center;"></asp:TextBox>
+                        <input type="button" name="btnBasicAdd" value="+" style="width: 20px;" />
+                        &nbsp;&nbsp;合计：
+                        <asp:Label ID="labBasicTotal" runat="server" Text="0"></asp:Label>
+                    </asp:Panel>
+                </td>
+            </tr>
+        </ItemTemplate>
+        <FooterTemplate>
+            <%if (otherInstallPriceRepeater.Items.Count == 0)
+              { %>
+            <tr class="tr_bai">
+                <td colspan="7" style="text-align: center;">
+                    --无数据--
+                </td>
+            </tr>
+            <%} %>
+            </table>
+        </FooterTemplate>
+    </asp:Repeater>
+    
+    <div style="text-align: center; height: 50px; margin-top: 30px; margin-bottom: 30px;">
+        <asp:Button ID="btnSubmit" runat="server" Text="提 交" class="layui-btn layui-btn-normal"
+            OnClick="btnSubmit_Click" OnClientClick="return Check()" />
+    </div>
     </form>
 </body>
 </html>
+<script src="js/addQuotation.js" type="text/javascript"></script>

@@ -9,6 +9,13 @@
     <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
     <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
     <script src="/My97DatePicker/WdatePicker.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        function Finish() {
+            layer.closeAll();
+            layer.msg("提交成功!");
+            $("#btnRefresh").click();
+        }
+    </script>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -126,9 +133,12 @@
                                     总金额
                                 </td>
                                 <td>
+                                    添加人
+                                </td>
+                                <td>
                                     添加时间
                                 </td>
-                                <td style="width: 90px;">
+                                <td style="width: 150px;">
                                     操作
                                 </td>
                             </tr>
@@ -145,16 +155,30 @@
                                     <asp:Label ID="labSubjectCategory" runat="server" Text=""></asp:Label>
                                 </td>
                                 <td>
-                                    <asp:Label ID="labTotalArea" runat="server" Text=""></asp:Label>
+                                   <%-- <asp:Label ID="labTotalArea" runat="server" Text=""></asp:Label>--%>
+                                    <%#Eval("order.TotalArea")%>
                                 </td>
                                 <td>
-                                    <asp:Label ID="labTotalPrice" runat="server" Text=""></asp:Label>
+                                    <%--<asp:Label ID="labTotalPrice" runat="server" Text=""></asp:Label>--%>
+                                    <%#Eval("order.TotalPrice")%>
                                 </td>
                                 <td>
-                                    <%#Eval("AddDate")%>
+                                    <%#Eval("AddUserName")%>
                                 </td>
                                 <td>
-                                    <asp:LinkButton ID="lbDelete" runat="server" ForeColor="Red">删除</asp:LinkButton>
+                                    <%#Eval("order.AddDate")%>
+                                </td>
+                                <td>
+                                    <span name="spanCheckQuote" data-itemid='<%#Eval("order.Id")%>' style=" cursor:pointer;color:Blue;">查看</span>
+                                    &nbsp;
+                                    |
+                                    <%--<span name="spanEditQuote" data-itemid='<%#Eval("order.Id")%>' style=" cursor:pointer;color:Blue;">编辑</span>--%>
+                                    <%--<asp:LinkButton ID="lbEdit" runat="server" ForeColor="Blue" OnClientClick="return editItem('<%#Eval("order.Id")%>')">删除</asp:LinkButton>--%>
+                                    <asp:LinkButton ID="lbEdit" runat="server">编辑</asp:LinkButton>
+                                    &nbsp;
+                                    |
+                                    &nbsp;
+                                    <asp:LinkButton ID="lbDelete" runat="server" CommandArgument='<%#Eval("order.Id")%>'>删除</asp:LinkButton>
                                 </td>
                             </tr>
                     </ItemTemplate>
@@ -162,7 +186,7 @@
                         <%if (gvList.Items.Count == 0)
                           {%>
                         <tr class="tr_bai">
-                            <td colspan="7" style="text-align: center;">
+                            <td colspan="8" style="text-align: center;">
                                 --无数据--
                             </td>
                         </tr>
@@ -170,6 +194,8 @@
                         </table>
                     </FooterTemplate>
                 </asp:Repeater>
+                <asp:Button ID="btnRefresh" runat="server" Text="Button" 
+                    onclick="btnRefresh_Click" style=" display:none;"/>
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>
