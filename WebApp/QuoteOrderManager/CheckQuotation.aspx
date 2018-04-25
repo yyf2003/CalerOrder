@@ -1,6 +1,7 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AddQuotation.aspx.cs" Inherits="WebApp.QuoteOrderManager.AddQuotation" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CheckQuotation.aspx.cs" Inherits="WebApp.QuoteOrderManager.CheckQuotation" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title></title>
@@ -8,21 +9,9 @@
     <script src="/Scripts/jquery-1.7.2.js" type="text/javascript"></script>
     <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
     <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
-    <script type="text/javascript">
-        function finish(msg) {
-            if (msg == "ok") {
-                window.parent.Finish();
-            }
-            else {
-                layer.msg("提交失败!");
-            }
-        }
-    </script>
 </head>
 <body>
     <form id="form1" runat="server">
-    <asp:ScriptManager ID="ScriptManager1" runat="server">
-    </asp:ScriptManager>
     <div>
         <table class="table">
             <tr class="tr_bai">
@@ -538,23 +527,12 @@
             </table>
         </FooterTemplate>
     </asp:Repeater>
-    <table class="table">
-        <tr class="tr_hui">
-            <td style="width: 180px;">
-                合计报价金额：
-            </td>
-            <td style="text-align: left; padding-left: 5px; font-weight: bold; font-size: 18px;">
-                <asp:Label ID="labQuoteTotalPrice" runat="server" Text="0"></asp:Label>
-                <asp:HiddenField ID="hfQuoteTotalPrice" runat="server" Value="0" />
-                <asp:HiddenField ID="hfQuoteTotalArea" runat="server" Value="0" />
-                <asp:HiddenField ID="hfQuoteTotalPrice1" runat="server" Value="0" />
-            </td>
-        </tr>
-    </table>
-    <div class="tr" style="margin-top: 20px;">
+
+
+     <div class="tr" style="margin-top: 20px;">
         》其他安装费统计
     </div>
-    <asp:Repeater ID="otherInstallPriceRepeater" runat="server" OnItemDataBound="otherInstallPriceRepeater_ItemDataBound">
+     <asp:Repeater ID="otherInstallPriceRepeater" runat="server" OnItemDataBound="otherInstallPriceRepeater_ItemDataBound">
         <HeaderTemplate>
             <table class="table" id="otherInstallPriceTable">
                 <tr class="tr_hui">
@@ -577,7 +555,7 @@
                         合计
                     </td>
                     <td>
-                        操作
+                        报价
                     </td>
                 </tr>
         </HeaderTemplate>
@@ -596,7 +574,6 @@
                     <%#Eval("Count")%>
                 </td>
                 <td>
-                    <%--<%#decimal.Parse(Eval("Price").ToString()) * int.Parse(Eval("Count").ToString())%>--%>
                     <asp:Label ID="labPrice" runat="server" Text=""></asp:Label>
                 </td>
                 <td id="subPrice" runat="server">
@@ -604,45 +581,24 @@
                 </td>
                 <td id="operatePrice" runat="server">
                     <asp:Panel ID="PanelOOH" runat="server">
-                        5000:
-                        <input type="button" name="btnOOHDec" value="-" style="width: 20px;" />
-                        <asp:TextBox ID="txtOOHPriceCount1" runat="server" data-val="5000" Text="0" MaxLength="3"
-                            Style="width: 30px; text-align: center;"></asp:TextBox>
-                        <input type="button" name="btnOOHAdd" value="+" style="width: 20px;" />
-                        &nbsp;&nbsp;2700:
-                        <input type="button" name="btnOOHDec" value="-" style="width: 20px;" />
-                        <asp:TextBox ID="txtOOHPriceCount2" runat="server" data-val="2700" Text="0" MaxLength="3"
-                            Style="width: 30px; text-align: center;"></asp:TextBox>
-                        <input type="button" name="btnOOHAdd" value="+" style="width: 20px;" />
-                        &nbsp;&nbsp;1800:
-                        <input type="button" name="btnOOHDec" value="-" style="width: 20px;" />
-                        <asp:TextBox ID="txtOOHPriceCount3" runat="server" data-val="1800" Text="0" MaxLength="3"
-                            Style="width: 30px; text-align: center;"></asp:TextBox>
-                        <input type="button" name="btnOOHAdd" value="+" style="width: 20px;" />
-                        &nbsp;&nbsp;600:
-                        <input type="button" name="btnOOHDec" value="-" style="width: 20px;" />
-                        <asp:TextBox ID="txtOOHPriceCount4" runat="server" data-val="600" Text="0" MaxLength="3"
-                            Style="width: 30px; text-align: center;"></asp:TextBox>
-                        <input type="button" name="btnOOHAdd" value="+" style="width: 20px;" />
+                       5000：
+                       <asp:Label ID="labOOHPriceCount1" runat="server" Text="0"></asp:Label>，
+                        &nbsp;&nbsp;2700：
+                       <asp:Label ID="labOOHPriceCount2" runat="server" Text="0"></asp:Label>，
+                        &nbsp;&nbsp;1800：
+                        <asp:Label ID="labOOHPriceCount3" runat="server" Text="0"></asp:Label>，
+                        &nbsp;&nbsp;600：
+                        <asp:Label ID="labOOHPriceCount4" runat="server" Text="0"></asp:Label>
                         &nbsp;&nbsp; 合计：
                         <asp:Label ID="labOOHTotal" runat="server" Text="0"></asp:Label>
                     </asp:Panel>
                     <asp:Panel ID="PanelBasic" runat="server">
-                        800:
-                        <input type="button" name="btnBasicDec" value="-" style="width: 20px;" />
-                        <asp:TextBox ID="txtBasicPriceCount1" runat="server" Text="0" data-val="800" MaxLength="3"
-                            Style="width: 30px; text-align: center;"></asp:TextBox>
-                        <input type="button" name="btnBasicAdd" value="+" style="width: 20px;" />
-                        &nbsp;&nbsp;400:
-                        <input type="button" name="btnBasicDec" value="-" style="width: 20px;" />
-                        <asp:TextBox ID="txtBasicPriceCount2" runat="server" Text="0" data-val="400" MaxLength="3"
-                            Style="width: 30px; text-align: center;"></asp:TextBox>
-                        <input type="button" name="btnBasicAdd" value="+" style="width: 20px;" />
-                        &nbsp;&nbsp;150:
-                        <input type="button" name="btnBasicDec" value="-" style="width: 20px;" />
-                        <asp:TextBox ID="txtBasicPriceCount3" runat="server" Text="0" data-val="150" MaxLength="3"
-                            Style="width: 30px; text-align: center;"></asp:TextBox>
-                        <input type="button" name="btnBasicAdd" value="+" style="width: 20px;" />
+                       800：
+                        <asp:Label ID="labBasicPriceCount1" runat="server" Text="0"></asp:Label>，
+                        &nbsp;&nbsp;400：
+                        <asp:Label ID="labBasicPriceCount2" runat="server" Text="0"></asp:Label>，
+                        &nbsp;&nbsp;150：
+                        <asp:Label ID="labBasicPriceCount3" runat="server" Text="0"></asp:Label>
                         &nbsp;&nbsp;合计：
                         <asp:Label ID="labBasicTotal" runat="server" Text="0"></asp:Label>
                     </asp:Panel>
@@ -661,12 +617,21 @@
             </table>
         </FooterTemplate>
     </asp:Repeater>
-    
-    <div style="text-align: center; height: 50px; margin-top: 30px; margin-bottom: 30px;">
-        <asp:Button ID="btnSubmit" runat="server" Text="提 交" class="layui-btn layui-btn-normal"
-            OnClick="btnSubmit_Click" OnClientClick="return Check()" />
-    </div>
+
+    <table class="table">
+        <tr class="tr_hui">
+            <td style="width: 180px;font-weight: bold; font-size: 16px;">
+                合计报价金额：
+            </td>
+            <td style="text-align: left; padding-left: 5px; font-weight: bold; font-size: 16px;">
+                <asp:Label ID="labQuoteTotalPrice" runat="server" Text="0"></asp:Label>
+                <asp:HiddenField ID="hfQuoteTotalPrice" runat="server" Value="0" />
+                <asp:HiddenField ID="hfQuoteTotalArea" runat="server" Value="0" />
+                <asp:HiddenField ID="hfQuoteTotalPrice1" runat="server" Value="0" />
+            </td>
+        </tr>
+    </table>
     </form>
 </body>
 </html>
-<script src="js/addQuotation.js" type="text/javascript"></script>
+<script src="js/checkQuotation.js" type="text/javascript"></script>

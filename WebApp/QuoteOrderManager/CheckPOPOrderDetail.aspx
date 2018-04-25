@@ -22,6 +22,15 @@
                     <asp:Label ID="labSheet" runat="server" Text=""></asp:Label>
                 </td>
             </tr>
+            <tr class="tr_bai">
+                <td style=" height:35px;">
+                    订单导出
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:Button ID="btnExport" runat="server" Text="导 出"  
+                        CssClass="layui-btn layui-btn-small" onclick="btnExport_Click"/>
+                </td>
+            </tr>
         </table>
         <div style=" width:100%; overflow:auto;">
         <asp:Repeater ID="CheckPOPOrderRepeater" runat="server">

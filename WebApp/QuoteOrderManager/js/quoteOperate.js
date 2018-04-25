@@ -106,4 +106,21 @@ function editItem(id) {
     });
 }
 
+function checkItem(id) {
+    var url = "CheckQuotation.aspx?itemId=" + id;
+    layer.open({
+        type: 2,
+        time: 0,
+        title: '查看报价单',
+        skin: 'layui-layer-rim', //加上边框
+        area: ['95%', '90%'],
+        content: url,
+        id: 'layer1',
+
+        cancel: function (index) {
+            layer.closeAll();
+        }
+
+    });
+}
 

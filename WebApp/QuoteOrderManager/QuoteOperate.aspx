@@ -169,7 +169,7 @@
                                     <%#Eval("order.AddDate")%>
                                 </td>
                                 <td>
-                                    <span name="spanCheckQuote" data-itemid='<%#Eval("order.Id")%>' style=" cursor:pointer;color:Blue;">查看</span>
+                                    <span  onclick="checkItem('<%#Eval("order.Id")%>')" style=" cursor:pointer;color:Blue;">查看</span>
                                     &nbsp;
                                     |
                                     <%--<span name="spanEditQuote" data-itemid='<%#Eval("order.Id")%>' style=" cursor:pointer;color:Blue;">编辑</span>--%>

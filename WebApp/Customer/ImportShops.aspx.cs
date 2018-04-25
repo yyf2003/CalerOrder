@@ -605,6 +605,15 @@ namespace WebApp.Customer
                     bool isShut = false;
                     bool isInstall0 = false;
                     isexist = CheckShop(shopNo, out shopId, out isShut, out isInstall0);
+                    if (isexist)
+                    {
+
+                    }
+                    else if (string.IsNullOrWhiteSpace(outsourceName))
+                    {
+                        canSave = false;
+                        errorMsg.Append("请填写外协名称；");
+                    }
                     if (!isexist && !string.IsNullOrWhiteSpace(shopName) && ShopNameIsExist(shopName))
                     {
                         canSave = false;
@@ -616,7 +625,7 @@ namespace WebApp.Customer
                         shopNoList.Add(shopNo.ToUpper());
                         
                         if (isShut)
-                            errorMsg.Append("该店铺编号已经标志删除；");
+                            errorMsg.Append("该店铺已经删除；");
                         shopModel = new Models.Shop();
                         if (isexist)
                         {
