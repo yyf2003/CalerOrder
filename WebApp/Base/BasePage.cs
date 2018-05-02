@@ -643,6 +643,51 @@ namespace WebApp
             }
 
         }
+
+        public List<FinalOrderDetailTemp> StatisticPOPTotalPrice(IEnumerable<FinalOrderDetailTemp> orderList)
+        {
+            List<FinalOrderDetailTemp> list = new List<FinalOrderDetailTemp>();
+            if (orderList.Any())
+            {
+                orderList.ToList().ForEach(s =>
+                {
+                    FinalOrderDetailTemp model = s;
+                    decimal area = 0;
+                    decimal width = s.GraphicWidth ?? 0;
+                    decimal length = s.GraphicLength ?? 0;
+                    string GraphicMaterial = s.GraphicMaterial ?? "";
+                    if (width > 0 && length > 0 && !string.IsNullOrWhiteSpace(GraphicMaterial))
+                    {
+                        
+                        if (GraphicMaterial.Contains("挂轴"))
+                        {
+
+                            if (GraphicMaterial.Contains("+挂轴") || GraphicMaterial.Contains("+上挂轴") || GraphicMaterial.Contains("+下挂轴"))
+                            {
+                                area += ((width * length) / 1000000) * (s.Quantity ?? 1);
+                                if (GraphicMaterial.Contains("+挂轴"))
+                                    area += (width / 1000) * 2 * (s.Quantity ?? 1);
+                                else
+                                    area += (width / 1000) * (s.Quantity ?? 1);
+                            }
+                            else
+                            {
+                                area += (width / 1000) * 2 * (s.Quantity ?? 1);
+                            }
+
+                        }
+                        else
+                        {
+                            area += ((width * length) / 1000000) * (s.Quantity ?? 1);
+                        }
+                    }
+                    model.Area = area;
+                    list.Add(model);
+                });
+                
+            }
+            return list;
+        }
         /// <summary>
         /// 统计报价订单pop的价格和面积
         /// </summary>

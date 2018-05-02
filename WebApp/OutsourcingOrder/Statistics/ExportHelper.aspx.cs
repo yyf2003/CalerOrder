@@ -105,13 +105,17 @@ namespace WebApp.OutsourcingOrder.Statistics
                 cityList = StringHelper.ToStringList(city, ',');
             }
             List<OrderPriceDetail> newOrderList = new List<OrderPriceDetail>();
+            #region
             guidanceList.ForEach(gid => {
 
                 //是否全部三叶草
                 bool isBCSSubject = false;
 
                 var orderList0 = (from order in CurrentContext.DbContext.OutsourceOrderDetail
-                                
+                                  join guidance in CurrentContext.DbContext.SubjectGuidance
+                                  on order.GuidanceId equals guidance.ItemId
+                                  join outsource in CurrentContext.DbContext.Company
+                                  on order.OutsourceId equals outsource.Id
                                   join subject1 in CurrentContext.DbContext.Subject
                                   on order.SubjectId equals subject1.Id into subjectTemp
                                   from subject in subjectTemp.DefaultIfEmpty()
@@ -123,8 +127,9 @@ namespace WebApp.OutsourcingOrder.Statistics
                                  {
                                      order,
                                      //assign,
-                                     subject
-                                     //guidance
+                                     subject,
+                                     guidance,
+                                     outsource
                                  }).ToList();
                 var orderList = orderList0;
                 if (subjectList.Any())
@@ -220,6 +225,8 @@ namespace WebApp.OutsourcingOrder.Statistics
                             orderModel.ReceiveTotalPrice = double.Parse((s.order.ReceiveTotalPrice ?? 0).ToString());
                         }
                         orderModel.Remark = s.order.Remark;
+                        orderModel.GuidanceName = s.guidance.ItemName;
+                        orderModel.OutsourceName = s.outsource.CompanyName;
                         newOrderList.Add(orderModel);
 
                     });
@@ -322,6 +329,8 @@ namespace WebApp.OutsourcingOrder.Statistics
                             orderModel.UnitPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
                             orderModel.ReceiveUnitPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
                             orderModel.ReceiveTotalPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
+                            orderModel.GuidanceName = s.guidance.ItemName;
+                            orderModel.OutsourceName = s.outsource.CompanyName;
                             newOrderList.Add(orderModel);
                         });
                     }
@@ -355,6 +364,8 @@ namespace WebApp.OutsourcingOrder.Statistics
                             orderModel.UnitPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
                             orderModel.ReceiveUnitPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
                             orderModel.ReceiveTotalPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
+                            orderModel.GuidanceName = s.guidance.ItemName;
+                            orderModel.OutsourceName = s.outsource.CompanyName;
                             newOrderList.Add(orderModel);
                         });
                     }
@@ -362,7 +373,8 @@ namespace WebApp.OutsourcingOrder.Statistics
 
                 }
             });
-            //特殊外协费用
+            #endregion
+            #region 特殊外协费用
             if (!string.IsNullOrWhiteSpace(guidanceMonth) && StringHelper.IsDateTime(guidanceMonth))
             {
                 decimal installPrice = 0;
@@ -477,6 +489,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                     newOrderList.Add(orderModel);
                 }
             }
+            #endregion
             //
             if (newOrderList.Any())
             {
@@ -494,7 +507,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                     IRow dataRow = sheet.GetRow(startRow);
                     if (dataRow == null)
                         dataRow = sheet.CreateRow(startRow);
-                    for (int i = 0; i < 20; i++)
+                    for (int i = 0; i < 21; i++)
                     {
                         ICell cell = dataRow.GetCell(i);
                         if (cell == null)
@@ -522,18 +535,20 @@ namespace WebApp.OutsourcingOrder.Statistics
                     dataRow.GetCell(14).SetCellValue(s.Quantity);
                     dataRow.GetCell(15).SetCellValue(s.TotalPrice);
                     dataRow.GetCell(16).SetCellValue(s.ReceiveTotalPrice);
-                    dataRow.GetCell(17).SetCellValue(s.SubjectName);
-                    dataRow.GetCell(18).SetCellValue(s.Remark);
+                    dataRow.GetCell(17).SetCellValue(s.GuidanceName);
+                    dataRow.GetCell(18).SetCellValue(s.SubjectName);
+                    dataRow.GetCell(19).SetCellValue(s.Remark);
+                    dataRow.GetCell(20).SetCellValue(s.OutsourceName);
                     startRow++;
                 });
-                HttpCookie cookie = Request.Cookies["项目费用统计明细"];
-                if (cookie == null)
-                {
-                    cookie = new HttpCookie("项目费用统计明细");
-                }
-                cookie.Value = "1";
-                cookie.Expires = DateTime.Now.AddMinutes(30);
-                Response.Cookies.Add(cookie);
+                //HttpCookie cookie = Request.Cookies["项目费用统计明细"];
+                //if (cookie == null)
+                //{
+                //    cookie = new HttpCookie("项目费用统计明细");
+                //}
+                //cookie.Value = "1";
+                //cookie.Expires = DateTime.Now.AddMinutes(30);
+                //Response.Cookies.Add(cookie);
                 using (MemoryStream ms = new MemoryStream())
                 {
                     workBook.Write(ms);
@@ -551,17 +566,17 @@ namespace WebApp.OutsourcingOrder.Statistics
                 }
             }
 
-            else
-            {
-                HttpCookie cookie = Request.Cookies["项目费用统计明细"];
-                if (cookie == null)
-                {
-                    cookie = new HttpCookie("项目费用统计明细");
-                }
-                cookie.Value = "1";
-                cookie.Expires = DateTime.Now.AddMinutes(30);
-                Response.Cookies.Add(cookie);
-            }
+            //else
+            //{
+            //    HttpCookie cookie = Request.Cookies["项目费用统计明细"];
+            //    if (cookie == null)
+            //    {
+            //        cookie = new HttpCookie("项目费用统计明细");
+            //    }
+            //    cookie.Value = "1";
+            //    cookie.Expires = DateTime.Now.AddMinutes(30);
+            //    Response.Cookies.Add(cookie);
+            //}
         }
 
         void ExportDetailByDate()

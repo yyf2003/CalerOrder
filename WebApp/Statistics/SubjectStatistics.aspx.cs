@@ -27,6 +27,7 @@ namespace WebApp.Statistics
         string subjectEndDate = string.Empty;
         string shopType = string.Empty;
         List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+        List<InstallPriceShopInfo> installPriceList = new List<InstallPriceShopInfo>();
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["subjectId"] != null)
@@ -57,14 +58,7 @@ namespace WebApp.Statistics
             {
                 customerServiceId = Request.QueryString["customerServiceId"];
             }
-            //if (Request.QueryString["subjectBeginDate"] != null)
-            //{
-            //    subjectBeginDate = Request.QueryString["subjectBeginDate"];
-            //}
-            //if (Request.QueryString["subjectEndDate"] != null)
-            //{
-            //    subjectEndDate = Request.QueryString["subjectEndDate"];
-            //}
+           
             if (!IsPostBack)
             {
                 Subject subjectModel = new SubjectBLL().GetModel(subjectId);
@@ -114,8 +108,7 @@ namespace WebApp.Statistics
                         on order.SubjectId equals subject.Id
                         where order.SubjectId == subjectId && (order.IsDelete == null || order.IsDelete == false)
                         && ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || (order.OrderType >1))
-                       
-                              select new { order, shop, subject }).ToList();
+                        select new { order, shop, subject }).ToList();
             List<string> regionList1 = new List<string>();
             List<string> provinceList1 = new List<string>();
             List<string> cityList1 = new List<string>();
@@ -232,20 +225,14 @@ namespace WebApp.Statistics
                 if(customerServiceList.Any())
                     orderList1 = orderList1.Where(s => customerServiceList.Contains(s.shop.CSUserId??0)).ToList();
             }
-            //if (!string.IsNullOrWhiteSpace(subjectBeginDate))
-            //{
-            //    DateTime beginDate = DateTime.Parse(subjectBeginDate);
-            //    orderList1 = orderList1.Where(s => s.subject.AddDate >= beginDate).ToList();
-            //    if (!string.IsNullOrWhiteSpace(subjectEndDate))
-            //    {
-            //        DateTime endDate = DateTime.Parse(subjectEndDate).AddDays(1);
-            //        orderList1 = orderList1.Where(s => s.subject.AddDate < endDate).ToList();
-            //    }
-            //}
+           
             orderList = orderList1.Select(s => s.order).ToList();
             List<int> shopIdList = orderList1.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
-            //decimal installPrice = new ShopBLL().GetList(s => shopIdList.Contains(s.Id)).Select(s => s.InstallPrice ?? 0).Sum();
-            
+            int guidanceId = orderList1[0].subject.GuidanceId ?? 0;
+            if (guidanceId > 0)
+            {
+                installPriceList = new InstallPriceShopInfoBLL().GetList(s=>s.GuidanceId==guidanceId && s.SubjectId==subjectId);
+            }
             decimal area = 0;
             decimal popPrice = 0;
             
@@ -269,7 +256,6 @@ namespace WebApp.Statistics
                 labPOPPrice.Text = "0";
             }
             
-           
             var materialOrderList = (from materialOrder in CurrentContext.DbContext.OrderMaterial
                                      join shop in CurrentContext.DbContext.Shop
                                      on materialOrder.ShopId equals shop.Id
@@ -308,16 +294,7 @@ namespace WebApp.Statistics
             if (customerServiceList.Any())
                 materialOrderList = materialOrderList.Where(s => customerServiceList.Contains(s.shop.CSUserId ?? 0)).ToList();
 
-            //if (!string.IsNullOrWhiteSpace(subjectBeginDate))
-            //{
-            //    DateTime beginDate = DateTime.Parse(subjectBeginDate);
-            //    materialOrderList = materialOrderList.Where(s => s.subject.AddDate >= beginDate).ToList();
-            //    if (!string.IsNullOrWhiteSpace(subjectEndDate))
-            //    {
-            //        DateTime endDate = DateTime.Parse(subjectEndDate).AddDays(1);
-            //        materialOrderList = materialOrderList.Where(s => s.subject.AddDate < endDate).ToList();
-            //    }
-            //}
+           
             if (materialOrderList.Any())
             {
                 
@@ -363,27 +340,26 @@ namespace WebApp.Statistics
                 {
                     object shopIdObj = item.GetType().GetProperty("Id").GetValue(item, null);
                     int shopId = shopIdObj != null ? int.Parse(shopIdObj.ToString()) : 0;
-                    object installPriceObj = item.GetType().GetProperty("InstallPrice").GetValue(item,null);
-                    decimal installPrice = installPriceObj != null ? decimal.Parse(installPriceObj.ToString()) : 0;
                     var shopOrderList = orderList.Where(s => s.ShopId == shopId).ToList();
 
                    
                     Label areaLab = (Label)e.Item.FindControl("labArea");
                     Label POPPriceLab = (Label)e.Item.FindControl("labPOPPrice");
                     Label labMaterialPrice = (Label)e.Item.FindControl("labMaterialPrice");
-                    
-                    //Label subTotalLab = (Label)e.Item.FindControl("labSubTotal");
-                    
+
+                    Label labInstallPrice = (Label)e.Item.FindControl("labInstallPrice");
+                    Label labMeasurePrice = (Label)e.Item.FindControl("labMeasurePrice");
+                    Label labOtherPrice = (Label)e.Item.FindControl("labOtherPrice");
+
                     decimal area = 0;
                     decimal popPrice = 0;
-                    
-
+                    decimal installPrice = 0;
                     
                     //StatisticPOPPrice(shopOrderList, out popPrice, out area);
                     StatisticPOPTotalPrice(shopOrderList, out popPrice, out area);
                     areaLab.Text = area.ToString();
-                    
 
+                   
                     if (popPrice > 0)
                     {
                         POPPriceLab.Text = Math.Round(popPrice, 2).ToString();
@@ -391,12 +367,38 @@ namespace WebApp.Statistics
                         //POPPriceLab.Attributes.Add("data-shopid", shopId.ToString());
                         //POPPriceLab.Attributes.Add("name", "checkPOPPrice");
                     }
+                    var installPriceOrderList = shopOrderList.Where(s => s.OrderType == (int)OrderTypeEnum.安装费 && (s.OrderPrice ?? 0) > 0).ToList();
+                    if (installPriceOrderList.Any())
+                    {
+                        installPrice = installPriceOrderList.Sum(s => s.OrderPrice ?? 0);
+                    }
+                    var installList = installPriceList.Where(s => s.ShopId == shopId).ToList();
+                    if (installList.Any())
+                    {
+                        installPrice += (installList.Sum(s => (s.BasicPrice ?? 0) + (s.OOHPrice ?? 0) + (s.WindowPrice ?? 0)));
+                    }
+                    if (installPrice > 0)
+                    {
+                        labInstallPrice.Text = Math.Round(installPrice, 2).ToString();
+                    }
+                    var measurePriceOrderList = shopOrderList.Where(s => s.OrderType == (int)OrderTypeEnum.测量费 && (s.OrderPrice ?? 0) > 0).ToList();
+                    if (measurePriceOrderList.Any())
+                    {
+                        decimal measurePrice = measurePriceOrderList.Sum(s => s.OrderPrice ?? 0);
+                        labMeasurePrice.Text = Math.Round(measurePrice, 2).ToString();
+                    }
                     if (materialPriceDic.Keys.Contains(shopId))
                     {
                         labMaterialPrice.Text = Math.Round(materialPriceDic[shopId], 2).ToString();
                         //labMaterialPrice.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
                         //labMaterialPrice.Attributes.Add("data-shopid", shopId.ToString());
                         //labMaterialPrice.Attributes.Add("name", "checkMaterialOrderPrice");
+                    }
+                    var otherPriceOrderList = shopOrderList.Where(s => s.OrderType == (int)OrderTypeEnum.其他费用 && (s.OrderPrice ?? 0) > 0).ToList();
+                    if (otherPriceOrderList.Any())
+                    {
+                        decimal otherPrice = otherPriceOrderList.Sum(s => s.OrderPrice ?? 0);
+                        labOtherPrice.Text = Math.Round(otherPrice, 2).ToString();
                     }
                 }
             }

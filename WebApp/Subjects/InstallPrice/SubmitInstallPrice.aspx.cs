@@ -113,11 +113,12 @@ namespace WebApp.Subjects.InstallPrice
                 if (orderList.Any())
                 {
                     genericOrderList = orderList.Where(s => s.subjectCategory != null && s.subjectCategory.CategoryName.Contains("常规-非活动")).Select(s => s.order).ToList();
+                    List<int> orderIdList0 = new List<int>();
                     if (genericOrderList.Any())
                     {
-                        List<int> orderIdList0 = genericOrderList.Select(s => s.Id).ToList();
-                        notGenericOrderList = orderList.Where(s => !orderIdList0.Contains(s.order.Id)).Select(s => s.order).ToList();
+                        orderIdList0 = genericOrderList.Select(s => s.Id).ToList();
                     }
+                    notGenericOrderList = orderList.Where(s => !orderIdList0.Contains(s.order.Id)).Select(s => s.order).ToList();
                     Session["orderDetailInstallPrice"] = orderList.Select(s => s.order).ToList();
                     Session["notGenericOrderInstallPrice"] = notGenericOrderList;
                     Session["genericOrderInstallPrice"] = genericOrderList;

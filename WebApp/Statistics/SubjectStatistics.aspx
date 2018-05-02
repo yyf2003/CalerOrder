@@ -155,13 +155,18 @@
                     <td>
                         POP金额(元)
                     </td>
+                    <td>
+                        安装费(元)
+                    </td>
+                     <td>
+                        测量费(元)
+                    </td>
                      <td>
                         物料费用(元)
                     </td>
-                    
-                    <%--<td>
-                        统计金额(元)
-                    </td>--%>
+                    <td>
+                        其他费用(元)
+                    </td>
                     <td>
                         订单明细
                     </td>
@@ -202,8 +207,20 @@
                     <asp:Label ID="labPOPPrice" runat="server" Text="0"></asp:Label>
                 </td>
                 <td>
+                    <%--安装费--%>
+                    <asp:Label ID="labInstallPrice" runat="server" Text="0"></asp:Label>
+                </td>
+                <td>
+                    <%--测量费--%>
+                    <asp:Label ID="labMeasurePrice" runat="server" Text="0"></asp:Label>
+                </td>
+                <td>
                     <%--物料费用--%>
                     <asp:Label ID="labMaterialPrice" runat="server" Text="0"></asp:Label>
+                </td>
+                <td>
+                    <%--其他费用--%>
+                    <asp:Label ID="labOtherPrice" runat="server" Text="0"></asp:Label>
                 </td>
                 <td>
                    <asp:LinkButton ID="lbCheck" runat="server" CommandArgument='<%#Eval("Id") %>' CommandName="Check">查看</asp:LinkButton>
@@ -215,7 +232,7 @@
             <%if (gvList.Items.Count == 0)
               {%>
             <tr class="tr_bai">
-                <td colspan="11" style="text-align: center;">
+                <td colspan="14" style="text-align: center;">
                     --无数据--
                 </td>
             </tr>

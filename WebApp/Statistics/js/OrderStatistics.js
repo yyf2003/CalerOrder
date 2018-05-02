@@ -323,7 +323,7 @@ $(function () {
         var regions = "";
         var provinces = "";
         var citys = "";
-        
+
         $("input[name^='cblPriceSubjects']:checked").each(function () {
             subjectid += $(this).val() + ",";
         })
@@ -405,10 +405,7 @@ $(function () {
             alert("请选择活动");
             return false;
         }
-        //            if (subjectIds == "") {
-        //                alert("请选择项目");
-        //                return false;
-        //            }
+
         var isExportInstall = 0;
         var installPrice = "";
         var freight = "";
@@ -423,6 +420,66 @@ $(function () {
         $("#exportFrame").attr("src", url);
     })
 
+    //按店统计导出
+    $("#btnExportByShop").click(function () {
+        var guidanceIds = "";
+        var subjectIds = "";
+        var regions = "";
+        var provinces = "";
+        var citys = "";
+        var subjectChannel = 0;
+        var shopType = "";
+        var customerServiceIds = "";
+        var subjectCategory = "";
+        $("input[name^='cblGuidanceList']:checked").each(function () {
+            guidanceIds += $(this).val() + ",";
+        })
+        $("input[name^='cblRegion']:checked").each(function () {
+            regions += $(this).val() + ",";
+        })
+        $("input[name^='cblProvince']:checked").each(function () {
+            provinces += $(this).val() + ",";
+        })
+        $("input[name^='cblCity']:checked").each(function () {
+            citys += $(this).val() + ",";
+        })
+
+        $("input[name^='cblPriceSubjects']:checked").each(function () {
+            subjectIds += $(this).val() + ",";
+        })
+        $("input[name^='cblSubjects']:checked").each(function () {
+            subjectIds += $(this).val() + ",";
+        })
+        if (subjectIds == "") {
+            $("input[name^='cblPriceSubjects']").each(function () {
+                subjectIds += $(this).val() + ",";
+            })
+            $("input[name^='cblSubjects']").each(function () {
+                subjectIds += $(this).val() + ",";
+            })
+        }
+        $("input[name^='cblSubjectChannel']:checked").each(function () {
+            subjectChannel = $(this).val();
+        })
+        $("input[name^='cblShopType']:checked").each(function () {
+            shopType += $(this).val() + ",";
+        })
+        $("input[name^='cblCustomerService']:checked").each(function () {
+            customerServiceIds += $(this).val() + ",";
+        })
+        $("input[name^='cblSubjectCategory']:checked").each(function () {
+            subjectCategory += $(this).val() + ",";
+        })
+        if (guidanceIds == "") {
+            alert("请选择活动");
+            return false;
+        }
+
+        $("#exportWaitingByShop").show();
+        checkExportByShop();
+        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&subjectIds=" + subjectIds + "&regions=" + regions + "&provinces=" + provinces + "&citys=" + citys + "&subjectChannel=" + subjectChannel + "&shopType=" + shopType + "&customerServiceIds=" + customerServiceIds + "&subjectCategory=" + subjectCategory + "&exportType=byShop";
+        $("#exportFrame").attr("src", url);
+    })
     //导出关闭店铺订单明细
     $("#btnExport1").click(function () {
         var guidanceIds = "";
@@ -576,8 +633,26 @@ function checkExport() {
 
                 if (data == "ok") {
                     $("#exportWaiting").hide();
-                    $("#Img1").hide();
                     clearInterval(timer);
+                }
+
+            }
+        })
+
+    }, 1000);
+}
+
+var timer1;
+function checkExportByShop() {
+    timer1 = setInterval(function () {
+        $.ajax({
+            type: "get",
+            url: "handler/CheckExportState.ashx?type=exportByShop",
+            cache: false,
+            success: function (data) {
+                if (data == "ok") {
+                    $("#exportWaitingByShop").hide();
+                    clearInterval(timer1);
                 }
 
             }

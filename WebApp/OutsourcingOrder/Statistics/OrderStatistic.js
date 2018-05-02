@@ -33,6 +33,11 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
     if (eleId.indexOf("cblSubjects") != -1) {
         $("#loadOutsource").show();
     }
+    if (eleId.indexOf("cbAllGuidance") != -1) {
+        $("#loadCategory").show();
+        $("#loadSubject").show();
+        $("#loadOutsource").show();
+    }
 })
 
 
@@ -88,7 +93,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
 
     $("span[name='checkOtherPrice']").click(function () {
         GetCondition();
-       
+
         var url = "CheckOtherPriceDetail.aspx?outsourceId=" + currOutsourceId + "&guidanceId=" + guidanceId + "&region=" + region + "&province=" + province + "&city=" + city + "&assignType=" + assignType;
         layer.open({
             type: 2,
@@ -102,6 +107,39 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             }
         });
     });
+
+    $("#cbAllGuidance").click(function () {
+        var checked = this.checked;
+        $("input[name^='cblGuidanceList']").each(function () {
+            this.checked = checked;
+        })
+
+    });
+
+    $("input[name^='cblGuidanceList']").change(function () {
+        if (!this.checked) {
+            $("#cbAllGuidance").prop("checked", false);
+        }
+        else {
+            var checked = $("input[name^='cblGuidanceList']:checked").length == $("input[name^='cblGuidanceList']").length;
+            $("#cbAllGuidance").prop("checked", checked);
+        }
+    })
+    //var a = '<a id="btnExportDetail" style="float: left;" class="easyui-linkbutton l-btn l-btn-small l-btn-plain"  plain="true"  icon="icon-print">导出明细</a>';
+    //$("#toolbar").html(a);
+
+    $("#btnExportDetail").click(function () {
+        var guidanceId0 = "";
+        $("input[name^='cblGuidanceList']:checked").each(function () {
+            guidanceId0 += $(this).val() + ",";
+        })
+        if (guidanceId0 == "") {
+            layer.msg("请选择活动");
+            return false;
+        }
+        $("#btnExport").click();
+    })
+
 })
 
 

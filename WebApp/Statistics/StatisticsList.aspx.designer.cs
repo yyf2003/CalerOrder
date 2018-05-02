@@ -76,6 +76,33 @@ namespace WebApp.Statistics {
         protected global::System.Web.UI.WebControls.LinkButton lbDown;
         
         /// <summary>
+        /// txtBeginDate 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtBeginDate;
+        
+        /// <summary>
+        /// txtEndDate 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtEndDate;
+        
+        /// <summary>
+        /// lbClearDate 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton lbClearDate;
+        
+        /// <summary>
         /// cblGuidanceList 控件。
         /// </summary>
         /// <remarks>

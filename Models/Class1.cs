@@ -88,6 +88,8 @@ namespace Models
         public double TotalPrice { get; set; }
         public double ReceiveTotalPrice { get; set; }
         public string Remark { get; set; }
+        public string GuidanceName { get; set; }
+        public string OutsourceName { get; set; }
         
     }
 
@@ -101,6 +103,16 @@ namespace Models
         public decimal ReceiveInstallPrice { get; set; }
         public decimal ExpressPrice { get; set; }
         public decimal ReceiveExpressPrice { get; set; }
+        //pop金额
+        public decimal POPPrice { get; set; }
+        //pop总面积
+        public decimal POPArea { get; set; }
+        //测量费
+        public decimal MeasurePrice { get; set; }
+        //物料/道具费用
+        public decimal MaterialPrice { get; set; }
+        //其他费
+        public decimal OtherPrice { get; set; }
     }
 
     public partial class NewMaterialSupport {

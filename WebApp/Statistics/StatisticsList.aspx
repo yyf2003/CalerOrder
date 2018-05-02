@@ -75,6 +75,20 @@
                                     </td>
                                 </tr>
                                 <tr class="tr_bai">
+                                  <td>
+                                     起始时间
+                                  </td>
+                                  <td style="text-align: left; padding-left: 5px;">
+                                      <asp:TextBox ID="txtBeginDate" runat="server" CssClass="Wdate" onclick="WdatePicker({skin:'whyGreen',isShowClear:false,readOnly:true,onpicked:getBeginDate})"
+                                       OnTextChanged="txtBeginDate_TextChanged" AutoPostBack="true"  Style="width: 120px;"></asp:TextBox>
+                                      &nbsp;至&nbsp;
+                                      <asp:TextBox ID="txtEndDate" runat="server" CssClass="Wdate" onclick="WdatePicker({skin:'whyGreen',isShowClear:false,readOnly:true,onpicked:getEndDate})"
+                                                            Style="width: 120px;" OnTextChanged="txtEndDate_TextChanged" AutoPostBack="true"></asp:TextBox>
+                                     &nbsp;&nbsp;&nbsp;&nbsp;<asp:LinkButton ID="lbClearDate" runat="server" onclick="lbClearDate_Click" style=" color:Blue; text-decoration:underline;">清 空</asp:LinkButton>
+
+                                  </td>
+                                </tr>
+                                <tr class="tr_bai">
                                     <td style="width: 120px;">
                                         活动名称
                                     </td>
@@ -677,11 +691,17 @@
 <script src="/layer/layer.js" type="text/javascript"></script>
 <script type="text/javascript">
     function getMonth() {
-
         $("#txtGuidanceMonth").blur();
     }
 
-    
+    function getBeginDate() {
+        $("#txtBeginDate").blur();
+    }
+
+    function getEndDate() {
+        $("#txtEndDate").blur();
+    }
+
     function check() {
         $("#imgSearching").show();
         return true;

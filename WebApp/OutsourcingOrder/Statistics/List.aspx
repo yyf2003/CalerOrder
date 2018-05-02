@@ -127,13 +127,15 @@
                                 <ul class="layui-tab-title">
                                     <li class="layui-this" lay-id="1">统计信息</li>
                                 </ul>
-                                <div id="divContent1" class="layui-tab-content" style="padding: 0px;">
+                                <div id="divContent1" class="layui-tab-content" style="padding: 0px 10px;">
                                     <div class="layui-tab-item layui-show" style="height: 100%;">
                                         <div id="toolbar" style="height: 28px; padding-top: 3px;">
-                                            <a id="btnExportDetail" style="float: left;" class="easyui-linkbutton" plain="true"
-                                                icon="icon-print">导出明细</a>
+                                            <%--<a id="btnExportDetail" style="float: left;" class="easyui-linkbutton" plain="true"
+                                                icon="icon-print">导出明细</a>--%>
+                                            <span id="btnExportDetail" class="layui-btn layui-btn-small layui-btn-primary layui-btn-small">
+                                                <i class="layui-icon">&#xe61e;</i> 导出明细 </span>
                                         </div>
-                                        <div>
+                                        <div style="margin-top: 15px;">
                                             <table class="table">
                                                 <tr class="tr_hui">
                                                     <td style="width: 100px;">
@@ -280,18 +282,17 @@
                                     <asp:DropDownList ID="ddlCustomer1" runat="server" Style="height: 23px;">
                                     </asp:DropDownList>
                                 </td>
-                               
                             </tr>
-                             <tr class="tr_bai">
+                            <tr class="tr_bai">
                                 <td>
                                     时间
                                 </td>
                                 <td style="text-align: left; padding-left: 5px;">
-                                   <input type="text" id="txtBeginDate1" onclick="WdatePicker()" class="Wdate"/>
-                                   —
-                                   <input type="text" id="txtEndDate1" onclick="WdatePicker()" class="Wdate"/>
-                                   <input type="button" id="btnGetProvince" value="获取" class="easyui-linkbutton" style="width: 65px;
-                                        height: 26px; margin-left:20px;" />
+                                    <input type="text" id="txtBeginDate1" onclick="WdatePicker()" class="Wdate" />
+                                    —
+                                    <input type="text" id="txtEndDate1" onclick="WdatePicker()" class="Wdate" />
+                                    <input type="button" id="btnGetProvince" value="获取" class="easyui-linkbutton" style="width: 65px;
+                                        height: 26px; margin-left: 20px;" />
                                     <img id="Img1" src="/image/WaitImg/loadingA.gif" style="display: none;" />
                                 </td>
                             </tr>
@@ -299,7 +300,7 @@
                                 <td>
                                     省份
                                 </td>
-                                <td  style="text-align: left; padding-left: 5px;">
+                                <td style="text-align: left; padding-left: 5px;">
                                     <img id="ImgLoadProvince1" src="/image/WaitImg/loadingA.gif" style="display: none;" />
                                     <div id="provinceDiv1" style="width: 90%;">
                                     </div>
@@ -337,7 +338,7 @@
                                 </td>
                             </tr>
                         </table>
-                         <div>
+                        <div>
                             <div class="layui-tab layui-tab-card">
                                 <ul class="layui-tab-title">
                                     <li class="layui-this" lay-id="1">统计信息</li>

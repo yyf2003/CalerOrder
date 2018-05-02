@@ -59,6 +59,18 @@ namespace WebApp.Statistics.handler
 
                     }
                     break;
+                case "exportByShop":
+                    HttpCookie cookie2 = context.Request.Cookies["项目费用统计-按店统计"];
+                    result = cookie2 != null ? cookie2.Value : "0";
+                    if (result == "1")
+                    {
+                        cookie2.Value = "0";
+                        cookie2.Expires = DateTime.Now.AddMinutes(30);
+                        context.Response.Cookies.Add(cookie2);
+                        result = "ok";
+
+                    }
+                    break;
             }
             context.Response.Write(result);
         }

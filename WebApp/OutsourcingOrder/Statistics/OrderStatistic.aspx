@@ -71,6 +71,7 @@
                             <div id="loadGuidance" style="display: none;">
                                 <img src="/image/WaitImg/loadingA.gif" />
                             </div>
+                            <asp:CheckBox ID="cbAllGuidance" runat="server" AutoPostBack="true" />全选<br />
                             <asp:CheckBoxList ID="cblGuidanceList" runat="server" CssClass="cbl" CellSpacing="20"
                                 RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
                                 OnSelectedIndexChanged="cblGuidanceList_SelectedIndexChanged">
@@ -191,8 +192,16 @@
                 <ul class="layui-tab-title">
                     <li class="layui-this" lay-id="1">统计信息</li>
                 </ul>
-                <div id="divContent1" class="layui-tab-content" style="padding:0px 10px;">
-                
+                <div id="divContent1" class="layui-tab-content" style="padding: 0px 10px;">
+                    <div id="toolbar" style="height: 28px; padding-top: 3px; font-size: 13px;">
+                        <%-- <a id="btnExportDetail" style="float: left;" class="easyui-linkbutton l-btn l-btn-small l-btn-plain"  plain="true"
+                            icon="icon-print">导出明细</a>--%>
+                        <span id="btnExportDetail" class="layui-btn layui-btn-primary layui-btn-small">
+                            <i class="layui-icon">&#xe61e;</i>
+                            导出明细
+                        </span>
+                        
+                    </div>
                     <div style="margin-top: 15px;">
                         <table class="table">
                             <tr class="tr_hui">
@@ -325,11 +334,11 @@
                             </tr>
                         </table>
                     </div>
-                
                 </div>
             </div>
         </ContentTemplate>
     </asp:UpdatePanel>
+    <asp:Button ID="btnExport" runat="server" Text="" onclick="btnExport_Click" style=" display:none;"/>
     </form>
 </body>
 </html>

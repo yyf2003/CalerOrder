@@ -32,6 +32,7 @@ namespace WebApp.Statistics.handler
         string shopType = string.Empty;
         string customerServiceIds = string.Empty;
         string subjectCategory = string.Empty;
+        string exportType = string.Empty;
         public void ProcessRequest(HttpContext context)
         {
             context1 = context;
@@ -69,7 +70,14 @@ namespace WebApp.Statistics.handler
             {
                 subjectCategory = context.Request.QueryString["subjectCategory"];
             }
-            Export();
+            if (context.Request.QueryString["exportType"] != null)
+            {
+                exportType = context.Request.QueryString["exportType"];
+            }
+            if (exportType == "byShop")
+                ExportByShop();
+            else
+                Export();
         }
 
         void Export()
@@ -1009,7 +1017,304 @@ namespace WebApp.Statistics.handler
 
         }
 
+        //按店统计导出
+        void ExportByShop()
+        {
+            if (!string.IsNullOrWhiteSpace(guidanceIds))
+            {
+                List<int> guidanceIdList = new List<int>();
+                List<int> subjectIdList = new List<int>();
+                List<string> regionList = new List<string>();
+                List<string> provinceList = new List<string>();
+                List<string> cityList = new List<string>();
+                List<string> shopTypeList = new List<string>();
+                List<int> customerServiceList = new List<int>();
+                List<int> subjectCategoryList = new List<int>();
+                guidanceIdList = StringHelper.ToIntList(guidanceIds, ',');
+                if (!string.IsNullOrWhiteSpace(subjectIds))
+                    subjectIdList = StringHelper.ToIntList(subjectIds, ',');
 
+                if (!string.IsNullOrWhiteSpace(customerServiceIds))
+                {
+                    customerServiceList = StringHelper.ToIntList(customerServiceIds, ',');
+                }
+                if (!string.IsNullOrWhiteSpace(subjectCategory))
+                {
+                    subjectCategoryList = StringHelper.ToIntList(subjectCategory, ',');
+                }
+
+                string guidanceName = string.Empty;
+                //List<OrderPriceDetail> newOrderList = new List<OrderPriceDetail>();
+                //OrderPriceDetail orderModel;
+                if (guidanceIdList.Any())
+                {
+
+                    if (!string.IsNullOrWhiteSpace(regions))
+                    {
+                        regionList = StringHelper.ToStringList(regions, ',', LowerUpperEnum.ToLower);
+                    }
+                    else
+                    {
+                        new BasePage().GetResponsibleRegion.ForEach(s =>
+                        {
+                            regionList.Add(s.ToLower());
+                        });
+
+                    }
+                    var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                     join shop in CurrentContext.DbContext.Shop
+                                     on order.ShopId equals shop.Id
+                                     join subject in CurrentContext.DbContext.Subject
+                                     on order.SubjectId equals subject.Id
+                                     join guindance in CurrentContext.DbContext.SubjectGuidance
+                                     on order.GuidanceId equals guindance.ItemId
+                                     where guidanceIdList.Contains(order.GuidanceId ?? 0)
+                                    && (subject.IsDelete == null || subject.IsDelete == false)
+                                    && (subject.ApproveState == 1)
+                                    && (order.IsDelete == null || order.IsDelete == false)
+                                     && (regionList.Any() ? regionList.Contains(order.Region.ToLower()) : 1 == 1)
+                                     select new
+                                     {
+                                         order,
+                                         shop,
+                                         subject,
+                                         guindance
+
+                                     }).ToList();
+
+                    if (!string.IsNullOrWhiteSpace(shopType))
+                    {
+                        shopTypeList = StringHelper.ToStringList(shopType, ',');
+
+                    }
+                    if (subjectCategoryList.Any())
+                    {
+                        if (subjectCategoryList.Contains(0))
+                        {
+                            subjectCategoryList.Remove(0);
+                            if (subjectCategoryList.Any())
+                            {
+                                orderList = orderList.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0) || (s.subject.SubjectCategoryId == null || s.subject.SubjectCategoryId == 0)).ToList();
+
+                            }
+                            else
+                            {
+                                orderList = orderList.Where(s => s.subject.SubjectCategoryId == null || s.subject.SubjectCategoryId == 0).ToList();
+
+                            }
+                        }
+                        else
+                        {
+                            orderList = orderList.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0)).ToList();
+
+                        }
+                    }
+                    if (subjectChannel == 1)
+                    {
+                        //上海系统单
+                        orderList = orderList.Where(s => s.order.IsFromRegion == null || s.order.IsFromRegion == false).ToList();
+
+                    }
+                    else if (subjectChannel == 2)
+                    {
+                        //分区订单
+                        orderList = orderList.Where(s => s.order.IsFromRegion == true).ToList();
+
+                    }
+
+                    if (shopTypeList.Any())
+                    {
+                        if (shopTypeList.Contains("空"))
+                        {
+                            shopTypeList.Remove("空");
+                            if (shopTypeList.Any())
+                            {
+                                orderList = orderList.Where(s => shopTypeList.Contains(s.shop.ShopType) || (s.shop.ShopType == null || s.shop.ShopType == "")).ToList();
+
+                            }
+                            else
+                            {
+                                orderList = orderList.Where(s => (s.shop.ShopType == null || s.shop.ShopType == "")).ToList();
+
+                            }
+                        }
+                        else
+                        {
+                            orderList = orderList.Where(s => shopTypeList.Contains(s.shop.ShopType)).ToList();
+
+                        }
+                    }
+                    if (subjectIdList.Any())
+                    {
+                        orderList = orderList.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
+
+                    }
+
+
+                    if (regionList.Any())
+                    {
+                        if (!string.IsNullOrWhiteSpace(provinces))
+                        {
+                            provinceList = StringHelper.ToStringList(provinces, ',');
+                            if (provinceList.Any())
+                            {
+                                orderList = orderList.Where(s => provinceList.Contains(s.order.Province)).ToList();
+
+                                if (!string.IsNullOrWhiteSpace(citys))
+                                {
+                                    cityList = StringHelper.ToStringList(citys, ',');
+                                    if (cityList.Any())
+                                    {
+                                        orderList = orderList.Where(s => cityList.Contains(s.order.City)).ToList();
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (customerServiceList.Any())
+                    {
+                        if (customerServiceList.Contains(0))
+                        {
+                            customerServiceList.Remove(0);
+                            if (customerServiceList.Any())
+                            {
+                                orderList = orderList.Where(s => customerServiceList.Contains(s.shop.CSUserId ?? 0) || (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
+
+                            }
+                            else
+                            {
+                                orderList = orderList.Where(s => (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
+
+                            }
+                        }
+                        else
+                        {
+                            orderList = orderList.Where(s => customerServiceList.Contains(s.shop.CSUserId ?? 0)).ToList();
+
+                        }
+                    }
+                    if (!string.IsNullOrWhiteSpace(status))
+                    {
+                        if (status == "0")
+                        {
+                            orderList = orderList.Where(s => s.order.ShopStatus == null || s.order.ShopStatus == "" || s.order.ShopStatus == "正常").ToList();
+
+                        }
+                        else if (status == "1")
+                        {
+                            orderList = orderList.Where(s => s.order.ShopStatus != null && s.order.ShopStatus.Contains("闭")).ToList();
+
+                        }
+                    }
+                    if (orderList.Any())
+                    {
+                        List<Shop> shopList = orderList.Select(s => s.shop).Distinct().OrderBy(s => s.ShopNo).ToList();
+                        List<int> shopIdList = shopList.Select(s => s.Id).ToList();
+                        List<InstallPriceShopInfo> installPriceList = new InstallPriceShopInfoBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && shopIdList.Contains(s.ShopId??0));
+                        List<Models.ExpressPriceDetail> expressPriceList=new ExpressPriceDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && shopIdList.Contains(s.ShopId??0));
+                        for (int i = 0; i < shopList.Count; i++)
+                        {
+                            Shop model = shopList[i];
+                            var shopOrderList = orderList.Where(s => s.order.ShopId == model.Id).Select(s => s.order).ToList();
+                            decimal popPrice = 0;
+                            decimal area = 0;
+                            decimal installPrice = 0;
+                            decimal measurePrice = 0;
+                            decimal expressPrice = 0;
+                            decimal materialPrice = 0;
+                            decimal otherPrice = 0;
+
+                            new BasePage().StatisticPOPTotalPrice(shopOrderList, out popPrice, out area);
+                            model.POPPrice = popPrice;
+                            model.POPArea = area;
+                            var installOrderList = shopOrderList.Where(s=>s.OrderType==(int)OrderTypeEnum.安装费 && (s.OrderPrice??0)>0).ToList();
+                            if (installOrderList.Any())
+                            {
+                                installPrice += (installOrderList.Sum(s => s.OrderPrice ?? 0));
+                            }
+                            var oneShopInstallPriceList = installPriceList.Where(s => s.ShopId == model.Id).ToList();
+                            if (oneShopInstallPriceList.Any())
+                            {
+                                installPrice += (oneShopInstallPriceList.Sum(s => ((s.BasicPrice ?? 0)) + (s.OOHPrice ?? 0) + (s.WindowPrice ?? 0)));
+                            }
+                            model.InstallPrice = installPrice;
+                            measurePrice = shopOrderList.Where(s => s.OrderType == (int)OrderTypeEnum.测量费 && (s.OrderPrice ?? 0) > 0).Sum(s => s.OrderPrice ?? 0);
+                            model.MeasurePrice = measurePrice;
+                            expressPrice = shopOrderList.Where(s => (s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.运费) && (s.OrderPrice ?? 0) > 0).Sum(s => s.OrderPrice ?? 0);
+                            var oneExpressPriceList = expressPriceList.Where(s => s.ShopId == model.Id).ToList();
+                            if (oneExpressPriceList.Any())
+                            {
+                                expressPrice += (oneExpressPriceList.Sum(s =>s.ExpressPrice??0));
+                            }
+                            model.ExpressPrice=expressPrice;
+                            materialPrice = shopOrderList.Where(s => (s.OrderType == (int)OrderTypeEnum.物料 || s.OrderType == (int)OrderTypeEnum.道具) && (s.OrderPrice ?? 0) > 0).Sum(s => s.OrderPrice ?? 0);
+                            model.MaterialPrice = materialPrice;
+                            otherPrice = shopOrderList.Where(s => s.OrderType == (int)OrderTypeEnum.其他费用 && (s.OrderPrice ?? 0) > 0).Sum(s => s.OrderPrice ?? 0);
+                            model.OtherPrice = otherPrice;
+                        }
+                        string templateFileName = "项目统计-按店统计";
+                        string path = ConfigurationManager.AppSettings["ExportTemplate"];
+                        path = path.Replace("fileName", templateFileName);
+                        FileStream outFile = new FileStream(context1.Server.MapPath(path), FileMode.Open, FileAccess.Read, FileShare.Read);
+                        IWorkbook workBook = WorkbookFactory.Create(outFile, ImportOption.All);
+                        ISheet sheet = workBook.GetSheet("Sheet1");
+                        int startRow = 1;
+                        shopList.ForEach(s =>
+                        {
+                            IRow dataRow = sheet.GetRow(startRow);
+                            if (dataRow == null)
+                                dataRow = sheet.CreateRow(startRow);
+                            for (int i = 0; i < 20; i++)
+                            {
+                                ICell cell = dataRow.GetCell(i);
+                                if (cell == null)
+                                    cell = dataRow.CreateCell(i);
+
+                            }
+                            dataRow.GetCell(0).SetCellValue(s.ShopNo);
+                            dataRow.GetCell(1).SetCellValue(s.ShopName);
+                            dataRow.GetCell(2).SetCellValue(s.RegionName);
+                            dataRow.GetCell(3).SetCellValue(s.ProvinceName);
+                            dataRow.GetCell(4).SetCellValue(s.CityName);
+                            dataRow.GetCell(5).SetCellValue(s.CityTier);
+                            dataRow.GetCell(6).SetCellValue(s.IsInstall);
+                            dataRow.GetCell(7).SetCellValue(s.Channel);
+                            dataRow.GetCell(8).SetCellValue(s.Format);
+                            dataRow.GetCell(9).SetCellValue(double.Parse(s.POPArea.ToString()));
+                            dataRow.GetCell(10).SetCellValue(double.Parse(s.POPPrice.ToString()));
+                            dataRow.GetCell(11).SetCellValue(double.Parse(s.InstallPrice.ToString()));
+                            dataRow.GetCell(12).SetCellValue(double.Parse(s.MeasurePrice.ToString()));
+                            dataRow.GetCell(13).SetCellValue(double.Parse(s.ExpressPrice.ToString()));
+                            dataRow.GetCell(14).SetCellValue(double.Parse(s.MaterialPrice.ToString()));
+                            dataRow.GetCell(15).SetCellValue(double.Parse(s.OtherPrice.ToString()));
+                            decimal total = s.POPPrice + (s.InstallPrice??0) + s.MeasurePrice + s.ExpressPrice + s.MaterialPrice + s.OtherPrice;
+                            total = Math.Round(total, 2);
+                            dataRow.GetCell(16).SetCellValue(double.Parse(total.ToString()));
+                            startRow++;
+                        });
+                        HttpCookie cookie = context1.Request.Cookies["项目费用统计-按店统计"];
+                        if (cookie == null)
+                        {
+                            cookie = new HttpCookie("项目费用统计-按店统计");
+                        }
+                        cookie.Value = "1";
+                        cookie.Expires = DateTime.Now.AddMinutes(30);
+                        context1.Response.Cookies.Add(cookie);
+                        string fileName = "项目费用统计-按店统计";
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            workBook.Write(ms);
+                            ms.Flush();
+                            sheet = null;
+                            workBook = null;
+                            OperateFile.DownLoadFile(ms,fileName);
+
+                        }
+                    }
+                }
+            }
+        }
 
         public bool IsReusable
         {

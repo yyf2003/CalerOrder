@@ -315,9 +315,13 @@
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:CheckBox ID="cbInstallPrice" runat="server" />安装费 &nbsp;&nbsp;
-                    <input type="button" id="btnExport" value="导 出" class="easyui-linkbutton" style="width: 65px;
+                    <input type="button" id="btnExport" value="导出订单明细" class="easyui-linkbutton" style="width: 95px;
                         height: 26px;" />
                     <img id="exportWaiting" style="display: none;" src="../image/WaitImg/loadingA.gif" />
+
+                    <input type="button" id="btnExportByShop" value="按店统计导出" class="easyui-linkbutton" style="width: 95px;
+                        height: 26px; margin-left:30px;" />
+                    <img id="exportWaitingByShop" style="display: none;" src="../image/WaitImg/loadingA.gif" />
                 </td>
             </tr>
         </table>

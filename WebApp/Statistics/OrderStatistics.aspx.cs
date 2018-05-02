@@ -615,32 +615,56 @@ namespace WebApp.Statistics
         //统计
         //项目安装费字典：<项目Id，费用合计>(按店铺统计)
         Dictionary<int, decimal> subjectInstallPriceDic = new Dictionary<int, decimal>();
+
+        Dictionary<int, decimal> areaDic_s = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> areaDic_r = new Dictionary<int, decimal>();
+
+        Dictionary<int, decimal> popPriceDic_s = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> popPriceDic_r = new Dictionary<int, decimal>();
+
+        Dictionary<int, decimal> subjectInstallPriceDic_s = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> subjectInstallPriceDic_r = new Dictionary<int, decimal>();
        
         //二次安装费字典：<项目Id，费用合计>
         Dictionary<int, decimal> secondInstallPriceDic = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> secondInstallPriceDic_s = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> secondInstallPriceDic_r = new Dictionary<int, decimal>();
         //二次发货费字典：<项目Id，费用合计>
         Dictionary<int, decimal> secondExpressPriceDic = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> secondExpressPriceDic_s = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> secondExpressPriceDic_r = new Dictionary<int, decimal>();
 
         //项目快递费字典：<项目Id，费用合计>
         Dictionary<int, decimal> expressPriceDic = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> expressPriceDic_s = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> expressPriceDic_r = new Dictionary<int, decimal>();
         //物料（道具）费用
         Dictionary<int, decimal> materialPriceDic = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> materialPriceDic_s = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> materialPriceDic_r = new Dictionary<int, decimal>();
         //新开店安装费
         Dictionary<int, decimal> newShopInstallPriceDic = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> newShopInstallPriceDic_s = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> newShopInstallPriceDic_r = new Dictionary<int, decimal>();
         //其他费用
         Dictionary<int, decimal> otherPriceDic = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> otherPriceDic_s = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> otherPriceDic_r = new Dictionary<int, decimal>();
         //分区活动安装费
         Dictionary<int, decimal> regionInstallPriceDic = new Dictionary<int, decimal>();
         //分区活动发货费
         Dictionary<int, decimal> regionExpressPriceDic = new Dictionary<int, decimal>();
         //分区新开店测量费
         Dictionary<int, decimal> measurePriceDic = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> measurePriceDic_s = new Dictionary<int, decimal>();
+        Dictionary<int, decimal> measurePriceDic_r = new Dictionary<int, decimal>();
         //分区其他费
         Dictionary<int, decimal> regionOtherPriceDic = new Dictionary<int, decimal>();
 
         void Statistic()
         {
             CleanLab();
+            ClearSeesion();
             guidanceIdList = GetGuidanceSelected();
             subjectIdList = GetSubjectSelected();
             priceSubjectIdList = GetPriceSubjectSelected();
@@ -860,6 +884,33 @@ namespace WebApp.Statistics
             decimal regionOtherPrice = 0;//分区活动其他装费
             decimal regionExpressPrice = 0;//分区活动快递/发货装费
 
+
+
+            //decimal installPrice_s = 0;//安装费-上海
+            decimal secondInstallPrice_s = 0;//二次安装费-上海
+            decimal secondExperssPrice_s = 0;//二次快递费-上海
+            decimal expressPrice_s = 0;//促销快递费-上海
+            //decimal area_s = 0;//面积-上海
+            //decimal popPrice_s = 0;//POP制作费-上海
+            decimal newShopInstallPrice_s = 0;//新开店安装费-上海
+            //decimal freightPrice = 0;//运费-上海
+            decimal otherPrice_s = 0;//其他费用-上海
+            decimal measurePrice_s = 0;//新开店测量费-上海
+            
+
+            //decimal installPrice_r = 0;//安装费-分区
+            decimal secondInstallPrice_r = 0;//二次安装费-分区
+            decimal secondExperssPrice_r = 0;//二次安装费-分区
+            decimal expressPrice_r = 0;//促销快递费-分区
+            //decimal area_r = 0;//面积-分区
+            //decimal popPrice_r = 0;//POP制作费-分区
+            decimal newShopInstallPrice_r = 0;//新开店安装费-分区
+            //decimal freightPrice = 0;//运费-分区
+            decimal otherPrice_r = 0;//其他费用-分区
+            decimal measurePrice_r = 0;//新开店测量费-分区
+            
+
+
             decimal shutShopExpressPrice = 0;//闭店促销快递费
 
             //正常店铺订单
@@ -867,15 +918,81 @@ namespace WebApp.Statistics
             //闭店订单
             var shutShopOrder = orderList.Where(s => (s.order.ShopStatus != null && s.order.ShopStatus.Contains("闭"))).ToList();
 
-
+            //上海（系统）订单
+            var systemOrderList = orderList.Where(s => s.order.IsFromRegion == null || s.order.IsFromRegion == false).ToList();
+            //分区订单
+            var regionOrderList = orderList.Where(s => s.order.IsFromRegion == true).ToList();
 
             List<int> shopIdList = new List<int>();
+            List<int> regionShopIdList = new List<int>();
+
             if (orderList.Any())
             {
 
-                shopIdList = orderList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+                //shopIdList = orderList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+                shopIdList = systemOrderList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+                regionShopIdList = regionOrderList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
                 labSubjectCount.Text = (subjectIdList.Count).ToString();
-                StatisticPOPTotalPrice(orderList.Select(s => s.order), out popPrice, out area);
+                //StatisticPOPTotalPrice(orderList.Select(s => s.order), out popPrice, out area);
+                //StatisticPOPTotalPrice(systemOrderList.Select(s => s.order), out popPrice_s, out area_s);
+                //StatisticPOPTotalPrice(regionOrderList.Select(s => s.order), out popPrice_r, out area_r);
+
+                var systemOrderListPrice1 = StatisticPOPTotalPrice(systemOrderList.Select(s => s.order));
+                var regionOrderListPrice1 = StatisticPOPTotalPrice(regionOrderList.Select(s => s.order));
+
+                if (systemOrderListPrice1.Any())
+                {
+                    systemOrderListPrice1.ForEach(s => {
+                        area+=(s.Area??0);
+                        popPrice += (s.TotalPrice ?? 0);
+                        if (!areaDic_s.Keys.Contains(s.SubjectId ?? 0))
+                        {
+                            areaDic_s.Add(s.SubjectId ?? 0, s.Area??0);
+                        }
+                        else
+                        {
+                            areaDic_s[s.SubjectId ?? 0] = areaDic_s[s.SubjectId ?? 0] + (s.Area ?? 0);
+                        }
+                        if (!popPriceDic_s.Keys.Contains(s.SubjectId ?? 0))
+                        {
+                            popPriceDic_s.Add(s.SubjectId ?? 0, s.TotalPrice ?? 0);
+                        }
+                        else
+                        {
+                            popPriceDic_s[s.SubjectId ?? 0] = popPriceDic_s[s.SubjectId ?? 0] + (s.TotalPrice ?? 0);
+                        }
+                    });
+                    Session["area_s"] = areaDic_s;
+                    Session["popPrice_s"] = popPriceDic_s;
+                }
+                if (regionOrderListPrice1.Any())
+                {
+                    regionOrderListPrice1.ForEach(s =>
+                    {
+                        area += (s.Area ?? 0);
+                        popPrice += (s.TotalPrice ?? 0);
+                        if (!areaDic_r.Keys.Contains(s.SubjectId ?? 0))
+                        {
+                            areaDic_r.Add(s.SubjectId ?? 0, s.Area ?? 0);
+                        }
+                        else
+                        {
+                            areaDic_r[s.SubjectId ?? 0] = areaDic_r[s.SubjectId ?? 0] + (s.Area ?? 0);
+                        }
+                        if (!popPriceDic_r.Keys.Contains(s.SubjectId ?? 0))
+                        {
+                            popPriceDic_r.Add(s.SubjectId ?? 0, s.TotalPrice ?? 0);
+                        }
+                        else
+                        {
+                            popPriceDic_r[s.SubjectId ?? 0] = popPriceDic_r[s.SubjectId ?? 0] + (s.TotalPrice ?? 0);
+                        }
+                    });
+                    Session["area_r"] = areaDic_r;
+                    Session["popPrice_r"] = popPriceDic_r;
+                }
+                //area = area_s + area_r;
+                //popPrice = popPrice_s + popPrice_r;
                 labArea.Text = area > 0 ? (area + "平方米") : "0";
                 if (popPrice > 0)
                 {
@@ -883,29 +1000,58 @@ namespace WebApp.Statistics
                     labPOPPrice.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
                     labPOPPrice.Attributes.Add("name", "checkMaterial");
                 }
-
-
+                
             }
 
-            //快递费用（促销）
+            #region 快递费用（促销）
             //var saleGuidanceList=new SubjectGuidanceBLL().GetList(s=>)
             guidanceIdList.ForEach(gid =>
             {
-                var freightOrderShopList = orderList.Where(s => s.order.GuidanceId == gid && (((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Promotion && (s.guidance.HasExperssFees ?? false) == true) || ((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Delivery))).ToList();
-                if (freightOrderShopList.Any())
+                //var freightOrderShopList = orderList.Where(s => s.order.GuidanceId == gid && (((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Promotion && (s.guidance.HasExperssFees ?? false) == true) || ((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Delivery))).ToList();
+                //if (freightOrderShopList.Any())
+                //{
+                    
+                //    List<int> expressShopIdList = freightOrderShopList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+                //    var expressPriceList = new ExpressPriceDetailBLL().GetList(s => s.GuidanceId == gid && expressShopIdList.Contains(s.ShopId ?? 0)).ToList();
+                //    if (expressPriceList.Any())
+                //    {
+                //        expressPrice += expressPriceList.Sum(s => s.ExpressPrice ?? 0);
+                //    }
+
+
+                //}
+
+                List<int> expressShopIdList_s = new List<int>();
+                var freightOrderShopList_s = systemOrderList.Where(s => s.order.GuidanceId == gid && (((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Promotion && (s.guidance.HasExperssFees ?? false) == true) || ((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Delivery))).ToList();
+                if (freightOrderShopList_s.Any())
                 {
-                    //List<int> expressGuidanceList = freightOrderShopList.Select(s => s.guidance.ItemId).Distinct().ToList();
-                    //var priceOrderList = new PriceOrderDetailBLL().GetList(s => expressGuidanceList.Contains(s.GuidanceId??0) && s.OrderType==(int)OrderTypeEnum.发货费).ToList();
-                    List<int> expressShopIdList = freightOrderShopList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
-                    var expressPriceList = new ExpressPriceDetailBLL().GetList(s => s.GuidanceId == gid && expressShopIdList.Contains(s.ShopId ?? 0)).ToList();
+
+                    expressShopIdList_s = freightOrderShopList_s.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+                    var expressPriceList = new ExpressPriceDetailBLL().GetList(s => s.GuidanceId == gid && expressShopIdList_s.Contains(s.ShopId ?? 0)).ToList();
                     if (expressPriceList.Any())
                     {
-                        expressPrice += expressPriceList.Sum(s => s.ExpressPrice ?? 0);
+                        expressPrice_s += expressPriceList.Sum(s => s.ExpressPrice ?? 0);
+                    }
+
+
+                }
+
+
+                var freightOrderShopList_r = regionOrderList.Where(s => s.order.GuidanceId == gid && (((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Promotion && (s.guidance.HasExperssFees ?? false) == true) || ((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Delivery)) && !expressShopIdList_s.Contains(s.order.ShopId??0)).ToList();
+                if (freightOrderShopList_r.Any())
+                {
+
+                    List<int> expressShopIdList_r = freightOrderShopList_r.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+                    var expressPriceList = new ExpressPriceDetailBLL().GetList(s => s.GuidanceId == gid && expressShopIdList_r.Contains(s.ShopId ?? 0)).ToList();
+                    if (expressPriceList.Any())
+                    {
+                        expressPrice_r += expressPriceList.Sum(s => s.ExpressPrice ?? 0);
                     }
 
 
                 }
             });
+            #endregion
 
 
 
@@ -913,112 +1059,248 @@ namespace WebApp.Statistics
             #region 正常安装费
             guidanceIdList.ForEach(gid =>
             {
-                List<int> installShopIdList = orderList.Where(s => s.order.GuidanceId == gid && s.order.OrderType != (int)OrderTypeEnum.物料 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单).Select(s => s.order.ShopId ?? 0).Distinct().ToList();
-                //List<int> installGuidancIdList = orderList.Where(s => subjectIds.Contains(s.subject.Id) && s.order.OrderType != (int)OrderTypeEnum.物料 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单).Select(s => s.guidance.ItemId).ToList();
-                var installPriceDetailList = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
-                                              //join shop in CurrentContext.DbContext.Shop
-                                              //on installShop.ShopId equals shop.Id
+                //List<int> installShopIdList = orderList.Where(s => s.order.GuidanceId == gid && s.order.OrderType != (int)OrderTypeEnum.物料 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单).Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+                
+                //var installPriceDetailList = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
+                //                              join subject in CurrentContext.DbContext.Subject
+                //                              on installShop.SubjectId equals subject.Id
+                //                              join guidance in CurrentContext.DbContext.SubjectGuidance
+                //                              on installShop.GuidanceId equals guidance.ItemId
+                //                              where
+                //                              installShop.GuidanceId == gid
+                //                              && installShopIdList.Contains(installShop.ShopId ?? 0)
+                //                              && (guidance.ActivityTypeId != (int)GuidanceTypeEnum.Others)//不统计分区增补的安装费
+                //                              && (installShop.BasicPrice ?? 0) > 0
+                //                              select new
+                //                              {
+                //                                  installShop
+                                                
+                //                              }).ToList();
+
+                //if (installPriceDetailList.Any())
+                //{
+                //    decimal installPrice0 = 0;
+                //    installPriceDetailList.ForEach(s =>
+                //    {
+                //        installPrice0 = (s.installShop.BasicPrice ?? 0) + (s.installShop.WindowPrice ?? 0) + (s.installShop.OOHPrice ?? 0);
+                //        if (!subjectInstallPriceDic.Keys.Contains(s.installShop.SubjectId ?? 0))
+                //        {
+                //            subjectInstallPriceDic.Add(s.installShop.SubjectId ?? 0, installPrice0);
+                //        }
+                //        else
+                //        {
+                //            subjectInstallPriceDic[s.installShop.SubjectId ?? 0] = subjectInstallPriceDic[s.installShop.SubjectId ?? 0] + installPrice0;
+
+                //        }
+                //    });
+                //}
+
+                //上海
+                List<int> installShopIdList_s = systemOrderList.Where(s => s.order.GuidanceId == gid && s.order.OrderType != (int)OrderTypeEnum.物料 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单).Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+
+                var installPriceDetailList_s = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
                                               join subject in CurrentContext.DbContext.Subject
                                               on installShop.SubjectId equals subject.Id
                                               join guidance in CurrentContext.DbContext.SubjectGuidance
                                               on installShop.GuidanceId equals guidance.ItemId
                                               where
                                               installShop.GuidanceId == gid
-                                              && installShopIdList.Contains(installShop.ShopId ?? 0)
+                                              && installShopIdList_s.Contains(installShop.ShopId ?? 0)
                                               && (guidance.ActivityTypeId != (int)GuidanceTypeEnum.Others)//不统计分区增补的安装费
                                               && (installShop.BasicPrice ?? 0) > 0
                                               select new
                                               {
                                                   installShop
-                                                 // shop,
-                                                 // subject
+
                                               }).ToList();
 
-                if (installPriceDetailList.Any())
+                if (installPriceDetailList_s.Any())
                 {
-
-
-
-
                     decimal installPrice0 = 0;
-                    installPriceDetailList.ForEach(s =>
+                    installPriceDetailList_s.ForEach(s =>
                     {
                         installPrice0 = (s.installShop.BasicPrice ?? 0) + (s.installShop.WindowPrice ?? 0) + (s.installShop.OOHPrice ?? 0);
-                        if (!subjectInstallPriceDic.Keys.Contains(s.installShop.SubjectId ?? 0))
+                        if (!subjectInstallPriceDic_s.Keys.Contains(s.installShop.SubjectId ?? 0))
                         {
-                            subjectInstallPriceDic.Add(s.installShop.SubjectId ?? 0, installPrice0);
-                            //List<int> list0 = new List<int>() { s.installShop.ShopId??0};
-                            //installShopIdDic.Add(s.installShop.SubjectId ?? 0, list0);
+                            subjectInstallPriceDic_s.Add(s.installShop.SubjectId ?? 0, installPrice0);
                         }
                         else
                         {
-                            subjectInstallPriceDic[s.installShop.SubjectId ?? 0] = subjectInstallPriceDic[s.installShop.SubjectId ?? 0] + installPrice0;
+                            subjectInstallPriceDic_s[s.installShop.SubjectId ?? 0] = subjectInstallPriceDic_s[s.installShop.SubjectId ?? 0] + installPrice0;
 
+                        }
+                    });
+                }
+
+                //分区
+                List<int> installShopIdList_r = regionOrderList.Where(s => s.order.GuidanceId == gid && s.order.OrderType != (int)OrderTypeEnum.物料 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单).Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+
+                var installPriceDetailList_r = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
+                                                join subject in CurrentContext.DbContext.Subject
+                                                on installShop.SubjectId equals subject.Id
+                                                join guidance in CurrentContext.DbContext.SubjectGuidance
+                                                on installShop.GuidanceId equals guidance.ItemId
+                                                where
+                                                installShop.GuidanceId == gid
+                                                && installShopIdList_r.Contains(installShop.ShopId ?? 0)
+                                                && (guidance.ActivityTypeId != (int)GuidanceTypeEnum.Others)//不统计分区增补的安装费
+                                                && (installShop.BasicPrice ?? 0) > 0
+                                                select new
+                                                {
+                                                    installShop
+
+                                                }).ToList();
+
+                if (installPriceDetailList_r.Any())
+                {
+                    decimal installPrice0 = 0;
+                    installPriceDetailList_r.ForEach(s =>
+                    {
+                        installPrice0 = (s.installShop.BasicPrice ?? 0) + (s.installShop.WindowPrice ?? 0) + (s.installShop.OOHPrice ?? 0);
+                        if (!subjectInstallPriceDic_r.Keys.Contains(s.installShop.SubjectId ?? 0))
+                        {
+                            subjectInstallPriceDic_r.Add(s.installShop.SubjectId ?? 0, installPrice0);
+                        }
+                        else
+                        {
+                            subjectInstallPriceDic_r[s.installShop.SubjectId ?? 0] = subjectInstallPriceDic_r[s.installShop.SubjectId ?? 0] + installPrice0;
                         }
                     });
                 }
             });
 
 
-            //var orderInstallList = orderList.Where(s => (s.guidance.ActivityTypeId ?? 1) != (int)GuidanceTypeEnum.Others && s.subject.SubjectType != (int)SubjectTypeEnum.二次安装 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单 && s.order.OrderType == (int)OrderTypeEnum.安装费).ToList();
-           
+            
+
+            //var orderInstallList = orderList.Where(s => (s.guidance.ActivityTypeId ?? 1) != (int)GuidanceTypeEnum.Others && s.subject.SubjectType != (int)SubjectTypeEnum.二次安装 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单 && s.order.OrderType > (int)OrderTypeEnum.道具).ToList();
             //if (orderInstallList.Any())
             //{
-            //    decimal installPrice0 = 0;
-            //    orderInstallList.ForEach(s =>
+            //    subjectIdList.ForEach(s =>
             //    {
-            //        installPrice0 = s.order.OrderPrice ?? 0;
-            //        if (!subjectInstallPriceDic.Keys.Contains(s.order.SubjectId ?? 0))
+            //        decimal installPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.安装费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+            //        if (!subjectInstallPriceDic.Keys.Contains(s))
             //        {
-            //            subjectInstallPriceDic.Add(s.order.SubjectId ?? 0, installPrice0);
+            //            subjectInstallPriceDic.Add(s, installPrice0);
             //        }
             //        else
             //        {
-            //            subjectInstallPriceDic[s.order.SubjectId ?? 0] = subjectInstallPriceDic[s.order.SubjectId ?? 0] + installPrice0;
+            //            subjectInstallPriceDic[s] = subjectInstallPriceDic[s] + installPrice0;
             //        }
+                   
+            //        decimal otherPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.其他费用 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+            //        otherPrice += otherPrice0;
+            //        if (!otherPriceDic.Keys.Contains(s))
+            //        {
+            //            otherPriceDic.Add(s, otherPrice0);
+            //        }
+            //        else
+            //        {
+            //            otherPriceDic[s] += otherPrice0;
+            //        }
+
+            //        decimal regionExpressPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.发货费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    
+            //        expressPrice += regionExpressPrice0;
+
+            //        decimal measurePrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.测量费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+            //        if (measurePriceDic.Keys.Contains(s))
+            //        {
+            //            measurePriceDic[s] = measurePriceDic[s] + measurePrice0;
+            //        }
+            //        else
+            //        {
+            //            measurePriceDic.Add(s, measurePrice0);
+            //        }
+            //        measurePrice += measurePrice0;
+
             //    });
             //}
 
-            var orderInstallList = orderList.Where(s => (s.guidance.ActivityTypeId ?? 1) != (int)GuidanceTypeEnum.Others && s.subject.SubjectType != (int)SubjectTypeEnum.二次安装 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单 && s.order.OrderType > (int)OrderTypeEnum.道具).ToList();
-            if (orderInstallList.Any())
+            //上海
+            var orderInstallList_s = systemOrderList.Where(s => (s.guidance.ActivityTypeId ?? 1) != (int)GuidanceTypeEnum.Others && s.subject.SubjectType != (int)SubjectTypeEnum.二次安装 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单 && s.order.OrderType > (int)OrderTypeEnum.道具).ToList();
+            if (orderInstallList_s.Any())
             {
                 subjectIdList.ForEach(s =>
                 {
-                    decimal installPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.安装费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
-                    if (!subjectInstallPriceDic.Keys.Contains(s))
+                    decimal installPrice0 = orderInstallList_s.Where(r => r.order.OrderType == (int)OrderTypeEnum.安装费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    if (!subjectInstallPriceDic_s.Keys.Contains(s))
                     {
-                        subjectInstallPriceDic.Add(s, installPrice0);
+                        subjectInstallPriceDic_s.Add(s, installPrice0);
                     }
                     else
                     {
-                        subjectInstallPriceDic[s] = subjectInstallPriceDic[s] + installPrice0;
-                    }
-                   
-                    decimal otherPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.其他费用 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
-                    otherPrice += otherPrice0;
-                    if (!otherPriceDic.Keys.Contains(s))
-                    {
-                        otherPriceDic.Add(s, otherPrice0);
-                    }
-                    else
-                    {
-                        otherPriceDic[s] += otherPrice0;
+                        subjectInstallPriceDic_s[s] = subjectInstallPriceDic_s[s] + installPrice0;
                     }
 
-                    decimal regionExpressPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.发货费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
-                    
-                    expressPrice += regionExpressPrice0;
-
-                    decimal measurePrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.测量费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
-                    if (measurePriceDic.Keys.Contains(s))
+                    decimal otherPrice0 = orderInstallList_s.Where(r => r.order.OrderType == (int)OrderTypeEnum.其他费用 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    otherPrice_s += otherPrice0;
+                    if (!otherPriceDic_s.Keys.Contains(s))
                     {
-                        measurePriceDic[s] = measurePriceDic[s] + measurePrice0;
+                        otherPriceDic_s.Add(s, otherPrice0);
                     }
                     else
                     {
-                        measurePriceDic.Add(s, measurePrice0);
+                        otherPriceDic_s[s] += otherPrice0;
                     }
-                    measurePrice += measurePrice0;
+
+                    decimal regionExpressPrice0 = orderInstallList_s.Where(r => r.order.OrderType == (int)OrderTypeEnum.发货费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+
+                    expressPrice_s += regionExpressPrice0;
+
+                    decimal measurePrice0 = orderInstallList_s.Where(r => r.order.OrderType == (int)OrderTypeEnum.测量费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    if (measurePriceDic_s.Keys.Contains(s))
+                    {
+                        measurePriceDic_s[s] = measurePriceDic_s[s] + measurePrice0;
+                    }
+                    else
+                    {
+                        measurePriceDic_s.Add(s, measurePrice0);
+                    }
+                    measurePrice_s += measurePrice0;
+
+                });
+            }
+            //分区
+            var orderInstallList_r = regionOrderList.Where(s => (s.guidance.ActivityTypeId ?? 1) != (int)GuidanceTypeEnum.Others && s.subject.SubjectType != (int)SubjectTypeEnum.二次安装 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单 && s.order.OrderType > (int)OrderTypeEnum.道具).ToList();
+            if (orderInstallList_r.Any())
+            {
+                subjectIdList.ForEach(s =>
+                {
+                    decimal installPrice0 = orderInstallList_r.Where(r => r.order.OrderType == (int)OrderTypeEnum.安装费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    if (!subjectInstallPriceDic_r.Keys.Contains(s))
+                    {
+                        subjectInstallPriceDic_r.Add(s, installPrice0);
+                    }
+                    else
+                    {
+                        subjectInstallPriceDic_r[s] = subjectInstallPriceDic_r[s] + installPrice0;
+                    }
+
+                    decimal otherPrice0 = orderInstallList_r.Where(r => r.order.OrderType == (int)OrderTypeEnum.其他费用 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    otherPrice_r += otherPrice0;
+                    if (!otherPriceDic_r.Keys.Contains(s))
+                    {
+                        otherPriceDic_r.Add(s, otherPrice0);
+                    }
+                    else
+                    {
+                        otherPriceDic_r[s] += otherPrice0;
+                    }
+
+                    decimal regionExpressPrice0 = orderInstallList_r.Where(r => r.order.OrderType == (int)OrderTypeEnum.发货费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+
+                    expressPrice_r += regionExpressPrice0;
+
+                    decimal measurePrice0 = orderInstallList_r.Where(r => r.order.OrderType == (int)OrderTypeEnum.测量费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    if (measurePriceDic_r.Keys.Contains(s))
+                    {
+                        measurePriceDic_r[s] = measurePriceDic_r[s] + measurePrice0;
+                    }
+                    else
+                    {
+                        measurePriceDic_r.Add(s, measurePrice0);
+                    }
+                    measurePrice_r += measurePrice0;
 
                 });
             }
@@ -1026,175 +1308,206 @@ namespace WebApp.Statistics
             #endregion
 
             #region 物料费
-            //var materialList = (from materialOrder in CurrentContext.DbContext.OrderMaterial
-            //                    join shop in CurrentContext.DbContext.Shop
-            //                    on materialOrder.ShopId equals shop.Id
-            //                    join subject in CurrentContext.DbContext.Subject
-            //                    on materialOrder.SubjectId equals subject.Id
-            //                    where subjectIds.Contains(materialOrder.SubjectId ?? 0)
-            //                     && (subject.IsDelete == null || subject.IsDelete == false)
-            //                    && (subject.ApproveState == 1)
-            //                    //&& shopIdList.Contains(materialOrder.ShopId ?? 0)
-            //                    select new
-            //                    {
-            //                        materialOrder,
-            //                        shop,
-            //                        subject
-            //                    }).ToList();
-            var materialList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.物料).ToList();
+            //
+            //var materialList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.物料).ToList();
             //if (materialList.Any())
             //{
-            //if (shopTypeList.Any())
-            //{
-            //    if (shopTypeList.Contains("空"))
+                
+            //    materialList.ForEach(s =>
             //    {
-            //        shopTypeList.Remove("空");
-            //        if (shopTypeList.Any())
+            //        int num = s.order.Quantity ?? 0;
+            //        decimal price = s.order.UnitPrice ?? 0;
+            //        decimal subPrice = num * price;
+            //        if (materialPriceDic.Keys.Contains(s.order.SubjectId ?? 0))
             //        {
-            //            materialList = materialList.Where(s => shopTypeList.Contains(s.shop.ShopType) || (s.shop.ShopType == null || s.shop.ShopType == "")).ToList();
+            //            materialPriceDic[s.order.SubjectId ?? 0] += subPrice;
             //        }
             //        else
-            //            materialList = materialList.Where(s => (s.shop.ShopType == null || s.shop.ShopType == "")).ToList();
-            //    }
-            //    else
-            //        materialList = materialList.Where(s => shopTypeList.Contains(s.shop.ShopType)).ToList();
+            //            materialPriceDic.Add(s.order.SubjectId ?? 0, subPrice);
+            //    });
             //}
-            //if (addUserList.Any())
-            //{
-            //    materialList = materialList.Where(s => addUserList.Contains(s.subject.AddUserId ?? 0)).ToList();
-            //}
-            //if (subjectCategoryList.Any())
-            //{
-            //    materialList = materialList.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0)).ToList();
-            //}
-            //if (regionList.Any())
-            //{
-            //    materialList = materialList.Where(s => regionList.Contains(s.shop.RegionName.ToLower())).ToList();
-            //    if (provinceList.Any())
-            //    {
-            //        materialList = materialList.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();
-            //        if (cityList.Any())
-            //            materialList = materialList.Where(s => cityList.Contains(s.shop.CityName)).ToList();
-            //    }
-            //}
-            //if (customerServiceIds.Any())
-            //{
-            //    if (customerServiceIds.Contains(0))
-            //    {
-            //        customerServiceIds.Remove(0);
-            //        if (customerServiceIds.Any())
-            //        {
-            //            materialList = materialList.Where(s => customerServiceIds.Contains(s.shop.CSUserId ?? 0) || (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
-
-            //        }
-            //        else
-            //        {
-            //            materialList = materialList.Where(s => (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
-
-            //        }
-            //    }
-            //    else
-            //    {
-            //        materialList = materialList.Where(s => customerServiceIds.Contains(s.shop.CSUserId ?? 0)).ToList();
-
-            //    }
-            //}
-            //}
-
-            if (materialList.Any())
+            //上海
+            var materialList_s = systemOrderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.物料).ToList();
+            if (materialList_s.Any())
             {
-                //List<int> materialOrderShopIdList = materialList.Select(s => s.shop.Id).Distinct().ToList();
-                //shopIdList.AddRange(materialOrderShopIdList);
-                materialList.ForEach(s =>
+                materialList_s.ForEach(s =>
                 {
                     int num = s.order.Quantity ?? 0;
                     decimal price = s.order.UnitPrice ?? 0;
                     decimal subPrice = num * price;
-                    if (materialPriceDic.Keys.Contains(s.order.SubjectId ?? 0))
+                    if (materialPriceDic_s.Keys.Contains(s.order.SubjectId ?? 0))
                     {
-                        materialPriceDic[s.order.SubjectId ?? 0] += subPrice;
+                        materialPriceDic_s[s.order.SubjectId ?? 0] += subPrice;
                     }
                     else
-                        materialPriceDic.Add(s.order.SubjectId ?? 0, subPrice);
+                        materialPriceDic_s.Add(s.order.SubjectId ?? 0, subPrice);
                 });
             }
+            //分区
+            var materialList_r = regionOrderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.物料).ToList();
+            if (materialList_r.Any())
+            {
+                materialList_r.ForEach(s =>
+                {
+                    int num = s.order.Quantity ?? 0;
+                    decimal price = s.order.UnitPrice ?? 0;
+                    decimal subPrice = num * price;
+                    if (materialPriceDic_r.Keys.Contains(s.order.SubjectId ?? 0))
+                    {
+                        materialPriceDic_r[s.order.SubjectId ?? 0] += subPrice;
+                    }
+                    else
+                        materialPriceDic_r.Add(s.order.SubjectId ?? 0, subPrice);
+                });
+            }
+
             #endregion
             #region 二次安装费
-            var secondInstallList = orderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.二次安装 && (s.order.OrderType ?? 1) == (int)OrderTypeEnum.安装费);
-            if (secondInstallList.Any())
+            //var secondInstallList = orderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.二次安装 && (s.order.OrderType ?? 1) == (int)OrderTypeEnum.安装费);
+            //if (secondInstallList.Any())
+            //{
+            //    secondInstallList.ToList().ForEach(s =>
+            //    {
+            //        if (!secondInstallPriceDic.Keys.Contains((s.subject.Id)))
+            //        {
+            //            secondInstallPriceDic.Add(s.subject.Id, (s.order.OrderPrice ?? 0));
+            //        }
+            //        else
+            //        {
+            //            secondInstallPriceDic[s.subject.Id] += (s.order.OrderPrice ?? 0);
+            //        }
+            //        secondInstallPrice += (s.order.OrderPrice ?? 0);
+            //    });
+            //}
+            //上海
+            var secondInstallList_s = systemOrderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.二次安装 && (s.order.OrderType ?? 1) == (int)OrderTypeEnum.安装费);
+            if (secondInstallList_s.Any())
             {
-                secondInstallList.ToList().ForEach(s =>
+                secondInstallList_s.ToList().ForEach(s =>
                 {
-                    if (!secondInstallPriceDic.Keys.Contains((s.subject.Id)))
+                    if (!secondInstallPriceDic_s.Keys.Contains((s.subject.Id)))
                     {
-                        secondInstallPriceDic.Add(s.subject.Id, (s.order.OrderPrice ?? 0));
+                        secondInstallPriceDic_s.Add(s.subject.Id, (s.order.OrderPrice ?? 0));
                     }
                     else
                     {
-                        secondInstallPriceDic[s.subject.Id] += (s.order.OrderPrice ?? 0);
+                        secondInstallPriceDic_s[s.subject.Id] += (s.order.OrderPrice ?? 0);
                     }
-                    secondInstallPrice += (s.order.OrderPrice ?? 0);
+                    secondInstallPrice_s += (s.order.OrderPrice ?? 0);
+                });
+            }
+            //分区
+            var secondInstallList_r = regionOrderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.二次安装 && (s.order.OrderType ?? 1) == (int)OrderTypeEnum.安装费);
+            if (secondInstallList_r.Any())
+            {
+                secondInstallList_r.ToList().ForEach(s =>
+                {
+                    if (!secondInstallPriceDic_r.Keys.Contains((s.subject.Id)))
+                    {
+                        secondInstallPriceDic_r.Add(s.subject.Id, (s.order.OrderPrice ?? 0));
+                    }
+                    else
+                    {
+                        secondInstallPriceDic_r[s.subject.Id] += (s.order.OrderPrice ?? 0);
+                    }
+                    secondInstallPrice_r += (s.order.OrderPrice ?? 0);
                 });
             }
             #endregion
             #region 二次发货费
-            var secondExpressList = orderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.二次安装 && (s.order.OrderType ?? 1) == (int)OrderTypeEnum.发货费);
-            if (secondExpressList.Any())
+            //var secondExpressList = orderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.二次安装 && (s.order.OrderType ?? 1) == (int)OrderTypeEnum.发货费);
+            //if (secondExpressList.Any())
+            //{
+            //    secondExpressList.ToList().ForEach(s =>
+            //    {
+            //        if (!secondExpressPriceDic.Keys.Contains((s.subject.Id)))
+            //        {
+            //            secondExpressPriceDic.Add(s.subject.Id, (s.order.OrderPrice ?? 0));
+            //        }
+            //        else
+            //        {
+            //            secondExpressPriceDic[s.subject.Id] += (s.order.OrderPrice ?? 0);
+            //        }
+            //        secondExperssPrice += (s.order.OrderPrice ?? 0);
+            //    });
+            //}
+            //Session["secondInstallPriceDicStatistics"] = secondInstallPriceDic;
+            //上海
+            var secondExpressList_s = systemOrderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.二次安装 && (s.order.OrderType ?? 1) == (int)OrderTypeEnum.发货费);
+            if (secondExpressList_s.Any())
             {
-                secondExpressList.ToList().ForEach(s =>
+                secondExpressList_s.ToList().ForEach(s =>
                 {
-                    if (!secondExpressPriceDic.Keys.Contains((s.subject.Id)))
+                    if (!secondExpressPriceDic_s.Keys.Contains((s.subject.Id)))
                     {
-                        secondExpressPriceDic.Add(s.subject.Id, (s.order.OrderPrice ?? 0));
+                        secondExpressPriceDic_s.Add(s.subject.Id, (s.order.OrderPrice ?? 0));
                     }
                     else
                     {
-                        secondExpressPriceDic[s.subject.Id] += (s.order.OrderPrice ?? 0);
+                        secondExpressPriceDic_s[s.subject.Id] += (s.order.OrderPrice ?? 0);
                     }
-                    secondExperssPrice += (s.order.OrderPrice ?? 0);
+                    secondExperssPrice_s += (s.order.OrderPrice ?? 0);
                 });
             }
-            Session["secondInstallPriceDicStatistics"] = secondInstallPriceDic;
-            //Session["secondExperssDicStatistics"] = secondExperssPrice;
+            //分区
+            var secondExpressList_r = regionOrderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.二次安装 && (s.order.OrderType ?? 1) == (int)OrderTypeEnum.发货费);
+            if (secondExpressList_r.Any())
+            {
+                secondExpressList_r.ToList().ForEach(s =>
+                {
+                    if (!secondExpressPriceDic_r.Keys.Contains((s.subject.Id)))
+                    {
+                        secondExpressPriceDic_r.Add(s.subject.Id, (s.order.OrderPrice ?? 0));
+                    }
+                    else
+                    {
+                        secondExpressPriceDic_r[s.subject.Id] += (s.order.OrderPrice ?? 0);
+                    }
+                    secondExperssPrice_r += (s.order.OrderPrice ?? 0);
+                });
+            }
             #endregion
             #region 统计其他费用（新开安装费/运费）
-            var orderDetailList = new PriceOrderDetailBLL().GetList(s => priceSubjectIdList.Contains(s.SubjectId ?? 0) && ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.新开店安装费 || (s.SubjectType ?? 1) == (int)SubjectTypeEnum.运费));
-            if (regionList.Any())
+            if (subjectChannel < 2)
             {
-                orderDetailList = orderDetailList.Where(s => regionList.Contains(s.Region.ToLower())).ToList();
-                if (provinceList.Any())
+                //统计分区的时候不计算这个
+                var orderDetailList = new PriceOrderDetailBLL().GetList(s => priceSubjectIdList.Contains(s.SubjectId ?? 0) && ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.新开店安装费 || (s.SubjectType ?? 1) == (int)SubjectTypeEnum.运费));
+                if (regionList.Any())
                 {
-                    orderDetailList = orderDetailList.Where(s => provinceList.Contains(s.Province)).ToList();
-                    if (cityList.Any())
-                        orderDetailList = orderDetailList.Where(s => cityList.Contains(s.City)).ToList();
+                    orderDetailList = orderDetailList.Where(s => regionList.Contains(s.Region.ToLower())).ToList();
+                    if (provinceList.Any())
+                    {
+                        orderDetailList = orderDetailList.Where(s => provinceList.Contains(s.Province)).ToList();
+                        if (cityList.Any())
+                            orderDetailList = orderDetailList.Where(s => cityList.Contains(s.City)).ToList();
+                    }
+                }
+                if (orderDetailList.Any())
+                {
+                    orderDetailList.ForEach(s =>
+                    {
+                        if (!newShopInstallPriceDic_s.Keys.Contains((s.SubjectId ?? 0)))
+                        {
+                            newShopInstallPriceDic_s.Add((s.SubjectId ?? 0), (s.Amount ?? 0));
+                        }
+                        else
+                        {
+                            newShopInstallPriceDic_s[(s.SubjectId ?? 0)] += (s.Amount ?? 0);
+                        }
+                        newShopInstallPrice_s += (s.Amount ?? 0);
+                    });
+                    
                 }
             }
-            if (orderDetailList.Any())
-            {
-                orderDetailList.ForEach(s =>
-                {
-                    if (!newShopInstallPriceDic.Keys.Contains((s.SubjectId ?? 0)))
-                    {
-                        newShopInstallPriceDic.Add((s.SubjectId ?? 0), (s.Amount ?? 0));
-                    }
-                    else
-                    {
-                        newShopInstallPriceDic[(s.SubjectId ?? 0)] += (s.Amount ?? 0);
-                    }
-                    newShopInstallPrice += (s.Amount ?? 0);
-                });
-            }
-            Session["newShopInstallDicStatistics"] = newShopInstallPriceDic;
+            //Session["newShopInstallDicStatistics"] = newShopInstallPriceDic;
+            
+
             #endregion
-           
             #region 分区活动费（安装费，测量费，其他费用）
-            var regionPriceOrderList = orderList.Where(s => (s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Others && (s.order.OrderType ?? 1) > 1).ToList();
+            var regionPriceOrderList = regionOrderList.Where(s => (s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Others && (s.order.OrderType ?? 1) > 1).ToList();
             if (regionPriceOrderList.Any())
             {
-                //regionInstallPrice = regionPriceOrderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.安装费).Sum(s => s.order.OrderPrice ?? 0);
-                //measurePrice = regionPriceOrderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.测量费).Sum(s => s.order.OrderPrice ?? 0);
-                //regionOtherPrice = regionPriceOrderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.其他费用).Sum(s => s.order.OrderPrice ?? 0);
-                //regionExpressPrice = regionPriceOrderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.发货费).Sum(s => s.order.OrderPrice ?? 0);
+                
                 subjectIdList.ForEach(s =>
                 {
                     decimal regionInstallPrice0 = regionPriceOrderList.Where(r => r.order.OrderType == (int)OrderTypeEnum.安装费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
@@ -1231,15 +1544,15 @@ namespace WebApp.Statistics
                     regionExpressPrice += regionExpressPrice0;
 
                     decimal measurePrice0 = regionPriceOrderList.Where(r => r.order.OrderType == (int)OrderTypeEnum.测量费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
-                    if (measurePriceDic.Keys.Contains(s))
+                    if (measurePriceDic_r.Keys.Contains(s))
                     {
-                        measurePriceDic[s] = measurePriceDic[s] + measurePrice0;
+                        measurePriceDic_r[s] = measurePriceDic_r[s] + measurePrice0;
                     }
                     else
                     {
-                        measurePriceDic.Add(s, measurePrice0);
+                        measurePriceDic_r.Add(s, measurePrice0);
                     }
-                    measurePrice += measurePrice0;
+                    measurePrice_r += measurePrice0;
 
                 });
 
@@ -1248,101 +1561,235 @@ namespace WebApp.Statistics
 
             #endregion
             #region 费用订单
-            var priceOrderList = orderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.费用订单).ToList();
-            if (priceOrderList.Any())
+            //var priceOrderList = orderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.费用订单).ToList();
+            //if (priceOrderList.Any())
+            //{
+            //    priceOrderList.ForEach(s =>
+            //    {
+            //        decimal price0 = s.order.OrderPrice ?? 0;
+            //        if (s.order.OrderType == (int)OrderTypeEnum.安装费)
+            //        {
+
+            //            if (!subjectInstallPriceDic.Keys.Contains(s.order.SubjectId ?? 0))
+            //            {
+            //                subjectInstallPriceDic.Add(s.order.SubjectId ?? 0, price0);
+            //            }
+            //            else
+            //            {
+            //                subjectInstallPriceDic[s.order.SubjectId ?? 0] = subjectInstallPriceDic[s.order.SubjectId ?? 0] + price0;
+            //            }
+            //        }
+            //        else if (s.order.OrderType == (int)OrderTypeEnum.发货费)
+            //        {
+            //            expressPrice += price0;
+
+            //        }
+            //        else if (s.order.OrderType == (int)OrderTypeEnum.其他费用)
+            //        {
+            //            otherPrice += price0;
+            //            if (!otherPriceDic.Keys.Contains((s.order.SubjectId ?? 0)))
+            //            {
+            //                otherPriceDic.Add((s.order.SubjectId ?? 0), price0);
+            //            }
+            //            else
+            //            {
+            //                otherPriceDic[(s.order.SubjectId ?? 0)] += price0;
+            //            }
+            //        }
+            //        else if (s.order.OrderType == (int)OrderTypeEnum.运费)
+            //        {
+            //            //运费和新开的费用放一起
+            //            newShopInstallPrice += price0;
+            //            if (!newShopInstallPriceDic.Keys.Contains((s.order.SubjectId ?? 0)))
+            //            {
+            //                newShopInstallPriceDic.Add((s.order.SubjectId ?? 0), price0);
+            //            }
+            //            else
+            //            {
+            //                newShopInstallPriceDic[(s.order.SubjectId ?? 0)] += price0;
+            //            }
+
+            //        }
+            //    });
+            //}
+            //Session["otherPriceDicStatistics"] = otherPriceDic;
+            //上海
+            var priceOrderList_s = systemOrderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.费用订单).ToList();
+            if (priceOrderList_s.Any())
             {
-                priceOrderList.ForEach(s =>
+                priceOrderList_s.ForEach(s =>
                 {
                     decimal price0 = s.order.OrderPrice ?? 0;
                     if (s.order.OrderType == (int)OrderTypeEnum.安装费)
                     {
 
-                        if (!subjectInstallPriceDic.Keys.Contains(s.order.SubjectId ?? 0))
+                        if (!subjectInstallPriceDic_s.Keys.Contains(s.order.SubjectId ?? 0))
                         {
-                            subjectInstallPriceDic.Add(s.order.SubjectId ?? 0, price0);
+                            subjectInstallPriceDic_s.Add(s.order.SubjectId ?? 0, price0);
                         }
                         else
                         {
-                            subjectInstallPriceDic[s.order.SubjectId ?? 0] = subjectInstallPriceDic[s.order.SubjectId ?? 0] + price0;
+                            subjectInstallPriceDic_s[s.order.SubjectId ?? 0] = subjectInstallPriceDic_s[s.order.SubjectId ?? 0] + price0;
                         }
                     }
                     else if (s.order.OrderType == (int)OrderTypeEnum.发货费)
                     {
-                        expressPrice += price0;
+                        expressPrice_s += price0;
 
                     }
                     else if (s.order.OrderType == (int)OrderTypeEnum.其他费用)
                     {
-                        otherPrice += price0;
-                        if (!otherPriceDic.Keys.Contains((s.order.SubjectId ?? 0)))
+                        otherPrice_s += price0;
+                        if (!otherPriceDic_s.Keys.Contains((s.order.SubjectId ?? 0)))
                         {
-                            otherPriceDic.Add((s.order.SubjectId ?? 0), price0);
+                            otherPriceDic_s.Add((s.order.SubjectId ?? 0), price0);
                         }
                         else
                         {
-                            otherPriceDic[(s.order.SubjectId ?? 0)] += price0;
+                            otherPriceDic_s[(s.order.SubjectId ?? 0)] += price0;
                         }
                     }
                     else if (s.order.OrderType == (int)OrderTypeEnum.运费)
                     {
                         //运费和新开的费用放一起
-                        newShopInstallPrice += price0;
-                        if (!newShopInstallPriceDic.Keys.Contains((s.order.SubjectId ?? 0)))
+                        newShopInstallPrice_s += price0;
+                        if (!newShopInstallPriceDic_s.Keys.Contains((s.order.SubjectId ?? 0)))
                         {
-                            newShopInstallPriceDic.Add((s.order.SubjectId ?? 0), price0);
+                            newShopInstallPriceDic_s.Add((s.order.SubjectId ?? 0), price0);
                         }
                         else
                         {
-                            newShopInstallPriceDic[(s.order.SubjectId ?? 0)] += price0;
+                            newShopInstallPriceDic_s[(s.order.SubjectId ?? 0)] += price0;
                         }
 
                     }
                 });
             }
-            Session["otherPriceDicStatistics"] = otherPriceDic;
-            #endregion
-            #endregion
 
-            if (subjectInstallPriceDic.Keys.Count > 0)
+            //分区
+            var priceOrderList_r = regionOrderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.费用订单).ToList();
+            if (priceOrderList_r.Any())
             {
+                priceOrderList_r.ForEach(s =>
+                {
+                    decimal price0 = s.order.OrderPrice ?? 0;
+                    if (s.order.OrderType == (int)OrderTypeEnum.安装费)
+                    {
 
-                installPrice += (subjectInstallPriceDic.Sum(s => s.Value));
+                        if (!subjectInstallPriceDic_r.Keys.Contains(s.order.SubjectId ?? 0))
+                        {
+                            subjectInstallPriceDic_r.Add(s.order.SubjectId ?? 0, price0);
+                        }
+                        else
+                        {
+                            subjectInstallPriceDic_r[s.order.SubjectId ?? 0] = subjectInstallPriceDic_r[s.order.SubjectId ?? 0] + price0;
+                        }
+                    }
+                    else if (s.order.OrderType == (int)OrderTypeEnum.发货费)
+                    {
+                        expressPrice_r += price0;
+
+                    }
+                    else if (s.order.OrderType == (int)OrderTypeEnum.其他费用)
+                    {
+                        otherPrice_r += price0;
+                        if (!otherPriceDic_r.Keys.Contains((s.order.SubjectId ?? 0)))
+                        {
+                            otherPriceDic_r.Add((s.order.SubjectId ?? 0), price0);
+                        }
+                        else
+                        {
+                            otherPriceDic_r[(s.order.SubjectId ?? 0)] += price0;
+                        }
+                    }
+                    else if (s.order.OrderType == (int)OrderTypeEnum.运费)
+                    {
+                        //运费和新开的费用放一起
+                        newShopInstallPrice_r += price0;
+                        if (!newShopInstallPriceDic_r.Keys.Contains((s.order.SubjectId ?? 0)))
+                        {
+                            newShopInstallPriceDic_r.Add((s.order.SubjectId ?? 0), price0);
+                        }
+                        else
+                        {
+                            newShopInstallPriceDic_r[(s.order.SubjectId ?? 0)] += price0;
+                        }
+
+                    }
+                });
+            }
+            #endregion
+            #endregion
+            
+            if (subjectInstallPriceDic_s.Keys.Count > 0)
+            {
+                Session["subjectInstallPrice_s"] = subjectInstallPriceDic_s;
+                installPrice += (subjectInstallPriceDic_s.Sum(s => s.Value));
 
             }
-            Session["installPriceDicStatistics"] = subjectInstallPriceDic;
-            if (expressPriceDic.Keys.Count > 0)
+            if (subjectInstallPriceDic_r.Keys.Count > 0)
+            {
+                Session["subjectInstallPrice_r"] = subjectInstallPriceDic_r;
+                installPrice += (subjectInstallPriceDic_r.Sum(s => s.Value));
+
+            }
+           
+            if (expressPriceDic_s.Keys.Count > 0)
             {
                 if (subjectIdList.Any())
                 {
                     subjectIdList.ForEach(s =>
                     {
-                        if (expressPriceDic.Keys.Contains(s))
-                            expressPrice += expressPriceDic[s];
+                        if (expressPriceDic_s.Keys.Contains(s))
+                            expressPrice += expressPriceDic_s[s];
                     });
                 }
                 else
                 {
-                    foreach (KeyValuePair<int, decimal> item in expressPriceDic)
+                    foreach (KeyValuePair<int, decimal> item in expressPriceDic_s)
                     {
                         expressPrice += item.Value;
                     }
                 }
+                Session["expressPrice_s"] = expressPriceDic_s;
             }
-            Session["expressPriceDicStatistics"] = expressPriceDic;
+            if (expressPriceDic_r.Keys.Count > 0)
+            {
+                if (subjectIdList.Any())
+                {
+                    subjectIdList.ForEach(s =>
+                    {
+                        if (expressPriceDic_r.Keys.Contains(s))
+                            expressPrice += expressPriceDic_r[s];
+                    });
+                }
+                else
+                {
+                    foreach (KeyValuePair<int, decimal> item in expressPriceDic_r)
+                    {
+                        expressPrice += item.Value;
+                    }
+                }
+                Session["expressPrice_r"] = expressPriceDic_r;
+            }
+          
             if (shopIdList.Any())
             {
                 labShopCount.Text = shopIdList.Distinct().Count().ToString();
                 labShopCount.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
                 labShopCount.Attributes.Add("name", "checkShop");
             }
+            expressPrice = expressPrice_s + expressPrice_r;
             if (expressPrice > 0)
             {
                 labExpressPrice.Text = Math.Round(expressPrice, 2) + "元";
             }
+            secondExperssPrice = secondExperssPrice_s + secondExperssPrice_r;
             if (secondExperssPrice > 0)
             {
                 labSecondExpressPrice.Text = Math.Round(secondExperssPrice, 2) + "元";
             }
+            secondInstallPrice = secondInstallPrice_s + secondInstallPrice_r;
             if (secondInstallPrice > 0)
             {
                 labSecondInstallPrice.Text = Math.Round(secondInstallPrice, 2) + "元";
@@ -1355,32 +1802,61 @@ namespace WebApp.Statistics
             }
 
             decimal materialPrice = 0;
-            if (materialPriceDic.Keys.Count > 0)
+            if (materialPriceDic_s.Keys.Count > 0)
             {
                 if (subjectIdList.Any())
                 {
                     subjectIdList.ForEach(s =>
                     {
-                        if (materialPriceDic.Keys.Contains(s))
-                            materialPrice += materialPriceDic[s];
+                        if (materialPriceDic_s.Keys.Contains(s))
+                            materialPrice += materialPriceDic_s[s];
                     });
                 }
                 else
                 {
-                    foreach (KeyValuePair<int, decimal> item in materialPriceDic)
+                    foreach (KeyValuePair<int, decimal> item in materialPriceDic_s)
                     {
                         materialPrice += item.Value;
                     }
                 }
+                Session["materialPrice_s"] = materialPriceDic_s;
             }
-            Session["materialPriceDicStatistics"] = materialPriceDic;
+            if (materialPriceDic_r.Keys.Count > 0)
+            {
+                if (subjectIdList.Any())
+                {
+                    subjectIdList.ForEach(s =>
+                    {
+                        if (materialPriceDic_r.Keys.Contains(s))
+                            materialPrice += materialPriceDic_r[s];
+                    });
+                }
+                else
+                {
+                    foreach (KeyValuePair<int, decimal> item in materialPriceDic_r)
+                    {
+                        materialPrice += item.Value;
+                    }
+                }
+                Session["materialPrice_r"] = materialPriceDic_r;
+            }
+           
             if (materialPrice > 0)
             {
                 labMaterialPrice.Text = Math.Round(materialPrice, 2) + "元";
                 labMaterialPrice.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
                 labMaterialPrice.Attributes.Add("name", "checkMaterialOrderPrice");
             }
-
+           
+            if (newShopInstallPriceDic_s.Keys.Count > 0)
+            {
+                Session["newShopInstallPrice_s"] = newShopInstallPriceDic_s;
+            }
+            if (newShopInstallPriceDic_r.Keys.Count > 0)
+            {
+                Session["newShopInstallPrice_r"] = newShopInstallPriceDic_r;
+            }
+            newShopInstallPrice = newShopInstallPrice_s + newShopInstallPrice_r;
             if (newShopInstallPrice > 0)
             {
                 labNewShopInstallPrice.Text = Math.Round(newShopInstallPrice, 2) + "元";
@@ -1388,6 +1864,15 @@ namespace WebApp.Statistics
                 labNewShopInstallPrice.Attributes.Add("name", "checkNewShopInstallPrice");
 
             }
+            if (otherPriceDic_s.Keys.Count > 0)
+            {
+                Session["otherPrice_s"] = otherPriceDic_s;
+            }
+            if (otherPriceDic_r.Keys.Count > 0)
+            {
+                Session["otherPrice_r"] = otherPriceDic_r;
+            }
+            otherPrice = otherPrice_s + otherPrice_r;
             if (otherPrice > 0)
             {
                 labFreight.Text = Math.Round(otherPrice, 2) + "元";
@@ -1405,6 +1890,8 @@ namespace WebApp.Statistics
                 labRegionExpressPrice.Text = Math.Round(regionExpressPrice, 2) + "元";
 
             }
+            
+            measurePrice = measurePrice_s + measurePrice_r;
             if (measurePrice > 0)
             {
                 labMeasurePrice.Text = Math.Round(measurePrice, 2) + "元";
@@ -1505,8 +1992,9 @@ namespace WebApp.Statistics
 
                 decimal shutShopMaterialPrice = 0;
                 //闭店物料费用
-                if (materialList.Any())
+                if (materialList_s.Any() || materialList_r.Any())
                 {
+                    var materialList = materialList_s.Concat(materialList_r);
                     var shutList = materialList.Where(s => s.shop.Status != null && s.shop.Status.Contains("闭")).ToList();
                     if (shutList.Any())
                     {
@@ -1537,6 +2025,26 @@ namespace WebApp.Statistics
             }
         }
 
+
+        void ClearSeesion()
+        {
+            Session["area_s"] = null;
+            Session["area_r"] = null;
+            Session["popPrice_s"] = null;
+            Session["popPrice_r"] = null;
+            Session["subjectInstallPrice_s"] = null;
+            Session["subjectInstallPrice_r"] = null;
+            Session["expressPrice_s"] = null;
+            Session["expressPrice_r"] = null;
+            Session["materialPrice_s"] = null;
+            Session["materialPrice_r"] = null;
+            Session["newShopInstallPrice_s"] = null;
+            Session["newShopInstallPrice_r"] = null;
+            Session["otherPrice_s"] = null;
+            Session["otherPrice_r"] = null;
+            Session["measurePrice_s"] = null;
+            Session["measurePrice_r"] = null;
+        }
        
 
         /// <summary>
@@ -1623,7 +2131,7 @@ namespace WebApp.Statistics
         /// <param name="e"></param>
         /// 
 
-        protected void gvList_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        protected void gvList_ItemDataBound1(object sender, RepeaterItemEventArgs e)
         {
 
             if (e.Item.ItemType == ListItemType.AlternatingItem || e.Item.ItemType == ListItemType.Item)
@@ -1939,6 +2447,172 @@ namespace WebApp.Statistics
                 }
             }
 
+        }
+
+        protected void gvList_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemType == ListItemType.AlternatingItem || e.Item.ItemType == ListItemType.Item)
+            {
+                object item = e.Item.DataItem;
+                if (item != null)
+                {
+
+                    object subjectIdObj = item.GetType().GetProperty("Id").GetValue(item, null);
+                    int subjectId = subjectIdObj != null ? int.Parse(subjectIdObj.ToString()) : 0;
+                    object subjectTypeObj = item.GetType().GetProperty("SubjectType").GetValue(item, null);
+                    int subjectType = subjectTypeObj != null ? int.Parse(subjectTypeObj.ToString()) : 1;
+                    object priceBlongRegionObj = item.GetType().GetProperty("PriceBlongRegion").GetValue(item, null);
+                    string priceBlongRegion = priceBlongRegionObj != null ? priceBlongRegionObj.ToString() : string.Empty;
+
+                    ((Label)e.Item.FindControl("labSubjectType")).Text = CommonMethod.GeEnumName<SubjectTypeEnum>(subjectType.ToString());
+
+                    Label shopCountLab = (Label)e.Item.FindControl("labShopCount");
+                    
+                    Label POPPriceLab = (Label)e.Item.FindControl("labPOPPrice");
+                    Label InstallPriceLab = (Label)e.Item.FindControl("labInstallPrice");
+                    Label ExpressPriceLab = (Label)e.Item.FindControl("labExpressPrice");
+
+
+                    object subjectNameObj = item.GetType().GetProperty("SubjectName").GetValue(item, null);
+                    string subjectName = subjectNameObj != null ? subjectNameObj.ToString() : "";
+
+                    object remarkObj = item.GetType().GetProperty("Remark").GetValue(item, null);
+                    string remark = remarkObj != null ? remarkObj.ToString() : "";
+
+                    Label labSubjectName = (Label)e.Item.FindControl("labSubjectName");
+                    if (subjectName.Contains("补单") && !string.IsNullOrWhiteSpace(remark))
+                    {
+                        subjectName += "-" + remark + "";
+                    }
+                    if (!string.IsNullOrWhiteSpace(priceBlongRegion))
+                    {
+                        subjectName += "-" + priceBlongRegion + "实施";
+                    }
+                    labSubjectName.Text = subjectName;
+
+
+                    if (Session["area_s"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["area_s"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labArea");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId],2).ToString();
+                        }
+                    }
+                    if (Session["area_r"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["area_r"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labArea1");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                    if (Session["popPrice_s"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["popPrice_s"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labPOPPrice");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                    if (Session["popPrice_r"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["popPrice_r"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labPOPPrice1");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                    if (Session["subjectInstallPrice_s"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["subjectInstallPrice_s"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labInstallPrice");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                    if (Session["subjectInstallPrice_r"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["subjectInstallPrice_r"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labInstallPrice1");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                    if (Session["materialPrice_s"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["materialPrice_s"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labMaterial");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                    if (Session["materialPrice_r"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["materialPrice_r"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labMaterial1");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                    if (Session["newShopInstallPrice_s"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["newShopInstallPrice_s"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labNewShopInstallPrice");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                    if (Session["newShopInstallPrice_r"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["newShopInstallPrice_r"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labNewShopInstallPrice1");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                    if (Session["otherPrice_s"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["otherPrice_s"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labOtherPrice");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                    if (Session["otherPrice_r"] != null)
+                    {
+                        Dictionary<int, decimal> newDic = new Dictionary<int, decimal>();
+                        newDic = Session["otherPrice_r"] as Dictionary<int, decimal>;
+                        Label lab = (Label)e.Item.FindControl("labOtherPrice1");
+                        if (newDic.Keys.Count > 0 && newDic.Keys.Contains(subjectId))
+                        {
+                            lab.Text = Math.Round(newDic[subjectId], 2).ToString();
+                        }
+                    }
+                }
+            }
         }
 
         protected void ddlCustomer_SelectedIndexChanged(object sender, EventArgs e)

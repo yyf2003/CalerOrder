@@ -35,11 +35,7 @@ namespace WebApp.Statistics
         {
             cblGuidanceList.Items.Clear();
             int customerId = int.Parse(ddlCustomer.SelectedValue);
-
-            // var list = new SubjectGuidanceBLL().GetList(s => s.CustomerId == customerId).ToList();
             var list = (from guidance in CurrentContext.DbContext.SubjectGuidance
-                        //join type in CurrentContext.DbContext.ADOrderActivity
-                        //on guidance.ActivityTypeId equals type.ActivityId
                         join subject in CurrentContext.DbContext.Subject
                         on guidance.ItemId equals subject.GuidanceId
                         where guidance.CustomerId == customerId
@@ -49,19 +45,28 @@ namespace WebApp.Statistics
                         select new
                         {
                             guidance
-                            //type
+                            
                         }).Distinct().ToList();
 
-
-            string guidanceMonth = txtGuidanceMonth.Text;
-            if (!string.IsNullOrWhiteSpace(guidanceMonth) && StringHelper.IsDateTime(guidanceMonth))
+            string beginDate = txtBeginDate.Text;
+            string endDate = txtEndDate.Text;
+            if (!string.IsNullOrWhiteSpace(beginDate) && !string.IsNullOrWhiteSpace(endDate) && StringHelper.IsDateTime(beginDate) && StringHelper.IsDateTime(endDate))
             {
-                DateTime date = DateTime.Parse(guidanceMonth);
-                int year = date.Year;
-                int month = date.Month;
-                list = list.Where(s => s.guidance.GuidanceYear == year && s.guidance.GuidanceMonth == month).ToList();
+                DateTime begin = DateTime.Parse(beginDate);
+                DateTime end = DateTime.Parse(endDate);
+                list = list.Where(s => s.guidance.BeginDate >= begin && s.guidance.EndDate < end.AddDays(1)).ToList();
             }
-
+            else
+            {
+                string guidanceMonth = txtGuidanceMonth.Text;
+                if (!string.IsNullOrWhiteSpace(guidanceMonth) && StringHelper.IsDateTime(guidanceMonth))
+                {
+                    DateTime date = DateTime.Parse(guidanceMonth);
+                    int year = date.Year;
+                    int month = date.Month;
+                    list = list.Where(s => s.guidance.GuidanceYear == year && s.guidance.GuidanceMonth == month).ToList();
+                }
+            }
             if (list.Any())
             {
                 list = list.OrderBy(s => s.guidance.ItemId).ToList();
@@ -470,11 +475,6 @@ namespace WebApp.Statistics
             }
             //return list;
         }
-
-
-
-
-
 
         void BindSubjectTypeList() {
             cblSubjectCategory.Items.Clear();
@@ -1103,6 +1103,28 @@ namespace WebApp.Statistics
                 if (totalPrice2 > 0)
                     labTotalPrice.Text = Math.Round(totalPrice2, 2).ToString();
             }
+        }
+
+        //protected void txtBeginDate_TextChanged(object sender, EventArgs e)
+        //{
+
+        //}
+        
+        protected void txtEndDate_TextChanged(object sender, EventArgs e)
+        {
+            BindGuidance();
+        }
+
+        protected void txtBeginDate_TextChanged(object sender, EventArgs e)
+        {
+            BindGuidance();
+        }
+
+        protected void lbClearDate_Click(object sender, EventArgs e)
+        {
+            txtBeginDate.Text = "";
+            txtEndDate.Text = "";
+            BindGuidance();
         }
     }
 }

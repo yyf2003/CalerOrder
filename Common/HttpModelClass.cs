@@ -50,8 +50,8 @@ namespace Common
                             application.Context.Session["provinceSelected"] = null;
                         if (application.Context.Session["citySelected"] != null)
                             application.Context.Session["citySelected"] = null;
-                        if (application.Context.Session["orderDetailStatistics"] != null)
-                            application.Context.Session["orderDetailStatistics"] = null;
+                        //if (application.Context.Session["orderDetailStatistics"] != null)
+                            //application.Context.Session["orderDetailStatistics"] = null;
                         if (application.Context.Session["shopStatistics"] != null)
                             application.Context.Session["shopStatistics"] = null;
                         if (application.Context.Session["subjectStatistics"] != null)
@@ -60,17 +60,17 @@ namespace Common
                             application.Context.Session["guidanceStatistics"] = null;
 
 
-                        if (application.Context.Session["installPriceDicStatistics"] != null)
-                            application.Context.Session["installPriceDicStatistics"] = null;
-                        if (application.Context.Session["expressPriceDicStatistics"] != null)
-                            application.Context.Session["expressPriceDicStatistics"] = null;
-                        if (application.Context.Session["materialPriceDicStatistics"] != null)
-                            application.Context.Session["materialPriceDicStatistics"] = null;
-                        if (application.Context.Session["freightDicStatistics"] != null)
-                            application.Context.Session["freightDicStatistics"] = null;
+                        //if (application.Context.Session["installPriceDicStatistics"] != null)
+                        //    application.Context.Session["installPriceDicStatistics"] = null;
+                        //if (application.Context.Session["expressPriceDicStatistics"] != null)
+                        //    application.Context.Session["expressPriceDicStatistics"] = null;
+                        //if (application.Context.Session["materialPriceDicStatistics"] != null)
+                        //    application.Context.Session["materialPriceDicStatistics"] = null;
+                        //if (application.Context.Session["freightDicStatistics"] != null)
+                        //    application.Context.Session["freightDicStatistics"] = null;
 
-                        if (application.Context.Session["secondInstallPriceDicStatistics"] != null)
-                            application.Context.Session["secondInstallPriceDicStatistics"] = null;
+                        //if (application.Context.Session["secondInstallPriceDicStatistics"] != null)
+                        //    application.Context.Session["secondInstallPriceDicStatistics"] = null;
                         //if (application.Context.Session["secondExperssDicStatistics"] != null)
                             //application.Context.Session["secondExperssDicStatistics"] = null;
                        
