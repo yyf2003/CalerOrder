@@ -18,6 +18,15 @@
         function SubmitFail(msg) {
             alert("提交失败："+msg);
         }
+        function ApproveStae(msg,url) {
+            if (msg == "ok") {
+                layer.msg("审批成功");
+                window.location.href = url;
+            }
+            else {
+                layer.confirm(msg, { title: "提交失败", btn: ['确定'] });
+            }
+        }
     </script>
 </head>
 <body>

@@ -3366,17 +3366,17 @@ namespace WebApp.Subjects.Handler
                     }
                 });
             }
-            var orderlist = orderBll.GetList(s=>s.SubjectId==subjectId);
-            orderlist.ForEach(s => {
-                if (s.OrderType == (int)OrderTypeEnum.物料)
-                {
-                    new BasePage().SaveQuotationOrder(s, false);
-                }
-                else
-                {
-                    new BasePage().SaveQuotationOrder(s);
-                }
-            });
+            //var orderlist = orderBll.GetList(s=>s.SubjectId==subjectId);
+            //orderlist.ForEach(s => {
+            //    if (s.OrderType == (int)OrderTypeEnum.物料)
+            //    {
+            //        new BasePage().SaveQuotationOrder(s, false);
+            //    }
+            //    else
+            //    {
+            //        new BasePage().SaveQuotationOrder(s);
+            //    }
+            //});
 
         }
 

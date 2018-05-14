@@ -1145,6 +1145,7 @@ namespace WebApp.Statistics
                                                 && installShopIdList_r.Contains(installShop.ShopId ?? 0)
                                                 && (guidance.ActivityTypeId != (int)GuidanceTypeEnum.Others)//不统计分区增补的安装费
                                                 && (installShop.BasicPrice ?? 0) > 0
+                                                && !installShopIdList_s.Contains(installShop.ShopId ?? 0)
                                                 select new
                                                 {
                                                     installShop
@@ -1222,7 +1223,7 @@ namespace WebApp.Statistics
             {
                 subjectIdList.ForEach(s =>
                 {
-                    decimal installPrice0 = orderInstallList_s.Where(r => r.order.OrderType == (int)OrderTypeEnum.安装费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    decimal installPrice0 = orderInstallList_s.Where(r => r.order.OrderType == (int)OrderTypeEnum.安装费 && r.subject.Id == s).Sum(r => (r.order.OrderPrice ?? 0)*(r.order.Quantity??1));
                     if (!subjectInstallPriceDic_s.Keys.Contains(s))
                     {
                         subjectInstallPriceDic_s.Add(s, installPrice0);
@@ -1232,7 +1233,7 @@ namespace WebApp.Statistics
                         subjectInstallPriceDic_s[s] = subjectInstallPriceDic_s[s] + installPrice0;
                     }
 
-                    decimal otherPrice0 = orderInstallList_s.Where(r => r.order.OrderType == (int)OrderTypeEnum.其他费用 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    decimal otherPrice0 = orderInstallList_s.Where(r => (r.order.OrderType == (int)OrderTypeEnum.其他费用 || r.order.OrderType == (int)OrderTypeEnum.印刷费) && r.subject.Id == s).Sum(r => (r.order.OrderPrice ?? 0) * (r.order.Quantity ?? 1));
                     otherPrice_s += otherPrice0;
                     if (!otherPriceDic_s.Keys.Contains(s))
                     {
@@ -1243,11 +1244,11 @@ namespace WebApp.Statistics
                         otherPriceDic_s[s] += otherPrice0;
                     }
 
-                    decimal regionExpressPrice0 = orderInstallList_s.Where(r => r.order.OrderType == (int)OrderTypeEnum.发货费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    decimal regionExpressPrice0 = orderInstallList_s.Where(r => (r.order.OrderType == (int)OrderTypeEnum.发货费 || r.order.OrderType == (int)OrderTypeEnum.快递费 || r.order.OrderType == (int)OrderTypeEnum.运费) && r.subject.Id == s).Sum(r => (r.order.OrderPrice ?? 0) * (r.order.Quantity ?? 1));
 
                     expressPrice_s += regionExpressPrice0;
 
-                    decimal measurePrice0 = orderInstallList_s.Where(r => r.order.OrderType == (int)OrderTypeEnum.测量费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    decimal measurePrice0 = orderInstallList_s.Where(r => r.order.OrderType == (int)OrderTypeEnum.测量费 && r.subject.Id == s).Sum(r => (r.order.OrderPrice ?? 0) * (r.order.Quantity ?? 1));
                     if (measurePriceDic_s.Keys.Contains(s))
                     {
                         measurePriceDic_s[s] = measurePriceDic_s[s] + measurePrice0;
@@ -1266,7 +1267,7 @@ namespace WebApp.Statistics
             {
                 subjectIdList.ForEach(s =>
                 {
-                    decimal installPrice0 = orderInstallList_r.Where(r => r.order.OrderType == (int)OrderTypeEnum.安装费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    decimal installPrice0 = orderInstallList_r.Where(r => r.order.OrderType == (int)OrderTypeEnum.安装费 && r.subject.Id == s).Sum(r => (r.order.OrderPrice ?? 0) * (r.order.Quantity ?? 1));
                     if (!subjectInstallPriceDic_r.Keys.Contains(s))
                     {
                         subjectInstallPriceDic_r.Add(s, installPrice0);
@@ -1276,7 +1277,7 @@ namespace WebApp.Statistics
                         subjectInstallPriceDic_r[s] = subjectInstallPriceDic_r[s] + installPrice0;
                     }
 
-                    decimal otherPrice0 = orderInstallList_r.Where(r => r.order.OrderType == (int)OrderTypeEnum.其他费用 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    decimal otherPrice0 = orderInstallList_r.Where(r => (r.order.OrderType == (int)OrderTypeEnum.其他费用 || r.order.OrderType == (int)OrderTypeEnum.印刷费) && r.subject.Id == s).Sum(r => (r.order.OrderPrice ?? 0) * (r.order.Quantity ?? 1));
                     otherPrice_r += otherPrice0;
                     if (!otherPriceDic_r.Keys.Contains(s))
                     {
@@ -1287,11 +1288,11 @@ namespace WebApp.Statistics
                         otherPriceDic_r[s] += otherPrice0;
                     }
 
-                    decimal regionExpressPrice0 = orderInstallList_r.Where(r => r.order.OrderType == (int)OrderTypeEnum.发货费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    decimal regionExpressPrice0 = orderInstallList_r.Where(r => (r.order.OrderType == (int)OrderTypeEnum.发货费 || r.order.OrderType == (int)OrderTypeEnum.快递费 || r.order.OrderType == (int)OrderTypeEnum.运费) && r.subject.Id == s).Sum(r => (r.order.OrderPrice ?? 0) * (r.order.Quantity ?? 1));
 
                     expressPrice_r += regionExpressPrice0;
 
-                    decimal measurePrice0 = orderInstallList_r.Where(r => r.order.OrderType == (int)OrderTypeEnum.测量费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
+                    decimal measurePrice0 = orderInstallList_r.Where(r => r.order.OrderType == (int)OrderTypeEnum.测量费 && r.subject.Id == s).Sum(r => (r.order.OrderPrice ?? 0) * (r.order.Quantity ?? 1));
                     if (measurePriceDic_r.Keys.Contains(s))
                     {
                         measurePriceDic_r[s] = measurePriceDic_r[s] + measurePrice0;
@@ -1471,7 +1472,7 @@ namespace WebApp.Statistics
             if (subjectChannel < 2)
             {
                 //统计分区的时候不计算这个
-                var orderDetailList = new PriceOrderDetailBLL().GetList(s => priceSubjectIdList.Contains(s.SubjectId ?? 0) && ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.新开店安装费 || (s.SubjectType ?? 1) == (int)SubjectTypeEnum.运费));
+                var orderDetailList = new PriceOrderDetailBLL().GetList(s => priceSubjectIdList.Contains(s.SubjectId ?? 0) && ((s.SubjectType ?? 1) == (int)SubjectTypeEnum.新开店安装费 || (s.SubjectType ?? 1) == (int)SubjectTypeEnum.运费) && (s.ShopId??0)==0);
                 if (regionList.Any())
                 {
                     orderDetailList = orderDetailList.Where(s => regionList.Contains(s.Region.ToLower())).ToList();
@@ -1486,15 +1487,22 @@ namespace WebApp.Statistics
                 {
                     orderDetailList.ForEach(s =>
                     {
-                        if (!newShopInstallPriceDic_s.Keys.Contains((s.SubjectId ?? 0)))
+                        if (s.OrderType == (int)SubjectTypeEnum.新开店安装费)
                         {
-                            newShopInstallPriceDic_s.Add((s.SubjectId ?? 0), (s.Amount ?? 0));
+                            if (!newShopInstallPriceDic_s.Keys.Contains((s.SubjectId ?? 0)))
+                            {
+                                newShopInstallPriceDic_s.Add((s.SubjectId ?? 0), (s.Amount ?? 0));
+                            }
+                            else
+                            {
+                                newShopInstallPriceDic_s[(s.SubjectId ?? 0)] += (s.Amount ?? 0);
+                            }
+                            newShopInstallPrice_s += (s.Amount ?? 0);
                         }
-                        else
+                        else if (s.OrderType == (int)SubjectTypeEnum.运费)
                         {
-                            newShopInstallPriceDic_s[(s.SubjectId ?? 0)] += (s.Amount ?? 0);
+                            expressPrice_s += (s.Amount ?? 0);
                         }
-                        newShopInstallPrice_s += (s.Amount ?? 0);
                     });
                     
                 }
@@ -1619,7 +1627,7 @@ namespace WebApp.Statistics
             {
                 priceOrderList_s.ForEach(s =>
                 {
-                    decimal price0 = s.order.OrderPrice ?? 0;
+                    decimal price0 = (s.order.OrderPrice ?? 0)*(s.order.Quantity??1);
                     if (s.order.OrderType == (int)OrderTypeEnum.安装费)
                     {
 
@@ -1632,12 +1640,12 @@ namespace WebApp.Statistics
                             subjectInstallPriceDic_s[s.order.SubjectId ?? 0] = subjectInstallPriceDic_s[s.order.SubjectId ?? 0] + price0;
                         }
                     }
-                    else if (s.order.OrderType == (int)OrderTypeEnum.发货费)
+                    else if (s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.快递费 || s.order.OrderType == (int)OrderTypeEnum.运费)
                     {
                         expressPrice_s += price0;
 
                     }
-                    else if (s.order.OrderType == (int)OrderTypeEnum.其他费用)
+                    else if (s.order.OrderType == (int)OrderTypeEnum.其他费用 || s.order.OrderType == (int)OrderTypeEnum.印刷费)
                     {
                         otherPrice_s += price0;
                         if (!otherPriceDic_s.Keys.Contains((s.order.SubjectId ?? 0)))
@@ -1649,20 +1657,20 @@ namespace WebApp.Statistics
                             otherPriceDic_s[(s.order.SubjectId ?? 0)] += price0;
                         }
                     }
-                    else if (s.order.OrderType == (int)OrderTypeEnum.运费)
-                    {
-                        //运费和新开的费用放一起
-                        newShopInstallPrice_s += price0;
-                        if (!newShopInstallPriceDic_s.Keys.Contains((s.order.SubjectId ?? 0)))
-                        {
-                            newShopInstallPriceDic_s.Add((s.order.SubjectId ?? 0), price0);
-                        }
-                        else
-                        {
-                            newShopInstallPriceDic_s[(s.order.SubjectId ?? 0)] += price0;
-                        }
+                    //else if (s.order.OrderType == (int)OrderTypeEnum.运费)
+                    //{
+                    //    //运费和新开的费用放一起
+                    //    newShopInstallPrice_s += price0;
+                    //    if (!newShopInstallPriceDic_s.Keys.Contains((s.order.SubjectId ?? 0)))
+                    //    {
+                    //        newShopInstallPriceDic_s.Add((s.order.SubjectId ?? 0), price0);
+                    //    }
+                    //    else
+                    //    {
+                    //        newShopInstallPriceDic_s[(s.order.SubjectId ?? 0)] += price0;
+                    //    }
 
-                    }
+                    //}
                 });
             }
 
@@ -1672,7 +1680,7 @@ namespace WebApp.Statistics
             {
                 priceOrderList_r.ForEach(s =>
                 {
-                    decimal price0 = s.order.OrderPrice ?? 0;
+                    decimal price0 = (s.order.OrderPrice ?? 0)*(s.order.Quantity??1);
                     if (s.order.OrderType == (int)OrderTypeEnum.安装费)
                     {
 
@@ -1685,12 +1693,12 @@ namespace WebApp.Statistics
                             subjectInstallPriceDic_r[s.order.SubjectId ?? 0] = subjectInstallPriceDic_r[s.order.SubjectId ?? 0] + price0;
                         }
                     }
-                    else if (s.order.OrderType == (int)OrderTypeEnum.发货费)
+                    else if (s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.快递费 || s.order.OrderType == (int)OrderTypeEnum.运费)
                     {
                         expressPrice_r += price0;
 
                     }
-                    else if (s.order.OrderType == (int)OrderTypeEnum.其他费用)
+                    else if (s.order.OrderType == (int)OrderTypeEnum.其他费用 || s.order.OrderType == (int)OrderTypeEnum.印刷费)
                     {
                         otherPrice_r += price0;
                         if (!otherPriceDic_r.Keys.Contains((s.order.SubjectId ?? 0)))
@@ -1702,20 +1710,20 @@ namespace WebApp.Statistics
                             otherPriceDic_r[(s.order.SubjectId ?? 0)] += price0;
                         }
                     }
-                    else if (s.order.OrderType == (int)OrderTypeEnum.运费)
-                    {
-                        //运费和新开的费用放一起
-                        newShopInstallPrice_r += price0;
-                        if (!newShopInstallPriceDic_r.Keys.Contains((s.order.SubjectId ?? 0)))
-                        {
-                            newShopInstallPriceDic_r.Add((s.order.SubjectId ?? 0), price0);
-                        }
-                        else
-                        {
-                            newShopInstallPriceDic_r[(s.order.SubjectId ?? 0)] += price0;
-                        }
+                    //else if (s.order.OrderType == (int)OrderTypeEnum.运费)
+                    //{
+                    //    //运费和新开的费用放一起
+                    //    newShopInstallPrice_r += price0;
+                    //    if (!newShopInstallPriceDic_r.Keys.Contains((s.order.SubjectId ?? 0)))
+                    //    {
+                    //        newShopInstallPriceDic_r.Add((s.order.SubjectId ?? 0), price0);
+                    //    }
+                    //    else
+                    //    {
+                    //        newShopInstallPriceDic_r[(s.order.SubjectId ?? 0)] += price0;
+                    //    }
 
-                    }
+                    //}
                 });
             }
             #endregion

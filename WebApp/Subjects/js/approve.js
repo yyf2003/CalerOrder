@@ -24,22 +24,24 @@ function Check() {
         }
     }
     //return confirm("确定提交吗？");
-    if (confirm("确定提交吗？")) {
-        $("#btnDiv").hide();
-        //$("#loadingApprove").show();
-        layer.open({
-            type: 1,
-            time: 0,
-            title: '提示信息',
-            skin: 'layui-layer-rim', //加上边框
-            area: ['450px', '200px'],
-            content: $("#approveLoading"),
-            id: 'loadLayer',
-            closeBtn: 0
+//    if (confirm("确定提交吗？")) {
+//        $("#btnDiv").hide();
+//       
+//        return true;
+//    }
+//    else
+    //        return false;
 
-        });
-        return true;
-    }
-    else
-        return false;
+    layer.open({
+        type: 1,
+        time: 0,
+        title: '提示信息',
+        skin: 'layui-layer-rim', //加上边框
+        area: ['450px', '200px'],
+        content: $("#approveLoading"),
+        id: 'loadLayer',
+        closeBtn: 0
+
+    });
+
 }

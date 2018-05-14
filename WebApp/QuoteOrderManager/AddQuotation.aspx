@@ -9,6 +9,11 @@
     <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
     <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
     <script type="text/javascript">
+        var month = '<%=month %>';
+        var guidanceId = '<%=guidanceId %>';
+        var subjectCategory = '<%=subjectCategory %>';
+        var subjectId = '<%=subjectId %>';
+        var customerId = '<%=customerId %>';
         function finish(msg) {
             if (msg == "ok") {
                 window.parent.Finish();
@@ -18,6 +23,22 @@
             }
         }
     </script>
+    <style type="text/css">
+        #popTable li
+        {
+            margin-bottom: 2px;
+            height: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            padding-left: 5px;
+            color: Blue;
+        }
+        #popTable li:hover
+        {
+            background-color: #f0f1f2;
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -51,6 +72,14 @@
             </tr>
             <tr class="tr_bai">
                 <td>
+                    项目名称
+                </td>
+                <td colspan="5" style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labSubjectNames" runat="server" Text=""></asp:Label>
+                </td>
+            </tr>
+            <tr class="tr_bai">
+                <td>
                     VVIP店铺
                 </td>
                 <td style="width: 200px; text-align: left; padding-left: 5px;">
@@ -74,10 +103,9 @@
     <div class="tr" style="margin-top: 20px;">
         》POP订单统计
     </div>
-    
     <asp:Repeater ID="popList" runat="server" OnItemDataBound="popList_ItemDataBound">
         <HeaderTemplate>
-            <table class="table">
+            <table class="table" id="popTable">
                 <tr class="tr_hui">
                     <td>
                         画面位置
@@ -107,8 +135,8 @@
                 <td runat="server" id="sheet">
                     <%--画面位置--%>
                     <%--<asp:Label ID="labSheet" runat="server" Text=""></asp:Label>--%>
-                    
-                    <span name="popSheetSpan" style=" cursor:pointer; text-decoration:underline;color:Blue;"><%#Eval("Sheet") %></span>
+                    <span name="popSheetSpan" style="cursor: pointer; text-decoration: underline; color: Blue;">
+                        <%#Eval("Sheet") %></span>
                 </td>
                 <td>
                     <%--画面名称/描述--%>
@@ -165,6 +193,40 @@
                 </td>
                 <td style="text-align: center;">
                     <asp:Label ID="labPOPTotalPrice" runat="server" Text="0"></asp:Label>
+                </td>
+            </tr>
+            <tr class="tr_bai">
+                <td colspan="4" style="text-align: right;">
+                    新增比例：
+                </td>
+                <td style="text-align: center;">
+                    <div style="position: relative;">
+                        <asp:TextBox ID="txtAddRate" runat="server" MaxLength="5" Style="width: 80px; text-align: center;"></asp:TextBox>
+                        <span style=" font-weight:bolder;">%</span>
+                        <div id="divAddRate" style="display: none; position: absolute; width: 80px; background-color: White;
+                            border: 1px solid #ccc; padding-top: 2px; z-index: 100;">
+                            <ul id="ddlAddRate" style="margin-top: 0; width: 80px; margin-left: 0px; list-style: none;">
+                                <li>0</li>
+                                <li>1</li>
+                                <li>2</li>
+                                <li>3</li>
+                                <li>4</li>
+                                <li>5</li>
+                                <li>6</li>
+                                <li>7</li>
+                                <li>8</li>
+                                <li>9</li>
+                                <li>10</li>
+                            </ul>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    新增金额：
+                </td>
+                <td style="text-align: center;">
+                    <img id="loadNewPriceImg" src="../image/WaitImg/loadingA.gif" style=" display:none;"/>
+                    <asp:Label ID="labNewPOPTotalPrice" runat="server" Text="0"></asp:Label>
                 </td>
             </tr>
             <%} %>
@@ -577,7 +639,10 @@
                         合计
                     </td>
                     <td>
-                        操作
+                        剩余
+                    </td>
+                    <td>
+                        报价
                     </td>
                 </tr>
         </HeaderTemplate>
@@ -602,8 +667,45 @@
                 <td id="subPrice" runat="server">
                     <asp:Label ID="labSubPrice" runat="server" Text=""></asp:Label>
                 </td>
-                <td id="operatePrice" runat="server">
+                <td id="subPriceLeft" runat="server">
+                    <asp:Label ID="labsubPriceLeft" runat="server" Text=""></asp:Label>
+                </td>
+                <td id="operatePrice" runat="server" style=" text-align:left; padding-left :10px;">
+                    <asp:HiddenField ID="hfChangeType" runat="server" />
+                    <asp:Panel ID="PanelPOP" runat="server">
+                       <div>
+                       <span style=" font-weight:bolder;">POP</span>：
+                       位置:
+                        <asp:DropDownList ID="ddlSheet" runat="server">
+                           <asp:ListItem Value="">请选择</asp:ListItem>
+                           <asp:ListItem Value="橱窗">橱窗</asp:ListItem>
+                           <asp:ListItem Value="陈列桌">陈列桌</asp:ListItem>
+                           <asp:ListItem Value="服装墙">服装墙</asp:ListItem>
+                           <asp:ListItem Value="鞋墙">鞋墙</asp:ListItem>
+                           <asp:ListItem Value="SMU">SMU</asp:ListItem>
+                           <asp:ListItem Value="中岛">中岛</asp:ListItem>
+                           <asp:ListItem Value="收银台">收银台</asp:ListItem>
+                           <asp:ListItem Value="OOH">OOH</asp:ListItem>
+                        </asp:DropDownList>
+                        &nbsp;&nbsp;材质:
+                        <asp:DropDownList ID="ddlMaterial" runat="server">
+                          <asp:ListItem Value="">请选择材质</asp:ListItem>
+                        </asp:DropDownList>
+                        &nbsp;&nbsp;面积:
+                        <asp:TextBox ID="txtPOPArea" runat="server" MaxLength="5" style=" width:60px; text-align:center;"></asp:TextBox><span style="color:Blue;">平米</span>
+                        <input name="btnAddPOPQuote" type="button" value="添加" class="layui-btn layui-btn-xs" style=" margin-left:10px;"/>
+                        &nbsp;&nbsp; 合计：
+                        <asp:Label ID="labPOPTotal" runat="server" Text="0"></asp:Label>
+                        <div style=" margin-left:40px; text-align:left;">
+                           <%--<span name="popQuoteList"></span>--%>
+                        </div>
+                        </div>
+                       
+                    </asp:Panel>
+
                     <asp:Panel ID="PanelOOH" runat="server">
+                       <span style=" font-weight:bolder;">安装费</span>：
+
                         5000:
                         <input type="button" name="btnOOHDec" value="-" style="width: 20px;" />
                         <asp:TextBox ID="txtOOHPriceCount1" runat="server" data-val="5000" Text="0" MaxLength="3"
@@ -628,6 +730,8 @@
                         <asp:Label ID="labOOHTotal" runat="server" Text="0"></asp:Label>
                     </asp:Panel>
                     <asp:Panel ID="PanelBasic" runat="server">
+                        <span style=" font-weight:bolder;">安装费</span>：
+
                         800:
                         <input type="button" name="btnBasicDec" value="-" style="width: 20px;" />
                         <asp:TextBox ID="txtBasicPriceCount1" runat="server" Text="0" data-val="800" MaxLength="3"
@@ -661,12 +765,17 @@
             </table>
         </FooterTemplate>
     </asp:Repeater>
-    
     <div style="text-align: center; height: 50px; margin-top: 30px; margin-bottom: 30px;">
         <asp:Button ID="btnSubmit" runat="server" Text="提 交" class="layui-btn layui-btn-normal"
             OnClick="btnSubmit_Click" OnClientClick="return Check()" />
+        <asp:HiddenField ID="hfPOPQuoteJson" runat="server" />
     </div>
     </form>
 </body>
 </html>
 <script src="js/addQuotation.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () { 
+      //$().siblings
+    })
+</script>

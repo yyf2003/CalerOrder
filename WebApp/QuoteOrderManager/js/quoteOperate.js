@@ -12,21 +12,22 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
     }
     if (eleId.indexOf("cblGuidanceList") != -1) {
         $("#loadCategory").show();
-       
+        $("#loadSubject").show();
     }
-
-    
     if (eleId.indexOf("btnCheckAllGuidance") != -1) {
         $("#loadCategory").show();
-      
+        $("#loadSubject").show();
     }
-
+    if (eleId.indexOf("cblSubjectCategory") != -1) {
+        $("#loadSubject").show();
+    }
 
 })
 
 Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
     $("#loadGuidance").hide();
     $("#loadCategory").hide();
+    $("#loadSubject").hide();
     $("#cbCheckAllGuidance").change(function () {
         var checked = this.checked;
         $("input[name^='cblGuidanceList']").each(function () {
@@ -34,6 +35,26 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
         });
         $("#btnCheckAllGuidance").click();
     })
+
+
+    $("#cbAllSubject").change(function () {
+        var checked = this.checked;
+        $("input[name^='cblSubjectName']").each(function () {
+            this.checked = checked;
+        });
+    })
+
+    $("input[name^='cblSubjectName']").change(function () {
+        if (!this.checked) {
+            $("#cbAllSubject").prop("checked", false);
+        }
+        else {
+            var checked = $("input[name^='cblSubjectName']:checked").length == $("input[name^='cblSubjectName']").length;
+            $("#cbAllSubject").prop("checked", checked);
+        }
+    })
+
+
 
     $("#btnAddQuote").click(function () {
         var customerId = $("#ddlCustomer").val();
@@ -46,11 +67,15 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
         $("input[name^='cblSubjectCategory']:checked").each(function () {
             subjectCategory += $(this).val() + ',';
         })
+        var subjectId = "";
+        $("input[name^='cblSubjectName']:checked").each(function () {
+            subjectId += $(this).val() + ',';
+        })
         if (guidanceId == "") {
             layer.msg("请选择活动");
             return false;
         }
-        var url = "AddQuotation.aspx?customerId=" + customerId + "&month=" + month + "&guidanceId=" + guidanceId + "&subjectCategory=" + subjectCategory;
+        var url = "AddQuotation.aspx?customerId=" + customerId + "&month=" + month + "&guidanceId=" + guidanceId + "&subjectCategory=" + subjectCategory + "&subjectId=" + subjectId;
         layer.open({
             type: 2,
             time: 0,
@@ -59,7 +84,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             area: ['95%', '90%'],
             content: url,
             id: 'layer1',
-            
+
             cancel: function (index) {
                 layer.closeAll();
             }
@@ -67,24 +92,24 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
         });
     })
 
-//    $("span[name='spanEditQuote']").click(function () {
-//        var id = $(this).data("itemid");
-//        var url = "AddQuotation.aspx?itemId=" + id;
-//        layer.open({
-//            type: 2,
-//            time: 0,
-//            title: '编辑报价单',
-//            skin: 'layui-layer-rim', //加上边框
-//            area: ['95%', '90%'],
-//            content: url,
-//            id: 'layer1',
-//            
-//            cancel: function (index) {
-//                layer.closeAll();
-//            }
+    //    $("span[name='spanEditQuote']").click(function () {
+    //        var id = $(this).data("itemid");
+    //        var url = "AddQuotation.aspx?itemId=" + id;
+    //        layer.open({
+    //            type: 2,
+    //            time: 0,
+    //            title: '编辑报价单',
+    //            skin: 'layui-layer-rim', //加上边框
+    //            area: ['95%', '90%'],
+    //            content: url,
+    //            id: 'layer1',
+    //            
+    //            cancel: function (index) {
+    //                layer.closeAll();
+    //            }
 
-//        });
-//    })
+    //        });
+    //    })
 })
 
 

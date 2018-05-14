@@ -3210,7 +3210,7 @@ namespace WebApp.Subjects.ADOrders
                             finalOrderTempBll.Add(finalOrderTempModel);
                             //保存报价单
                             
-                            new BasePage().SaveQuotationOrder(finalOrderTempModel);
+                            //new BasePage().SaveQuotationOrder(finalOrderTempModel);
                         });
                     }
                     //物料信息
@@ -3290,7 +3290,7 @@ namespace WebApp.Subjects.ADOrders
 
                             finalOrderTempBll.Add(finalOrderTempModel);
                             //保存报价单
-                            new BasePage().SaveQuotationOrder(finalOrderTempModel,false);
+                            //new BasePage().SaveQuotationOrder(finalOrderTempModel,false);
                         });
                     }
 
@@ -3383,6 +3383,7 @@ namespace WebApp.Subjects.ADOrders
                     string City = string.Empty;
                     string Address = string.Empty;
                     string price = string.Empty;
+                    string count = string.Empty;
                     string contents = string.Empty;
                     string remark = string.Empty;
                     if (cols.Contains("店铺编号"))
@@ -3528,6 +3529,7 @@ namespace WebApp.Subjects.ADOrders
                 string width = string.Empty;
                 string length = string.Empty;
                 string material = string.Empty;
+                //string unitPrice = string.Empty;
                 string chooseImg = string.Empty;
                 string positionDescription = string.Empty;
                 string remark = string.Empty;
@@ -3553,7 +3555,6 @@ namespace WebApp.Subjects.ADOrders
                         shopNo = StringHelper.ReplaceSpecialChar(dr["POSCode"].ToString().Trim());
                     else if (HandMakeOrderCols.Contains("POS Code"))
                         shopNo = StringHelper.ReplaceSpecialChar(dr["POS Code"].ToString().Trim());
-
                     if (HandMakeOrderCols.Contains("POP位置"))
                         sheet = StringHelper.ReplaceSpecialChar(dr["POP位置"].ToString().Trim());
                     else if (HandMakeOrderCols.Contains("位置"))
@@ -3597,6 +3598,12 @@ namespace WebApp.Subjects.ADOrders
                         material = StringHelper.ReplaceSpecialChar(dr["POP材质"].ToString().Trim());
                     else if (HandMakeOrderCols.Contains("材质"))
                         material = StringHelper.ReplaceSpecialChar(dr["材质"].ToString().Trim());
+
+                    //if (HandMakeOrderCols.Contains("材质单价"))
+                    //    unitPrice = StringHelper.ReplaceSpecialChar(dr["材质单价"].ToString().Trim());
+                    //else if (HandMakeOrderCols.Contains("单价"))
+                    //    unitPrice = StringHelper.ReplaceSpecialChar(dr["单价"].ToString().Trim());
+
                     if (HandMakeOrderCols.Contains("选图"))
                         chooseImg = StringHelper.ReplaceSpecialChar(dr["选图"].ToString().Trim());
                     else if (HandMakeOrderCols.Contains("系列/选图"))
@@ -3699,8 +3706,6 @@ namespace WebApp.Subjects.ADOrders
                     {
                         sheet = "中岛";
                     }
-
-
                     if (string.IsNullOrWhiteSpace(gender))
                     {
                         canSave = false;
@@ -4596,8 +4601,8 @@ namespace WebApp.Subjects.ADOrders
                             orderModel.CSUserId = s.shop.CSUserId;
                             orderBll.Add(orderModel);
                             //保存报价订单
-                            orderModel.UnitName = unitName;
-                            new BasePage().SaveQuotationOrder(orderModel);
+                            //orderModel.UnitName = unitName;
+                            //new BasePage().SaveQuotationOrder(orderModel);
 
                         });
                     }
@@ -4774,7 +4779,7 @@ namespace WebApp.Subjects.ADOrders
                             }
                             orderModel.CSUserId = o.shop.CSUserId;
                             orderBll.Add(orderModel);
-                            new BasePage().SaveQuotationOrder(orderModel,false);
+                            //new BasePage().SaveQuotationOrder(orderModel,false);
                         });
                     }
 

@@ -1,9 +1,8 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CheckOtherPriceDetail.aspx.cs" Inherits="WebApp.OutsourcingOrder.Statistics.CheckOtherPriceDetail" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CheckOtherPriceDetail.aspx.cs"
+    Inherits="WebApp.OutsourcingOrder.Statistics.CheckOtherPriceDetail" %>
 
 <%@ Register Assembly="AspNetPager" Namespace="Wuqi.Webdiyer" TagPrefix="webdiyer" %>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title></title>
@@ -17,10 +16,8 @@
     <div class="tr">
         >>费用信息
     </div>
-    
-    <asp:Repeater ID="gvList" runat="server">
+    <asp:Repeater ID="gvList" runat="server" onitemdatabound="gvList_ItemDataBound">
         <HeaderTemplate>
-            
             <table class="table1" style="width: 100%;">
                 <tr class="tr_hui">
                     <td style="width: 40px;">
@@ -44,16 +41,17 @@
                     <td>
                         城市
                     </td>
-                    
                     <td>
                         Format
                     </td>
-                   
                     <td>
                         应付金额
                     </td>
                     <td>
                         应收金额
+                    </td>
+                    <td>
+                        数量
                     </td>
                     <td>
                         备注
@@ -66,7 +64,7 @@
                     <%#(AspNetPager1.CurrentPageIndex-1)*AspNetPager1.PageSize+ Container.ItemIndex + 1%>
                 </td>
                 <td>
-                   其他费用
+                    <asp:Label ID="labOrderType" runat="server" Text=""></asp:Label>
                 </td>
                 <td>
                     <%#Eval("shop.ShopNo")%>
@@ -83,20 +81,21 @@
                 <td>
                     <%#Eval("shop.CityName")%>
                 </td>
-                
-                
-                    <td>
-                        <%#Eval("order.Format")%>
-                    </td>
-               
+                <td>
+                    <%#Eval("order.Format")%>
+                </td>
                 <td>
                     <%#Eval("order.PayOrderPrice")%>
                 </td>
-                 <td>
+                <td>
                     <%#Eval("order.ReceiveOrderPrice")%>
                 </td>
-               <td>
-                     <%#Eval("order.Remark")%>
+                <td>
+                    <%#Eval("order.Quantity")%>
+                </td>
+                <td>
+                    <%--<%#Eval("order.Remark")%>--%>
+                    <asp:Label ID="labRemark" runat="server" Text=""></asp:Label>
                 </td>
             </tr>
         </ItemTemplate>
@@ -104,7 +103,7 @@
             <%if (gvList.Items.Count == 0)
               {%>
             <tr class="tr_bai">
-                <td colspan="11" style="text-align: center;">
+                <td colspan="12" style="text-align: center;">
                     --无数据--
                 </td>
             </tr>

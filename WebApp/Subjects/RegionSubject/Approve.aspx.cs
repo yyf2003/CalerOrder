@@ -302,7 +302,7 @@ namespace WebApp.Subjects.RegionSubject
             string remark = txtRemark.Text.Trim();
             SubjectBLL subjectBll = new SubjectBLL();
             bool isApproveOk = false;
-            string msg = string.Empty;
+            string msg = "ok";
             int subjectType = 1;
             int guidanceId = 0;
             Models.Subject model = subjectBll.GetModel(subjectId);
@@ -479,7 +479,7 @@ namespace WebApp.Subjects.RegionSubject
                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                     finalOrderTempModel.UnitName = unitName;
                                     finalOrderTempBll.Add(finalOrderTempModel);
-                                    new BasePage().SaveQuotationOrder(finalOrderTempModel, useQuoteSetting);
+                                    //new BasePage().SaveQuotationOrder(finalOrderTempModel, useQuoteSetting);
                                 }
                             });
 
@@ -525,15 +525,19 @@ namespace WebApp.Subjects.RegionSubject
             }
             if (isApproveOk)
             {
-               
+
                 if (result == 1 && subjectType != (int)SubjectTypeEnum.新开店安装费 && subjectType != (int)SubjectTypeEnum.运费)
                 {
                     new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId);
                 }
-                Alert("审批成功！", "ApproveList.aspx");
+                //Alert("审批成功！", "ApproveList.aspx");
+                ExcuteJs("ApproveStae", msg, "ApproveList.aspx");
             }
             else
-                Alert("审批失败！");
+            {
+                //Alert("审批失败！");
+                ExcuteJs("ApproveStae", msg, "");
+            }
         }
 
 

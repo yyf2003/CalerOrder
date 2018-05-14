@@ -120,7 +120,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (orderList.Any())
             {
                 List<int> shopIdList = orderList.Select(s => s.orderDetail.ShopId ?? 0).ToList();
-                var experssOrderList = orderList0.Where(s => shopIdList.Contains(s.orderDetail.ShopId ?? 0) && (s.orderDetail.OrderType == (int)OrderTypeEnum.发货费 || s.orderDetail.OrderType == (int)OrderTypeEnum.运费)).ToList();
+                var experssOrderList = orderList0.Where(s => shopIdList.Contains(s.orderDetail.ShopId ?? 0) && (s.orderDetail.OrderType == (int)OrderTypeEnum.发货费 || s.orderDetail.OrderType == (int)OrderTypeEnum.快递费 || s.orderDetail.OrderType == (int)OrderTypeEnum.运费)).ToList();
                 int shopid = 1;
                 experssOrderList.ForEach(s =>
                      {

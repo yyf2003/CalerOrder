@@ -127,6 +127,7 @@ namespace WebApp.Subjects.PriceOrder
                         string price = string.Empty;
                         //应付费用金额
                         string payPrice = string.Empty;
+                        string count = string.Empty;
                         string contents = string.Empty;
                         string remark = string.Empty;
                         
@@ -140,6 +141,7 @@ namespace WebApp.Subjects.PriceOrder
                             price = string.Empty;
                             //应付费用金额
                             payPrice = string.Empty;
+                            count = string.Empty;
                             contents = string.Empty;
                             remark = string.Empty;
                             StringBuilder msg = new StringBuilder();
@@ -174,6 +176,9 @@ namespace WebApp.Subjects.PriceOrder
                                 payPrice = StringHelper.ReplaceSpecialChar(dr["应付费用"].ToString().Trim());
                             else if (cols.Contains("应付金额"))
                                 payPrice = StringHelper.ReplaceSpecialChar(dr["应付金额"].ToString().Trim());
+
+                            if (cols.Contains("数量"))
+                                count = StringHelper.ReplaceSpecialChar(dr["数量"].ToString().Trim());
 
                             if (cols.Contains("费用内容"))
                                 contents = StringHelper.ReplaceSpecialChar(dr["费用内容"].ToString().Trim());
@@ -237,6 +242,11 @@ namespace WebApp.Subjects.PriceOrder
                                 canSave = false;
                                 msg.Append("应付金额填写不正确；");
                             }
+                            if (!string.IsNullOrWhiteSpace(count) && !StringHelper.IsIntVal(count))
+                            {
+                                canSave = false;
+                                msg.Append("数量填写不正确；");
+                            }
                             if (canSave)
                             {
                                 if (string.IsNullOrWhiteSpace(payPrice))
@@ -246,6 +256,7 @@ namespace WebApp.Subjects.PriceOrder
                                 priceModel.Address = shopFromDB.POPAddress;
                                 priceModel.Amount = StringHelper.IsDecimal(price);
                                 priceModel.PayAmount = StringHelper.IsDecimal(payPrice);
+                                priceModel.Quantity = !string.IsNullOrWhiteSpace(count) ? int.Parse(count) : 1;
                                 priceModel.City = shopFromDB.CityName;
                                 priceModel.Contents = contents;
                                 priceModel.Province = shopFromDB.ProvinceName;

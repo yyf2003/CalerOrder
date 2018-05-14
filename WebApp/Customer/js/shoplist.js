@@ -700,7 +700,7 @@ function onBodyDown(event) {
 $(function () {
 
     $("#txtChannel").on("click", function () {
-        showChannelMenu()();
+        showChannelMenu();
     })
 
     $("#txtFormat").on("click", function () {

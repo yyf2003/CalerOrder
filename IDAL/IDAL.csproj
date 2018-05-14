@@ -69,6 +69,7 @@
     <Compile Include="IPlace.cs" />
     <Compile Include="IPOPOrder.cs" />
     <Compile Include="IQuoteMaterialDAL.cs" />
+    <Compile Include="IQuoteOrderDetailDAL.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="IShop.cs" />
     <Compile Include="IShopMachineFrame.cs" />

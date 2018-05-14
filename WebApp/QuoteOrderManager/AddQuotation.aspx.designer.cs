@@ -58,6 +58,15 @@ namespace WebApp.QuoteOrderManager {
         protected global::System.Web.UI.WebControls.Label labSubjectCategory;
         
         /// <summary>
+        /// labSubjectNames 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labSubjectNames;
+        
+        /// <summary>
         /// labVVIPShop 控件。
         /// </summary>
         /// <remarks>
@@ -398,5 +407,14 @@ namespace WebApp.QuoteOrderManager {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnSubmit;
+        
+        /// <summary>
+        /// hfPOPQuoteJson 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfPOPQuoteJson;
     }
 }

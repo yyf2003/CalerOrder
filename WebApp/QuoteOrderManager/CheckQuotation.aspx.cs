@@ -10,6 +10,12 @@ using Models;
 using Common;
 using System.Configuration;
 using System.Web.UI.HtmlControls;
+using NPOI.SS.UserModel;
+using System.Data;
+using NPOI;
+using NPOI.XSSF.UserModel;
+using OfficeOpenXml;
+using System.IO;
 
 namespace WebApp.QuoteOrderManager
 {
@@ -89,7 +95,7 @@ namespace WebApp.QuoteOrderManager
         void BindPOPList()
         {
 
-           
+            Session["QuoteModel"] = null;
             var orderList = (from order in CurrentContext.DbContext.QuoteOrderDetail
                              join subject in CurrentContext.DbContext.Subject
                              on order.SubjectId equals subject.Id
@@ -629,9 +635,13 @@ namespace WebApp.QuoteOrderManager
             popList.DataBind();
             CombineCell(popList, new List<string> { "sheet" });
             BindInstallPrice(popOrderList);
+            Session["QuoteModel"] = quoteOrderList;
 
         }
-
+        /// <summary>
+        /// 缓存安装费
+        /// </summary>
+        List<InstallPriceQuoteModel> InstallPriceQuoteModelList = new List<InstallPriceQuoteModel>();
         void BindInstallPrice(List<QuoteOrderDetail> orderList)
         {
             //List<string> cityTierList = new List<string>() { "T1", "T2", "T3" };
@@ -673,7 +683,7 @@ namespace WebApp.QuoteOrderManager
 
             //decimal otherBasicInstallPrice = 0;
             List<int> installShopList = new List<int>();
-
+            
             guidanceIdList.ForEach(gid =>
             {
                 //安装费
@@ -694,7 +704,7 @@ namespace WebApp.QuoteOrderManager
                 if (installPriceList.Any())
                 {
                     installShopList.AddRange(installPriceList.Select(s => s.install.ShopId ?? 0).Distinct().ToList());
-
+                    InstallPriceQuoteModel installQuoteModel;
                     installPriceList.ForEach(s =>
                     {
                         string materialSupport = (s.install.MaterialSupport != null) ? (s.install.MaterialSupport.ToLower()) : string.Empty;
@@ -706,6 +716,7 @@ namespace WebApp.QuoteOrderManager
                                 kidsWindowCount++;
                                 kidsWindowPrice += 500;
                                 installPriceTotal += 500;
+                                
                             }
                             else if ((s.install.BasicPrice ?? 0) > 0)
                             {
@@ -713,7 +724,26 @@ namespace WebApp.QuoteOrderManager
                                 kidsBasicPrice += 150;
                                 installPriceTotal += 150;
                             }
+                            bool flag = false;
+                            for (int i = 0; i < InstallPriceQuoteModelList.Count; i++)
+                            {
+                                installQuoteModel = InstallPriceQuoteModelList[i];
+                                if (installQuoteModel.ChargeItem == "BasicInstall" && installQuoteModel.ChargeType == "kids" && installQuoteModel.UnitPrice == (s.install.BasicPrice ?? 0))
+                                {
+                                    installQuoteModel.Amount++;
+                                    flag = true;
+                                }
 
+                            }
+                            if (!flag)
+                            {
+                                installQuoteModel = new InstallPriceQuoteModel();
+                                installQuoteModel.Amount = 1;
+                                installQuoteModel.ChargeItem = "BasicInstall";
+                                installQuoteModel.ChargeType = "kids";
+                                installQuoteModel.UnitPrice = (s.install.BasicPrice ?? 0);
+                                InstallPriceQuoteModelList.Add(installQuoteModel);
+                            }
                         }
                         else
                         {
@@ -730,6 +760,7 @@ namespace WebApp.QuoteOrderManager
                                     oohLevelOneCount++;
                                     oohLevelOnePrice += 5000;
                                     installPriceTotal += 5000;
+                                    
                                 }
                                 else if (s.install.OOHPrice == 2700)
                                 {
@@ -776,6 +807,26 @@ namespace WebApp.QuoteOrderManager
                                         otherInstallPriceList.Add(otherInstallPrice);
                                     }
                                 }
+                                bool flag = false;
+                                for (int i = 0; i < InstallPriceQuoteModelList.Count; i++)
+                                {
+                                    installQuoteModel = InstallPriceQuoteModelList[i];
+                                    if (installQuoteModel.ChargeItem == "OOHInstall" && installQuoteModel.ChargeType == (s.install.OOHPrice ?? 0).ToString() && installQuoteModel.UnitPrice == (s.install.OOHPrice ?? 0))
+                                    {
+                                        installQuoteModel.Amount++;
+                                        flag = true;
+                                    }
+
+                                }
+                                if (!flag)
+                                {
+                                    installQuoteModel = new InstallPriceQuoteModel();
+                                    installQuoteModel.Amount = 1;
+                                    installQuoteModel.ChargeItem = "OOHInstall";
+                                    installQuoteModel.ChargeType = (s.install.OOHPrice ?? 0).ToString();
+                                    installQuoteModel.UnitPrice = (s.install.OOHPrice ?? 0);
+                                    InstallPriceQuoteModelList.Add(installQuoteModel);
+                                }
 
                             }
                             if ((s.install.WindowPrice ?? 0) > 0)
@@ -799,6 +850,26 @@ namespace WebApp.QuoteOrderManager
                                     windowLevelThreePrice += 200;
                                     installPriceTotal += 200;
                                 }
+                                bool flag = false;
+                                for (int i = 0; i < InstallPriceQuoteModelList.Count; i++)
+                                {
+                                    installQuoteModel = InstallPriceQuoteModelList[i];
+                                    if (installQuoteModel.ChargeItem == "WindowInstall" && installQuoteModel.ChargeType == (s.install.WindowPrice ?? 0).ToString() && installQuoteModel.UnitPrice == (s.install.WindowPrice ?? 0))
+                                    {
+                                        installQuoteModel.Amount++;
+                                        flag = true;
+                                    }
+
+                                }
+                                if (!flag)
+                                {
+                                    installQuoteModel = new InstallPriceQuoteModel();
+                                    installQuoteModel.Amount = 1;
+                                    installQuoteModel.ChargeItem = "WindowInstall";
+                                    installQuoteModel.ChargeType = (s.install.WindowPrice ?? 0).ToString();
+                                    installQuoteModel.UnitPrice = (s.install.WindowPrice ?? 0);
+                                    InstallPriceQuoteModelList.Add(installQuoteModel);
+                                }
                             }
                             if ((s.install.BasicPrice ?? 0) > 0)
                             {
@@ -808,6 +879,26 @@ namespace WebApp.QuoteOrderManager
                                     genericLevelCount++;
                                     genericLevelPrice += 150;
                                     installPriceTotal += 150;
+                                    bool flag = false;
+                                    for (int i = 0; i < InstallPriceQuoteModelList.Count; i++)
+                                    {
+                                        installQuoteModel = InstallPriceQuoteModelList[i];
+                                        if (installQuoteModel.ChargeItem == "BasicInstall" && installQuoteModel.ChargeType == "generic" && installQuoteModel.UnitPrice == (s.install.BasicPrice ?? 0))
+                                        {
+                                            installQuoteModel.Amount++;
+                                            flag = true;
+                                        }
+
+                                    }
+                                    if (!flag)
+                                    {
+                                        installQuoteModel = new InstallPriceQuoteModel();
+                                        installQuoteModel.Amount = 1;
+                                        installQuoteModel.ChargeItem = "BasicInstall";
+                                        installQuoteModel.ChargeType = "generic";
+                                        installQuoteModel.UnitPrice = (s.install.BasicPrice ?? 0);
+                                        InstallPriceQuoteModelList.Add(installQuoteModel);
+                                    }
                                 }
                                 else
                                 {
@@ -855,6 +946,26 @@ namespace WebApp.QuoteOrderManager
                                             otherInstallPrice.PriceType = "店铺安装费";
                                             otherInstallPriceList.Add(otherInstallPrice);
                                         }
+                                    }
+                                    bool flag = false;
+                                    for (int i = 0; i < InstallPriceQuoteModelList.Count; i++)
+                                    {
+                                        installQuoteModel = InstallPriceQuoteModelList[i];
+                                        if (installQuoteModel.ChargeItem == "BasicInstall" && installQuoteModel.ChargeType == (s.install.BasicPrice ?? 0).ToString() && installQuoteModel.UnitPrice == (s.install.BasicPrice ?? 0))
+                                        {
+                                            installQuoteModel.Amount++;
+                                            flag = true;
+                                        }
+
+                                    }
+                                    if (!flag)
+                                    {
+                                        installQuoteModel = new InstallPriceQuoteModel();
+                                        installQuoteModel.Amount = 1;
+                                        installQuoteModel.ChargeItem = "BasicInstall";
+                                        installQuoteModel.ChargeType = (s.install.BasicPrice ?? 0).ToString();
+                                        installQuoteModel.UnitPrice = (s.install.BasicPrice ?? 0);
+                                        InstallPriceQuoteModelList.Add(installQuoteModel);
                                     }
                                 }
                             }
@@ -925,6 +1036,10 @@ namespace WebApp.QuoteOrderManager
             otherInstallPriceRepeater.DataBind();
             OtherInstallPriceCombineCell();
             SetTotalPrice();
+            if (InstallPriceQuoteModelList.Any())
+            {
+                Session["InstallPriceQuoteModel"] = InstallPriceQuoteModelList;
+            }
         }
 
         void BindeExpressPrice(List<QuoteOrderDetail> orderList)
@@ -1140,6 +1255,7 @@ namespace WebApp.QuoteOrderManager
                         var specialPriceDetailList0 = specialPriceQuoteDetailList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.OOH).ToList();
                         if (specialPriceDetailList0.Any())
                         {
+                            InstallPriceQuoteModel installQuoteModel;
                             int total = 0;
                             Label labOOHPriceCount1 = (Label)e.Item.FindControl("labOOHPriceCount1");
                             Label labOOHPriceCount2 = (Label)e.Item.FindControl("labOOHPriceCount2");
@@ -1147,30 +1263,79 @@ namespace WebApp.QuoteOrderManager
                             Label labOOHPriceCount4 = (Label)e.Item.FindControl("labOOHPriceCount4");
                             Label labOOHTotal = (Label)e.Item.FindControl("labOOHTotal");
 
-                            var level1 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 5000).FirstOrDefault();
-                            if (level1 != null)
-                            {
-                                labOOHPriceCount1.Text = (level1.Quantity ?? 0).ToString();
-                                total += (level1.Quantity ?? 0) * 5000;
-                            }
-                            var level2 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 2700).FirstOrDefault();
-                            if (level2 != null)
-                            {
-                                labOOHPriceCount2.Text = (level2.Quantity ?? 0).ToString();
-                                total += (level2.Quantity ?? 0) * 2700;
-                            }
-                            var level3 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 1800).FirstOrDefault();
-                            if (level3 != null)
-                            {
-                                labOOHPriceCount3.Text = (level3.Quantity ?? 0).ToString();
-                                total += (level3.Quantity ?? 0) * 1800;
-                            }
-                            var level4 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 600).FirstOrDefault();
-                            if (level4 != null)
-                            {
-                                labOOHPriceCount4.Text = (level4.Quantity ?? 0).ToString();
-                                total += (level4.Quantity ?? 0) * 1800;
-                            }
+                            specialPriceDetailList0.ForEach(s => {
+                                if (s.InstallPriceLevel == 5000)
+                                {
+                                    labOOHPriceCount1.Text = (s.Quantity ?? 0).ToString();
+                                }
+                                if (s.InstallPriceLevel == 2700)
+                                {
+                                    labOOHPriceCount2.Text = (s.Quantity ?? 0).ToString();
+                                }
+                                if (s.InstallPriceLevel == 1800)
+                                {
+                                    labOOHPriceCount3.Text = (s.Quantity ?? 0).ToString();
+                                }
+                                if (s.InstallPriceLevel == 600)
+                                {
+                                    labOOHPriceCount4.Text = (s.Quantity ?? 0).ToString();
+                                }
+                                total += (s.Quantity ?? 0) * (s.InstallPriceLevel??0);
+
+                                if (oohIndex == 0)
+                                {
+                                    bool flag = false;
+                                    for (int i = 0; i < InstallPriceQuoteModelList.Count; i++)
+                                    {
+                                        installQuoteModel = InstallPriceQuoteModelList[i];
+                                        if (installQuoteModel.ChargeItem == "OOHInstall" && installQuoteModel.ChargeType == (s.InstallPriceLevel ?? 0).ToString() && installQuoteModel.UnitPrice == (s.InstallPriceLevel ?? 0))
+                                        {
+                                            installQuoteModel.Amount += (s.Quantity ?? 0);
+                                            flag = true;
+                                        }
+
+                                    }
+                                    if (!flag)
+                                    {
+                                        installQuoteModel = new InstallPriceQuoteModel();
+                                        installQuoteModel.Amount = (s.Quantity ?? 0);
+                                        installQuoteModel.ChargeItem = "OOHInstall";
+                                        installQuoteModel.ChargeType = (s.InstallPriceLevel ?? 0).ToString();
+                                        installQuoteModel.UnitPrice = (s.InstallPriceLevel ?? 0);
+                                        InstallPriceQuoteModelList.Add(installQuoteModel);
+                                    }
+                                }
+                            });
+
+                            #region 废除
+                            //var level1 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 5000).FirstOrDefault();
+                            //if (level1 != null)
+                            //{
+                            //    labOOHPriceCount1.Text = (level1.Quantity ?? 0).ToString();
+                            //    total += (level1.Quantity ?? 0) * 5000;
+                                
+                               
+                            //}
+                            //var level2 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 2700).FirstOrDefault();
+                            //if (level2 != null)
+                            //{
+                            //    labOOHPriceCount2.Text = (level2.Quantity ?? 0).ToString();
+                            //    total += (level2.Quantity ?? 0) * 2700;
+
+                            //}
+                            //var level3 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 1800).FirstOrDefault();
+                            //if (level3 != null)
+                            //{
+                            //    labOOHPriceCount3.Text = (level3.Quantity ?? 0).ToString();
+                            //    total += (level3.Quantity ?? 0) * 1800;
+                            //}
+                            //var level4 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 600).FirstOrDefault();
+                            //if (level4 != null)
+                            //{
+                            //    labOOHPriceCount4.Text = (level4.Quantity ?? 0).ToString();
+                            //    total += (level4.Quantity ?? 0) * 600;
+                            //}
+                            #endregion
                             labOOHTotal.Text = total.ToString();
                             if (oohIndex == 0)
                             {
@@ -1186,6 +1351,7 @@ namespace WebApp.QuoteOrderManager
                         var specialPriceDetailList0 = specialPriceQuoteDetailList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.Basic).ToList();
                         if (specialPriceDetailList0.Any())
                         {
+                            InstallPriceQuoteModel installQuoteModel;
                             int total = 0;
                             Label labBasicPriceCount1 = (Label)e.Item.FindControl("labBasicPriceCount1");
                             Label labBasicPriceCount2 = (Label)e.Item.FindControl("labBasicPriceCount2");
@@ -1193,25 +1359,66 @@ namespace WebApp.QuoteOrderManager
 
                             Label labBasicTotal = (Label)e.Item.FindControl("labBasicTotal");
 
-                            var level1 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 800).FirstOrDefault();
-                            if (level1 != null)
-                            {
-                                labBasicPriceCount1.Text = (level1.Quantity ?? 0).ToString();
-                                total += (level1.Quantity ?? 0) * 800;
-                            }
-                            var level2 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 400).FirstOrDefault();
-                            if (level2 != null)
-                            {
-                                labBasicPriceCount2.Text = (level2.Quantity ?? 0).ToString();
-                                total += (level2.Quantity ?? 0) * 400;
-                            }
-                            var level3 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 150).FirstOrDefault();
-                            if (level3 != null)
-                            {
-                                labBasicPriceCount3.Text = (level3.Quantity ?? 0).ToString();
-                                total += (level3.Quantity ?? 0) * 150;
-                            }
+                            specialPriceDetailList0.ForEach(s => {
+                                total += (s.Quantity ?? 0) * (s.InstallPriceLevel??0);
+                                if (s.InstallPriceLevel == 800)
+                                {
+                                    labBasicPriceCount1.Text = (s.Quantity ?? 0).ToString();
+                                }
+                                if (s.InstallPriceLevel == 400)
+                                {
+                                    labBasicPriceCount2.Text = (s.Quantity ?? 0).ToString();
+                                }
+                                if (s.InstallPriceLevel == 150)
+                                {
+                                    labBasicPriceCount3.Text = (s.Quantity ?? 0).ToString();
+                                }
 
+                                if (basicIndex == 0)
+                                {
+                                    bool flag = false;
+                                    for (int i = 0; i < InstallPriceQuoteModelList.Count; i++)
+                                    {
+                                        installQuoteModel = InstallPriceQuoteModelList[i];
+                                        if (installQuoteModel.ChargeItem == "BasicInstall" && installQuoteModel.ChargeType == (s.InstallPriceLevel ?? 0).ToString() && installQuoteModel.UnitPrice == (s.InstallPriceLevel ?? 0))
+                                        {
+                                            installQuoteModel.Amount += (s.Quantity ?? 0);
+                                            flag = true;
+                                        }
+
+                                    }
+                                    if (!flag)
+                                    {
+                                        installQuoteModel = new InstallPriceQuoteModel();
+                                        installQuoteModel.Amount = s.Quantity ?? 0;
+                                        installQuoteModel.ChargeItem = "BasicInstall";
+                                        installQuoteModel.ChargeType = (s.InstallPriceLevel ?? 0).ToString();
+                                        installQuoteModel.UnitPrice = (s.InstallPriceLevel ?? 0);
+                                        InstallPriceQuoteModelList.Add(installQuoteModel);
+                                    }
+                                }
+                            });
+
+                            #region 废除
+                            //var level1 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 800).FirstOrDefault();
+                            //if (level1 != null)
+                            //{
+                            //    labBasicPriceCount1.Text = (level1.Quantity ?? 0).ToString();
+                            //    total += (level1.Quantity ?? 0) * 800;
+                            //}
+                            //var level2 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 400).FirstOrDefault();
+                            //if (level2 != null)
+                            //{
+                            //    labBasicPriceCount2.Text = (level2.Quantity ?? 0).ToString();
+                            //    total += (level2.Quantity ?? 0) * 400;
+                            //}
+                            //var level3 = specialPriceDetailList0.Where(s => s.InstallPriceLevel == 150).FirstOrDefault();
+                            //if (level3 != null)
+                            //{
+                            //    labBasicPriceCount3.Text = (level3.Quantity ?? 0).ToString();
+                            //    total += (level3.Quantity ?? 0) * 150;
+                            //}
+                            #endregion
                             labBasicTotal.Text = total.ToString();
                             if (basicIndex == 0)
                             {
@@ -1224,7 +1431,124 @@ namespace WebApp.QuoteOrderManager
                 }
             }
         }
+
+        protected void btnExport_Click(object sender, EventArgs e)
+        {
+            List<QuoteModel> quoteOrderList = new List<QuoteModel>();
+            List<InstallPriceQuoteModel> installPriceQuoteList = new List<InstallPriceQuoteModel>();
+            if (Session["QuoteModel"] != null)
+            {
+                quoteOrderList = Session["QuoteModel"] as List<QuoteModel>;
+            }
+            if (Session["InstallPriceQuoteModel"] != null)
+            {
+                installPriceQuoteList = Session["InstallPriceQuoteModel"] as List<InstallPriceQuoteModel>;
+            }
+            if (quoteOrderList.Any())
+            {
+                string fileName = "活动报价模板";
+                string templateFileName = "报价模板";
+                string path = ConfigurationManager.AppSettings["ExportTemplate"];
+                path = path.Replace("fileName", templateFileName);
+                FileStream outFile = new FileStream(Server.MapPath(path), FileMode.Open, FileAccess.Read, FileShare.Read);
+                ExcelPackage package = new ExcelPackage(outFile);
+                ExcelWorksheet sheet = package.Workbook.Worksheets[1];
+
+                string vvipShopCount = labVVIPShop.Text;
+                string installShopCount = labInstallShop.Text;
+                string normalShopCount = labNormalShop.Text;
+                sheet.Cells[6, 6].Value = vvipShopCount;
+                sheet.Cells[8, 6].Value = normalShopCount;
+                int rowIndex = 13;
+                quoteOrderList.ForEach(s => {
+                    while (StringHelper.ReplaceSpace(sheet.Cells[rowIndex, 1].Text) != StringHelper.ReplaceSpace(s.Sheet))
+                    {
+                        rowIndex++;
+                    }
+                    sheet.Cells[rowIndex, 2].Value = s.PositionDescription;
+                    sheet.Cells[rowIndex, 3].Value = s.QuoteGraphicMaterial;
+                    sheet.Cells[rowIndex, 5].Value = s.Amount;
+                    rowIndex++;
+                });
+                if (installPriceQuoteList.Any())
+                {
+                    var oohInstallList = installPriceQuoteList.Where(s => s.ChargeItem == "OOHInstall").ToList();
+                    if (oohInstallList.Any())
+                    {
+                        oohInstallList.ForEach(s =>
+                        {
+                            if (s.UnitPrice == 5000)
+                            {
+                                sheet.Cells[156, 7].Value = s.Amount.ToString();
+                            }
+                            if (s.UnitPrice == 2700)
+                            {
+                                sheet.Cells[157, 7].Value = s.Amount.ToString();
+                            }
+                            if (s.UnitPrice == 1800)
+                            {
+                                sheet.Cells[158, 7].Value = s.Amount.ToString();
+                            }
+                            if (s.UnitPrice == 600)
+                            {
+                                sheet.Cells[159, 7].Value = s.Amount.ToString();
+                            }
+                        });
+                    }
+                    var windowInstallList = installPriceQuoteList.Where(s => s.ChargeItem == "WindowInstall").ToList();
+                    if (windowInstallList.Any())
+                    {
+                        windowInstallList.ForEach(s => {
+                            if (s.UnitPrice==1000)
+                                sheet.Cells[160, 7].Value = s.Amount.ToString();
+                            if (s.UnitPrice == 500)
+                                sheet.Cells[162, 7].Value = s.Amount.ToString();
+                            if (s.UnitPrice == 200)
+                                sheet.Cells[164, 7].Value = s.Amount.ToString();
+                        });
+                    }
+                    var basicInstallList = installPriceQuoteList.Where(s => s.ChargeItem == "BasicInstall").ToList();
+                    if (basicInstallList.Any())
+                    {
+                        basicInstallList.ForEach(s => {
+                            if (s.ChargeType == "generic")
+                            {
+                                sheet.Cells[168, 7].Value = s.Amount.ToString();
+                            }
+                            else if (s.ChargeType == "kids")
+                            {
+                                if (s.UnitPrice == 500)
+                                    sheet.Cells[166, 7].Value = s.Amount.ToString();
+                                if (s.UnitPrice == 150)
+                                    sheet.Cells[167, 7].Value = s.Amount.ToString();
+                            }
+                            else
+                            {
+                                if (s.UnitPrice == 800)
+                                    sheet.Cells[161, 7].Value = s.Amount.ToString();
+                                if (s.UnitPrice == 400)
+                                    sheet.Cells[163, 7].Value = s.Amount.ToString();
+                                if (s.UnitPrice == 150)
+                                    sheet.Cells[165, 7].Value = s.Amount.ToString();
+                            }
+                        });
+                    }
+                }
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    package.SaveAs(ms);
+                    ms.Flush();
+                    sheet = null;
+                    OperateFile.DownLoadFile(ms, fileName);
+
+                }
+            }
+        }
+
+
+
     }
+
 
     
 }

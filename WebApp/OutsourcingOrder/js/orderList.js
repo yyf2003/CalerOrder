@@ -414,15 +414,7 @@ function GetOutsourceList() {
     })
 }
 
-//function selectOutsource(oId, oName) {
-//    currOutsourceId = oId;
-//    currOutsourceName = oName;
-//    $("#orderTitle").panel({
-//        title: ">>外协名称：" + oName
-//    });
-//    GetGuidacneList();
-//    ClearDiv();
-//}
+
 
 function selectOutsource() {
     var rows = $("#tbOutsource").datagrid("getSelections");
@@ -714,6 +706,7 @@ function editOrder() {
                             $("tr.price").show();
                             $("#txtPayPrice").val(json[0].PayOrderPrice);
                             $("#txtReceivePrice").val(json[0].ReceiveOrderPrice);
+                            $("#txtPriceQuantity").val(json[0].Quantity);
                             $("#txtSheet").val("").attr("disabled", "disabled");
                         }
                         else {
@@ -939,6 +932,7 @@ function ClearVal() {
     $("#txtShopNo").attr("disabled", false);
     $("input:radio[name^='rblOrderType']").attr("disabled", false);
     $("#txtQuantity").val("1");
+    $("#txtPriceQuantity").val("1");
 
     document.getElementById("ddlMachineFrame").length = 1;
     document.getElementById("ddlMaterial").length = 1;
@@ -983,6 +977,7 @@ function CheckVal() {
     var Remark = $.trim($("#txtRemark").val());
     var PayPrice = $.trim($("#txtPayPrice").val()) || 0;
     var ReceivePrice = $.trim($("#txtReceivePrice").val()) || 0;
+    var priceQuantity = $.trim($("#txtPriceQuantity").val());
     if (ShopNo == "") {
         layer.msg("请填写店铺编号");
         return false;
@@ -1000,11 +995,20 @@ function CheckVal() {
             layer.msg("请填写应收费用");
             return false;
         }
+        if (priceQuantity == "") {
+            layer.msg("请填写数量");
+            return false;
+        }
+        if (isNaN(priceQuantity)) {
+            layer.msg("数量填写不正确");
+            return false;
+        }
         if (isNaN(ReceivePrice) || parseFloat(ReceivePrice) == 0) {
             layer.msg("应收费用填写不正确");
             return false;
         }
         Remark = $.trim($("#txtPriceRemark").val());
+        Order.model.Quantity = priceQuantity;
     }
     else {
         if (Sheet == "") {
@@ -1055,6 +1059,7 @@ function CheckVal() {
                 return false;
             }
         }
+        Order.model.Quantity = Quantity;
     }
     Order.model.OrderType = orderType;
     Order.model.ShopNo = ShopNo;
@@ -1064,7 +1069,6 @@ function CheckVal() {
     Order.model.MachineFrame = MachineFrame;
     Order.model.PositionDescription = PositionDescription;
     Order.model.Gender = Gender;
-    Order.model.Quantity = Quantity;
     Order.model.GraphicWidth = GraphicWidth;
     Order.model.GraphicLength = GraphicLength;
     Order.model.OrderGraphicMaterial = GraphicMaterial;

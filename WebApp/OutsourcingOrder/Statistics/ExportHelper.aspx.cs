@@ -210,12 +210,19 @@ namespace WebApp.OutsourcingOrder.Statistics
                         if ((s.order.PayOrderPrice ?? 0) > 0)
                         {
                             //orderPrice = (s.order.OrderPrice ?? 0).ToString();
-                            orderModel.TotalPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
+                            orderModel.TotalPrice = double.Parse(((s.order.PayOrderPrice ?? 0) * (s.order.Quantity ?? 1)).ToString());
                             orderModel.UnitPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
                             orderModel.Gender = string.Empty;
                             orderModel.Sheet = string.Empty;
                             orderModel.ReceiveUnitPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
-                            orderModel.ReceiveTotalPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
+                            orderModel.ReceiveTotalPrice = double.Parse(((s.order.ReceiveOrderPrice ?? 0) * (s.order.Quantity ?? 1)).ToString());
+                            System.Text.StringBuilder remarksb = new System.Text.StringBuilder(s.order.PositionDescription);
+                            
+                            if (!string.IsNullOrWhiteSpace(s.order.Remark))
+                            {
+                                remarksb.AppendFormat("({0})", s.order.Remark);
+                            }
+                            orderModel.Remark = remarksb.ToString();
                         }
                         else
                         {
@@ -223,8 +230,9 @@ namespace WebApp.OutsourcingOrder.Statistics
                             orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
                             orderModel.ReceiveUnitPrice = double.Parse((s.order.ReceiveUnitPrice ?? 0).ToString());
                             orderModel.ReceiveTotalPrice = double.Parse((s.order.ReceiveTotalPrice ?? 0).ToString());
+                            orderModel.Remark = s.order.Remark;
                         }
-                        orderModel.Remark = s.order.Remark;
+                        
                         orderModel.GuidanceName = s.guidance.ItemName;
                         orderModel.OutsourceName = s.outsource.CompanyName;
                         newOrderList.Add(orderModel);
@@ -335,7 +343,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                         });
                     }
                     //var expressPriceList = new OutsourceOrderDetailBLL().GetList(s => s.GuidanceId == gid && outsourceList.Contains(s.OutsourceId ?? 0) && s.SubjectId == 0 && shopIdList.Contains(s.ShopId ?? 0) && s.OrderType == (int)OrderTypeEnum.发货费).ToList();
-                    var expressPriceList = orderList0.Where(s => s.order.SubjectId == 0 && shopIdList.Contains(s.order.ShopId ?? 0) && s.order.OrderType == (int)OrderTypeEnum.发货费).ToList();
+                    var expressPriceList = orderList0.Where(s => s.order.SubjectId == 0 && shopIdList.Contains(s.order.ShopId ?? 0) && (s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.运费)).ToList();
                     if (outsourceTypeList.Any())
                     {
                         expressPriceList = expressPriceList.Where(s => outsourceTypeList.Contains(s.order.AssignType ?? 0)).ToList();
@@ -656,7 +664,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (!string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
             {
                 DateTime endDate = DateTime.Parse(endDateStr);
-                orderList0 = orderList0.Where(s => s.subject.AddDate < endDate).ToList();
+                orderList0 = orderList0.Where(s => s.subject.AddDate < endDate.AddDays(1)).ToList();
             }
             if (provinceList.Any())
             {
@@ -743,12 +751,19 @@ namespace WebApp.OutsourcingOrder.Statistics
                         if ((s.order.PayOrderPrice ?? 0) > 0)
                         {
                             //orderPrice = (s.order.OrderPrice ?? 0).ToString();
-                            orderModel.TotalPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
+                            orderModel.TotalPrice = double.Parse(((s.order.PayOrderPrice ?? 0) * (s.order.Quantity ?? 1)).ToString());
                             orderModel.UnitPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
                             orderModel.Gender = string.Empty;
                             orderModel.Sheet = string.Empty;
                             orderModel.ReceiveUnitPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
-                            orderModel.ReceiveTotalPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
+                            orderModel.ReceiveTotalPrice = double.Parse(((s.order.ReceiveOrderPrice ?? 0)*(s.order.Quantity??1)).ToString());
+                            System.Text.StringBuilder remarksb = new System.Text.StringBuilder(s.order.PositionDescription);
+
+                            if (!string.IsNullOrWhiteSpace(s.order.Remark))
+                            {
+                                remarksb.AppendFormat("({0})", s.order.Remark);
+                            }
+                            orderModel.Remark = remarksb.ToString();
                         }
                         else
                         {
@@ -756,8 +771,9 @@ namespace WebApp.OutsourcingOrder.Statistics
                             orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
                             orderModel.ReceiveUnitPrice = double.Parse((s.order.ReceiveUnitPrice ?? 0).ToString());
                             orderModel.ReceiveTotalPrice = double.Parse((s.order.ReceiveTotalPrice ?? 0).ToString());
+                            orderModel.Remark = s.order.Remark;
                         }
-                        orderModel.Remark = s.order.Remark;
+                        
                         newOrderList.Add(orderModel);
 
                     });

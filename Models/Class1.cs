@@ -268,7 +268,7 @@ namespace Models
         public string UnitName { get; set; }
     }
     /// <summary>
-    /// 报价模板导出模型
+    /// POP报价模板导出模型
     /// </summary>
     public class QuoteModel {
         public string Sheet { get; set; }
@@ -279,6 +279,22 @@ namespace Models
         public string UnitName { get; set; }
         public decimal TotalPrice { get; set; }
     }
-
+    /// <summary>
+    /// 安装费报价模板导出模型
+    /// </summary>
+    public class InstallPriceQuoteModel
+    {
+        /// <summary>
+        /// 费用名称
+        /// </summary>
+        public string ChargeItem { get; set; }
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public string ChargeType { get; set; }
+        public decimal Amount { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal TotalPrice { get; set; }
+    }
 
 }

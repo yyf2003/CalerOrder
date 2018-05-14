@@ -355,7 +355,7 @@ namespace WebApp.Statistics
                                 //快递费统计
                                 subExpressPrice += new ExpressPriceDetailBLL().GetList(s => s.GuidanceId == guidanceId && shopIdList.Contains(s.ShopId ?? 0)).Sum(s => s.ExpressPrice ?? 0);
 
-                                var expressPriceOrderList = orderList.Where(s => s.OrderType == (int)OrderTypeEnum.发货费).ToList();
+                                var expressPriceOrderList = orderList.Where(s => s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.快递费||s.OrderType == (int)OrderTypeEnum.运费).ToList();
                                 if (expressPriceOrderList.Any())
                                 {
                                     subExpressPrice += (expressPriceOrderList.Sum(s => s.OrderPrice ?? 0));
@@ -366,15 +366,15 @@ namespace WebApp.Statistics
                                 {
                                     subMaterialPrice += (materialList.Sum(s => (s.Quantity ?? 1) * (s.UnitPrice ?? 0)));
                                 }
-                                var yunFeiOrderList = orderList.Where(s => s.OrderType == (int)OrderTypeEnum.运费).ToList();
-                                if (yunFeiOrderList.Any())
-                                {
-                                    subNewShopPrice += (yunFeiOrderList.Sum(s => s.OrderPrice ?? 0));
-                                }
-                                var otherPriceiOrderList = orderList.Where(s => s.OrderType == (int)OrderTypeEnum.其他费用).ToList();
+                                //var yunFeiOrderList = orderList.Where(s => s.OrderType == (int)OrderTypeEnum.运费).ToList();
+                                //if (yunFeiOrderList.Any())
+                                //{
+                                //    subNewShopPrice += (yunFeiOrderList.Sum(s => s.OrderPrice ?? 0));
+                                //}
+                                var otherPriceiOrderList = orderList.Where(s => s.OrderType == (int)OrderTypeEnum.其他费用 || s.OrderType == (int)OrderTypeEnum.印刷费).ToList();
                                 if (otherPriceiOrderList.Any())
                                 {
-                                    subOtherPrice += (otherPriceiOrderList.Sum(s => s.OrderPrice ?? 0));
+                                    subOtherPrice += (otherPriceiOrderList.Sum(s => ((s.OrderPrice ?? 0)*(s.Quantity??1))));
                                 }
 
                                 //
@@ -568,7 +568,7 @@ namespace WebApp.Statistics
                                 //快递费统计
                                 subExpressPrice += new ExpressPriceDetailBLL().GetList(s => guidanceSelectIdList1.Contains(s.GuidanceId ?? 0) && shopIdList.Contains(s.ShopId ?? 0)).Sum(s => s.ExpressPrice ?? 0);
 
-                                var expressPriceOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.发货费).ToList();
+                                var expressPriceOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.发货费 ||s.OrderType == (int)OrderTypeEnum.快递费||s.OrderType == (int)OrderTypeEnum.运费).ToList();
                                 if (expressPriceOrderList.Any())
                                 {
                                     subExpressPrice += (expressPriceOrderList.Sum(s => s.OrderPrice ?? 0));
@@ -579,15 +579,15 @@ namespace WebApp.Statistics
                                 {
                                     subMaterialPrice += (materialList.Sum(s => (s.Quantity ?? 1) * (s.UnitPrice ?? 0)));
                                 }
-                                var yunFeiOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.运费).ToList();
-                                if (yunFeiOrderList.Any())
-                                {
-                                    subNewShopPrice += (yunFeiOrderList.Sum(s => s.OrderPrice ?? 0));
-                                }
-                                var otherPriceiOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.其他费用).ToList();
+                                //var yunFeiOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.运费).ToList();
+                                //if (yunFeiOrderList.Any())
+                                //{
+                                //    subNewShopPrice += (yunFeiOrderList.Sum(s => s.OrderPrice ?? 0));
+                                //}
+                                var otherPriceiOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.其他费用 || s.OrderType == (int)OrderTypeEnum.印刷费).ToList();
                                 if (otherPriceiOrderList.Any())
                                 {
-                                    subOtherPrice += (otherPriceiOrderList.Sum(s => s.OrderPrice ?? 0));
+                                    subOtherPrice += (otherPriceiOrderList.Sum(s => ((s.OrderPrice ?? 0)*(s.Quantity??1))));
                                 }
 
                                 var installPriceList = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
@@ -990,7 +990,7 @@ namespace WebApp.Statistics
                             //快递费统计
                             subExpressPrice += new ExpressPriceDetailBLL().GetList(s => guidanceSelectIdList1.Contains(s.GuidanceId ?? 0) && shopIdList.Contains(s.ShopId ?? 0)).Sum(s => s.ExpressPrice ?? 0);
 
-                            var expressPriceOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.发货费).ToList();
+                            var expressPriceOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.快递费 || s.OrderType == (int)OrderTypeEnum.运费).ToList();
                             if (expressPriceOrderList.Any())
                             {
                                 subExpressPrice += (expressPriceOrderList.Sum(s => s.OrderPrice ?? 0));
@@ -1001,15 +1001,15 @@ namespace WebApp.Statistics
                             {
                                 subMaterialPrice += (materialList.Sum(s => (s.Quantity ?? 1) * (s.UnitPrice ?? 0)));
                             }
-                            var yunFeiOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.运费).ToList();
-                            if (yunFeiOrderList.Any())
-                            {
-                                subNewShopPrice += (yunFeiOrderList.Sum(s => s.OrderPrice ?? 0));
-                            }
-                            var otherPriceiOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.其他费用).ToList();
+                            //var yunFeiOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.运费).ToList();
+                            //if (yunFeiOrderList.Any())
+                            //{
+                            //    subNewShopPrice += (yunFeiOrderList.Sum(s => s.OrderPrice ?? 0));
+                            //}
+                            var otherPriceiOrderList = orderList00.Where(s => s.OrderType == (int)OrderTypeEnum.其他费用 || s.OrderType == (int)OrderTypeEnum.印刷费).ToList();
                             if (otherPriceiOrderList.Any())
                             {
-                                subOtherPrice += (otherPriceiOrderList.Sum(s => s.OrderPrice ?? 0));
+                                subOtherPrice += (otherPriceiOrderList.Sum(s => ((s.OrderPrice ?? 0)*(s.Quantity??1))));
                             }
 
                             var installPriceList = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo

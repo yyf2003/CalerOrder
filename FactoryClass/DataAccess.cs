@@ -123,5 +123,11 @@ namespace FactoryClass
             string className = assemlyPath + ".BasicMachineFrameDAL";
             return (IBasicMachineFrameDAL)CreateObject(assemlyPath, className);
         }
+
+        public static IQuoteOrderDetailDAL CreateQuoteOrderDetail()
+        {
+            string className = assemlyPath + ".QuoteOrderDetailDAL";
+            return (IQuoteOrderDetailDAL)CreateObject(assemlyPath, className);
+        }
     }
 }

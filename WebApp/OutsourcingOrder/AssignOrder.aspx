@@ -340,7 +340,7 @@
                 <input type="text" id="txtSearchShopNo" />
                 <img id="imgLoading" style="display: none;" src='../image/WaitImg/loadingA.gif' />
             </div>
-             <div style="float: left; width:40px; color:Blue;padding-top: 5px; padding-left: 10px;">
+            <%-- <div style="float: left; width:40px; color:Blue;padding-top: 5px; padding-left: 10px;">
              操作：
             </div>
             <div style="float: left;">
@@ -350,7 +350,7 @@
             </div>
             <div style="color:Blue;float: left;padding-top: 5px; margin-left: 15px;">
               提示：撤销操作是按店整体撤销
-            </div>
+            </div>--%>
         </div>
         <table id="noData" class="table" style="display: ;">
             <tr class="tr_bai">

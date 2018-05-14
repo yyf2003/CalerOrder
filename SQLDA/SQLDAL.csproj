@@ -58,6 +58,7 @@
     <Compile Include="POPOrderDAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuoteMaterialDAL.cs" />
+    <Compile Include="QuoteOrderDetailDAL.cs" />
     <Compile Include="ShopDAL.cs" />
     <Compile Include="ShopMachineFrameDAL.cs" />
     <Compile Include="SQLHelper.cs" />

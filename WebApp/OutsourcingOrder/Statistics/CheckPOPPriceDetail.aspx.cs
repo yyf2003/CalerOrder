@@ -21,8 +21,15 @@ namespace WebApp.OutsourcingOrder.Statistics
         string city = string.Empty;
         string assignType = string.Empty;
         string guidanceMonth = string.Empty;
+        string checkType = string.Empty;
+        string beginDateStr = string.Empty;
+        string endDateStr = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Request.QueryString["checkType"] != null)
+            {
+                checkType = Request.QueryString["checkType"];
+            }
             if (Request.QueryString["outsourceId"] != null)
             {
                 outsourceId = Request.QueryString["outsourceId"];
@@ -58,6 +65,14 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (Request.QueryString["customerId"] != null)
             {
                 customerId =int.Parse(Request.QueryString["customerId"]);
+            }
+            if (Request.QueryString["beginDate"] != null)
+            {
+                beginDateStr = Request.QueryString["beginDate"];
+            }
+            if (Request.QueryString["endDate"] != null)
+            {
+                endDateStr = Request.QueryString["endDate"];
             }
             if (!IsPostBack)
             {
@@ -104,38 +119,61 @@ namespace WebApp.OutsourcingOrder.Statistics
             }
             
 
-            var assignShopList = new OutsourceOrderDetailBLL().GetList(s => outsourceIdList.Contains(s.OutsourceId ?? 0) && guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.OrderType == (int)OrderTypeEnum.POP || s.OrderType == (int)OrderTypeEnum.道具) && (s.IsDelete == null || s.IsDelete == false));
-
+            //var assignShopList = new OutsourceOrderDetailBLL().GetList(s => outsourceIdList.Contains(s.OutsourceId ?? 0) && guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.OrderType == (int)OrderTypeEnum.POP || s.OrderType == (int)OrderTypeEnum.道具) && (s.IsDelete == null || s.IsDelete == false));
+            var assignShopList = (from order in CurrentContext.DbContext.OutsourceOrderDetail
+                                 join subject in CurrentContext.DbContext.Subject
+                                 on order.SubjectId equals subject.Id
+                                 where outsourceIdList.Contains(order.OutsourceId ?? 0)
+                                 && (order.OrderType == (int)OrderTypeEnum.POP || order.OrderType == (int)OrderTypeEnum.道具)
+                                 && (order.IsDelete == null || order.IsDelete == false)
+                                 select new {
+                                     order,
+                                     subject
+                                 }).ToList();
+            if (guidanceIdList.Any())
+            {
+                assignShopList = assignShopList.Where(s => guidanceIdList.Contains(s.order.GuidanceId??0)).ToList();
+            }
             //var assignShopList = new OutsourceAssignShopBLL().GetList(s => s.OutsourceId == outsourceId && guidanceIdList.Contains(s.GuidanceId ?? 0));
             if (subjectIdList.Any())
             {
-                assignShopList = assignShopList.Where(s => subjectIdList.Contains(s.SubjectId??0)).ToList();
+                assignShopList = assignShopList.Where(s => subjectIdList.Contains(s.order.SubjectId??0)).ToList();
             }
             if (regionList.Any())
             {
-                assignShopList = assignShopList.Where(s =>s.Region!=null && regionList.Contains(s.Region.ToLower())).ToList();
+                assignShopList = assignShopList.Where(s => s.order.Region != null && regionList.Contains(s.order.Region.ToLower())).ToList();
             }
             if (provinceList.Any())
             {
-                assignShopList = assignShopList.Where(s => provinceList.Contains(s.Province)).ToList();
+                assignShopList = assignShopList.Where(s => provinceList.Contains(s.order.Province)).ToList();
             }
             if (cityList.Any())
             {
-                assignShopList = assignShopList.Where(s => cityList.Contains(s.City)).ToList();
+                assignShopList = assignShopList.Where(s => cityList.Contains(s.order.City)).ToList();
             }
             if (assignTypeList.Any())
             {
-                assignShopList = assignShopList.Where(s => assignTypeList.Contains(s.AssignType ?? 0)).ToList();
+                assignShopList = assignShopList.Where(s => assignTypeList.Contains(s.order.AssignType ?? 0)).ToList();
             }
             if (!string.IsNullOrWhiteSpace(txtShopNo.Text))
             {
                 string shopNo = txtShopNo.Text.Trim().ToUpper();
-                assignShopList = assignShopList.Where(s => s.ShopNo.ToUpper().Contains(shopNo)).ToList();
+                assignShopList = assignShopList.Where(s => s.order.ShopNo.ToUpper().Contains(shopNo)).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(checkType) && checkType=="byDate")
+            {
+                if (!string.IsNullOrWhiteSpace(beginDateStr) && StringHelper.IsDateTime(beginDateStr) && !string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
+                {
+                    DateTime beginDate = DateTime.Parse(beginDateStr);
+                    DateTime endDate = DateTime.Parse(endDateStr);
+                    assignShopList = assignShopList.Where(s =>s.subject.AddDate>=beginDate && s.subject.AddDate < endDate.AddDays(1)).ToList();
+                }
+                
             }
             if (!IsPostBack)
             {
                 decimal materialPrice = 0;
-                List<int> shopIdList = assignShopList.Select(s => s.ShopId??0).Distinct().ToList();
+                List<int> shopIdList = assignShopList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
                 if (!string.IsNullOrWhiteSpace(guidanceMonth) && StringHelper.IsDateTime(guidanceMonth))
                 {
                     DateTime date0 = DateTime.Parse(guidanceMonth);
@@ -149,9 +187,9 @@ namespace WebApp.OutsourcingOrder.Statistics
                     }
                 }
 
-                decimal totalPay = assignShopList.Sum(s => s.TotalPrice ?? 0);
-                decimal totalReceive = assignShopList.Sum(s => s.ReceiveTotalPrice ?? 0);
-                labShopCount.Text = assignShopList.Select(s => s.ShopId).Distinct().Count().ToString();
+                decimal totalPay = assignShopList.Sum(s => s.order.TotalPrice ?? 0);
+                decimal totalReceive = assignShopList.Sum(s => s.order.ReceiveTotalPrice ?? 0);
+                labShopCount.Text = assignShopList.Select(s => s.order.ShopId).Distinct().Count().ToString();
                 if (materialPrice > 0)
                 {
                     
@@ -167,7 +205,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             }
             AspNetPager1.RecordCount = assignShopList.Count;
             this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
-            gvPOP.DataSource = assignShopList.OrderBy(s => s.ShopId).ThenBy(s=>s.Sheet).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            gvPOP.DataSource = assignShopList.OrderBy(s => s.order.ShopId).ThenBy(s => s.order.Sheet).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
             gvPOP.DataBind();
         }
 

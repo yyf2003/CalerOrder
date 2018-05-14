@@ -88,9 +88,9 @@ namespace WebApp.OutsourcingOrder.Statistics
                                   on order.ShopId equals shop.Id
                                   where outsourceIdList.Contains(order.OutsourceId ?? 0)
                                   && guidanceIdList.Contains(order.GuidanceId ?? 0)
-                                  && order.OrderType == (int)OrderTypeEnum.其他费用
+                                  && (order.OrderType == (int)OrderTypeEnum.其他费用 || order.OrderType == (int)OrderTypeEnum.印刷费)
                                   && (order.IsDelete == null || order.IsDelete == false)
-                                  select new { order, shop }).ToList();
+                                  select new { order,order.OrderType,order.Remark,order.PositionDescription, shop }).ToList();
 
             //var assignShopList = new OutsourceAssignShopBLL().GetList(s => s.OutsourceId == outsourceId && guidanceIdList.Contains(s.GuidanceId ?? 0));
             if (regionList.Any())
@@ -120,6 +120,36 @@ namespace WebApp.OutsourcingOrder.Statistics
         protected void AspNetPager1_PageChanged(object sender, EventArgs e)
         {
             BindData();
+        }
+
+        protected void gvList_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemIndex != -1)
+            { 
+                object item = e.Item.DataItem;
+                if (item != null)
+                {
+                    object orderTypeObj = item.GetType().GetProperty("OrderType").GetValue(item, null);
+                    string orderType = (orderTypeObj ?? string.Empty).ToString();
+                    ((Label)e.Item.FindControl("labOrderType")).Text = CommonMethod.GeEnumName<OrderTypeEnum>(orderType);
+
+
+                    object remarkObj = item.GetType().GetProperty("Remark").GetValue(item, null);
+                    string remark = (remarkObj ?? string.Empty).ToString();
+
+                    object positionDescriptionObj = item.GetType().GetProperty("PositionDescription").GetValue(item, null);
+                    string positionDescription = (positionDescriptionObj ?? string.Empty).ToString();
+
+                    System.Text.StringBuilder remarksb = new System.Text.StringBuilder(positionDescription);
+
+                    if (!string.IsNullOrWhiteSpace(remark))
+                    {
+                        remarksb.AppendFormat("({0})", remark);
+                    }
+                    ((Label)e.Item.FindControl("labRemark")).Text = string.Format("{0}", remarksb.ToString());
+                }
+
+            }
         }
     }
 }

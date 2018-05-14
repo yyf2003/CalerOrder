@@ -723,26 +723,29 @@ function SearchByDate() {
 
                 var labPOPPrice = "0";
                 if (json[0].POPPrice > 0) {
-                    labPOPPrice = "<a href='javascript:void(0)' onclick='CheckPOPPrice()' style='text-decoration:underline;color:blue;'>" + json[0].POPPrice + "</a>";
+                    labPOPPrice = "<a href='javascript:void(0)' onclick='CheckPOPPriceByDate()' style='text-decoration:underline;color:blue;'>" + json[0].POPPrice + "</a>";
                 } $("#labPOPPrice1").html(labPOPPrice);
 
                 var labInstallPrice = "0";
                 if (json[0].InstallPrice > 0) {
-                    labInstallPrice = "<a href='javascript:void(0)' onclick='CheckInstallPrice()' style='text-decoration:underline;color:blue;'>" + json[0].InstallPrice + "</a>";
+                    //labInstallPrice = "<a href='javascript:void(0)' onclick='CheckInstallPriceByDate()' style='text-decoration:underline;color:blue;'>" + json[0].InstallPrice + "</a>";
+                    labInstallPrice = json[0].InstallPrice;
                 }
                 $("#labInstall1").html(labInstallPrice);
                 $("#labMeasurePrice1").html(json[0].MeasurePrice);
                 var otherPrice = "0";
                 if (json[0].OtherPrice > 0) {
 
-                    otherPrice = "<a href='javascript:void(0)' onclick='CheckOtherPrice()' style='text-decoration:underline;color:blue;'>" + json[0].OtherPrice + "</a>";
+                    //otherPrice = "<a href='javascript:void(0)' onclick='CheckOtherPriceByDate()' style='text-decoration:underline;color:blue;'>" + json[0].OtherPrice + "</a>";
+                    otherPrice = json[0].OtherPrice;
                 }
                 $("#labOtherPrice1").html(otherPrice);
 
                 var rotherPrice = "0";
                 if (json[0].ReceiveOtherPrice > 0) {
 
-                    rotherPrice = "<a href='javascript:void(0)' onclick='CheckOtherPrice()' style='text-decoration:underline;color:blue;'>" + json[0].ReceiveOtherPrice + "</a>";
+                    //rotherPrice = "<a href='javascript:void(0)' onclick='CheckOtherPriceByDate()' style='text-decoration:underline;color:blue;'>" + json[0].ReceiveOtherPrice + "</a>";
+                    rotherPrice = json[0].ReceiveOtherPrice
                 }
                 $("#labROtherPrice1").html(rotherPrice);
 
@@ -753,7 +756,8 @@ function SearchByDate() {
                 $("#labRPOPPrice1").html(json[0].ReceivePOPPrice);
                 var labRInstallPrice = "0";
                 if (json[0].ReceiveInstallPrice > 0) {
-                    labRInstallPrice = "<a href='javascript:void(0)' onclick='CheckInstallPrice()' style='text-decoration:underline;color:blue;'>" + json[0].ReceiveInstallPrice + "</a>";
+                    //labRInstallPrice = "<a href='javascript:void(0)' onclick='CheckInstallPriceByDate()' style='text-decoration:underline;color:blue;'>" + json[0].ReceiveInstallPrice + "</a>";
+                    labRInstallPrice = json[0].ReceiveInstallPrice;
                 }
                 $("#labRInstall1").html(labRInstallPrice);
                 $("#labRMeasurePrice1").html(json[0].ReceiveMeasurePrice);
@@ -766,4 +770,48 @@ function SearchByDate() {
             }
         }
     })
+}
+
+
+function CheckPOPPriceByDate() {
+    var customerId = $("#ddlCustomer1").val();
+    var beginDate = $.trim($("#txtBeginDate1").val());
+    var endDate = $.trim($("#txtEndDate1").val());
+    if (currOutsourceId == "") {
+        layer.msg("请选择外协");
+        return false;
+    }
+    if (beginDate == "") {
+        layer.msg("请输入开始时间");
+        return false;
+    }
+    if (endDate == "") {
+        layer.msg("请输入结束时间");
+        return false;
+    }
+    var province1 = "";
+    $("input[name='provinceCB1']:checked").each(function () {
+        province1 += $(this).val() + ",";
+    })
+    var city1 = "";
+    $("input[name='cityCB1']:checked").each(function () {
+        city1 += $(this).val() + ",";
+    })
+    var assignType1 = "";
+    $("input[name^='cblOutsourceType1']:checked").each(function () {
+        assignType1 += $(this).val() + ",";
+    })
+
+    var url = "CheckPOPPriceDetail.aspx?&checkType=byDate&outsourceId=" + currOutsourceId + "&province=" + province1 + "&city=" + city1 + "&assignType=" + assignType1 + "&customerId=" + customerId + "&beginDate=" + beginDate + "&endDate=" + endDate;
+    layer.open({
+        type: 2,
+        time: 0,
+        title: 'POP费用明细',
+        skin: 'layui-layer-rim', //加上边框
+        area: ['95%', '90%'],
+        content: url,
+        cancel: function () {
+
+        }
+    });
 }

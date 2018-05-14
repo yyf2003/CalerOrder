@@ -236,7 +236,7 @@ namespace WebApp.OutsourcingOrder
                         model.PositionDescription = "";
                         model.Province = "";
                         // model.Quantity = item.order.Quantity != null ? double.Parse(item.order.Quantity.ToString()) : 0;
-                        model.Quantity = 1;
+                        model.Quantity = s.assignOrder.Quantity != null ? double.Parse(s.assignOrder.Quantity.ToString()) : 1;
                         model.Sheet = "";
                         model.ShopName = s.shop.ShopName;
                         model.ShopNo = s.shop.ShopNo;
@@ -335,7 +335,7 @@ namespace WebApp.OutsourcingOrder
                         model.PositionDescription = "";
                         model.Province = "";
                        
-                        model.Quantity = 1;
+                        model.Quantity = (s.order.Quantity??1);
                         model.Sheet = "";
                         model.ShopName = s.order.ShopName;
                         model.ShopNo = s.order.ShopNo;
@@ -382,7 +382,7 @@ namespace WebApp.OutsourcingOrder
                         model.PositionDescription = "";
                         model.Province = "";
 
-                        model.Quantity = 1;
+                        model.Quantity = (s.order.Quantity??1);
                         model.Sheet = "";
                         model.ShopName = s.order.ShopName;
                         model.ShopNo = s.order.ShopNo;
@@ -795,7 +795,7 @@ namespace WebApp.OutsourcingOrder
                         model.PositionDescription = "";
                         model.Province = "";
                         // model.Quantity = item.order.Quantity != null ? double.Parse(item.order.Quantity.ToString()) : 0;
-                        model.Quantity = 1;
+                        model.Quantity =(s.order.Quantity??1);
                         model.Sheet = "";
                         model.ShopName = s.shop.ShopName;
                         model.ShopNo = s.shop.ShopNo;
@@ -896,7 +896,7 @@ namespace WebApp.OutsourcingOrder
                         model.PositionDescription = "";
                         model.Province = "";
 
-                        model.Quantity = 1;
+                        model.Quantity = (s.order.Quantity ?? 1);
                         model.Sheet = "";
                         model.ShopName = s.order.ShopName;
                         model.ShopNo = s.order.ShopNo;
@@ -943,7 +943,7 @@ namespace WebApp.OutsourcingOrder
                         model.PositionDescription = "";
                         model.Province = "";
 
-                        model.Quantity = 1;
+                        model.Quantity = (s.order.Quantity ?? 1);
                         model.Sheet = "";
                         model.ShopName = s.order.ShopName;
                         model.ShopNo = s.order.ShopNo;

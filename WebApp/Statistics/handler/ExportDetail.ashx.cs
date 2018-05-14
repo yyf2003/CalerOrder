@@ -612,7 +612,7 @@ namespace WebApp.Statistics.handler
                                     orderModel.GraphicWidth = 0;
                                     orderModel.GraphicMaterial = string.Empty;
                                     orderModel.PositionDescription = string.Empty;
-                                    orderModel.Quantity = 1;
+                                    orderModel.Quantity = s.order.Quantity??1;
                                     orderModel.Sheet = string.Empty;
                                     orderModel.ShopName = s.shop.ShopName;
                                     orderModel.ShopNo = s.shop.ShopNo;
@@ -622,7 +622,7 @@ namespace WebApp.Statistics.handler
                                     orderModel.SubjectName = s.subject.SubjectName;
                                     orderModel.SubjectNo = s.subject.SubjectNo;
                                     orderModel.UnitPrice = 0;
-                                    orderModel.TotalPrice = double.Parse((s.order.OrderPrice ?? 0).ToString());
+                                    orderModel.TotalPrice = double.Parse(((s.order.OrderPrice ?? 0)*(s.order.Quantity??1)).ToString());
                                     orderModel.Remark = s.order.Remark;
                                     newOrderList.Add(orderModel);
                                 }
@@ -633,7 +633,7 @@ namespace WebApp.Statistics.handler
                     #region 安装费
                     if (isExportInstall == 1)
                     {
-                        var installPriceOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.安装费 || s.order.OrderType == (int)OrderTypeEnum.测量费 || s.order.OrderType == (int)OrderTypeEnum.其他费用).ToList();
+                        var installPriceOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.安装费 || s.order.OrderType == (int)OrderTypeEnum.测量费 || s.order.OrderType == (int)OrderTypeEnum.其他费用 || s.order.OrderType == (int)OrderTypeEnum.印刷费).ToList();
                         installPriceOrderList.ForEach(s =>
                         {
                             string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
@@ -646,7 +646,7 @@ namespace WebApp.Statistics.handler
                             orderModel.GraphicWidth = 0;
                             orderModel.GraphicMaterial = string.Empty;
                             orderModel.PositionDescription = string.Empty;
-                            orderModel.Quantity = 1;
+                            orderModel.Quantity = s.order.Quantity??1;
                             orderModel.Sheet = string.Empty;
                             orderModel.ShopName = s.shop.ShopName;
                             orderModel.ShopNo = s.shop.ShopNo;
@@ -655,8 +655,8 @@ namespace WebApp.Statistics.handler
                             orderModel.City = s.shop.CityName;
                             orderModel.SubjectName = s.subject.SubjectName;
                             orderModel.SubjectNo = s.subject.SubjectNo;
-                            orderModel.UnitPrice = 0;
-                            orderModel.TotalPrice = double.Parse((s.order.OrderPrice ?? 0).ToString());
+                            orderModel.UnitPrice = double.Parse((s.order.OrderPrice ?? 0).ToString()); ;
+                            orderModel.TotalPrice = double.Parse(((s.order.OrderPrice ?? 0)*(s.order.Quantity??1)).ToString());
                             orderModel.Remark = s.order.Remark;
                             newOrderList.Add(orderModel);
                         });
@@ -782,7 +782,7 @@ namespace WebApp.Statistics.handler
                     }
                     #endregion
                     #region 快递费
-                    var expressPriceOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.运费).ToList();
+                    var expressPriceOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.快递费 || s.order.OrderType == (int)OrderTypeEnum.运费).ToList();
                     expressPriceOrderList.ForEach(s =>
                     {
                         string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
@@ -1211,7 +1211,7 @@ namespace WebApp.Statistics.handler
                     {
                         List<Shop> shopList = orderList.Select(s => s.shop).Distinct().OrderBy(s => s.ShopNo).ToList();
                         List<int> shopIdList = shopList.Select(s => s.Id).ToList();
-                        List<InstallPriceShopInfo> installPriceList = new InstallPriceShopInfoBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && shopIdList.Contains(s.ShopId??0));
+                        List<InstallPriceShopInfo> installPriceList = new InstallPriceShopInfoBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (subjectIdList.Any()?subjectIdList.Contains(s.SubjectId??0):1==1) && shopIdList.Contains(s.ShopId ?? 0));
                         List<Models.ExpressPriceDetail> expressPriceList=new ExpressPriceDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && shopIdList.Contains(s.ShopId??0));
                         for (int i = 0; i < shopList.Count; i++)
                         {
@@ -1241,7 +1241,7 @@ namespace WebApp.Statistics.handler
                             model.InstallPrice = installPrice;
                             measurePrice = shopOrderList.Where(s => s.OrderType == (int)OrderTypeEnum.测量费 && (s.OrderPrice ?? 0) > 0).Sum(s => s.OrderPrice ?? 0);
                             model.MeasurePrice = measurePrice;
-                            expressPrice = shopOrderList.Where(s => (s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.运费) && (s.OrderPrice ?? 0) > 0).Sum(s => s.OrderPrice ?? 0);
+                            expressPrice = shopOrderList.Where(s => (s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.快递费 || s.OrderType == (int)OrderTypeEnum.运费) && (s.OrderPrice ?? 0) > 0).Sum(s => s.OrderPrice ?? 0);
                             var oneExpressPriceList = expressPriceList.Where(s => s.ShopId == model.Id).ToList();
                             if (oneExpressPriceList.Any())
                             {
@@ -1250,7 +1250,7 @@ namespace WebApp.Statistics.handler
                             model.ExpressPrice=expressPrice;
                             materialPrice = shopOrderList.Where(s => (s.OrderType == (int)OrderTypeEnum.物料 || s.OrderType == (int)OrderTypeEnum.道具) && (s.OrderPrice ?? 0) > 0).Sum(s => s.OrderPrice ?? 0);
                             model.MaterialPrice = materialPrice;
-                            otherPrice = shopOrderList.Where(s => s.OrderType == (int)OrderTypeEnum.其他费用 && (s.OrderPrice ?? 0) > 0).Sum(s => s.OrderPrice ?? 0);
+                            otherPrice = shopOrderList.Where(s => (s.OrderType == (int)OrderTypeEnum.其他费用 || s.OrderType == (int)OrderTypeEnum.印刷费) && (s.OrderPrice ?? 0) > 0).Sum(s => ((s.OrderPrice ?? 0)*(s.Quantity??1)));
                             model.OtherPrice = otherPrice;
                         }
                         string templateFileName = "项目统计-按店统计";

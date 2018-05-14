@@ -88,7 +88,7 @@ namespace WebApp.Subjects.PriceOrder
             string remark = txtRemark.Text;
             SubjectBLL subjectBll = new SubjectBLL();
             bool isApproveOk = false;
-            string msg = string.Empty;
+            string msg = "ok";
             //int subjectType = 1;
             using (TransactionScope tran = new TransactionScope())
             {
@@ -144,7 +144,7 @@ namespace WebApp.Subjects.PriceOrder
                                     finalOrderTempModel.InstallPricePOSScale = "";
                                     finalOrderTempModel.InstallPriceMaterialSupport ="";
                                     finalOrderTempModel.Province = o.shop.ProvinceName;
-                                    finalOrderTempModel.Quantity =1;
+                                    finalOrderTempModel.Quantity =o.order.Quantity;
                                     finalOrderTempModel.Region = o.shop.RegionName;
                                     finalOrderTempModel.ChooseImg = "";
                                     finalOrderTempModel.Remark = o.order.Remark;
@@ -164,7 +164,7 @@ namespace WebApp.Subjects.PriceOrder
                                     finalOrderTempModel.GraphicMaterial = "";
                                     finalOrderTempModel.GraphicWidth = width;
                                     //finalOrderTempModel.UnitPrice = GetMaterialPrice(o.order.GraphicMaterial);
-                                    finalOrderTempModel.PositionDescription = o.order.Remark;
+                                    finalOrderTempModel.PositionDescription = o.order.Contents;
                                     finalOrderTempModel.Area = (width * length) / 1000000;
                                     finalOrderTempModel.InstallPositionDescription = "";
                                     finalOrderTempModel.RegionSupplementId = 0;
@@ -174,14 +174,14 @@ namespace WebApp.Subjects.PriceOrder
                                     
                                     finalOrderTempModel.UnitPrice = unitPrice;
                                     finalOrderTempModel.TotalPrice = totalPrice;
-                                    finalOrderTempModel.IsFromRegion = true;
+                                    finalOrderTempModel.IsFromRegion = false;
                                     finalOrderTempModel.ShopStatus = o.shop.Status;
                                     finalOrderTempModel.OrderPrice = o.order.Amount;
                                     finalOrderTempModel.PayOrderPrice = o.order.PayAmount;
                                     finalOrderTempModel.GuidanceId = o.order.GuidanceId;
                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                     finalOrderTempBll.Add(finalOrderTempModel);
-                                    new BasePage().SaveQuotationOrder(finalOrderTempModel, false);
+                                    //new BasePage().SaveQuotationOrder(finalOrderTempModel, false);
                                 });
                             }
                             
@@ -217,6 +217,8 @@ namespace WebApp.Subjects.PriceOrder
                             }
                             //外协自动分单
                             AutoAssignPriceOrder(subjectId);
+                            //保存报价单
+                            new BasePage().SaveQuotationOrder(model.GuidanceId??0, subjectId, model.SubjectType ?? 0);
                         }
                         tran.Complete();
                         isApproveOk = true;
@@ -231,12 +233,13 @@ namespace WebApp.Subjects.PriceOrder
             {
 
                 string url = "/Subjects/ApproveList.aspx";
-                Alert("审批成功！", url);
+                //Alert("审批成功！", url);
+                ExcuteJs("ApproveStae", msg, url);
             }
             else
             {
-                Alert("提交失败！");
-              
+                //Alert("提交失败！");
+                ExcuteJs("ApproveStae", msg, "");
             }
         }
 

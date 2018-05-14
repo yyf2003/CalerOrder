@@ -363,7 +363,7 @@
                     <asp:Label ID="labInstallPrice" runat="server" Text="0"></asp:Label>
                 </td>
                 <td style="text-align: right;">
-                    快递费合计：
+                    快递费/运费合计：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labExpressPrice" runat="server" Text="0"></asp:Label>
@@ -383,7 +383,7 @@
                     <asp:Label ID="labMaterialPrice" runat="server" Text="0"></asp:Label>
                 </td>
                 <td style="text-align: right;">
-                    运费/新开店装修费：
+                    新开店装修费：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labNewShopInstallPrice" runat="server" Text="0"></asp:Label>
@@ -510,7 +510,7 @@
     <asp:Repeater ID="gvList" Visible="false" runat="server" OnItemDataBound="gvList_ItemDataBound"
         OnItemCommand="gvList_ItemCommand">
         <HeaderTemplate>
-            <table class="table1" style="width: 2000px;">
+            <table class="table1" style="width: 1700px;">
                 <tr class="tr_hui">
                     <td rowspan="2" style="width: 40px;">
                         序号

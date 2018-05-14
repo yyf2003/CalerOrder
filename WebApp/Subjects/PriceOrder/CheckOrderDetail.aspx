@@ -92,6 +92,9 @@
                             应付金额
                         </td>
                         <td>
+                            数量
+                        </td>
+                        <td>
                             费用内容
                         </td>
                         <td>
@@ -129,6 +132,9 @@
                         <%#Eval("PayAmount")%>
                     </td>
                     <td>
+                        <%#Eval("Quantity") == null ? 1 : Eval("Quantity")%>
+                    </td>
+                    <td>
                         <%#Eval("Contents")%>
                     </td>
                     <td>
@@ -140,7 +146,7 @@
                 <%if (orderListRepeater.Items.Count == 0)
                   { %>
                 <tr class="tr_bai">
-                    <td colspan="11" style="text-align: center;">
+                    <td colspan="12" style="text-align: center;">
                         --暂无数据--
                     </td>
                 </tr>

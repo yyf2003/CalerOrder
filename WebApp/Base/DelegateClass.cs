@@ -84,7 +84,8 @@ namespace WebApp.Base
                             //    new BasePage().SaveExpressPriceForDelivery(guidanceId, subjectId, subjectType, guidanceModel.ExperssPrice);
                             //}
                         }
-
+                        //保存报价单
+                        new BasePage().SaveQuotationOrder(guidanceId,subjectId, subjectType);
 
                         var subjectModel = (from subject in CurrentContext.DbContext.Subject
                                             join subjectCategory1 in CurrentContext.DbContext.ADSubjectCategory
@@ -1514,7 +1515,8 @@ namespace WebApp.Base
                                 new BasePage().SaveExpressPriceForDelivery(guidanceId, subjectId, subjectType, guidanceModel.ExperssPrice);
                             }
                         }
-
+                        //保存报价单
+                        new BasePage().SaveQuotationOrder(guidanceId,subjectId, subjectType);
 
                         var subjectModel = (from subject in CurrentContext.DbContext.Subject
                                             join subjectCategory1 in CurrentContext.DbContext.ADSubjectCategory
@@ -1531,7 +1533,7 @@ namespace WebApp.Base
                                             }).FirstOrDefault();
                         if (subjectModel != null)
                         {
-
+                            //保存外协订单
                             int guidanceType = subjectModel.gudiance.ActivityTypeId ?? 0;
                             List<FinalOrderDetailTemp> orderList0 = new List<FinalOrderDetailTemp>();
                             FinalOrderDetailTempBLL OrderDetailTempBll = new FinalOrderDetailTempBLL();

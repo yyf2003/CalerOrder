@@ -11,19 +11,19 @@ using Common;
 using System.Configuration;
 using System.Web.UI.HtmlControls;
 using System.Transactions;
+using Newtonsoft.Json;
 
 
 namespace WebApp.QuoteOrderManager
 {
     public partial class AddQuotation : BasePage
     {
-        string month = string.Empty;
-        string guidanceId = string.Empty;
-        string subjectCategory = string.Empty;
-        int customerId;
+        public string month = string.Empty;
+        public string guidanceId = string.Empty;
+        public string subjectCategory = string.Empty;
+        public string subjectId = string.Empty;
+        public int customerId;
         int itemId;
-
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["itemId"] != null)
@@ -45,6 +45,10 @@ namespace WebApp.QuoteOrderManager
             {
                 subjectCategory = Request.QueryString["subjectCategory"];
             }
+            if (Request.QueryString["subjectId"] != null)
+            {
+                subjectId = Request.QueryString["subjectId"];
+            }
             if (!IsPostBack)
             {
                 if (itemId > 0)
@@ -52,12 +56,13 @@ namespace WebApp.QuoteOrderManager
                     BindData();
                 }
                 BindGuidanceName();
+                
                 BindPOPList();
             }
         }
         List<int> guidanceIdList = new List<int>();
         List<int> categoryIdList = new List<int>();
-
+        List<int> subjectIdList = new List<int>();
         QuotationItemBLL quotationBll = new QuotationItemBLL();
         List<SpecialPriceQuoteDetail> specialPriceQuoteDetailList = new List<SpecialPriceQuoteDetail>();
         void BindData()
@@ -97,8 +102,18 @@ namespace WebApp.QuoteOrderManager
                     labSubjectCategory.Text = StringHelper.ListToString(list);
                 }
             }
+            if (!string.IsNullOrWhiteSpace(subjectId))
+            {
+                subjectIdList = StringHelper.ToIntList(subjectId, ',');
+                List<string> subjectNameList = new SubjectBLL().GetList(s => subjectIdList.Contains(s.Id)).Select(s => s.SubjectName).ToList();
+                if (subjectNameList.Any())
+                {
+                    labSubjectNames.Text = StringHelper.ListToString(subjectNameList);
+                }
+            }
         }
 
+       
         void BindPOPList()
         {
            
@@ -111,7 +126,7 @@ namespace WebApp.QuoteOrderManager
             //    categoryIdList = StringHelper.ToIntList(subjectCategory, ',');
             //}
             //var orderList = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete == false || s.IsDelete == null) && ((s.OrderType == (int)OrderTypeEnum.POP && s.GraphicLength != null && s.GraphicLength > 1 && s.GraphicWidth != null && s.GraphicWidth > 1) || (s.OrderType > (int)OrderTypeEnum.POP)));
-            var orderList=(from order in CurrentContext.DbContext.QuoteOrderDetail
+            var orderList = (from order in CurrentContext.DbContext.QuoteOrderDetail
                           join subject in CurrentContext.DbContext.Subject
                           on order.SubjectId equals subject.Id
                           where (order.IsDelete==null || order.IsDelete==false)
@@ -119,7 +134,8 @@ namespace WebApp.QuoteOrderManager
                           && (subject.IsDelete==null || subject.IsDelete==false)
                           && subject.ApproveState==1
                           where guidanceIdList.Contains(order.GuidanceId??0)
-                          && (categoryIdList.Any()?categoryIdList.Contains(subject.SubjectCategoryId??0):1==1)
+                          //&& (categoryIdList.Any()?categoryIdList.Contains(subject.SubjectCategoryId??0):1==1)
+                          && (subjectIdList.Any()?subjectIdList.Contains(order.SubjectId??0):1==1)
                           select new {
                             order,
                             subject
@@ -694,13 +710,13 @@ namespace WebApp.QuoteOrderManager
             {
                 //安装费
                 List<int> installShopIdList = orderList.Where(s => s.GuidanceId == gid).Select(s => s.ShopId ?? 0).Distinct().ToList();
-                List<int> subjectIdList = new SubjectBLL().GetList(s => s.GuidanceId == gid && (categoryIdList.Any()? categoryIdList.Contains(s.SubjectCategoryId ?? 0):1==1)).Select(s=>s.Id).ToList();
+                //List<int> subjectIdList = new SubjectBLL().GetList(s => s.GuidanceId == gid && (categoryIdList.Any()? categoryIdList.Contains(s.SubjectCategoryId ?? 0):1==1)).Select(s=>s.Id).ToList();
                 //var installPriceList = installShopBll.GetList(s => s.GuidanceId == gid && installShopIdList.Contains(s.ShopId ?? 0)).ToList();
                 var installPriceList = (from install in CurrentContext.DbContext.InstallPriceShopInfo
                                         join shop in CurrentContext.DbContext.Shop
                                         on install.ShopId equals shop.Id
                                         where install.GuidanceId == gid
-                                        && subjectIdList.Contains(install.SubjectId??0)
+                                        && (subjectIdList.Any()? subjectIdList.Contains(install.SubjectId??0):1==1)
                                         && installShopIdList.Contains(install.ShopId ?? 0)
                                         select new
                                         {
@@ -970,6 +986,23 @@ namespace WebApp.QuoteOrderManager
                     cell3.RowSpan += cell4.RowSpan;
                     ((Label)cell3.FindControl("labSubPrice")).Text = (price1 + price2).ToString();
 
+
+                    HtmlTableCell cell33 = otherInstallPriceRepeater.Items[i - 1].FindControl("subPriceLeft") as HtmlTableCell;
+                    HtmlTableCell cell44 = otherInstallPriceRepeater.Items[i].FindControl("subPriceLeft") as HtmlTableCell;
+                    cell33.RowSpan = (cell33.RowSpan == -1) ? 1 : cell33.RowSpan;
+                    cell44.RowSpan = (cell44.RowSpan == -1) ? 1 : cell44.RowSpan;
+
+                    string price11Str = ((Label)cell33.FindControl("labsubPriceLeft")).Text;
+                    string price22Str = ((Label)cell44.FindControl("labsubPriceLeft")).Text;
+
+                    decimal price11 = !string.IsNullOrWhiteSpace(price1Str) ? decimal.Parse(price1Str) : 0;
+                    decimal price22 = !string.IsNullOrWhiteSpace(price2Str) ? decimal.Parse(price2Str) : 0;
+
+                    cell44.Visible = false;
+                    cell33.RowSpan += cell44.RowSpan;
+                    ((Label)cell33.FindControl("labsubPriceLeft")).Text = (price11 + price22).ToString();
+
+
                     HtmlTableCell cell5 = otherInstallPriceRepeater.Items[i - 1].FindControl("operatePrice") as HtmlTableCell;
                     HtmlTableCell cell6 = otherInstallPriceRepeater.Items[i].FindControl("operatePrice") as HtmlTableCell;
                     cell5.RowSpan = (cell5.RowSpan == -1) ? 1 : cell5.RowSpan;
@@ -1142,11 +1175,31 @@ namespace WebApp.QuoteOrderManager
                     decimal subPrice = item.Count * item.Price;
                     ((Label)e.Item.FindControl("labPrice")).Text = subPrice.ToString();
                     ((Label)e.Item.FindControl("labSubPrice")).Text = subPrice.ToString();
+                    ((Label)e.Item.FindControl("labSubPriceLeft")).Text = subPrice.ToString();
 
+
+                    if (!materialList.Any())
+                    {
+                        GetCustomerMaterial();
+                    }
+                    DropDownList ddlMaterial = (DropDownList)e.Item.FindControl("ddlMaterial");
+                    materialList.ForEach(s => {
+                        ListItem li = new ListItem();
+                        li.Text = s.MaterialName + "("+s.Price+")";
+                        li.Value = s.MaterialName + "-" + s.Price;
+                        ddlMaterial.Items.Add(li);
+                    });
+                    //ddlMaterial.DataSource = materialList;
+                    //ddlMaterial.DataTextField = "MaterialName";
+                    //ddlMaterial.DataValueField = "MaterialName";
+                    //ddlMaterial.DataBind();
+                    //ddlMaterial.Items.Insert(0, new ListItem("请选择", ""));
                     Panel panelOOH= (Panel)e.Item.FindControl("PanelOOH");
                     Panel panelBasic = (Panel)e.Item.FindControl("PanelBasic");
+                    HiddenField hfChangeType = (HiddenField)e.Item.FindControl("hfChangeType");
                     if (item.PriceType == "户外安装费")
                     {
+                        hfChangeType.Value = ((int)QuoteInstallPriceChangeTypeEnum.OOH).ToString();
                         panelBasic.Visible = false;
                         var specialPriceDetailList0 = specialPriceQuoteDetailList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.OOH).ToList();
                         if (specialPriceDetailList0.Any())
@@ -1192,6 +1245,7 @@ namespace WebApp.QuoteOrderManager
                     }
                     else
                     {
+                        hfChangeType.Value = ((int)QuoteInstallPriceChangeTypeEnum.Basic).ToString();
                         panelOOH.Visible = false;
                         var specialPriceDetailList0 = specialPriceQuoteDetailList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.Basic).ToList();
                         if (specialPriceDetailList0.Any())
@@ -1372,6 +1426,30 @@ namespace WebApp.QuoteOrderManager
                             }
                         }
                     }
+                    string POPQuoteJson = hfPOPQuoteJson.Value;
+                    specialDetailBll.Delete(s => s.ItemId == model.Id && s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.POP);
+                    if (!string.IsNullOrWhiteSpace(POPQuoteJson))
+                    {
+                        List<SpecialPriceQuoteDetail> specialPriceList = JsonConvert.DeserializeObject<List<SpecialPriceQuoteDetail>>(POPQuoteJson);
+                        if (specialPriceList.Any())
+                        {
+                            specialPriceList.ForEach(s => {
+                                specialDetailModel = new SpecialPriceQuoteDetail();
+                                specialDetailModel.ItemId = model.Id;
+                                specialDetailModel.AddDate = DateTime.Now;
+                                specialDetailModel.AddUserId = CurrentUser.UserId;
+                                specialDetailModel.ChangeType = (int)QuoteInstallPriceChangeTypeEnum.POP;
+                                specialDetailModel.PriceType = s.ChangeType;
+                                specialDetailModel.GraphicMaterial = s.GraphicMaterial;
+                                specialDetailModel.GraphicMaterialUnitPrice = s.GraphicMaterialUnitPrice;
+                                specialDetailModel.Sheet = s.Sheet;
+                                specialDetailModel.AddArea = s.AddArea;
+                                //specialDetailModel.InstallPriceLevel = 150;
+                                specialDetailModel.Quantity = 1;
+                                specialDetailBll.Add(specialDetailModel);
+                            });
+                        }
+                    }
                     tran.Complete();
                     
                     
@@ -1391,7 +1469,29 @@ namespace WebApp.QuoteOrderManager
             hfQuoteTotalPrice1.Value = Math.Round((popTotalPrice + installPriceTotal + expressTotalPrice + specialTotal), 2).ToString();
         }
 
+        List<CustomerMaterialInfo> materialList = new List<CustomerMaterialInfo>();
+        void GetCustomerMaterial()
+        {
+            int priceItemId = 0;
+            var guidanceModel = new SubjectGuidanceBLL().GetList(s => guidanceIdList.Contains(s.ItemId)).FirstOrDefault();
+            if (guidanceModel != null)
+            {
+                priceItemId = guidanceModel.PriceItemId ?? 0;
+            }
+            var mList = (from customerMaterial in CurrentContext.DbContext.CustomerMaterialInfo
+                         join basicMaterial in CurrentContext.DbContext.BasicMaterial
+                         on customerMaterial.BasicMaterialId equals basicMaterial.Id
+                         where customerMaterial.CustomerId == customerId && (customerMaterial.IsDelete == false || customerMaterial.IsDelete == null)
+                         && customerMaterial.PriceItemId == priceItemId
+                         select new { basicMaterial.MaterialName, customerMaterial }).OrderBy(s => s.MaterialName).ToList();
 
+            mList.ForEach(s => {
+                CustomerMaterialInfo model = s.customerMaterial;
+                model.MaterialName = s.MaterialName;
+                materialList.Add(model);
+            });
+
+        }
     }
 
     public class OtherInstallPriceClass
@@ -1409,4 +1509,6 @@ namespace WebApp.QuoteOrderManager
         public int Count { get; set; }
 
     }
+
+
 }

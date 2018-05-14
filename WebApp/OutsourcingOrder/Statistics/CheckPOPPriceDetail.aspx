@@ -130,52 +130,52 @@
                     </td>
                     
                     <td>
-                        <%#Eval("ShopNo") %>
+                        <%#Eval("order.ShopNo")%>
                     </td>
                     <td>
-                        <%#Eval("ShopName") %>
+                        <%#Eval("order.ShopName")%>
                     </td>
                     <td>
-                        <%#Eval("Region") %>
+                        <%#Eval("order.Region")%>
                     </td>
                     <td>
-                        <%#Eval("Province") %>
+                        <%#Eval("order.Province")%>
                     </td>
                     <td>
-                        <%#Eval("City") %>
+                        <%#Eval("order.City")%>
                     </td>
                     <td>
-                        <%#Eval("Sheet")%>
+                        <%#Eval("order.Sheet")%>
                     </td>
                     <td>
-                        <%#Eval("GraphicNo")%>
+                        <%#Eval("order.GraphicNo")%>
                     </td>
                     <td>
-                        <%#Eval("Quantity")%>
+                        <%#Eval("order.Quantity")%>
                     </td>
                     <td>
-                        <%#Eval("Gender")%>
+                        <%#Eval("order.Gender")%>
                     </td>
                     <td>
-                        <%#Eval("GraphicWidth")%>
+                        <%#Eval("order.GraphicWidth")%>
                     </td>
                     <td>
-                        <%#Eval("GraphicLength")%>
+                        <%#Eval("order.GraphicLength")%>
                     </td>
                     <td>
-                        <%#Eval("GraphicMaterial")%>
+                        <%#Eval("order.GraphicMaterial")%>
                     </td>
                     <td>
-                        <%#Eval("UnitPrice")%>
+                        <%#Eval("order.UnitPrice")%>
                     </td>
                     <td>
-                        <%#Eval("ReceiveUnitPrice")%>
+                        <%#Eval("order.ReceiveUnitPrice")%>
                     </td>
                     <td>
-                        <%#Eval("TotalPrice")%>
+                        <%#Eval("order.TotalPrice")%>
                     </td>
                     <td>
-                        <%#Eval("ReceiveTotalPrice")%>
+                        <%#Eval("order.ReceiveTotalPrice")%>
                     </td>
                 </tr>
             </ItemTemplate>

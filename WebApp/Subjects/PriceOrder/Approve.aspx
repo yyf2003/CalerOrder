@@ -12,7 +12,20 @@
     <link href="/easyui1.4/themes/bootstrap/layout.css" rel="stylesheet" /> 
     <link href="/easyui1.4/themes/icon.css" rel="stylesheet" /> 
     <script src="/Scripts/jquery-1.7.2.js" type="text/javascript"></script> 
-    <script src="/easyui1.4/jquery.easyui.min.js"></script>
+     <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
+    <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
+    <script type="text/javascript">
+       
+        function ApproveStae(msg, url) {
+            if (msg == "ok") {
+                layer.msg("审批成功");
+                window.location.href = url;
+            }
+            else {
+                layer.confirm(msg, { title: "提交失败", btn: ['确定'] });
+            }
+        }
+    </script>
 </head>
 <body>
     <form id="form1" runat="server">

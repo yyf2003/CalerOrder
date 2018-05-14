@@ -595,13 +595,7 @@ namespace WebApp.Customer
                             errorMsg.AppendFormat("客服{0}不存在，请先创建用户；", csUserName);
                         }
                     }
-                    if (!string.IsNullOrWhiteSpace(outsourceName))
-                    {
-                        if (!GetOutsourceName(outsourceName, out outsourceId))
-                        {
-                            errorMsg.Append("外协名称填写不正确；");
-                        }
-                    }
+                    
                     bool isShut = false;
                     bool isInstall0 = false;
                     isexist = CheckShop(shopNo, out shopId, out isShut, out isInstall0);
@@ -609,10 +603,17 @@ namespace WebApp.Customer
                     {
 
                     }
-                    else if (string.IsNullOrWhiteSpace(outsourceName))
+                    else if (region.ToLower()!="west" && string.IsNullOrWhiteSpace(outsourceName))
                     {
                         canSave = false;
                         errorMsg.Append("请填写外协名称；");
+                    }
+                    if (!string.IsNullOrWhiteSpace(outsourceName))
+                    {
+                        if (!GetOutsourceName(outsourceName, out outsourceId))
+                        {
+                            errorMsg.Append("外协名称填写不正确；");
+                        }
                     }
                     if (!isexist && !string.IsNullOrWhiteSpace(shopName) && ShopNameIsExist(shopName))
                     {

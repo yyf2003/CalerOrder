@@ -230,6 +230,10 @@ namespace Common
         其他费用,
         [Description("费用订单")]
         运费,
+        [Description("费用订单")]
+        印刷费,
+        [Description("费用订单")]
+        快递费,
     }
 
     public enum OrderChangeTypeEnum

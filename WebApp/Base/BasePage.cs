@@ -514,6 +514,16 @@ namespace WebApp
             ClientScript.RegisterClientScriptBlock(GetType(), "al", js);
         }
 
+        public void ExcuteJs(string fun, string msg,string url)
+        {
+            string js = "<script>" + fun + "();</script>";
+            if (!string.IsNullOrWhiteSpace(msg))
+            {
+                js = "<script>" + fun + "('" + msg + "','" + url + "');</script>";
+            }
+            ClientScript.RegisterClientScriptBlock(GetType(), "al", js);
+        }
+
 
         protected string GetAttachList(string fileCode, int subjectId)
         {
@@ -7019,7 +7029,179 @@ namespace WebApp
         QuoteOrderDetail quoteOrderModel;
         QuoteOrderSettingBLL quoteOrderSettingBll = new QuoteOrderSettingBLL();
         List<QuoteOrderSetting> settingList = new List<QuoteOrderSetting>();
-        public void SaveQuotationOrder(FinalOrderDetailTemp order, bool? orderSetting = true)
+        /// <summary>
+        /// 台卡尺寸List
+        /// </summary>
+        List<MachineFrameSize> taiKaSizeList = new List<MachineFrameSize>();
+        public void SaveQuotationOrder(int guidanceId, int subjectId, int subjectType)
+        {
+            int priceItemId = 0;
+            SubjectGuidance guidanceModel = new SubjectGuidanceBLL().GetModel(guidanceId);
+            if (guidanceModel!=null)
+            {
+                priceItemId = guidanceModel.PriceItemId ?? 0;
+            }
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            if (subjectType == (int)SubjectTypeEnum.HC订单 || subjectType == (int)SubjectTypeEnum.分区补单)
+            {
+                orderList = new FinalOrderDetailTempBLL().GetList(s => s.RegionSupplementId == subjectId && (s.IsDelete == null || s.IsDelete == false));
+            }
+            else
+            {
+                orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0 && (s.IsDelete == null || s.IsDelete == false));
+            }
+            if (orderList.Any())
+            {
+                if (!taiKaSizeList.Any())
+                {
+                    taiKaSizeList = new List<MachineFrameSize>();
+                    taiKaSizeList = (from size in CurrentContext.DbContext.MachineFrameSize
+                                     join mType in CurrentContext.DbContext.MachineFrameType
+                                     on size.MachineFrameTypeId equals mType.Id
+                                     where mType.Sheet == "台卡"
+                                     select size).ToList();
+                }
+                orderList.ForEach(order =>
+                {
+
+
+                    decimal width = order.GraphicWidth ?? 0;
+                    decimal length = order.GraphicLength ?? 0;
+
+                    quoteOrderModel = new QuoteOrderDetail();
+                    quoteOrderModel.AddDate = DateTime.Now;
+                    quoteOrderModel.AddUserId = order.AddUserId;
+                    quoteOrderModel.AgentCode = order.AgentCode;
+                    quoteOrderModel.AgentName = order.AgentName;
+
+                    quoteOrderModel.BCSIsInstall = order.BCSIsInstall;
+                    quoteOrderModel.BusinessModel = order.BusinessModel;
+                    quoteOrderModel.Category = order.Category;
+                    quoteOrderModel.Channel = order.Channel;
+                    quoteOrderModel.ChooseImg = order.ChooseImg;
+                    quoteOrderModel.City = order.City;
+                    quoteOrderModel.CityTier = order.CityTier;
+                    quoteOrderModel.Contact = order.Contact;
+                    quoteOrderModel.CornerType = order.CornerType;
+                    quoteOrderModel.CSUserId = order.CSUserId;
+                    quoteOrderModel.CustomerMaterialId = order.CustomerMaterialId;
+                    quoteOrderModel.FinalOrderId = order.Id;
+                    quoteOrderModel.Gender = order.Gender;
+
+                    quoteOrderModel.GraphicMaterial = order.GraphicMaterial;
+                    
+                    quoteOrderModel.GraphicNo = order.GraphicNo;
+
+                    quoteOrderModel.GuidanceId = order.GuidanceId;
+                    quoteOrderModel.InstallPositionDescription = order.InstallPositionDescription;
+                    quoteOrderModel.InstallPriceMaterialSupport = order.InstallPriceMaterialSupport;
+                    quoteOrderModel.InstallPricePOSScale = order.InstallPricePOSScale;
+                    quoteOrderModel.IsFromRegion = order.IsFromRegion;
+                    quoteOrderModel.IsInstall = order.IsInstall;
+                    quoteOrderModel.IsValid = order.IsValid;
+                    quoteOrderModel.LocationType = order.LocationType;
+                    quoteOrderModel.MachineFrame = order.MachineFrame;
+                    quoteOrderModel.MaterialSupport = order.MaterialSupport;
+                    quoteOrderModel.OrderGender = order.OrderGender;
+                    quoteOrderModel.OrderPrice = order.OrderPrice;
+                    quoteOrderModel.OrderType = order.OrderType;
+                    quoteOrderModel.PayOrderPrice = order.PayOrderPrice;
+                    quoteOrderModel.POPAddress = order.POPAddress;
+                    quoteOrderModel.POPName = order.POPName;
+                    quoteOrderModel.POPType = order.POPType;
+                    quoteOrderModel.PositionDescription = order.PositionDescription;
+                    quoteOrderModel.POSScale = order.POSScale;
+                    quoteOrderModel.PriceBlongRegion = order.PriceBlongRegion;
+                    quoteOrderModel.Province = order.Province;
+                    quoteOrderModel.Quantity = order.Quantity;
+                    quoteOrderModel.Region = order.Region;
+                    quoteOrderModel.RegionSupplementId = order.RegionSupplementId;
+                    quoteOrderModel.Remark = order.Remark;
+                    quoteOrderModel.RightSideStick = order.RightSideStick;
+                    quoteOrderModel.Sheet = order.Sheet;
+                    quoteOrderModel.ShopId = order.ShopId;
+                    quoteOrderModel.ShopName = order.ShopName;
+                    quoteOrderModel.ShopNo = order.ShopNo;
+                    quoteOrderModel.ShopStatus = order.ShopStatus;
+                    quoteOrderModel.SmallMaterialId = order.SmallMaterialId;
+                    quoteOrderModel.SubjectId = order.SubjectId;
+                    quoteOrderModel.Tel = order.Tel;
+
+                    //原始尺寸
+                    quoteOrderModel.GraphicWidth = order.GraphicWidth;
+                    quoteOrderModel.GraphicLength = order.GraphicLength;
+                    quoteOrderModel.Area = order.Area;
+                    quoteOrderModel.DefaultTotalPrice = order.TotalPrice;
+                    quoteOrderModel.AutoAddTotalPrice = order.TotalPrice;
+                    //增加的尺寸
+                    //quoteOrderModel.AutoAddGraphicWidth = widthAdd;
+                    //quoteOrderModel.AutoAddGraphicLength = lengthAdd;
+                    //quoteOrderModel.AutoAddArea = areaAdd;
+                    //quoteOrderModel.AutoAddTotalPrice = addTotalPrice;
+
+                    //增加后尺寸
+                    //quoteOrderModel.TotalGraphicWidth = width;
+                    //quoteOrderModel.TotalGraphicLength = length;
+                    //quoteOrderModel.TotalPrice = totalPriceAfterAdd;
+                    //quoteOrderModel.TotalArea = totalAreaAfterAdd;
+
+                    quoteOrderModel.UnitPrice = order.UnitPrice;
+                    quoteOrderModel.UnitName = order.UnitName;
+                    quoteOrderModel.WindowDeep = order.WindowDeep;
+                    quoteOrderModel.WindowHigh = order.WindowHigh;
+                    quoteOrderModel.WindowSize = order.WindowSize;
+                    quoteOrderModel.WindowStick = order.WindowStick;
+                    quoteOrderModel.WindowWide = order.WindowWide;
+
+
+                    if (!string.IsNullOrWhiteSpace(order.GraphicMaterial))
+                    {
+                        string QuoteGraphicMaterial = this.GetQuoteMaterial(order.GraphicMaterial);
+                        bool isTaiKa = false;
+                        if (order.Sheet.Contains("台卡") || order.Remark.Contains("台卡") || order.PositionDescription.Contains("台卡"))
+                        {
+                            isTaiKa = true;
+                        }
+                        else
+                        {
+                            foreach (var size in taiKaSizeList)
+                            {
+                                if (length == size.Height && width == size.Width)
+                                {
+                                    isTaiKa = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (isTaiKa)
+                            QuoteGraphicMaterial = "背胶PP+3mm雪弗板+蝴蝶支架";
+                        quoteOrderModel.QuoteGraphicMaterial = QuoteGraphicMaterial;
+                        POP pop = new POP();
+                        pop.Quantity = order.Quantity;
+                        pop.PriceItemId = priceItemId;
+                        pop.GraphicMaterial = QuoteGraphicMaterial;
+                        pop.GraphicLength = length;
+                        pop.GraphicWidth = width;
+                        decimal totalPrice = 0;
+                        string unitName = string.Empty;
+                        decimal newunitPrice = new BasePage().GetMaterialUnitPrice(pop, out totalPrice, out unitName);
+                        quoteOrderModel.UnitPrice = newunitPrice;
+                        quoteOrderModel.UnitName = unitName;
+                        quoteOrderModel.TotalPrice = totalPrice;
+                        quoteOrderModel.AutoAddTotalPrice = totalPrice;
+                    }
+
+                    quoteOrderBll.Add(quoteOrderModel);
+                });
+            }
+        }
+
+        /// <summary>
+        /// 自动增加sum尺寸
+        /// </summary>
+        /// <param name="order"></param>
+        /// <param name="orderSetting"></param>
+        public void SaveQuotationOrder1(FinalOrderDetailTemp order, bool? orderSetting = true)
         {
             if (order != null)
             {
@@ -7194,11 +7376,10 @@ namespace WebApp
             }
         }
 
-
-
         public void SaveQuotationOrder123(FinalOrderDetailTemp order, bool? orderSetting = true)
         { }
 
+       
 
         Dictionary<string, string> materialDic = new Dictionary<string, string>();
         QuoteMaterialBLL quoteMaterialBll = new QuoteMaterialBLL();
@@ -7245,8 +7426,8 @@ namespace WebApp
                 orderList.ForEach(s =>
                 {
                     int Quantity = s.Quantity ?? 1;
-                    decimal width = s.TotalGraphicWidth ?? 0;
-                    decimal length = s.TotalGraphicLength ?? 0;
+                    decimal width = s.GraphicWidth ?? 0;
+                    decimal length = s.GraphicLength ?? 0;
                     if (!string.IsNullOrWhiteSpace(s.QuoteGraphicMaterial))
                     {
                         MaterialClass mc = new MaterialClass();

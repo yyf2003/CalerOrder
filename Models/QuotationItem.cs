@@ -25,5 +25,8 @@ namespace Models
         public Nullable<decimal> TotalArea { get; set; }
         public Nullable<decimal> TotalPrice { get; set; }
         public Nullable<bool> IsDelete { get; set; }
+        public string SubjectIds { get; set; }
+        public string QuoteSubjectName { get; set; }
+        public Nullable<decimal> AddRate { get; set; }
     }
 }

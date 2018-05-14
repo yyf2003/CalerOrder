@@ -110,7 +110,7 @@ namespace WebApp.Subjects
             string remark = txtRemark.Text;
             SubjectBLL subjectBll = new SubjectBLL();
             bool isApproveOk = false;
-            string msg = string.Empty;
+            string msg = "ok";
             int guidanceId = 0;
             int subjectType = 1;
             Models.Subject model = subjectBll.GetModel(subjectId);
@@ -200,7 +200,7 @@ namespace WebApp.Subjects
                                         finalOrderTempModel.GuidanceId = o.order.GuidanceId;
                                         finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                         finalOrderTempBll.Add(finalOrderTempModel);
-                                        new BasePage().SaveQuotationOrder(finalOrderTempModel, false);
+                                        //new BasePage().SaveQuotationOrder(finalOrderTempModel, false);
                                     });
                                 }
                             }
@@ -254,12 +254,13 @@ namespace WebApp.Subjects
                 string url = "ApproveList.aspx";
                 if (subjectType == (int)SubjectTypeEnum.正常单)
                     url = "/Subjects/RegionSubject/ApproveList.aspx";
-                Alert("审批成功！", url);
+                //Alert("审批成功！", url);
+                ExcuteJs("ApproveStae", msg, url);
             }
             else
             {
-                Alert("提交失败！");
-                
+                //Alert("提交失败！");
+                ExcuteJs("ApproveStae",msg,"");
             }
         }
 

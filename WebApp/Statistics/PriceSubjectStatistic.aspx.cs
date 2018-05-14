@@ -77,7 +77,7 @@ namespace WebApp.Statistics
                        join subject in CurrentContext.DbContext.Subject
                        on order.SubjectId equals subject.Id
                        where 
-                       subjectIdList.Any()?(subjectIdList.Contains(order.SubjectId ?? 0)&& order.OrderType == (int)OrderTypeEnum.其他费用):order.SubjectId==subjectId
+                       subjectIdList.Any()?(subjectIdList.Contains(order.SubjectId ?? 0)&& (order.OrderType == (int)OrderTypeEnum.其他费用 || order.OrderType == (int)OrderTypeEnum.印刷费)):order.SubjectId==subjectId
                        && (order.IsDelete == null || order.IsDelete == false)
                        //&& (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
                        && (regionList.Any() ?regionList.Contains(order.Region.ToLower()) : 1 == 1)
@@ -85,6 +85,10 @@ namespace WebApp.Statistics
                         select new {
                            order,
                            order.OrderType,
+                           order.OrderPrice,
+                           order.Quantity,
+                           order.Remark,
+                           order.PositionDescription,
                            subject
                        }).ToList();
            
@@ -107,7 +111,7 @@ namespace WebApp.Statistics
             }
             
             labShopCount.Text = (list.Select(s=>s.order.ShopId??0).Distinct().Count()).ToString();
-            labTotlePrice.Text = (list.Sum(s => s.order.OrderPrice ?? 0)).ToString();
+            labTotlePrice.Text = (list.Sum(s => (s.order.OrderPrice ?? 0)*(s.order.Quantity??1))).ToString();
             AspNetPager1.RecordCount = list.Count;
             this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
             gvList.DataSource = list.OrderBy(s => s.order.ShopId).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
@@ -130,6 +134,29 @@ namespace WebApp.Statistics
                     object orderTypeObj = item.GetType().GetProperty("OrderType").GetValue(item, null);
                     string orderType = (orderTypeObj??string.Empty).ToString();
                     ((Label)e.Item.FindControl("labOrderType")).Text = CommonMethod.GeEnumName<OrderTypeEnum>(orderType);
+
+                    object orderPriceObj = item.GetType().GetProperty("OrderPrice").GetValue(item, null);
+                    decimal orderPrice = orderPriceObj != null ? decimal.Parse(orderPriceObj.ToString()) : 0;
+
+                    object quantityObj = item.GetType().GetProperty("Quantity").GetValue(item, null);
+                    decimal quantity = quantityObj != null ? int.Parse(quantityObj.ToString()) : 1;
+
+                    object remarkObj = item.GetType().GetProperty("Remark").GetValue(item, null);
+                    string remark = (remarkObj ?? string.Empty).ToString();
+
+                    object positionDescriptionObj = item.GetType().GetProperty("PositionDescription").GetValue(item, null);
+                    string positionDescription = (positionDescriptionObj ?? string.Empty).ToString();
+
+                    ((Label)e.Item.FindControl("labSubPrice")).Text = (orderPrice * quantity).ToString();
+
+                    System.Text.StringBuilder remarksb = new System.Text.StringBuilder(positionDescription);
+
+                    if(!string.IsNullOrWhiteSpace(remark))
+                    {
+                        remarksb.AppendFormat("({0})", remark);
+                    }
+                    ((Label)e.Item.FindControl("labRemark")).Text = string.Format("{0}", remarksb.ToString());
+
                 }
             }
         }

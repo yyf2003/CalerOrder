@@ -121,6 +121,24 @@ namespace WebApp.QuoteOrderManager {
         protected global::System.Web.UI.WebControls.CheckBoxList cblSubjectCategory;
         
         /// <summary>
+        /// cbAllSubject 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox cbAllSubject;
+        
+        /// <summary>
+        /// cblSubjectName 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList cblSubjectName;
+        
+        /// <summary>
         /// cblRegion 控件。
         /// </summary>
         /// <remarks>

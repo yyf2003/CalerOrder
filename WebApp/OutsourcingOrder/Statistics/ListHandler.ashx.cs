@@ -205,19 +205,19 @@ namespace WebApp.OutsourcingOrder.Statistics
                         {
                             installOrderPriceList = installOrderPriceList.Where(s => assignTypeList.Contains(s.order.AssignType ?? 0)).ToList();
                         }
-                        installPrice += installOrderPriceList.Sum(s => s.order.PayOrderPrice ?? 0);
-                        receiveinstallPrice += installOrderPriceList.Sum(s => s.order.ReceiveOrderPrice ?? 0);
+                        installPrice += installOrderPriceList.Sum(s => (s.order.PayOrderPrice ?? 0)*(s.order.Quantity??1));
+                        receiveinstallPrice += installOrderPriceList.Sum(s => (s.order.ReceiveOrderPrice ?? 0) *(s.order.Quantity ?? 1));
                     }
                     //快递费
-                    var expressOrderPriceList = orderList0.Where(s => shopIdList.Contains(s.order.ShopId ?? 0) && s.order.SubjectId == 0 && (s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.运费)).ToList();
+                    var expressOrderPriceList = orderList0.Where(s => shopIdList.Contains(s.order.ShopId ?? 0) && s.order.SubjectId == 0 && (s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.快递费 || s.order.OrderType == (int)OrderTypeEnum.运费)).ToList();
                     if (expressOrderPriceList.Any())
                     {
                         if (assignTypeList.Any())
                         {
                             expressOrderPriceList = expressOrderPriceList.Where(s => assignTypeList.Contains(s.order.AssignType ?? 0)).ToList();
                         }
-                        expressPrice += expressOrderPriceList.Sum(s => s.order.PayOrderPrice ?? 0);
-                        receiveExpressPrice += expressOrderPriceList.Sum(s => s.order.ReceiveOrderPrice ?? 0);
+                        expressPrice += expressOrderPriceList.Sum(s => (s.order.PayOrderPrice ?? 0) * (s.order.Quantity ?? 1));
+                        receiveExpressPrice += expressOrderPriceList.Sum(s => (s.order.ReceiveOrderPrice ?? 0) * (s.order.Quantity ?? 1));
                     }
                     var assignShopList = new OutsourceAssignShopBLL().GetList(s => s.GuidanceId == gid && installShopIdList.Contains(s.ShopId ?? 0) && outsourceList.Contains(s.OutsourceId ?? 0)).ToList();
                     assignShopList.ForEach(s =>
@@ -257,18 +257,18 @@ namespace WebApp.OutsourcingOrder.Statistics
                             
                             if (s.order.OrderType == (int)OrderTypeEnum.测量费)
                             {
-                                measurePrice += (s.order.PayOrderPrice ?? 0);
-                                receiveMeasurePrice += (s.order.ReceiveOrderPrice ?? 0);
+                                measurePrice += ((s.order.PayOrderPrice ?? 0) * (s.order.Quantity ?? 1));
+                                receiveMeasurePrice += ((s.order.ReceiveOrderPrice ?? 0) * (s.order.Quantity ?? 1));
                             }
-                            if (s.order.OrderType == (int)OrderTypeEnum.其他费用)
+                            if (s.order.OrderType == (int)OrderTypeEnum.其他费用 || s.order.OrderType == (int)OrderTypeEnum.印刷费)
                             {
-                                otherPrice += (s.order.PayOrderPrice ?? 0);
-                                receiveOtherPrice += (s.order.ReceiveOrderPrice ?? 0);
+                                otherPrice += ((s.order.PayOrderPrice ?? 0) * (s.order.Quantity ?? 1));
+                                receiveOtherPrice += ((s.order.ReceiveOrderPrice ?? 0) * (s.order.Quantity ?? 1));
                             }
-                            if (s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.运费)
+                            if (s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.快递费 || s.order.OrderType == (int)OrderTypeEnum.运费)
                             {
-                                expressPrice += (s.order.PayOrderPrice ?? 0);
-                                receiveExpressPrice += (s.order.ReceiveOrderPrice ?? 0);
+                                expressPrice += ((s.order.PayOrderPrice ?? 0) * (s.order.Quantity ?? 1));
+                                receiveExpressPrice += ((s.order.ReceiveOrderPrice ?? 0) * (s.order.Quantity ?? 1));
                             }
                         });
                         //安装费单独算
@@ -396,7 +396,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                 if (!string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
                 {
                     DateTime endDate = DateTime.Parse(endDateStr);
-                    orderList0 = orderList0.Where(s => s.subject.AddDate < endDate).ToList();
+                    orderList0 = orderList0.Where(s => s.subject.AddDate < endDate.AddDays(1)).ToList();
                     if (orderList0.Any())
                     {
                         List<string> provinceList = orderList0.Select(s => s.order.Province).Distinct().ToList();
@@ -605,7 +605,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (!string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
             {
                 DateTime endDate = DateTime.Parse(endDateStr);
-                orderList0 = orderList0.Where(s => s.subject.AddDate < endDate).ToList();
+                orderList0 = orderList0.Where(s => s.subject.AddDate < endDate.AddDays(1)).ToList();
             }
             if (provinceList.Any())
             {
@@ -691,7 +691,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                             receiveinstallPrice += installOrderPriceList.Sum(s => s.order.ReceiveOrderPrice ?? 0);
                         }
                         //快递费
-                        var expressOrderPriceList = orderList.Where(s =>  s.order.SubjectId == 0 && s.order.OrderType == (int)OrderTypeEnum.发货费).ToList();
+                        var expressOrderPriceList = orderList.Where(s => s.order.SubjectId == 0 && (s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.快递费 || s.order.OrderType == (int)OrderTypeEnum.运费)).ToList();
                         if (expressOrderPriceList.Any())
                         {
                             if (assignTypeList.Any())
@@ -746,12 +746,12 @@ namespace WebApp.OutsourcingOrder.Statistics
                                     measurePrice += (s.order.PayOrderPrice ?? 0);
                                     receiveMeasurePrice += (s.order.ReceiveOrderPrice ?? 0);
                                 }
-                                if (s.order.OrderType == (int)OrderTypeEnum.其他费用)
+                                if (s.order.OrderType == (int)OrderTypeEnum.其他费用 || s.order.OrderType == (int)OrderTypeEnum.印刷费)
                                 {
-                                    otherPrice += (s.order.PayOrderPrice ?? 0);
-                                    receiveOtherPrice += (s.order.ReceiveOrderPrice ?? 0);
+                                    otherPrice += ((s.order.PayOrderPrice ?? 0)*(s.order.Quantity??1));
+                                    receiveOtherPrice += ((s.order.ReceiveOrderPrice ?? 0) * (s.order.Quantity ?? 1));
                                 }
-                                if (s.order.OrderType == (int)OrderTypeEnum.发货费)
+                                if (s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.快递费 || s.order.OrderType == (int)OrderTypeEnum.运费)
                                 {
                                     expressPrice += (s.order.PayOrderPrice ?? 0);
                                     receiveExpressPrice += (s.order.ReceiveOrderPrice ?? 0);

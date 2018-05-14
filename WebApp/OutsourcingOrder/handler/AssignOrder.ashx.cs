@@ -4221,92 +4221,150 @@ namespace WebApp.OutsourcingOrder.handler
                     }
                     #endregion
 
-                    #region 安装费
-
-                    if (addInstallPrice && !hasInstallPrice && assignOrderModel.AddInstallPrice)
+                    #region 安装费和快递费
+                    if (popOrderList.Any())
                     {
-                        decimal installPrice = 0;
-                        decimal receiveInstallPrice = 0;
-                        string remark = "活动安装费";
-                        if (outsourceType == (int)GuidanceTypeEnum.Install)
+                        if (addInstallPrice && !hasInstallPrice && assignOrderModel.AddInstallPrice)
                         {
-                            //按照级别，获取基础安装费
-                            
-                            var installShopList = installPriceTempList.Where(sh => sh.ShopId == shopId).ToList();
-                            if (installShopList.Any())
+                            decimal installPrice = 0;
+                            decimal receiveInstallPrice = 0;
+                            string remark = "活动安装费";
+                            if (outsourceType == (int)GuidanceTypeEnum.Install)
                             {
-                                installShopList.ForEach(sh =>
-                                {
-                                    receiveInstallPrice += ((sh.BasicPrice ?? 0) + (sh.OOHPrice ?? 0) + (sh.WindowPrice ?? 0));
-                                });
-                            }
-                            if (assignOrderModel.IsBCSSubject)
-                            {
-                                if ((assignOrderModel.Shop.OutsourceBCSInstallPrice ?? 0) > 0)
-                                {
-                                    basicInstallPrice = assignOrderModel.Shop.OutsourceBCSInstallPrice ?? 0;
-                                }
-                                else if (assignOrderModel.BCSCityTierList.Contains(assignOrderModel.Shop.CityTier.ToUpper()))
-                                {
-                                    basicInstallPrice = 150;
-                                }
-                                else
-                                {
-                                    basicInstallPrice = 0;
-                                }
+                                //按照级别，获取基础安装费
 
-                            }
-                            else if (assignOrderModel.IsGenericSubject)
-                            {
-
-                                if (assignOrderModel.Shop.CityName == "包头市" && (assignOrderModel.Shop.OutsourceInstallPrice ?? 0) > 0)
+                                var installShopList = installPriceTempList.Where(sh => sh.ShopId == shopId).ToList();
+                                if (installShopList.Any())
                                 {
-                                    basicInstallPrice = assignOrderModel.Shop.OutsourceInstallPrice ?? 0;
-                                }
-                                else if (assignOrderModel.BCSCityTierList.Contains(assignOrderModel.Shop.CityTier.ToUpper()))
-                                {
-                                    basicInstallPrice = 150;
-                                }
-                                else
-                                {
-                                    basicInstallPrice = 0;
-                                }
-                            }
-                            else
-                            {
-                                if ((assignOrderModel.Shop.OutsourceInstallPrice ?? 0) > 0)
-                                {
-                                    basicInstallPrice = assignOrderModel.Shop.OutsourceInstallPrice ?? 0;
-                                }
-                                else
-                                {
-                                    materialSupportList.ForEach(ma =>
+                                    installShopList.ForEach(sh =>
                                     {
-                                        decimal basicInstallPrice0 = new BasePage().GetOutsourceBasicInstallPrice(ma);
-                                        if (basicInstallPrice0 > basicInstallPrice)
-                                        {
-                                            basicInstallPrice = basicInstallPrice0;
-                                            materialSupport = ma;
-                                        }
+                                        receiveInstallPrice += ((sh.BasicPrice ?? 0) + (sh.OOHPrice ?? 0) + (sh.WindowPrice ?? 0));
                                     });
                                 }
+                                if (assignOrderModel.IsBCSSubject)
+                                {
+                                    if ((assignOrderModel.Shop.OutsourceBCSInstallPrice ?? 0) > 0)
+                                    {
+                                        basicInstallPrice = assignOrderModel.Shop.OutsourceBCSInstallPrice ?? 0;
+                                    }
+                                    else if (assignOrderModel.BCSCityTierList.Contains(assignOrderModel.Shop.CityTier.ToUpper()))
+                                    {
+                                        basicInstallPrice = 150;
+                                    }
+                                    else
+                                    {
+                                        basicInstallPrice = 0;
+                                    }
+
+                                }
+                                else if (assignOrderModel.IsGenericSubject)
+                                {
+
+                                    if (assignOrderModel.Shop.CityName == "包头市" && (assignOrderModel.Shop.OutsourceInstallPrice ?? 0) > 0)
+                                    {
+                                        basicInstallPrice = assignOrderModel.Shop.OutsourceInstallPrice ?? 0;
+                                    }
+                                    else if (assignOrderModel.BCSCityTierList.Contains(assignOrderModel.Shop.CityTier.ToUpper()))
+                                    {
+                                        basicInstallPrice = 150;
+                                    }
+                                    else
+                                    {
+                                        basicInstallPrice = 0;
+                                    }
+                                }
+                                else
+                                {
+                                    if ((assignOrderModel.Shop.OutsourceInstallPrice ?? 0) > 0)
+                                    {
+                                        basicInstallPrice = assignOrderModel.Shop.OutsourceInstallPrice ?? 0;
+                                    }
+                                    else
+                                    {
+                                        materialSupportList.ForEach(ma =>
+                                        {
+                                            decimal basicInstallPrice0 = new BasePage().GetOutsourceBasicInstallPrice(ma);
+                                            if (basicInstallPrice0 > basicInstallPrice)
+                                            {
+                                                basicInstallPrice = basicInstallPrice0;
+                                                materialSupport = ma;
+                                            }
+                                        });
+                                    }
+                                }
+                                installPrice = oohInstallPrice + basicInstallPrice;
                             }
-                            installPrice = oohInstallPrice + basicInstallPrice;
-                        }
-                        else if (promotionInstallPrice > 0)
-                        {
-                            installPrice = promotionInstallPrice;
-                            receiveInstallPrice = promotionInstallPrice;
-                            remark = "促销窗贴安装费";
-                        }
-
-                        #region 添加安装费
-                        if (installPrice > 0)
-                        {
-
-                            if (oohInstallPrice > 0 && (assignOrderModel.Shop.OOHInstallOutsourceId ?? 0) > 0)
+                            else if (promotionInstallPrice > 0)
                             {
-                                //如果有单独的户外安装外协
+                                installPrice = promotionInstallPrice;
+                                receiveInstallPrice = promotionInstallPrice;
+                                remark = "促销窗贴安装费";
+                            }
+
+                            #region 添加安装费
+                            if (installPrice > 0)
+                            {
+
+                                if (oohInstallPrice > 0 && (assignOrderModel.Shop.OOHInstallOutsourceId ?? 0) > 0)
+                                {
+                                    //如果有单独的户外安装外协
+                                    outsourceOrderDetailModel = new OutsourceOrderDetail();
+                                    outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
+                                    outsourceOrderDetailModel.AddDate = DateTime.Now;
+                                    outsourceOrderDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                    outsourceOrderDetailModel.AgentCode = popOrderList[0].AgentCode;
+                                    outsourceOrderDetailModel.AgentName = popOrderList[0].AgentName;
+                                    outsourceOrderDetailModel.BusinessModel = popOrderList[0].BusinessModel;
+                                    outsourceOrderDetailModel.Channel = popOrderList[0].Channel;
+                                    outsourceOrderDetailModel.City = popOrderList[0].City;
+                                    outsourceOrderDetailModel.CityTier = popOrderList[0].CityTier;
+                                    outsourceOrderDetailModel.Contact = popOrderList[0].Contact;
+                                    outsourceOrderDetailModel.Format = popOrderList[0].Format;
+                                    outsourceOrderDetailModel.GraphicMaterial = string.Empty;
+                                    outsourceOrderDetailModel.GraphicNo = string.Empty;
+                                    outsourceOrderDetailModel.GraphicWidth = 0;
+                                    outsourceOrderDetailModel.GuidanceId = guidanceId;
+                                    outsourceOrderDetailModel.IsInstall = popOrderList[0].IsInstall;
+                                    outsourceOrderDetailModel.BCSIsInstall = popOrderList[0].BCSIsInstall;
+                                    outsourceOrderDetailModel.LocationType = popOrderList[0].LocationType;
+                                    outsourceOrderDetailModel.MachineFrame = string.Empty;
+                                    outsourceOrderDetailModel.MaterialSupport = materialSupport;
+                                    outsourceOrderDetailModel.OrderGender = string.Empty;
+                                    outsourceOrderDetailModel.OrderType = (int)OrderTypeEnum.安装费;
+                                    outsourceOrderDetailModel.POPAddress = popOrderList[0].POPAddress;
+                                    outsourceOrderDetailModel.POPName = string.Empty;
+                                    outsourceOrderDetailModel.POPType = string.Empty;
+                                    outsourceOrderDetailModel.PositionDescription = string.Empty;
+                                    outsourceOrderDetailModel.POSScale = posScale;
+                                    outsourceOrderDetailModel.Province = assignOrderModel.Shop.ProvinceName;
+                                    outsourceOrderDetailModel.Quantity = 1;
+                                    outsourceOrderDetailModel.Region = assignOrderModel.Shop.RegionName;
+                                    outsourceOrderDetailModel.Remark = "户外安装费";
+                                    outsourceOrderDetailModel.Sheet = string.Empty;
+                                    outsourceOrderDetailModel.ShopId = shopId;
+                                    outsourceOrderDetailModel.ShopName = popOrderList[0].ShopName;
+                                    outsourceOrderDetailModel.ShopNo = popOrderList[0].ShopNo;
+                                    outsourceOrderDetailModel.ShopStatus = popOrderList[0].ShopStatus;
+                                    outsourceOrderDetailModel.SubjectId = 0;
+                                    outsourceOrderDetailModel.Tel = assignOrderModel.Shop.Tel1;
+                                    outsourceOrderDetailModel.TotalArea = 0;
+                                    outsourceOrderDetailModel.WindowDeep = 0;
+                                    outsourceOrderDetailModel.WindowHigh = 0;
+                                    outsourceOrderDetailModel.WindowSize = string.Empty;
+                                    outsourceOrderDetailModel.WindowWide = 0;
+                                    outsourceOrderDetailModel.ReceiveOrderPrice = 0;
+                                    outsourceOrderDetailModel.PayOrderPrice = oohInstallPrice;
+                                    outsourceOrderDetailModel.PayBasicInstallPrice = 0;
+                                    outsourceOrderDetailModel.PayOOHInstallPrice = oohInstallPrice;
+                                    outsourceOrderDetailModel.InstallPriceMaterialSupport = materialSupport;
+                                    outsourceOrderDetailModel.ReceiveUnitPrice = 0;
+                                    outsourceOrderDetailModel.ReceiveTotalPrice = 0;
+                                    outsourceOrderDetailModel.CSUserId = popOrderList[0].CSUserId;
+                                    outsourceOrderDetailModel.OutsourceId = assignOrderModel.Shop.OOHInstallOutsourceId;
+                                    outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
+                                    installPrice = installPrice - oohInstallPrice;
+                                    oohInstallPrice = 0;
+                                }
                                 outsourceOrderDetailModel = new OutsourceOrderDetail();
                                 outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                                 outsourceOrderDetailModel.AddDate = DateTime.Now;
@@ -4338,7 +4396,7 @@ namespace WebApp.OutsourcingOrder.handler
                                 outsourceOrderDetailModel.Province = assignOrderModel.Shop.ProvinceName;
                                 outsourceOrderDetailModel.Quantity = 1;
                                 outsourceOrderDetailModel.Region = assignOrderModel.Shop.RegionName;
-                                outsourceOrderDetailModel.Remark = "户外安装费";
+                                outsourceOrderDetailModel.Remark = remark;
                                 outsourceOrderDetailModel.Sheet = string.Empty;
                                 outsourceOrderDetailModel.ShopId = shopId;
                                 outsourceOrderDetailModel.ShopName = popOrderList[0].ShopName;
@@ -4351,21 +4409,44 @@ namespace WebApp.OutsourcingOrder.handler
                                 outsourceOrderDetailModel.WindowHigh = 0;
                                 outsourceOrderDetailModel.WindowSize = string.Empty;
                                 outsourceOrderDetailModel.WindowWide = 0;
-                                outsourceOrderDetailModel.ReceiveOrderPrice = 0;
-                                outsourceOrderDetailModel.PayOrderPrice = oohInstallPrice;
-                                outsourceOrderDetailModel.PayBasicInstallPrice = 0;
+                                outsourceOrderDetailModel.ReceiveOrderPrice = receiveInstallPrice;
+                                outsourceOrderDetailModel.PayOrderPrice = installPrice;
+                                outsourceOrderDetailModel.PayBasicInstallPrice = basicInstallPrice;
                                 outsourceOrderDetailModel.PayOOHInstallPrice = oohInstallPrice;
                                 outsourceOrderDetailModel.InstallPriceMaterialSupport = materialSupport;
                                 outsourceOrderDetailModel.ReceiveUnitPrice = 0;
                                 outsourceOrderDetailModel.ReceiveTotalPrice = 0;
                                 outsourceOrderDetailModel.CSUserId = popOrderList[0].CSUserId;
-                                outsourceOrderDetailModel.OutsourceId = assignOrderModel.Shop.OOHInstallOutsourceId;
+                                outsourceOrderDetailModel.OutsourceId = assignOrderModel.InstallOutsourceId > 0 ? assignOrderModel.InstallOutsourceId : outsourceId;
                                 outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
-                                installPrice = installPrice - oohInstallPrice;
-                                oohInstallPrice = 0;
                             }
+                            #endregion
+                        }
+                        else if (assignOrderModel.AddExperssPrice)
+                        {
+                            ExpressPriceDetail expressPriceDetailModel = expressPriceDetailList.Where(s => s.ShopId == shopId).FirstOrDefault();
+                            //快递费
+                            decimal rExpressPrice = 0;
+                            decimal payExpressPrice = 0;
+                            if (expressPriceDetailModel != null && (expressPriceDetailModel.ExpressPrice ?? 0) > 0)
+                            {
+                                rExpressPrice = expressPriceDetailModel.ExpressPrice ?? 0;
+                            }
+                            else
+                                rExpressPrice = 35;
+
+                            ExpressPriceConfig eM = expressPriceConfigList.Where(price => price.ReceivePrice == rExpressPrice).FirstOrDefault();
+                            if (eM != null)
+                                payExpressPrice = eM.PayPrice ?? 0;
+                            else
+                                payExpressPrice = 22;
+                            if (assignOrderModel.Shop.ProvinceName == "内蒙古" && !assignOrderModel.Shop.CityName.Contains("通辽"))
+                            {
+                                payExpressPrice = 0;
+                            }
+
                             outsourceOrderDetailModel = new OutsourceOrderDetail();
-                            outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
+                            outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
                             outsourceOrderDetailModel.AddDate = DateTime.Now;
                             outsourceOrderDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
                             outsourceOrderDetailModel.AgentCode = popOrderList[0].AgentCode;
@@ -4374,7 +4455,7 @@ namespace WebApp.OutsourcingOrder.handler
                             outsourceOrderDetailModel.Channel = popOrderList[0].Channel;
                             outsourceOrderDetailModel.City = popOrderList[0].City;
                             outsourceOrderDetailModel.CityTier = popOrderList[0].CityTier;
-                            outsourceOrderDetailModel.Contact = popOrderList[0].Contact;
+                            outsourceOrderDetailModel.Contact = assignOrderModel.Shop.Contact1;
                             outsourceOrderDetailModel.Format = popOrderList[0].Format;
                             outsourceOrderDetailModel.GraphicMaterial = string.Empty;
                             outsourceOrderDetailModel.GraphicNo = string.Empty;
@@ -4384,10 +4465,10 @@ namespace WebApp.OutsourcingOrder.handler
                             outsourceOrderDetailModel.BCSIsInstall = popOrderList[0].BCSIsInstall;
                             outsourceOrderDetailModel.LocationType = popOrderList[0].LocationType;
                             outsourceOrderDetailModel.MachineFrame = string.Empty;
-                            outsourceOrderDetailModel.MaterialSupport = materialSupport;
+                            outsourceOrderDetailModel.MaterialSupport = string.Empty;
                             outsourceOrderDetailModel.OrderGender = string.Empty;
-                            outsourceOrderDetailModel.OrderType = (int)OrderTypeEnum.安装费;
-                            outsourceOrderDetailModel.POPAddress = popOrderList[0].POPAddress;
+                            outsourceOrderDetailModel.OrderType = (int)OrderTypeEnum.发货费;
+                            outsourceOrderDetailModel.POPAddress = assignOrderModel.Shop.POPAddress;
                             outsourceOrderDetailModel.POPName = string.Empty;
                             outsourceOrderDetailModel.POPType = string.Empty;
                             outsourceOrderDetailModel.PositionDescription = string.Empty;
@@ -4395,7 +4476,7 @@ namespace WebApp.OutsourcingOrder.handler
                             outsourceOrderDetailModel.Province = assignOrderModel.Shop.ProvinceName;
                             outsourceOrderDetailModel.Quantity = 1;
                             outsourceOrderDetailModel.Region = assignOrderModel.Shop.RegionName;
-                            outsourceOrderDetailModel.Remark = remark;
+                            outsourceOrderDetailModel.Remark = string.Empty;
                             outsourceOrderDetailModel.Sheet = string.Empty;
                             outsourceOrderDetailModel.ShopId = shopId;
                             outsourceOrderDetailModel.ShopName = popOrderList[0].ShopName;
@@ -4408,100 +4489,20 @@ namespace WebApp.OutsourcingOrder.handler
                             outsourceOrderDetailModel.WindowHigh = 0;
                             outsourceOrderDetailModel.WindowSize = string.Empty;
                             outsourceOrderDetailModel.WindowWide = 0;
-                            outsourceOrderDetailModel.ReceiveOrderPrice = receiveInstallPrice;
-                            outsourceOrderDetailModel.PayOrderPrice = installPrice;
-                            outsourceOrderDetailModel.PayBasicInstallPrice = basicInstallPrice;
-                            outsourceOrderDetailModel.PayOOHInstallPrice = oohInstallPrice;
-                            outsourceOrderDetailModel.InstallPriceMaterialSupport = materialSupport;
+                            outsourceOrderDetailModel.ReceiveOrderPrice = rExpressPrice;
+                            outsourceOrderDetailModel.PayOrderPrice = payExpressPrice;
+                            outsourceOrderDetailModel.PayBasicInstallPrice = 0;
+                            outsourceOrderDetailModel.PayOOHInstallPrice = 0;
+                            outsourceOrderDetailModel.PayExpressPrice = payExpressPrice;
+                            outsourceOrderDetailModel.ReceiveExpresslPrice = rExpressPrice;
+                            outsourceOrderDetailModel.InstallPriceMaterialSupport = string.Empty;
                             outsourceOrderDetailModel.ReceiveUnitPrice = 0;
                             outsourceOrderDetailModel.ReceiveTotalPrice = 0;
                             outsourceOrderDetailModel.CSUserId = popOrderList[0].CSUserId;
-                            outsourceOrderDetailModel.OutsourceId = assignOrderModel.InstallOutsourceId > 0 ? assignOrderModel.InstallOutsourceId : outsourceId;
+                            outsourceOrderDetailModel.OutsourceId = outsourceId;
                             outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
                         }
-                        #endregion
                     }
-                    else if (assignOrderModel.AddExperssPrice)
-                    {
-                        ExpressPriceDetail expressPriceDetailModel = expressPriceDetailList.Where(s => s.ShopId == shopId).FirstOrDefault();
-                        //快递费
-                        decimal rExpressPrice = 0;
-                        decimal payExpressPrice = 0;
-                        if (expressPriceDetailModel != null && (expressPriceDetailModel.ExpressPrice ?? 0) > 0)
-                        {
-                            rExpressPrice = expressPriceDetailModel.ExpressPrice ?? 0;
-                        }
-                        else
-                            rExpressPrice = 35;
-
-                        ExpressPriceConfig eM = expressPriceConfigList.Where(price => price.ReceivePrice == rExpressPrice).FirstOrDefault();
-                        if (eM != null)
-                            payExpressPrice = eM.PayPrice ?? 0;
-                        else
-                            payExpressPrice = 22;
-                        if (assignOrderModel.Shop.ProvinceName == "内蒙古" && !assignOrderModel.Shop.CityName.Contains("通辽"))
-                        {
-                            payExpressPrice = 0;
-                        }
-
-                        outsourceOrderDetailModel = new OutsourceOrderDetail();
-                        outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
-                        outsourceOrderDetailModel.AddDate = DateTime.Now;
-                        outsourceOrderDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
-                        outsourceOrderDetailModel.AgentCode = popOrderList[0].AgentCode;
-                        outsourceOrderDetailModel.AgentName = popOrderList[0].AgentName;
-                        outsourceOrderDetailModel.BusinessModel = popOrderList[0].BusinessModel;
-                        outsourceOrderDetailModel.Channel = popOrderList[0].Channel;
-                        outsourceOrderDetailModel.City = popOrderList[0].City;
-                        outsourceOrderDetailModel.CityTier = popOrderList[0].CityTier;
-                        outsourceOrderDetailModel.Contact = assignOrderModel.Shop.Contact1;
-                        outsourceOrderDetailModel.Format = popOrderList[0].Format;
-                        outsourceOrderDetailModel.GraphicMaterial = string.Empty;
-                        outsourceOrderDetailModel.GraphicNo = string.Empty;
-                        outsourceOrderDetailModel.GraphicWidth = 0;
-                        outsourceOrderDetailModel.GuidanceId = guidanceId;
-                        outsourceOrderDetailModel.IsInstall = popOrderList[0].IsInstall;
-                        outsourceOrderDetailModel.BCSIsInstall = popOrderList[0].BCSIsInstall;
-                        outsourceOrderDetailModel.LocationType = popOrderList[0].LocationType;
-                        outsourceOrderDetailModel.MachineFrame = string.Empty;
-                        outsourceOrderDetailModel.MaterialSupport = string.Empty;
-                        outsourceOrderDetailModel.OrderGender = string.Empty;
-                        outsourceOrderDetailModel.OrderType = (int)OrderTypeEnum.发货费;
-                        outsourceOrderDetailModel.POPAddress = assignOrderModel.Shop.POPAddress;
-                        outsourceOrderDetailModel.POPName = string.Empty;
-                        outsourceOrderDetailModel.POPType = string.Empty;
-                        outsourceOrderDetailModel.PositionDescription = string.Empty;
-                        outsourceOrderDetailModel.POSScale = posScale;
-                        outsourceOrderDetailModel.Province = assignOrderModel.Shop.ProvinceName;
-                        outsourceOrderDetailModel.Quantity = 1;
-                        outsourceOrderDetailModel.Region = assignOrderModel.Shop.RegionName;
-                        outsourceOrderDetailModel.Remark = string.Empty;
-                        outsourceOrderDetailModel.Sheet = string.Empty;
-                        outsourceOrderDetailModel.ShopId = shopId;
-                        outsourceOrderDetailModel.ShopName = popOrderList[0].ShopName;
-                        outsourceOrderDetailModel.ShopNo = popOrderList[0].ShopNo;
-                        outsourceOrderDetailModel.ShopStatus = popOrderList[0].ShopStatus;
-                        outsourceOrderDetailModel.SubjectId = 0;
-                        outsourceOrderDetailModel.Tel = assignOrderModel.Shop.Tel1;
-                        outsourceOrderDetailModel.TotalArea = 0;
-                        outsourceOrderDetailModel.WindowDeep = 0;
-                        outsourceOrderDetailModel.WindowHigh = 0;
-                        outsourceOrderDetailModel.WindowSize = string.Empty;
-                        outsourceOrderDetailModel.WindowWide = 0;
-                        outsourceOrderDetailModel.ReceiveOrderPrice = rExpressPrice;
-                        outsourceOrderDetailModel.PayOrderPrice = payExpressPrice;
-                        outsourceOrderDetailModel.PayBasicInstallPrice = 0;
-                        outsourceOrderDetailModel.PayOOHInstallPrice = 0;
-                        outsourceOrderDetailModel.PayExpressPrice = payExpressPrice;
-                        outsourceOrderDetailModel.ReceiveExpresslPrice = rExpressPrice;
-                        outsourceOrderDetailModel.InstallPriceMaterialSupport = string.Empty;
-                        outsourceOrderDetailModel.ReceiveUnitPrice = 0;
-                        outsourceOrderDetailModel.ReceiveTotalPrice = 0;
-                        outsourceOrderDetailModel.CSUserId = popOrderList[0].CSUserId;
-                        outsourceOrderDetailModel.OutsourceId = outsourceId;
-                        outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
-                    }
-
                     #endregion
                 }
             }
@@ -4637,18 +4638,7 @@ namespace WebApp.OutsourcingOrder.handler
             {
                 ruanmo = int.Parse(context1.Request.Form["ruanmo"]);
             }
-            //if (context1.Request.Form["assignState"] != null)
-            //{
-            //    assignState = context1.Request.Form["assignState"];
-            //}
-            //if (context1.Request.Form["shopNo"] != null)
-            //{
-            //    shopNo = context1.Request.Form["shopNo"];
-            //    if (!string.IsNullOrWhiteSpace(shopNo))
-            //    {
-            //        shopNoList = StringHelper.ToStringList(shopNo.Replace("，", ","), ',', LowerUpperEnum.ToLower);
-            //    }
-            //}
+           
             List<string> myRegionList = new BasePage().GetResponsibleRegion;
             if (myRegionList.Any())
             {

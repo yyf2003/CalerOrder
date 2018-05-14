@@ -58,6 +58,14 @@
                     <asp:Label ID="labNormalShop" runat="server" Text=""></asp:Label>
                 </td>
             </tr>
+            <tr>
+              <td>
+              </td>
+              <td colspan="5" style="text-align: left; padding-left: 5px; height:40px;">
+                  <asp:Button ID="btnExport" runat="server" Text="导出报价单" 
+                      class="layui-btn layui-btn-small" onclick="btnExport_Click"/>
+              </td>
+            </tr>
         </table>
     </div>
     <div class="tr" style="margin-top: 20px;">

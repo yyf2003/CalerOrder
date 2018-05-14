@@ -2011,6 +2011,7 @@
           <Property Name="Province" Type="varchar" MaxLength="50" />
           <Property Name="City" Type="varchar" MaxLength="50" />
           <Property Name="Address" Type="varchar" MaxLength="100" />
+          <Property Name="Quantity" Type="int" />
           <Property Name="Amount" Type="decimal" Scale="2" />
           <Property Name="PayAmount" Type="decimal" Scale="2" />
           <Property Name="Contents" Type="varchar" MaxLength="200" />
@@ -2074,11 +2075,14 @@
           <Property Name="GuidanceMonth" Type="int" />
           <Property Name="GuidanceId" Type="nvarchar" MaxLength="50" />
           <Property Name="SubjectCategoryId" Type="nvarchar" MaxLength="50" />
+          <Property Name="SubjectIds" Type="nvarchar" MaxLength="50" />
+          <Property Name="QuoteSubjectName" Type="nvarchar" MaxLength="50" />
           <Property Name="AddDate" Type="datetime" />
           <Property Name="AddUserId" Type="int" />
           <Property Name="TotalArea" Type="decimal" Scale="2" />
           <Property Name="TotalPrice" Type="decimal" Scale="2" />
           <Property Name="IsDelete" Type="bit" />
+          <Property Name="AddRate" Type="decimal" Scale="2" />
         </EntityType>
         <EntityType Name="Quotations">
           <Key>
@@ -2541,6 +2545,7 @@
           <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="ItemId" Type="int" />
           <Property Name="ChangeType" Type="int" />
+          <Property Name="PriceType" Type="int" />
           <Property Name="Sheet" Type="nvarchar" MaxLength="50" />
           <Property Name="PositionDescription" Type="nvarchar" MaxLength="50" />
           <Property Name="GraphicMaterial" Type="nvarchar" MaxLength="50" />
@@ -4860,6 +4865,7 @@
           <Property Type="String" Name="Remark" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Type="DateTime" Name="AddDate" />
           <Property Type="Int32" Name="ApproveState" />
+          <Property Type="Int32" Name="Quantity" />
         </EntityType>
         <EntityType Name="ProvinceInOrderPlan">
           <Key>
@@ -4922,6 +4928,9 @@
           <Property Type="Decimal" Name="TotalArea" Precision="18" Scale="2" />
           <Property Type="Decimal" Name="TotalPrice" Precision="18" Scale="2" />
           <Property Type="Boolean" Name="IsDelete" />
+          <Property Type="String" Name="SubjectIds" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="QuoteSubjectName" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="Decimal" Name="AddRate" Precision="18" Scale="2" />
         </EntityType>
         <EntityType Name="Quotations">
           <Key>
@@ -5393,6 +5402,7 @@
           <Property Type="Int32" Name="InstallPriceLevel" />
           <Property Type="Int32" Name="AddUserId" />
           <Property Type="DateTime" Name="AddDate" />
+          <Property Type="Int32" Name="PriceType" />
         </EntityType>
         <EntityType Name="SpecialPriceQuoteItem">
           <Key>
@@ -7628,6 +7638,7 @@
           <EntitySetMapping Name="PriceOrderDetail">
             <EntityTypeMapping TypeName="KalerOrderDBModel.PriceOrderDetail">
               <MappingFragment StoreEntitySet="PriceOrderDetail">
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
                 <ScalarProperty Name="ApproveState" ColumnName="ApproveState" />
                 <ScalarProperty Name="AddDate" ColumnName="AddDate" />
                 <ScalarProperty Name="Remark" ColumnName="Remark" />
@@ -7704,6 +7715,9 @@
           <EntitySetMapping Name="QuotationItem">
             <EntityTypeMapping TypeName="KalerOrderDBModel.QuotationItem">
               <MappingFragment StoreEntitySet="QuotationItem">
+                <ScalarProperty Name="AddRate" ColumnName="AddRate" />
+                <ScalarProperty Name="QuoteSubjectName" ColumnName="QuoteSubjectName" />
+                <ScalarProperty Name="SubjectIds" ColumnName="SubjectIds" />
                 <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
                 <ScalarProperty Name="TotalPrice" ColumnName="TotalPrice" />
                 <ScalarProperty Name="TotalArea" ColumnName="TotalArea" />
@@ -8197,6 +8211,7 @@
           <EntitySetMapping Name="SpecialPriceQuoteDetail">
             <EntityTypeMapping TypeName="KalerOrderDBModel.SpecialPriceQuoteDetail">
               <MappingFragment StoreEntitySet="SpecialPriceQuoteDetail">
+                <ScalarProperty Name="PriceType" ColumnName="PriceType" />
                 <ScalarProperty Name="AddDate" ColumnName="AddDate" />
                 <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
                 <ScalarProperty Name="InstallPriceLevel" ColumnName="InstallPriceLevel" />

@@ -70,13 +70,15 @@
                     <td>
                         城市
                     </td>
-                    <%--<td>
-                        店铺地址
-                    </td>--%>
                     <td>
                         金额(元)
                     </td>
-                    
+                    <td>
+                        数量
+                    </td>
+                    <td>
+                        合计
+                    </td>
                     <td>
                         备注
                     </td>
@@ -109,15 +111,17 @@
                 <td>
                     <%#Eval("order.City")%>
                 </td>
-               <%-- <td>
-                    <%#Eval("order.Address")%>
-                </td>--%>
                 <td>
                     <%#Eval("order.OrderPrice")%>
                 </td>
-               
                 <td>
-                     <%#Eval("order.Remark")%>
+                    <%#Eval("Quantity")%>
+                </td>
+                 <td>
+                     <asp:Label ID="labSubPrice" runat="server" Text="0"></asp:Label>
+                </td>
+                <td>
+                    <asp:Label ID="labRemark" runat="server" Text=""></asp:Label>
                     
                 </td>
                
@@ -128,7 +132,7 @@
             <%if (gvList.Items.Count == 0)
               {%>
             <tr class="tr_bai">
-                <td colspan="10" style="text-align: center;">
+                <td colspan="12" style="text-align: center;">
                     --无数据--
                 </td>
             </tr>

@@ -86,6 +86,23 @@
                                 <img src="../image/WaitImg/loadingA.gif" />
                             </div>
                             <asp:CheckBoxList ID="cblSubjectCategory" runat="server" CssClass="cbl" CellSpacing="20"
+                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="10" AutoPostBack="true"
+                                OnSelectedIndexChanged="cblSubjectCategory_SelectedIndexChanged">
+                            </asp:CheckBoxList>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            项目名称
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <div id="loadSubject" style="display: none;">
+                                <img src="../image/WaitImg/loadingA.gif" />
+                            </div>
+                            <div>
+                                <asp:CheckBox ID="cbAllSubject" runat="server" /><span style="color: Blue;">全选</span>
+                            </div>
+                            <asp:CheckBoxList ID="cblSubjectName" runat="server" CssClass="cbl" CellSpacing="20"
                                 RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="10">
                             </asp:CheckBoxList>
                         </td>
@@ -102,15 +119,13 @@
                     </tr>
                     <tr class="tr_bai">
                         <td>
-                            
                         </td>
-                        <td style="text-align: left; padding-left: 5px; height:35px;">
-                           
-                                <input type="button" value="添加报价" id="btnAddQuote" class="layui-btn layui-btn-small"/>
+                        <td style="text-align: left; padding-left: 5px; height: 35px;">
+                            <input type="button" value="添加报价" id="btnAddQuote" class="layui-btn layui-btn-small" />
                         </td>
                     </tr>
                 </table>
-                <div class="tr" style=" margin-top:20px;">
+                <div class="tr" style="margin-top: 20px;">
                     >>报价列表
                 </div>
                 <asp:Repeater ID="gvList" runat="server" OnItemDataBound="gvList_ItemDataBound" OnItemCommand="gvList_ItemCommand">
@@ -144,43 +159,40 @@
                             </tr>
                     </HeaderTemplate>
                     <ItemTemplate>
-                       <tr class="tr_hui">
-                                <td>
-                                     <%#Container.ItemIndex + 1%>
-                                </td>
-                                <td>
-                                    <asp:Label ID="labGuidanceName" runat="server" Text=""></asp:Label>
-                                </td>
-                                <td>
-                                    <asp:Label ID="labSubjectCategory" runat="server" Text=""></asp:Label>
-                                </td>
-                                <td>
-                                   <%-- <asp:Label ID="labTotalArea" runat="server" Text=""></asp:Label>--%>
-                                    <%#Eval("order.TotalArea")%>
-                                </td>
-                                <td>
-                                    <%--<asp:Label ID="labTotalPrice" runat="server" Text=""></asp:Label>--%>
-                                    <%#Eval("order.TotalPrice")%>
-                                </td>
-                                <td>
-                                    <%#Eval("AddUserName")%>
-                                </td>
-                                <td>
-                                    <%#Eval("order.AddDate")%>
-                                </td>
-                                <td>
-                                    <span  onclick="checkItem('<%#Eval("order.Id")%>')" style=" cursor:pointer;color:Blue;">查看</span>
-                                    &nbsp;
-                                    |
-                                    <%--<span name="spanEditQuote" data-itemid='<%#Eval("order.Id")%>' style=" cursor:pointer;color:Blue;">编辑</span>--%>
-                                    <%--<asp:LinkButton ID="lbEdit" runat="server" ForeColor="Blue" OnClientClick="return editItem('<%#Eval("order.Id")%>')">删除</asp:LinkButton>--%>
-                                    <asp:LinkButton ID="lbEdit" runat="server">编辑</asp:LinkButton>
-                                    &nbsp;
-                                    |
-                                    &nbsp;
-                                    <asp:LinkButton ID="lbDelete" runat="server" CommandArgument='<%#Eval("order.Id")%>'>删除</asp:LinkButton>
-                                </td>
-                            </tr>
+                        <tr class="tr_hui">
+                            <td>
+                                <%#Container.ItemIndex + 1%>
+                            </td>
+                            <td>
+                                <asp:Label ID="labGuidanceName" runat="server" Text=""></asp:Label>
+                            </td>
+                            <td>
+                                <asp:Label ID="labSubjectCategory" runat="server" Text=""></asp:Label>
+                            </td>
+                            <td>
+                                <%-- <asp:Label ID="labTotalArea" runat="server" Text=""></asp:Label>--%>
+                                <%#Eval("order.TotalArea")%>
+                            </td>
+                            <td>
+                                <%--<asp:Label ID="labTotalPrice" runat="server" Text=""></asp:Label>--%>
+                                <%#Eval("order.TotalPrice")%>
+                            </td>
+                            <td>
+                                <%#Eval("AddUserName")%>
+                            </td>
+                            <td>
+                                <%#Eval("order.AddDate")%>
+                            </td>
+                            <td>
+                                <span onclick="checkItem('<%#Eval("order.Id")%>')" style="cursor: pointer; color: Blue;">
+                                    查看</span> &nbsp; |
+                                <%--<span name="spanEditQuote" data-itemid='<%#Eval("order.Id")%>' style=" cursor:pointer;color:Blue;">编辑</span>--%>
+                                <%--<asp:LinkButton ID="lbEdit" runat="server" ForeColor="Blue" OnClientClick="return editItem('<%#Eval("order.Id")%>')">删除</asp:LinkButton>--%>
+                                <asp:LinkButton ID="lbEdit" runat="server">编辑</asp:LinkButton>
+                                &nbsp; | &nbsp;
+                                <asp:LinkButton ID="lbDelete" runat="server" CommandArgument='<%#Eval("order.Id")%>'>删除</asp:LinkButton>
+                            </td>
+                        </tr>
                     </ItemTemplate>
                     <FooterTemplate>
                         <%if (gvList.Items.Count == 0)
@@ -194,8 +206,8 @@
                         </table>
                     </FooterTemplate>
                 </asp:Repeater>
-                <asp:Button ID="btnRefresh" runat="server" Text="Button" 
-                    onclick="btnRefresh_Click" style=" display:none;"/>
+                <asp:Button ID="btnRefresh" runat="server" Text="Button" OnClick="btnRefresh_Click"
+                    Style="display: none;" />
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>
