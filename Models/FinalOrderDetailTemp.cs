@@ -27,6 +27,7 @@ namespace Models
         public string CityTier { get; set; }
         public string IsInstall { get; set; }
         public string BCSIsInstall { get; set; }
+        public string GenericIsInstall { get; set; }
         public string AgentCode { get; set; }
         public string AgentName { get; set; }
         public string POPAddress { get; set; }

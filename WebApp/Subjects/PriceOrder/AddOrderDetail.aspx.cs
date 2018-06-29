@@ -393,6 +393,7 @@ namespace WebApp.Subjects.PriceOrder
                     model.Status = 4;
                     model.ApproveState = 0;
                     subjectBll.Update(model);
+                    model.SubmitDate = DateTime.Now;
                     Alert("提交成功", "/Subjects/SubjectList.aspx");
                 }
                 else

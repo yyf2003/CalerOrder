@@ -142,6 +142,7 @@ namespace WebApp.Materials.Handler
                        where basicMaterial.MaterialCategoryId == categoryId
                        && (basicMaterial.IsDelete == null || basicMaterial.IsDelete==false)
                        select new {
+                           basicMaterial.UnitId,
                            basicMaterial.Id,
                            basicMaterial.MaterialName,
                            unit.UnitName
@@ -151,7 +152,7 @@ namespace WebApp.Materials.Handler
             {
                 list.ForEach(s =>
                 {
-                    json.Append("{\"Id\":\"" + s.Id + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"UnitName\":\"" + s.UnitName + "\"},");
+                    json.Append("{\"Id\":\"" + s.Id + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"UnitId\":\"" + s.UnitId + "\",\"UnitName\":\"" + s.UnitName + "\"},");
                 });
                 return "[" + json.ToString().TrimEnd(',') + "]";
             }
@@ -177,13 +178,24 @@ namespace WebApp.Materials.Handler
 
         string GetBasicMaterial(int categoryId)
         {
-            var list = new BasicMaterialBLL().GetList(s => s.MaterialCategoryId == categoryId && (s.IsDelete == null || s.IsDelete == false));
+            //var list = new BasicMaterialBLL().GetList(s => s.MaterialCategoryId == categoryId && (s.IsDelete == null || s.IsDelete == false));
+            var list = (from bm in CurrentContext.DbContext.BasicMaterial
+                       join category in CurrentContext.DbContext.MaterialCategory
+                       on bm.MaterialCategoryId equals category.Id
+                       join unit1 in CurrentContext.DbContext.UnitInfo
+                       on bm.UnitId equals unit1.Id into unitTemp
+                       from unit in unitTemp.DefaultIfEmpty()
+                       select new {
+                           bm,
+                           category,
+                           unit
+                       }).OrderBy(s=>s.bm.MaterialName).ToList();
             if (list.Any())
             {
                 StringBuilder json = new StringBuilder();
                 list.ForEach(s =>
                 {
-                    json.Append("{\"Id\":\"" + s.Id + "\",\"UnitId\":\"" + s.UnitId + "\",\"MaterialName\":\"" + s.MaterialName + "\"},");
+                    json.Append("{\"Id\":\"" + s.bm.Id + "\",\"UnitId\":\"" + s.bm.UnitId + "\",\"UnitName\":\"" + s.unit.UnitName + "\",\"MaterialName\":\"" + s.bm.MaterialName + "\",\"CategoryId\":\"" + s.bm.MaterialCategoryId + "\",\"CategoryName\":\"" + s.category.CategoryName + "\"},");
                 });
                 return "[" + json.ToString().TrimEnd(',') + "]";
             }
@@ -288,7 +300,7 @@ namespace WebApp.Materials.Handler
                             {
                                 newModel.BasicMaterialId = model.BasicMaterialId;
                                 newModel.BasicCategoryId = model.BasicCategoryId;
-                                newModel.CustomerId = model.CustomerId;
+                                //newModel.CustomerId = model.CustomerId;
                                 newModel.OrderMaterialName = model.OrderMaterialName;
                                 bll.Update(newModel);
                             }

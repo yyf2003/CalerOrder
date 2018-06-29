@@ -23,12 +23,27 @@ namespace WebApp.Subjects
             if (!IsPostBack)
             {
                 BindMyCustomerList(ref ddlCustomer);
+                BindGuidanceAddType();
                 BindExperssPrice();
                 BindActivityType();
                 BindMaterialPriceItem();
 
             }
             BindData();
+        }
+
+        void BindGuidanceAddType()
+        {
+            rblAddType.Items.Clear();
+            var enumList = CommonMethod.GetEnumList<GuidanceAddTypeEnum>();
+            enumList.ForEach(s => {
+                ListItem li = new ListItem();
+                li.Text = s.Desction + "&nbsp;&nbsp;";
+                li.Value = s.Value.ToString();
+                if (s.Value == (int)GuidanceAddTypeEnum.POP)
+                    li.Selected = true;
+                rblAddType.Items.Add(li);
+            });
         }
 
         void BindActivityType()
@@ -103,6 +118,9 @@ namespace WebApp.Subjects
                 {
                     
                     ddlCustomer.SelectedValue = model.CustomerId != null ? model.CustomerId.ToString() : "";
+                    int addType = model.AddType ?? 1;
+                    rblAddType.SelectedValue = addType.ToString();
+
                     BindMaterialPriceItem();
                     rblActivityType.SelectedValue = model.ActivityTypeId != null ? model.ActivityTypeId.ToString() : "0";
                     if (model.HasExperssFees != null)
@@ -167,6 +185,7 @@ namespace WebApp.Subjects
                 if (subjectList.Any())
                 {
                     ddlCustomer.Enabled = false;
+                    rblAddType.Enabled = false;
                     rblActivityType.Enabled = false;
                     ddlPriceItemList.Enabled = false;
 
@@ -229,6 +248,10 @@ namespace WebApp.Subjects
                     if (!string.IsNullOrWhiteSpace(EndDate))
                         model.EndDate = DateTime.Parse(EndDate);
                     model.ItemName = ItemName;
+                    int addType = 1;
+                    if (rblAddType.SelectedValue!=null)
+                        addType = int.Parse(rblAddType.SelectedValue);
+                    model.AddType = addType;
                     model.Remark = Remark;
                     model.CustomerId = int.Parse(ddlCustomer.SelectedValue);
                     if (rblActivityType.SelectedValue != null)

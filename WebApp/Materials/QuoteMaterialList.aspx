@@ -66,18 +66,10 @@
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
+            
             <tr class="tr_bai">
                 <td style="width: 100px; height: 25px;">
-                    报价材质名称：
-                </td>
-                <td colspan="3" style="text-align: left; padding-left: 5px;">
-                    <input type="text" id="txtQuoteMaterialName" maxlength="40" style="width: 200px;" />
-                    <span style="color: Red;">*</span>
-                </td>
-            </tr>
-            <tr class="tr_bai">
-                <td style="width: 100px; height: 25px;">
-                    客户材质：
+                    基础材质：
                 </td>
                 <td colspan="3" style="text-align: left; padding-left: 5px;">
                     <select id="selCategory">
@@ -91,12 +83,21 @@
             </tr>
             <tr class="tr_bai">
                 <td style="width: 100px; height: 25px;">
+                    报价材质名称：
+                </td>
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                    <input type="text" id="txtQuoteMaterialName" maxlength="40" style="width: 200px;" />
+                    <span style="color: Red;">*</span>
+                </td>
+            </tr>
+           <%-- <tr class="tr_bai">
+                <td style="width: 100px; height: 25px;">
                     单价：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labPrice" runat="server" Text=""></asp:Label>
                 </td>
-            </tr>
+            </tr>--%>
             <tr class="tr_bai">
                 <td style="width: 100px; height: 25px;">
                     单位：

@@ -95,6 +95,14 @@ namespace Common
         ToUpper,
     }
 
+    public enum GuidanceAddTypeEnum {
+        [Description("POP")]
+        POP=1,
+        [Description("道具")]
+        Prop=2
+    }
+
+
     public enum SubjectTypeEnum
     {
         [Description("POP订单")]
@@ -126,8 +134,10 @@ namespace Common
         费用订单,//12
         [Description("散单")]
         散单,//13
-        [Description("外协订单1")]
-        外协订单,//
+        [Description("外协订单")]
+        外协订单,//14
+        [Description("道具订单")]
+        道具订单,//15
 
     }
 
@@ -350,14 +360,46 @@ namespace Common
         
     }
 
-    //安装费项目类型
+    //其他费用报价折算类型
     public enum QuoteInstallPriceChangeTypeEnum
     {
+        /// <summary>
+        /// POP材质
+        /// </summary>
         POP=1,
+        /// <summary>
+        /// ooh高空
+        /// </summary>
         OOH=2,
+        /// <summary>
+        /// 店内安装
+        /// </summary>
         Basic=3,
-        Others=4
+        /// <summary>
+        /// 印刷费
+        /// </summary>
+        Print=4,
+        /// <summary>
+        /// 其他费用
+        /// </summary>
+        Others=5
 
+    }
+
+    /// <summary>
+    /// 新增项目类型
+    /// </summary>
+    public enum SubjectItemTypeEnum {
+        /// <summary>
+        /// 正常项目
+        /// </summary>
+        [Description("正常项目")]
+        Normal=1,
+        /// <summary>
+        /// 增补项目
+        /// </summary>
+        [Description("上海增补")]
+        Supplement=2,
     }
 }
 

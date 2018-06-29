@@ -352,7 +352,7 @@
               提示：撤销操作是按店整体撤销
             </div>--%>
         </div>
-        <table id="noData" class="table" style="display: ;">
+        <table id="noData" class="table">
             <tr class="tr_bai">
                 <td style="text-align: center; height: 30px;">
                     --无可显示的信息--
@@ -429,8 +429,17 @@
                     <asp:ListItem Value="1">安装&nbsp;&nbsp;</asp:ListItem>
                     <asp:ListItem Value="2">发货 </asp:ListItem>
                 </asp:RadioButtonList>
-                &nbsp;&nbsp;&nbsp;
-                <input type="checkbox" id="cbNoInstallPrice"/><span style=" color:Blue;">无安装费</span>
+                <%--&nbsp;&nbsp;&nbsp;
+                <input type="checkbox" id="cbNoInstallPrice"/><span style=" color:Blue;">无安装费</span>--%>
+                &nbsp;&nbsp;
+                <span id="expressType" style=" display:none;">
+                   <input type="checkbox" id="cbNoExpressPrice"/><span style=" color:Blue;">无快递费</span>
+                   &nbsp;
+                   <input type="checkbox" id="cbKeepExpressPrice"/><span style=" color:Blue;">快递费归原外协</span>
+                   &nbsp;
+                   <input type="checkbox" id="Checkbox1"/><span style=" color:Blue;">保留归原外协快递费，新外协新增快递费</span>
+                </span>
+
             </td>
         </tr>
         <tr class="tr_bai">

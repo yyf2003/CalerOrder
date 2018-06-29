@@ -225,6 +225,7 @@ namespace Common
             return SourceFliePath;
         }
 
+        
         public static void DownLoadFile(DataTable dt, string fileName = null)
         {
             if (dt != null && dt.Rows.Count > 0)
@@ -322,7 +323,7 @@ namespace Common
 
         }
 
-        public static void DownLoadFile(string path,string fileName1=null)
+        public static void DownLoadFile(string path, string fileName1 = null)
         {
 
             if (path != "")
@@ -335,10 +336,13 @@ namespace Common
                     }
 
                     string fileName = path.Substring(path.LastIndexOf('/') + 1);
+                    
                     if (!string.IsNullOrWhiteSpace(fileName1))
                     {
                         //string fn = fileName1 + fileName.Substring(fileName.IndexOf('.'));
-                        fileName = fileName1;
+                        string extend = fileName.Substring(fileName.LastIndexOf('.'));
+                        fileName = fileName1 + extend;
+
                     }
                     long len = 102400;
                     byte[] buffer = new byte[len];

@@ -745,10 +745,10 @@ function GetGuidance() {
 }
 
 function GetProjectList() {
-
+  
     var guidanceIds = $("#guidanceDiv").find("input[name='guidancerd']:checked").val() || "";
 
-
+   
     $("#projectsDiv").html("");
     $("#activityDiv").html("");
     $("#typeDiv").html("");
@@ -762,7 +762,7 @@ function GetProjectList() {
     $("#projectLoadImg").show();
     $.ajax({
         type: "get",
-        url: "../Subjects/Handler/CheckOrder.ashx",
+        url: "handler/AssignOrder.ashx",
         data: { type: "getProjectList", guidanceIds: guidanceIds },
         complete: function () { $("#projectLoadImg").hide(); },
         success: function (data) {
@@ -818,7 +818,7 @@ function ScreenProject() {
     $("#projectLoadImg").show();
     $.ajax({
         type: "get",
-        url: "../Subjects/Handler/CheckOrder.ashx",
+        url: "handler/AssignOrder.ashx",
         data: { type: "screenProject", guidanceIds: guidanceIds, activityId: activityIds, typeId: typeIds },
         complete: function () { $("#projectLoadImg").hide(); },
         success: function (data) {

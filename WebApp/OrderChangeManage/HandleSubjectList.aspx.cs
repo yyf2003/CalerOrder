@@ -84,7 +84,7 @@ namespace WebApp.OrderChangeManage
                     Subject subjectModel = new SubjectBLL().GetModel(subjectId);
                     if (subjectModel != null)
                     {
-                        if (subjectModel.SubjectType == (int)SubjectTypeEnum.HC订单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区补单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区增补 || subjectModel.SubjectType == (int)SubjectTypeEnum.新开店订单)
+                        if (subjectModel.SubjectType == (int)SubjectTypeEnum.HC订单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区补单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区增补 || subjectModel.SubjectType == (int)SubjectTypeEnum.新开店订单 || subjectModel.SubjectType == (int)SubjectTypeEnum.正常单)
                         {
                             //url = "../Subjects/RegionSubject/List.aspx";
                             url = string.Format("/Subjects/RegionSubject/List.aspx?subjectId={0}&operateType={1}&applicationDetailId={2}", model.SubjectId, model.ChangeType, id);

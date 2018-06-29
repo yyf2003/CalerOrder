@@ -75,6 +75,11 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             layer.msg("请选择活动");
             return false;
         }
+        if (subjectId == "") {
+            layer.msg("请选择项目");
+            return false;
+        }
+        $("#hfIsChange").val("");
         var url = "AddQuotation.aspx?customerId=" + customerId + "&month=" + month + "&guidanceId=" + guidanceId + "&subjectCategory=" + subjectCategory + "&subjectId=" + subjectId;
         layer.open({
             type: 2,
@@ -84,32 +89,16 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             area: ['95%', '90%'],
             content: url,
             id: 'layer1',
-
             cancel: function (index) {
                 layer.closeAll();
+                $("#btnRefreshGuidance").click();
+                
             }
 
         });
     })
 
-    //    $("span[name='spanEditQuote']").click(function () {
-    //        var id = $(this).data("itemid");
-    //        var url = "AddQuotation.aspx?itemId=" + id;
-    //        layer.open({
-    //            type: 2,
-    //            time: 0,
-    //            title: '编辑报价单',
-    //            skin: 'layui-layer-rim', //加上边框
-    //            area: ['95%', '90%'],
-    //            content: url,
-    //            id: 'layer1',
-    //            
-    //            cancel: function (index) {
-    //                layer.closeAll();
-    //            }
 
-    //        });
-    //    })
 })
 
 
@@ -123,9 +112,9 @@ function editItem(id) {
         area: ['95%', '90%'],
         content: url,
         id: 'layer1',
-
         cancel: function (index) {
             layer.closeAll();
+            $("#btnRefreshOrder").click();
         }
 
     });

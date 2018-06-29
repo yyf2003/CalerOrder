@@ -93,6 +93,7 @@
     <Compile Include="HCOrderDetailBLL.cs" />
     <Compile Include="HCPOPBLL.cs" />
     <Compile Include="HCSmallGraphicSizeBLL.cs" />
+    <Compile Include="ImportQuoteOrderBLL.cs" />
     <Compile Include="InstallBLL.cs" />
     <Compile Include="InstallPriceConfigBLL.cs" />
     <Compile Include="InstallPriceDetailBLL.cs" />
@@ -153,6 +154,8 @@
     <Compile Include="POSScaleInfoBLL.cs" />
     <Compile Include="PriceOrderDetailBLL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropOrderDetailBLL.cs" />
+    <Compile Include="PropOutsourceOrderDetailBLL.cs" />
     <Compile Include="ProvinceInOrderPlanBLL.cs" />
     <Compile Include="ProvinceInRegionBLL.cs" />
     <Compile Include="QuotationAccountBLL.cs" />
@@ -162,6 +165,8 @@
     <Compile Include="QuotationItemBLL.cs" />
     <Compile Include="QuotationsBLL.cs" />
     <Compile Include="QuotationTaxRateBLL.cs" />
+    <Compile Include="QuoteAddRateAtSizeBLL.cs" />
+    <Compile Include="QuoteDifferenceDetailBLL.cs" />
     <Compile Include="QuoteMaterialBLL.cs" />
     <Compile Include="QuoteOrderDetailBLL.cs" />
     <Compile Include="QuoteOrderSettingBLL.cs" />

@@ -65,5 +65,8 @@ namespace Models
         public Nullable<int> OOHInstallOutsourceId { get; set; }
         public Nullable<int> BCSOutsourceId { get; set; }
         public Nullable<int> ProductOutsourceId { get; set; }
+        public string GenericIsInstall { get; set; }
+        public Nullable<decimal> GenericInstallPrice { get; set; }
+        public Nullable<decimal> OutsourceGenericInstallPrice { get; set; }
     }
 }

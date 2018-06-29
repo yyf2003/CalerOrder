@@ -160,22 +160,7 @@ namespace WebApp.Subjects.Handler
             string result = string.Empty;
             var guidanceList = new SubjectBLL().GetList(s => s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false)).Select(s => s.GuidanceId ?? 0).Distinct().ToList();
             var list = guidanceBll.GetList(s => s.CustomerId == customerId && guidanceList.Contains(s.ItemId) && (s.IsDelete==null || s.IsDelete==false));
-            //var list = guidanceBll.GetList(s => s.CustomerId == customerId && guidanceList.Contains(s.ItemId));
-            //if (StringHelper.IsDateTime(beginDate) && StringHelper.IsDateTime(endDate))
-            //{
-            //    DateTime begin = DateTime.Parse(beginDate);
-            //    DateTime end = DateTime.Parse(endDate).AddDays(1);
-            //    list = list.Where(s => s.BeginDate >= begin && s.BeginDate < end).ToList();
-
-            //}
-            //else
-            //{
-            //    DateTime date = DateTime.Now;
-            //    DateTime beginDate1 = new DateTime(date.Year, date.Month, 1);
-            //    //DateTime beginDate1 = newDate.AddMonths(-2);
-            //    DateTime endDate1 = beginDate1.AddMonths(1);
-            //    list = list.Where(s => s.BeginDate >= beginDate1 && s.BeginDate < endDate1).ToList();
-            //}
+            
             DateTime date = DateTime.Now;
             int year = date.Year;
             int month = date.Month;
@@ -228,7 +213,7 @@ namespace WebApp.Subjects.Handler
                                 //&& subject.SubjectType != (int)SubjectTypeEnum.二次安装
                                 && subject.SubjectType != (int)SubjectTypeEnum.新开店安装费
                                 //&& (myRegion.Any() ? (myRegion.Contains(shop.RegionName.ToLower())) : 1 == 1)
-                                && (myRegion.Any()?(subject.PriceBlongRegion!=null && subject.PriceBlongRegion!="")?(myRegion.Contains(subject.PriceBlongRegion.ToLower())):(myRegion.Contains(shop.RegionName.ToLower())):1==1)
+                                && (myRegion.Any()?((subject.PriceBlongRegion!=null && subject.PriceBlongRegion!="")?(myRegion.Contains(subject.PriceBlongRegion.ToLower())):(myRegion.Contains(shop.RegionName.ToLower()))):1==1)
                                 && (order.IsDelete == null || order.IsDelete==false)
                                 select new {
                                     SubjectId= subject.Id,
@@ -249,7 +234,7 @@ namespace WebApp.Subjects.Handler
                                      where guidanceIdList.Contains(subject.GuidanceId ?? 0) && (subject.IsDelete == null || subject.IsDelete == false)
                                      && subject.ApproveState == 1
                                      //&& (myRegion.Any() ? (myRegion.Contains(shop.RegionName.ToLower())) : 1 == 1)
-                                     && (myRegion.Any() ? (subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(shop.RegionName.ToLower())) : 1 == 1)
+                                     && (myRegion.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(shop.RegionName.ToLower()))) : 1 == 1)
                                      select new {
                                          SubjectId = subject.Id,
                                          shop
@@ -381,7 +366,7 @@ namespace WebApp.Subjects.Handler
                                 && subject.ApproveState == 1
                                 && subject.SubjectType != (int)SubjectTypeEnum.新开店安装费
                                 && order.IsFromRegion==true
-                                && (myRegion.Any() ? (subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(shop.RegionName.ToLower())) : 1 == 1)
+                                && (myRegion.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(shop.RegionName.ToLower()))) : 1 == 1)
                                 && (order.IsDelete == null || order.IsDelete == false)
                                 select new
                                 {
@@ -448,23 +433,7 @@ namespace WebApp.Subjects.Handler
             {
                 typeList = StringHelper.ToIntList(typeIds, ',');
             }
-            //var projectList = (from subject in CurrentContext.DbContext.Subject
-            //                   join subjectType1 in CurrentContext.DbContext.SubjectType
-            //                   on subject.SubjectTypeId equals subjectType1.Id into typeTemp
-            //                   join category1 in CurrentContext.DbContext.ADSubjectCategory
-            //                   on subject.SubjectCategoryId equals category1.Id into categoryTemp
-            //                   from subjectType in typeTemp.DefaultIfEmpty()
-            //                   from category in categoryTemp.DefaultIfEmpty()
-            //                   where guidanceIdList.Contains(subject.GuidanceId ?? 0) && (subject.IsDelete == null || subject.IsDelete == false)
-            //                   && subject.ApproveState == 1
-            //                   && subject.SubjectType != (int)SubjectTypeEnum.二次安装费
-            //                   select subject).OrderBy(s => s.SubjectTypeId).ToList();
-
-            //if (!regionList.Any())
-            //{
-            //    regionList = new BasePage().GetResponsibleRegion;
-            //    StringHelper.ToUpperOrLowerList(ref regionList, LowerUpperEnum.ToLower);
-            //}
+            
             List<string> myRegion = new BasePage().GetResponsibleRegion;
             if (myRegion.Any())
             {
@@ -483,7 +452,7 @@ namespace WebApp.Subjects.Handler
                                 && subject.SubjectType != (int)SubjectTypeEnum.新开店安装费
                                 //&& (myRegion.Any() ? (myRegion.Contains(shop.RegionName.ToLower())) : 1 == 1)
                                 && (order.IsDelete == null || order.IsDelete == false)
-                                && (myRegion.Any() ? (subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(shop.RegionName.ToLower())) : 1 == 1)
+                                && (myRegion.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(shop.RegionName.ToLower()))) : 1 == 1)
                                 select new {
                                     shop,
                                     subject
@@ -533,7 +502,7 @@ namespace WebApp.Subjects.Handler
                                      where guidanceIdList.Contains(subject.GuidanceId ?? 0) && (subject.IsDelete == null || subject.IsDelete == false)
                                      && subject.ApproveState == 1
                                      //&& (myRegion.Any() ? (myRegion.Contains(shop.RegionName.ToLower())) : 1 == 1)
-                                     && (myRegion.Any() ? (subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(shop.RegionName.ToLower())) : 1 == 1)
+                                     && (myRegion.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(shop.RegionName.ToLower()))) : 1 == 1)
                                      select new {
                                          shop,
                                          subject

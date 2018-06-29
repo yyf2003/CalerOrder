@@ -29,5 +29,8 @@ namespace Models
         public Nullable<int> AddUserId { get; set; }
         public string Remark { get; set; }
         public Nullable<int> SubjectType { get; set; }
+        public Nullable<int> QuoteItemId { get; set; }
+        public Nullable<int> InstallPriceSubjectType { get; set; }
+        public Nullable<bool> IsDelete { get; set; }
     }
 }

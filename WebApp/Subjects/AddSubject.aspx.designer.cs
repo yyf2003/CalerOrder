@@ -49,6 +49,15 @@ namespace WebApp.Subjects {
         protected global::System.Web.UI.UpdatePanel UpdatePanel1;
         
         /// <summary>
+        /// rblSubjectItemType 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButtonList rblSubjectItemType;
+        
+        /// <summary>
         /// ddlCustomer 控件。
         /// </summary>
         /// <remarks>
@@ -74,6 +83,24 @@ namespace WebApp.Subjects {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddlGuidance;
+        
+        /// <summary>
+        /// supplementSubjectListTr 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableRow supplementSubjectListTr;
+        
+        /// <summary>
+        /// ddlSupplementSubjectList 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlSupplementSubjectList;
         
         /// <summary>
         /// txtSubjectName 控件。

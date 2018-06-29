@@ -10,10 +10,11 @@
     <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
     <script src="/My97DatePicker/WdatePicker.js" type="text/javascript"></script>
     <script type="text/javascript">
+       
         function Finish() {
             layer.closeAll();
             layer.msg("提交成功!");
-            $("#btnRefresh").click();
+            $("#btnRefreshOrder").click();
         }
     </script>
 </head>
@@ -28,7 +29,7 @@
                 活动报价提交
             </p>
     </div>
-    <div>
+    <div style=" margin-bottom:20px;">
         <asp:UpdatePanel ID="UpdatePanel1" runat="server">
             <ContentTemplate>
                 <table class="table">
@@ -126,7 +127,7 @@
                     </tr>
                 </table>
                 <div class="tr" style="margin-top: 20px;">
-                    >>报价列表
+                    >>报价单列表
                 </div>
                 <asp:Repeater ID="gvList" runat="server" OnItemDataBound="gvList_ItemDataBound" OnItemCommand="gvList_ItemCommand">
                     <HeaderTemplate>
@@ -140,6 +141,9 @@
                                 </td>
                                 <td>
                                     项目类型
+                                </td>
+                                <td>
+                                    报价项目
                                 </td>
                                 <td>
                                     总面积
@@ -159,7 +163,7 @@
                             </tr>
                     </HeaderTemplate>
                     <ItemTemplate>
-                        <tr class="tr_hui">
+                        <tr class="tr_bai">
                             <td>
                                 <%#Container.ItemIndex + 1%>
                             </td>
@@ -170,12 +174,15 @@
                                 <asp:Label ID="labSubjectCategory" runat="server" Text=""></asp:Label>
                             </td>
                             <td>
-                                <%-- <asp:Label ID="labTotalArea" runat="server" Text=""></asp:Label>--%>
-                                <%#Eval("order.TotalArea")%>
+                                <%#Eval("order.QuoteSubjectName")%>
                             </td>
                             <td>
-                                <%--<asp:Label ID="labTotalPrice" runat="server" Text=""></asp:Label>--%>
-                                <%#Eval("order.TotalPrice")%>
+                                <asp:Label ID="labTotalArea" runat="server" Text=""></asp:Label>
+                                <%--<%#Eval("order.TotalArea")%>--%>
+                            </td>
+                            <td>
+                                <asp:Label ID="labTotalPrice" runat="server" Text=""></asp:Label>
+                                <%--<%#Eval("order.TotalPrice")%>--%>
                             </td>
                             <td>
                                 <%#Eval("AddUserName")%>
@@ -198,7 +205,7 @@
                         <%if (gvList.Items.Count == 0)
                           {%>
                         <tr class="tr_bai">
-                            <td colspan="8" style="text-align: center;">
+                            <td colspan="9" style="text-align: center;">
                                 --无数据--
                             </td>
                         </tr>
@@ -206,11 +213,14 @@
                         </table>
                     </FooterTemplate>
                 </asp:Repeater>
-                <asp:Button ID="btnRefresh" runat="server" Text="Button" OnClick="btnRefresh_Click"
+                <asp:Button ID="btnRefreshOrder" runat="server" Text="Button" OnClick="btnRefreshOrder_Click"
+                    Style="display: none;" />
+                <asp:Button ID="btnRefreshGuidance" runat="server" Text="Button" OnClick="btnRefreshGuidance_Click"
                     Style="display: none;" />
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>
+    
     </form>
 </body>
 </html>

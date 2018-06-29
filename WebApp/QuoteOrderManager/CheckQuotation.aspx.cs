@@ -12,10 +12,12 @@ using System.Configuration;
 using System.Web.UI.HtmlControls;
 using NPOI.SS.UserModel;
 using System.Data;
-using NPOI;
-using NPOI.XSSF.UserModel;
+//using NPOI;
+//using NPOI.XSSF.UserModel;
 using OfficeOpenXml;
 using System.IO;
+using NPOI.HSSF.UserModel;
+using System.Text;
 
 namespace WebApp.QuoteOrderManager
 {
@@ -25,6 +27,7 @@ namespace WebApp.QuoteOrderManager
         string month = string.Empty;
         string guidanceId = string.Empty;
         string subjectCategory = string.Empty;
+        string subjectId = string.Empty;
         int customerId;
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -37,22 +40,28 @@ namespace WebApp.QuoteOrderManager
                 BindData();
                 BindGuidanceName();
                 BindPOPList();
+                BindeExpressPriceImportQuote();
+                SetTotalPrice();
             }
         }
 
         decimal expressTotalPrice = 0;
         decimal installPriceTotal = 0;
+        decimal installPriceStandard = 0;//标准安装费合计
         decimal popTotalPrice = 0;
         decimal popTotalArea = 0;
-        int specialTotal = 0;
+        decimal specialTotal = 0;
         int oohIndex = 0;
         int basicIndex = 0;
 
         List<int> guidanceIdList = new List<int>();
         List<int> categoryIdList = new List<int>();
+        List<int> subjectIdList = new List<int>();
 
         QuotationItemBLL quotationBll = new QuotationItemBLL();
         List<SpecialPriceQuoteDetail> specialPriceQuoteDetailList = new List<SpecialPriceQuoteDetail>();
+        decimal addRate = 0;
+        decimal addRatePrice = 0;
         void BindData()
         {
             QuotationItem model = quotationBll.GetModel(itemId);
@@ -65,6 +74,9 @@ namespace WebApp.QuoteOrderManager
                 }
                 guidanceId = model.GuidanceId;
                 subjectCategory = model.SubjectCategoryId;
+                subjectId = model.SubjectIds;
+                addRate = model.AddRate ?? 0;
+                addRatePrice = model.AddRatePrice ?? 0;
                 specialPriceQuoteDetailList = new SpecialPriceQuoteDetailBLL().GetList(s => s.ItemId == itemId);
             }
         }
@@ -90,9 +102,21 @@ namespace WebApp.QuoteOrderManager
                     labSubjectCategory.Text = StringHelper.ListToString(list);
                 }
             }
+            if (!string.IsNullOrWhiteSpace(subjectId))
+            {
+                subjectIdList = StringHelper.ToIntList(subjectId, ',');
+                List<string> subjectNameList = new SubjectBLL().GetList(s => subjectIdList.Contains(s.Id) && (s.HandMakeSubjectId??0)==0).Select(s => s.SubjectName).ToList();
+                if (subjectNameList.Any())
+                {
+                    labSubjectNames.Text = StringHelper.ListToString(subjectNameList);
+                }
+            }
         }
 
-        void BindPOPList()
+        /// <summary>
+        /// 不用
+        /// </summary>
+        void BindPOPList1()
         {
 
             Session["QuoteModel"] = null;
@@ -110,6 +134,11 @@ namespace WebApp.QuoteOrderManager
                                  order,
                                  subject
                              }).ToList();
+
+            if (subjectIdList.Any())
+            {
+                orderList = orderList.Where(s => subjectIdList.Contains(s.order.SubjectId??0)).ToList();
+            }
             List<QuoteModel> quoteOrderList = new List<QuoteModel>();
             List<QuoteOrderDetail> popOrderList = new List<QuoteOrderDetail>();
             //保存每个位置区域的订单
@@ -127,9 +156,13 @@ namespace WebApp.QuoteOrderManager
 
                 List<QuoteOrderDetail> popOrderListSave = new List<QuoteOrderDetail>();
                 List<int> selectedIdList = new List<int>();
+
+                string currSheet = string.Empty;
+                string currentPosition = string.Empty;
                 #region 橱窗区域
                 //橱窗背景订单
-
+                currSheet = "Window橱窗";
+                currentPosition = "橱窗";
                 var windowOrderList = popOrderList.Where(s => s.Sheet.Contains("橱窗") && !s.Sheet.Contains("地铺") && !s.Sheet.Contains("贴") && !s.PositionDescription.Contains("窗贴") && s.PositionDescription != "左侧贴" && s.PositionDescription != "右侧贴" && s.PositionDescription != "地贴" && s.PositionDescription != "地铺").ToList();
                 if (windowOrderList.Any())
                 {
@@ -139,7 +172,24 @@ namespace WebApp.QuoteOrderManager
                     StatisticMaterial(windowOrderList, ref windowList, "Window橱窗", "橱窗背景");
                     if (windowList.Any())
                     {
-                        quoteOrderList.AddRange(windowList);
+                        //quoteOrderList.AddRange(windowList);
+                        decimal area = windowList.Sum(s => s.Amount);
+                        decimal price = windowList.Sum(s => s.TotalPrice);
+                        var model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
                     }
                 }
                 //橱窗侧贴订单
@@ -152,7 +202,24 @@ namespace WebApp.QuoteOrderManager
                     StatisticMaterial(windowSizeStickOrderList, ref windowList, "Window橱窗", "橱窗侧贴");
                     if (windowList.Any())
                     {
-                        quoteOrderList.AddRange(windowList);
+                        //quoteOrderList.AddRange(windowList);
+                        decimal area = windowList.Sum(s => s.Amount);
+                        decimal price = windowList.Sum(s => s.TotalPrice);
+                        var model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
                     }
                 }
                 //橱窗地贴订单
@@ -165,7 +232,24 @@ namespace WebApp.QuoteOrderManager
                     StatisticMaterial(windowFlootStickOrderList, ref windowList, "Window橱窗", "橱窗地贴");
                     if (windowList.Any())
                     {
-                        quoteOrderList.AddRange(windowList);
+                        //quoteOrderList.AddRange(windowList);
+                        decimal area = windowList.Sum(s => s.Amount);
+                        decimal price = windowList.Sum(s => s.TotalPrice);
+                        QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
                     }
                 }
                 //橱窗窗贴订单
@@ -178,7 +262,24 @@ namespace WebApp.QuoteOrderManager
                     StatisticMaterial(windowStickOrderList, ref windowList, "Window橱窗", "窗贴");
                     if (windowList.Any())
                     {
-                        quoteOrderList.AddRange(windowList);
+                        //quoteOrderList.AddRange(windowList);
+                        decimal area = windowList.Sum(s => s.Amount);
+                        decimal price = windowList.Sum(s => s.TotalPrice);
+                        QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
                     }
                 }
                 if (popOrderListSave.Any())
@@ -189,6 +290,8 @@ namespace WebApp.QuoteOrderManager
                 #region 陈列桌区域
                 popOrderListSave = new List<QuoteOrderDetail>();
                 //陈列桌订单
+                currSheet = "WOW 陈列桌区域";
+                currentPosition = "陈列桌";
                 var tableOrderList = popOrderList.Where(s => s.Sheet.Contains("陈列桌") || s.Sheet.Contains("展桌")).ToList();
                 if (tableOrderList.Any())
                 {
@@ -228,7 +331,24 @@ namespace WebApp.QuoteOrderManager
                                 StatisticMaterial(tableQuoteOrderList, ref tableList, "WOW 陈列桌区域", ft.MachineFrameTypeName);
                                 if (tableList.Any())
                                 {
-                                    quoteOrderList.AddRange(tableList);
+                                    //quoteOrderList.AddRange(tableList);
+                                    decimal area = tableList.Sum(s => s.Amount);
+                                    decimal price = tableList.Sum(s => s.TotalPrice);
+                                    QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                    if (model0 != null)
+                                    {
+                                        model0.Amount += area;
+                                        model0.TotalPrice += price;
+                                    }
+                                    else
+                                    {
+                                        QuoteModel model1 = new QuoteModel();
+                                        model1.Amount = area;
+                                        model1.Sheet = currSheet;
+                                        model1.TotalPrice = price;
+                                        model1.PositionDescription = currentPosition;
+                                        quoteOrderList.Add(model1);
+                                    }
                                 }
                             });
                         }
@@ -249,7 +369,24 @@ namespace WebApp.QuoteOrderManager
                             StatisticMaterial(tableJTZOrderList, ref tableJTZList, "WOW 陈列桌区域", "陈列桌静态展");
                             if (tableJTZList.Any())
                             {
-                                quoteOrderList.AddRange(tableJTZList);
+                                //quoteOrderList.AddRange(tableJTZList);
+                                decimal area = tableJTZList.Sum(s => s.Amount);
+                                decimal price = tableJTZList.Sum(s => s.TotalPrice);
+                                QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                if (model0 != null)
+                                {
+                                    model0.Amount += area;
+                                    model0.TotalPrice += price;
+                                }
+                                else
+                                {
+                                    QuoteModel model1 = new QuoteModel();
+                                    model1.Amount = area;
+                                    model1.Sheet = currSheet;
+                                    model1.TotalPrice = price;
+                                    model1.PositionDescription = currentPosition;
+                                    quoteOrderList.Add(model1);
+                                }
                             }
 
                         }
@@ -264,7 +401,24 @@ namespace WebApp.QuoteOrderManager
                             StatisticMaterial(tableJTZOrderList, ref tableModuleList, "WOW 陈列桌区域", "陈列桌模特阵");
                             if (tableModuleList.Any())
                             {
-                                quoteOrderList.AddRange(tableModuleList);
+                                //quoteOrderList.AddRange(tableModuleList);
+                                decimal area = tableModuleList.Sum(s => s.Amount);
+                                decimal price = tableModuleList.Sum(s => s.TotalPrice);
+                                QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                if (model0 != null)
+                                {
+                                    model0.Amount += area;
+                                    model0.TotalPrice += price;
+                                }
+                                else
+                                {
+                                    QuoteModel model1 = new QuoteModel();
+                                    model1.Amount = area;
+                                    model1.Sheet = currSheet;
+                                    model1.TotalPrice = price;
+                                    model1.PositionDescription = currentPosition;
+                                    quoteOrderList.Add(model1);
+                                }
                             }
 
                         }
@@ -278,7 +432,24 @@ namespace WebApp.QuoteOrderManager
                             StatisticMaterial(tableList, ref tbList, "WOW 陈列桌区域", "陈列桌桌铺");
                             if (tbList.Any())
                             {
-                                quoteOrderList.AddRange(tbList);
+                                //quoteOrderList.AddRange(tbList);
+                                decimal area = tbList.Sum(s => s.Amount);
+                                decimal price = tbList.Sum(s => s.TotalPrice);
+                                QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                if (model0 != null)
+                                {
+                                    model0.Amount += area;
+                                    model0.TotalPrice += price;
+                                }
+                                else
+                                {
+                                    QuoteModel model1 = new QuoteModel();
+                                    model1.Amount = area;
+                                    model1.Sheet = currSheet;
+                                    model1.TotalPrice = price;
+                                    model1.PositionDescription = currentPosition;
+                                    quoteOrderList.Add(model1);
+                                }
                             }
 
                         }
@@ -291,6 +462,8 @@ namespace WebApp.QuoteOrderManager
                 #endregion
                 #region 服装墙区域订单
                 popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "App Wall 服装墙";
+                currentPosition = "服装墙";
                 var appOrderList = popOrderList.Where(s => s.Sheet.Contains("服装墙")).ToList();
                 if (appOrderList.Any())
                 {
@@ -331,7 +504,24 @@ namespace WebApp.QuoteOrderManager
                                 if (appList.Any())
                                 {
 
-                                    quoteOrderList.AddRange(appList);
+                                    //quoteOrderList.AddRange(appList);
+                                    decimal area = appList.Sum(s => s.Amount);
+                                    decimal price = appList.Sum(s => s.TotalPrice);
+                                    QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                    if (model0 != null)
+                                    {
+                                        model0.Amount += area;
+                                        model0.TotalPrice += price;
+                                    }
+                                    else
+                                    {
+                                        QuoteModel model1 = new QuoteModel();
+                                        model1.Amount = area;
+                                        model1.Sheet = currSheet;
+                                        model1.TotalPrice = price;
+                                        model1.PositionDescription = currentPosition;
+                                        quoteOrderList.Add(model1);
+                                    }
                                 }
 
                             });
@@ -352,7 +542,24 @@ namespace WebApp.QuoteOrderManager
                             StatisticMaterial(list0, ref oList, "App Wall 服装墙", ch + "服装墙");
                             if (oList.Any())
                             {
-                                quoteOrderList.AddRange(oList);
+                                //quoteOrderList.AddRange(oList);
+                                decimal area = oList.Sum(s => s.Amount);
+                                decimal price = oList.Sum(s => s.TotalPrice);
+                                QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                if (model0 != null)
+                                {
+                                    model0.Amount += area;
+                                    model0.TotalPrice += price;
+                                }
+                                else
+                                {
+                                    QuoteModel model1 = new QuoteModel();
+                                    model1.Amount = area;
+                                    model1.Sheet = currSheet;
+                                    model1.TotalPrice = price;
+                                    model1.PositionDescription = currentPosition;
+                                    quoteOrderList.Add(model1);
+                                }
                             }
                         });
 
@@ -366,6 +573,8 @@ namespace WebApp.QuoteOrderManager
                 #endregion
                 #region 鞋墙区域订单
                 popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "FTW Wall 鞋墙";
+                currentPosition = "鞋墙";
                 List<QuoteOrderDetail> ftwOrderList = new List<QuoteOrderDetail>();
                 List<string> shoeWareSheetList = new List<string>() { "鞋墙", "凹槽", "圆吧", "弧形", "鞋吧", "圆桌", "吧台", "鞋砖", "鞋柱" };
                 string shoeSheetStr = string.Empty;
@@ -420,7 +629,24 @@ namespace WebApp.QuoteOrderManager
                                 StatisticMaterial(ftwQuoteOrderListKV, ref ftwList, "FTW Wall 鞋墙", "HC鞋墙主KV");
                                 if (ftwList.Any())
                                 {
-                                    quoteOrderList.AddRange(ftwList);
+                                    //quoteOrderList.AddRange(ftwList);
+                                    decimal area = ftwList.Sum(s => s.Amount);
+                                    decimal price = ftwList.Sum(s => s.TotalPrice);
+                                    QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                    if (model0 != null)
+                                    {
+                                        model0.Amount += area;
+                                        model0.TotalPrice += price;
+                                    }
+                                    else
+                                    {
+                                        QuoteModel model1 = new QuoteModel();
+                                        model1.Amount = area;
+                                        model1.Sheet = currSheet;
+                                        model1.TotalPrice = price;
+                                        model1.PositionDescription = currentPosition;
+                                        quoteOrderList.Add(model1);
+                                    }
                                 }
                             }
                             //主灯槽
@@ -438,7 +664,24 @@ namespace WebApp.QuoteOrderManager
                                 StatisticMaterial(ftwQuoteOrderList, ref ftwList, "FTW Wall 鞋墙", "HC鞋墙灯槽");
                                 if (ftwList.Any())
                                 {
-                                    quoteOrderList.AddRange(ftwList);
+                                    //quoteOrderList.AddRange(ftwList);
+                                    decimal area = ftwList.Sum(s => s.Amount);
+                                    decimal price = ftwList.Sum(s => s.TotalPrice);
+                                    QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                    if (model0 != null)
+                                    {
+                                        model0.Amount += area;
+                                        model0.TotalPrice += price;
+                                    }
+                                    else
+                                    {
+                                        QuoteModel model1 = new QuoteModel();
+                                        model1.Amount = area;
+                                        model1.Sheet = currSheet;
+                                        model1.TotalPrice = price;
+                                        model1.PositionDescription = currentPosition;
+                                        quoteOrderList.Add(model1);
+                                    }
                                 }
 
                             }
@@ -452,7 +695,24 @@ namespace WebApp.QuoteOrderManager
                                 StatisticMaterial(ftwQuoteOrderListOthers, ref ftwList, "FTW Wall 鞋墙", "HC圆桌+科技+鞋吧");
                                 if (ftwList.Any())
                                 {
-                                    quoteOrderList.AddRange(ftwList);
+                                    //quoteOrderList.AddRange(ftwList);
+                                    decimal area = ftwList.Sum(s => s.Amount);
+                                    decimal price = ftwList.Sum(s => s.TotalPrice);
+                                    QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                    if (model0 != null)
+                                    {
+                                        model0.Amount += area;
+                                        model0.TotalPrice += price;
+                                    }
+                                    else
+                                    {
+                                        QuoteModel model1 = new QuoteModel();
+                                        model1.Amount = area;
+                                        model1.Sheet = currSheet;
+                                        model1.TotalPrice = price;
+                                        model1.PositionDescription = currentPosition;
+                                        quoteOrderList.Add(model1);
+                                    }
                                 }
 
                             }
@@ -486,7 +746,24 @@ namespace WebApp.QuoteOrderManager
                                 StatisticMaterial(ftwQuoteOrderList, ref ftwList, "FTW Wall 鞋墙", "鞋墙主KV");
                                 if (ftwList.Any())
                                 {
-                                    quoteOrderList.AddRange(ftwList);
+                                    //quoteOrderList.AddRange(ftwList);
+                                    decimal area = ftwList.Sum(s => s.Amount);
+                                    decimal price = ftwList.Sum(s => s.TotalPrice);
+                                    QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                    if (model0 != null)
+                                    {
+                                        model0.Amount += area;
+                                        model0.TotalPrice += price;
+                                    }
+                                    else
+                                    {
+                                        QuoteModel model1 = new QuoteModel();
+                                        model1.Amount = area;
+                                        model1.Sheet = currSheet;
+                                        model1.TotalPrice = price;
+                                        model1.PositionDescription = currentPosition;
+                                        quoteOrderList.Add(model1);
+                                    }
                                 }
 
                                 //灯槽
@@ -507,7 +784,24 @@ namespace WebApp.QuoteOrderManager
                                 StatisticMaterial(ftwQuoteOrderList, ref ftwList, "FTW Wall 鞋墙", "灯槽");
                                 if (ftwList.Any())
                                 {
-                                    quoteOrderList.AddRange(ftwList);
+                                    //quoteOrderList.AddRange(ftwList);
+                                    decimal area = ftwList.Sum(s => s.Amount);
+                                    decimal price = ftwList.Sum(s => s.TotalPrice);
+                                    QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                    if (model0 != null)
+                                    {
+                                        model0.Amount += area;
+                                        model0.TotalPrice += price;
+                                    }
+                                    else
+                                    {
+                                        QuoteModel model1 = new QuoteModel();
+                                        model1.Amount = area;
+                                        model1.Sheet = currSheet;
+                                        model1.TotalPrice = price;
+                                        model1.PositionDescription = currentPosition;
+                                        quoteOrderList.Add(model1);
+                                    }
                                 }
                             });
                         }
@@ -521,7 +815,24 @@ namespace WebApp.QuoteOrderManager
                             StatisticMaterial(otherSubjectOrderList, ref ftwList, "FTW Wall 鞋墙", "鞋墙");
                             if (ftwList.Any())
                             {
-                                quoteOrderList.AddRange(ftwList);
+                                //quoteOrderList.AddRange(ftwList);
+                                decimal area = ftwList.Sum(s => s.Amount);
+                                decimal price = ftwList.Sum(s => s.TotalPrice);
+                                QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                                if (model0 != null)
+                                {
+                                    model0.Amount += area;
+                                    model0.TotalPrice += price;
+                                }
+                                else
+                                {
+                                    QuoteModel model1 = new QuoteModel();
+                                    model1.Amount = area;
+                                    model1.Sheet = currSheet;
+                                    model1.TotalPrice = price;
+                                    model1.PositionDescription = currentPosition;
+                                    quoteOrderList.Add(model1);
+                                }
                             }
 
                         }
@@ -535,6 +846,8 @@ namespace WebApp.QuoteOrderManager
                 #endregion
                 #region SMU区域订单
                 popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "In-store SMU 店内其它位置SMU";
+                currentPosition = "SMU";
                 var smuOrderList = popOrderList.Where(s => s.Sheet.ToLower().Contains("smu")).ToList();
                 if (smuOrderList.Any())
                 {
@@ -544,7 +857,24 @@ namespace WebApp.QuoteOrderManager
                     StatisticMaterial(smuOrderList, ref smuList, "In-store SMU 店内其它位置SMU", "SMU");
                     if (smuList.Any())
                     {
-                        quoteOrderList.AddRange(smuList);
+                        //quoteOrderList.AddRange(smuList);
+                        decimal area = smuList.Sum(s => s.Amount);
+                        decimal price = smuList.Sum(s => s.TotalPrice);
+                        QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
                     }
                 }
                 #endregion
@@ -558,7 +888,24 @@ namespace WebApp.QuoteOrderManager
                     StatisticMaterial(zdOrderList, ref smuList, "In-store SMU 店内其它位置SMU", "中岛");
                     if (smuList.Any())
                     {
-                        quoteOrderList.AddRange(smuList);
+                        //quoteOrderList.AddRange(smuList);
+                        decimal area = smuList.Sum(s => s.Amount);
+                        decimal price = smuList.Sum(s => s.TotalPrice);
+                        QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
                     }
                 }
                 if (popOrderListSave.Any())
@@ -568,6 +915,8 @@ namespace WebApp.QuoteOrderManager
                 #endregion
                 #region 收银台区域订单
                 popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "Cashier Desk 收银台区域";
+                currentPosition = "收银台";
                 var cashierOrderList = popOrderList.Where(s => s.Sheet == "收银台").ToList();
                 if (cashierOrderList.Any())
                 {
@@ -577,7 +926,24 @@ namespace WebApp.QuoteOrderManager
                     StatisticMaterial(cashierOrderList, ref cashierList, "Cashier Desk 收银台区域", "收银台");
                     if (cashierList.Any())
                     {
-                        quoteOrderList.AddRange(cashierList);
+                        //quoteOrderList.AddRange(cashierList);
+                        decimal area = cashierList.Sum(s => s.Amount);
+                        decimal price = cashierList.Sum(s => s.TotalPrice);
+                        QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
                     }
                 }
                 if (popOrderListSave.Any())
@@ -587,6 +953,8 @@ namespace WebApp.QuoteOrderManager
                 #endregion
                 #region OOH区域订单
                 popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "OOH 店外非橱窗位置";
+                currentPosition = "OOH";
                 var oohOrderList = popOrderList.Where(s => s.Sheet.ToLower().Contains("ooh")).ToList();
                 if (oohOrderList.Any())
                 {
@@ -596,7 +964,24 @@ namespace WebApp.QuoteOrderManager
                     StatisticMaterial(oohOrderList, ref oohList, "OOH 店外非橱窗位置", "OOH");
                     if (oohList.Any())
                     {
-                        quoteOrderList.AddRange(oohList);
+                        //quoteOrderList.AddRange(oohList);
+                        decimal area = oohList.Sum(s => s.Amount);
+                        decimal price = oohList.Sum(s => s.TotalPrice);
+                        QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
                     }
                 }
                 if (popOrderListSave.Any())
@@ -606,6 +991,8 @@ namespace WebApp.QuoteOrderManager
                 #endregion
                 #region 除了以上常规位置外的其他位置
                 popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "其他区域";
+                currentPosition = "其他区域";
                 var otherSheetOrderList = popOrderList.Where(s => !selectedIdList.Contains(s.Id)).ToList();
                 if (otherSheetOrderList.Any())
                 {
@@ -618,7 +1005,24 @@ namespace WebApp.QuoteOrderManager
                         StatisticMaterial(orderList0, ref smuList, "其他区域", sheet);
                         if (smuList.Any())
                         {
-                            quoteOrderList.AddRange(smuList);
+                            //quoteOrderList.AddRange(smuList);
+                            decimal area = smuList.Sum(s => s.Amount);
+                            decimal price = smuList.Sum(s => s.TotalPrice);
+                            QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                            if (model0 != null)
+                            {
+                                model0.Amount += area;
+                                model0.TotalPrice += price;
+                            }
+                            else
+                            {
+                                QuoteModel model1 = new QuoteModel();
+                                model1.Amount = area;
+                                model1.Sheet = currSheet;
+                                model1.TotalPrice = price;
+                                model1.PositionDescription = currentPosition;
+                                quoteOrderList.Add(model1);
+                            }
                         }
                     });
 
@@ -638,10 +1042,451 @@ namespace WebApp.QuoteOrderManager
             Session["QuoteModel"] = quoteOrderList;
 
         }
+
+
+        /// <summary>
+        /// 获取POP数据
+        /// </summary>
+        void BindPOPList()
+        {
+
+            Session["QuoteModel"] = null;
+            var orderList = (from order in CurrentContext.DbContext.QuoteOrderDetail
+                             join subject in CurrentContext.DbContext.Subject
+                             on order.SubjectId equals subject.Id
+                             where (order.IsDelete == null || order.IsDelete == false)
+                             && ((order.OrderType == (int)OrderTypeEnum.POP && order.GraphicLength != null && order.GraphicLength > 1 && order.GraphicWidth != null && order.GraphicWidth > 1) || (order.OrderType > (int)OrderTypeEnum.POP))
+                             && (subject.IsDelete == null || subject.IsDelete == false)
+                             && subject.ApproveState == 1
+                             where guidanceIdList.Contains(order.GuidanceId ?? 0)
+                             && (categoryIdList.Any() ? categoryIdList.Contains(subject.SubjectCategoryId ?? 0) : 1 == 1)
+                             select new
+                             {
+                                 order,
+                                 subject
+                             }).ToList();
+
+            if (subjectIdList.Any())
+            {
+                orderList = orderList.Where(s => subjectIdList.Contains(s.order.SubjectId ?? 0)).ToList();
+            }
+            List<QuoteModel> quoteOrderList = new List<QuoteModel>();
+            List<QuoteOrderDetail> popOrderList = new List<QuoteOrderDetail>();
+            //保存每个位置区域的订单
+
+            if (orderList.Any())
+            {
+                popOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.POP || s.order.OrderType == (int)OrderTypeEnum.道具).Select(s => s.order).ToList();
+                //VVIP店铺
+                var vvipList = orderList.Where(s => s.order.MaterialSupport != null && s.order.MaterialSupport.ToLower() == "vvip").ToList();
+                List<int> vvipShopList = vvipList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+                //非VVIP店铺
+                List<int> notVVIPShopList = orderList.Where(s => !vvipShopList.Contains(s.order.ShopId ?? 0)).Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+                labVVIPShop.Text = vvipShopList.Count.ToString();
+                labNormalShop.Text = notVVIPShopList.Count.ToString();
+
+                List<QuoteOrderDetail> popOrderListSave = new List<QuoteOrderDetail>();
+                List<int> selectedIdList = new List<int>();
+
+                string currSheet = string.Empty;
+                string currentPosition = string.Empty;
+                #region 橱窗区域
+                //橱窗背景订单
+                currSheet = "Window橱窗";
+                currentPosition = "橱窗";
+                var windowOrderList = popOrderList.Where(s => s.Sheet.Contains(currentPosition)).ToList();
+                if (windowOrderList.Any())
+                {
+                    popOrderListSave.AddRange(windowOrderList);
+                    List<QuoteModel> windowList = new List<QuoteModel>();//
+                    selectedIdList.AddRange(windowOrderList.Select(s => s.Id).ToList());
+                    StatisticMaterial(windowOrderList, ref windowList, currSheet, currentPosition);
+                    if (windowList.Any())
+                    {
+                        
+                        decimal area = windowList.Sum(s => s.Amount);
+                        decimal price = windowList.Sum(s => s.TotalPrice);
+                        var model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
+                    }
+                }
+                if (popOrderListSave.Any())
+                {
+                    Session[currSheet] = popOrderListSave;
+                }
+                #endregion
+                #region 陈列桌区域
+                popOrderListSave = new List<QuoteOrderDetail>();
+                //陈列桌订单
+                currSheet = "WOW陈列桌区域";
+                currentPosition = "陈列桌";
+                var tableOrderList = popOrderList.Where(s => s.Sheet.Contains("陈列桌") || s.Sheet.Contains("展桌")).ToList();
+                if (tableOrderList.Any())
+                {
+                    popOrderListSave.AddRange(tableOrderList);
+                    List<QuoteModel> tableList = new List<QuoteModel>();//
+                    selectedIdList.AddRange(tableOrderList.Select(s => s.Id).ToList());
+                    StatisticMaterial(tableOrderList, ref tableList, currSheet, currentPosition);
+                    if (tableList.Any())
+                    {
+
+                        decimal area = tableList.Sum(s => s.Amount);
+                        decimal price = tableList.Sum(s => s.TotalPrice);
+                        var model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
+                    }
+                }
+                if (popOrderListSave.Any())
+                {
+                    Session[currSheet] = popOrderListSave;
+                }
+                #endregion
+                #region 服装墙区域订单
+                popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "AppWall服装墙";
+                currentPosition = "服装墙";
+                var appOrderList = popOrderList.Where(s => s.Sheet.Contains(currentPosition)).ToList();
+                if (appOrderList.Any())
+                {
+                    popOrderListSave.AddRange(appOrderList);
+                    List<QuoteModel> appList = new List<QuoteModel>();//
+                    selectedIdList.AddRange(appOrderList.Select(s => s.Id).ToList());
+                    StatisticMaterial(appOrderList, ref appList, currSheet, currentPosition);
+                    if (appList.Any())
+                    {
+
+                        decimal area = appList.Sum(s => s.Amount);
+                        decimal price = appList.Sum(s => s.TotalPrice);
+                        var model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
+                    }
+                }
+                if (popOrderListSave.Any())
+                {
+                    Session[currSheet] = popOrderListSave;
+                }
+                #endregion
+                #region 鞋墙区域订单
+                popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "FTWWall鞋墙";
+                currentPosition = "鞋墙";
+                List<QuoteOrderDetail> ftwOrderList = new List<QuoteOrderDetail>();
+                List<string> shoeWareSheetList = new List<string>() { "鞋墙", "凹槽", "圆吧", "弧形", "鞋吧", "圆桌", "吧台", "鞋砖", "鞋柱" };
+                string shoeSheetStr = string.Empty;
+                try
+                {
+                    shoeSheetStr = ConfigurationManager.AppSettings["QuoteOrderTemplateShoeSheet"];
+                }
+                catch
+                {
+
+                }
+                if (!string.IsNullOrWhiteSpace(shoeSheetStr))
+                {
+                    shoeWareSheetList = StringHelper.ToStringList(shoeSheetStr, ',');
+                }
+                if (shoeWareSheetList.Any())
+                {
+                    List<int> orderIdListTemp = new List<int>();
+                    shoeWareSheetList.ForEach(sh =>
+                    {
+                        var ftwOrderList0 = popOrderList.Where(s => s.Sheet.Contains(sh) && !orderIdListTemp.Contains(s.Id)).ToList();
+                        if (ftwOrderList0.Any())
+                        {
+                            popOrderListSave.AddRange(ftwOrderList0);
+                            ftwOrderList.AddRange(ftwOrderList0);
+                            orderIdListTemp.AddRange(ftwOrderList0.Select(s=>s.Id).ToList());
+                        }
+                    });
+                }
+                if (ftwOrderList.Any())
+                {
+                    List<QuoteModel> shoeList = new List<QuoteModel>();//
+                    selectedIdList.AddRange(ftwOrderList.Select(s => s.Id).ToList());
+                    StatisticMaterial(ftwOrderList, ref shoeList, currSheet, currentPosition);
+                    if (shoeList.Any())
+                    {
+
+                        decimal area = shoeList.Sum(s => s.Amount);
+                        decimal price = shoeList.Sum(s => s.TotalPrice);
+                        var model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
+                    }
+                }
+                if (popOrderListSave.Any())
+                {
+                    Session[currSheet] = popOrderListSave;
+                }
+                #endregion
+                #region SMU区域订单
+                popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "In-storeSMU店内其它位置SMU";
+                currentPosition = "SMU";
+                var smuOrderList = popOrderList.Where(s => s.Sheet.ToLower().Contains("smu")).ToList();
+                if (smuOrderList.Any())
+                {
+                    popOrderListSave.AddRange(smuOrderList);
+                    selectedIdList.AddRange(smuOrderList.Select(s => s.Id).ToList());
+                    List<QuoteModel> smuList = new List<QuoteModel>();//
+                    StatisticMaterial(smuOrderList, ref smuList, currSheet, currentPosition);
+                    if (smuList.Any())
+                    {
+                        //quoteOrderList.AddRange(smuList);
+                        decimal area = smuList.Sum(s => s.Amount);
+                        decimal price = smuList.Sum(s => s.TotalPrice);
+                        QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
+                    }
+                }
+                #endregion
+                #region 中岛
+                var zdOrderList = popOrderList.Where(s => s.Sheet.Contains("中岛")).ToList();
+                if (zdOrderList.Any())
+                {
+                    popOrderListSave.AddRange(zdOrderList);
+                    selectedIdList.AddRange(zdOrderList.Select(s => s.Id).ToList());
+                    List<QuoteModel> smuList = new List<QuoteModel>();//
+                    StatisticMaterial(zdOrderList, ref smuList, currSheet, "中岛");
+                    if (smuList.Any())
+                    {
+                        //quoteOrderList.AddRange(smuList);
+                        decimal area = smuList.Sum(s => s.Amount);
+                        decimal price = smuList.Sum(s => s.TotalPrice);
+                        QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
+                    }
+                }
+                if (popOrderListSave.Any())
+                {
+                    Session[currSheet] = popOrderListSave;
+                }
+                #endregion
+                #region 收银台/OOH订单
+                var cashierOrderList = popOrderList.Where(s => s.Sheet == "收银台").ToList();
+                if (cashierOrderList.Any())
+                {
+                    selectedIdList.AddRange(cashierOrderList.Select(s => s.Id).ToList());
+
+
+                }
+
+                var oohOrderList = popOrderList.Where(s => s.Sheet.ToLower().Contains("ooh")).ToList();
+                if (oohOrderList.Any())
+                {
+                    selectedIdList.AddRange(oohOrderList.Select(s => s.Id).ToList());
+
+                }
+                #endregion
+                #region 除了以上常规位置外的其他位置(放SMU里面)
+                var otherSheetOrderList = popOrderList.Where(s => !selectedIdList.Contains(s.Id)).ToList();
+                if (otherSheetOrderList.Any())
+                {
+
+                    List<string> sheets = otherSheetOrderList.Select(s => s.Sheet).Distinct().ToList();
+                    sheets.ForEach(sheet =>
+                    {
+                        var orderList0 = otherSheetOrderList.Where(s => s.Sheet == sheet).ToList();
+                        List<QuoteModel> smuList = new List<QuoteModel>();//
+                        StatisticMaterial(orderList0, ref smuList, currSheet, sheet);
+                        if (smuList.Any())
+                        {
+                            decimal area = smuList.Sum(s => s.Amount);
+                            decimal price = smuList.Sum(s => s.TotalPrice);
+                            QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                            if (model0 != null)
+                            {
+                                model0.Amount += area;
+                                model0.TotalPrice += price;
+                            }
+                            else
+                            {
+                                QuoteModel model1 = new QuoteModel();
+                                model1.Amount = area;
+                                model1.Sheet = currSheet;
+                                model1.TotalPrice = price;
+                                model1.PositionDescription = currentPosition;
+                                quoteOrderList.Add(model1);
+                            }
+
+                        }
+                    });
+
+                }
+
+                #endregion
+                #region 收银台区域订单
+                popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "CashierDesk收银台区域";
+                currentPosition = "收银台";
+                //var cashierOrderList = popOrderList.Where(s => s.Sheet.Contains(currentPosition)).ToList();
+                if (cashierOrderList.Any())
+                {
+                    popOrderListSave.AddRange(cashierOrderList);
+                    selectedIdList.AddRange(cashierOrderList.Select(s => s.Id).ToList());
+                    List<QuoteModel> cashierList = new List<QuoteModel>();//
+                    StatisticMaterial(cashierOrderList, ref cashierList, currSheet, currentPosition);
+                    if (cashierList.Any())
+                    {
+                        //quoteOrderList.AddRange(cashierList);
+                        decimal area = cashierList.Sum(s => s.Amount);
+                        decimal price = cashierList.Sum(s => s.TotalPrice);
+                        QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
+                    }
+                }
+                if (popOrderListSave.Any())
+                {
+                    Session[currSheet] = popOrderListSave;
+                }
+                #endregion
+                #region OOH区域订单
+                popOrderListSave = new List<QuoteOrderDetail>();
+                currSheet = "OOH店外非橱窗位置";
+                currentPosition = "OOH";
+                //var oohOrderList = popOrderList.Where(s => s.Sheet.ToLower().Contains("ooh")).ToList();
+                if (oohOrderList.Any())
+                {
+                    popOrderListSave.AddRange(oohOrderList);
+                    selectedIdList.AddRange(oohOrderList.Select(s => s.Id).ToList());
+                    List<QuoteModel> oohList = new List<QuoteModel>();//
+                    StatisticMaterial(oohOrderList, ref oohList, currSheet, currentPosition);
+                    if (oohList.Any())
+                    {
+                        //quoteOrderList.AddRange(oohList);
+                        decimal area = oohList.Sum(s => s.Amount);
+                        decimal price = oohList.Sum(s => s.TotalPrice);
+                        QuoteModel model0 = quoteOrderList.Where(s => s.Sheet == currSheet).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            model0.Amount += area;
+                            model0.TotalPrice += price;
+                        }
+                        else
+                        {
+                            QuoteModel model1 = new QuoteModel();
+                            model1.Amount = area;
+                            model1.Sheet = currSheet;
+                            model1.TotalPrice = price;
+                            model1.PositionDescription = currentPosition;
+                            quoteOrderList.Add(model1);
+                        }
+                    }
+                }
+                if (popOrderListSave.Any())
+                {
+                    Session[currSheet] = popOrderListSave;
+                }
+                #endregion
+                
+
+            }
+            popList.DataSource = quoteOrderList;
+            popList.DataBind();
+            CombineCell(popList, new List<string> { "sheet" });
+            BindInstallPrice(popOrderList);
+            Session["QuoteModel"] = quoteOrderList;
+
+        }
+
         /// <summary>
         /// 缓存安装费
         /// </summary>
         List<InstallPriceQuoteModel> InstallPriceQuoteModelList = new List<InstallPriceQuoteModel>();
+        /// <summary>
+        /// 获取安装费数据
+        /// </summary>
+        /// <param name="orderList"></param>
         void BindInstallPrice(List<QuoteOrderDetail> orderList)
         {
             //List<string> cityTierList = new List<string>() { "T1", "T2", "T3" };
@@ -683,19 +1528,20 @@ namespace WebApp.QuoteOrderManager
 
             //decimal otherBasicInstallPrice = 0;
             List<int> installShopList = new List<int>();
-            
+            List<ImportQuoteOrder> importInstallQuoteList = new List<ImportQuoteOrder>();
+            importInstallQuoteList = new ImportQuoteOrderBLL().GetList(s => s.ItemId == itemId && s.OrderType == (int)OrderTypeEnum.安装费);
             guidanceIdList.ForEach(gid =>
             {
                 //安装费
-                List<int> installShopIdList = orderList.Where(s => s.GuidanceId == gid).Select(s => s.ShopId ?? 0).Distinct().ToList();
-                List<int> subjectIdList = new SubjectBLL().GetList(s => s.GuidanceId == gid && (categoryIdList.Any() ? categoryIdList.Contains(s.SubjectCategoryId ?? 0) : 1 == 1)).Select(s => s.Id).ToList();
+                //List<int> installShopIdList = orderList.Where(s => s.GuidanceId == gid).Select(s => s.ShopId ?? 0).Distinct().ToList();
+                //List<int> subjectIdList = new SubjectBLL().GetList(s => s.GuidanceId == gid && (categoryIdList.Any() ? categoryIdList.Contains(s.SubjectCategoryId ?? 0) : 1 == 1)).Select(s => s.Id).ToList();
                 //var installPriceList = installShopBll.GetList(s => s.GuidanceId == gid && installShopIdList.Contains(s.ShopId ?? 0)).ToList();
                 var installPriceList = (from install in CurrentContext.DbContext.InstallPriceShopInfo
                                         join shop in CurrentContext.DbContext.Shop
                                         on install.ShopId equals shop.Id
                                         where install.GuidanceId == gid
                                         && subjectIdList.Contains(install.SubjectId ?? 0)
-                                        && installShopIdList.Contains(install.ShopId ?? 0)
+                                        //&& installShopIdList.Contains(install.ShopId ?? 0)
                                         select new
                                         {
                                             install,
@@ -704,6 +1550,7 @@ namespace WebApp.QuoteOrderManager
                 if (installPriceList.Any())
                 {
                     installShopList.AddRange(installPriceList.Select(s => s.install.ShopId ?? 0).Distinct().ToList());
+                    installPriceTotal = installPriceList.Sum(s => ((s.install.BasicPrice ?? 0) + (s.install.OOHPrice ?? 0) + (s.install.WindowPrice ?? 0)));
                     InstallPriceQuoteModel installQuoteModel;
                     installPriceList.ForEach(s =>
                     {
@@ -715,14 +1562,14 @@ namespace WebApp.QuoteOrderManager
                             {
                                 kidsWindowCount++;
                                 kidsWindowPrice += 500;
-                                installPriceTotal += 500;
+                                installPriceStandard += 500;
                                 
                             }
                             else if ((s.install.BasicPrice ?? 0) > 0)
                             {
                                 kidsBasicCount++;
                                 kidsBasicPrice += 150;
-                                installPriceTotal += 150;
+                                installPriceStandard += 150;
                             }
                             bool flag = false;
                             for (int i = 0; i < InstallPriceQuoteModelList.Count; i++)
@@ -759,26 +1606,26 @@ namespace WebApp.QuoteOrderManager
                                 {
                                     oohLevelOneCount++;
                                     oohLevelOnePrice += 5000;
-                                    installPriceTotal += 5000;
+                                    installPriceStandard += 5000;
                                     
                                 }
                                 else if (s.install.OOHPrice == 2700)
                                 {
                                     oohLevelTwoCount++;
                                     oohLevelTwoPrice += 2700;
-                                    installPriceTotal += 2700;
+                                    installPriceStandard += 2700;
                                 }
                                 else if (s.install.OOHPrice == 1800)
                                 {
                                     oohLevelThreeCount++;
                                     oohLevelThreePrice += 1800;
-                                    installPriceTotal += 1800;
+                                    installPriceStandard += 1800;
                                 }
                                 else if (s.install.OOHPrice == 600)
                                 {
                                     oohLevelFourCount++;
                                     oohLevelFourPrice += 600;
-                                    installPriceTotal += 600;
+                                    installPriceStandard += 600;
                                 }
                                 else//其他高空安装费
                                 {
@@ -836,19 +1683,19 @@ namespace WebApp.QuoteOrderManager
                                 {
                                     windowLevelOneCount++;
                                     windowLevelOnePrice += 1000;
-                                    installPriceTotal += 1000;
+                                    installPriceStandard += 1000;
                                 }
                                 else if (s.install.WindowPrice == 500)
                                 {
                                     windowLevelTwoCount++;
                                     windowLevelTwoPrice += 500;
-                                    installPriceTotal += 500;
+                                    installPriceStandard += 500;
                                 }
                                 else if (s.install.WindowPrice == 200)
                                 {
                                     windowLevelThreeCount++;
                                     windowLevelThreePrice += 200;
-                                    installPriceTotal += 200;
+                                    installPriceStandard += 200;
                                 }
                                 bool flag = false;
                                 for (int i = 0; i < InstallPriceQuoteModelList.Count; i++)
@@ -878,7 +1725,7 @@ namespace WebApp.QuoteOrderManager
                                 {
                                     genericLevelCount++;
                                     genericLevelPrice += 150;
-                                    installPriceTotal += 150;
+                                    installPriceStandard += 150;
                                     bool flag = false;
                                     for (int i = 0; i < InstallPriceQuoteModelList.Count; i++)
                                     {
@@ -906,19 +1753,19 @@ namespace WebApp.QuoteOrderManager
                                     {
                                         basicLevelOneCount++;
                                         basicLevelOnePrice += 800;
-                                        installPriceTotal += 800;
+                                        installPriceStandard += 800;
                                     }
                                     else if (s.install.BasicPrice == 400)
                                     {
                                         basicLevelTwoCount++;
                                         basicLevelTwoPrice += 400;
-                                        installPriceTotal += 400;
+                                        installPriceStandard += 400;
                                     }
                                     else if (s.install.BasicPrice == 150)
                                     {
                                         basicLevelThreeCount++;
                                         basicLevelThreePrice += 150;
-                                        installPriceTotal += 150;
+                                        installPriceStandard += 150;
                                     }
                                     else//其他级别的店铺安装费
                                     {
@@ -1018,9 +1865,240 @@ namespace WebApp.QuoteOrderManager
 
             labGenericLevelCount.Text = genericLevelCount.ToString();
             labGenericLevel.Text = genericLevelPrice.ToString();
-            labInstallPriceTotal.Text = installPriceTotal.ToString();
+            labInstallPriceTotal.Text = installPriceStandard.ToString();
 
+            #region 导入的安装费报价
+            if (importInstallQuoteList.Any())
+            {
+                decimal importInstallQuote = importInstallQuoteList.Sum(s => (s.InstallUnitPrice ?? 0) * (s.Quantity ?? 1));
+                popImportTotalPrice += importInstallQuote;
+                var oohquote1 = importInstallQuoteList.Where(s => s.InstallUnitPrice == 5000).FirstOrDefault();
+                decimal oohquote1Price = 0;
+                if (oohquote1 != null)
+                {
+                    labOOHLevel1QuoteCount.Text = (oohquote1.Quantity ?? 1).ToString();
+                    oohquote1Price = (oohquote1.Quantity ?? 1) * (oohquote1.InstallUnitPrice ?? 0);
+                    labOOHLevel1Quote.Text = oohquote1Price.ToString();
 
+                }
+                decimal d1 = oohquote1Price - oohLevelOnePrice;
+                string d1Str = d1.ToString();
+                if (d1 > 0)
+                {
+                    d1Str = "+" + d1;
+                }
+                labOOHLevel1QuoteDiff.Text = d1Str;
+
+                var oohquote2 = importInstallQuoteList.Where(s => s.InstallUnitPrice == 2700).FirstOrDefault();
+                decimal oohquote2Price = 0;
+                if (oohquote2 != null)
+                {
+                    labOOHLevel2QuoteCount.Text = (oohquote2.Quantity ?? 1).ToString();
+                    oohquote2Price = (oohquote2.Quantity ?? 1) * (oohquote2.InstallUnitPrice ?? 0);
+                    labOOHLevel2Quote.Text = oohquote2Price.ToString();
+
+                }
+                decimal d2 = oohquote2Price - oohLevelTwoPrice;
+                string d2Str = d2.ToString();
+                if (d2 > 0)
+                {
+                    d2Str = "+" + d2;
+                }
+                labOOHLevel2QuoteDiff.Text = d2Str;
+
+                var oohquote3 = importInstallQuoteList.Where(s => s.InstallUnitPrice == 1800).FirstOrDefault();
+                decimal oohquote3Price = 0;
+                if (oohquote3 != null)
+                {
+                    labOOHLevel3QuoteCount.Text = (oohquote3.Quantity ?? 1).ToString();
+                    oohquote3Price = (oohquote3.Quantity ?? 1) * (oohquote3.InstallUnitPrice ?? 0);
+                    labOOHLevel3Quote.Text = oohquote3Price.ToString();
+
+                }
+                decimal d3 = oohquote3Price - oohLevelThreePrice;
+                string d3Str = d3.ToString();
+                if (d3 > 0)
+                {
+                    d3Str = "+" + d3;
+                }
+                labOOHLevel3QuoteDiff.Text = d3Str;
+
+                var oohquote4 = importInstallQuoteList.Where(s => s.InstallUnitPrice == 600).FirstOrDefault();
+                decimal oohquote4Price = 0;
+                if (oohquote4 != null)
+                {
+                    labOOHLevel4QuoteCount.Text = (oohquote4.Quantity ?? 1).ToString();
+                    oohquote4Price = (oohquote4.Quantity ?? 1) * (oohquote4.InstallUnitPrice ?? 0);
+                    labOOHLevel4Quote.Text = oohquote4Price.ToString();
+
+                }
+                decimal d4 = oohquote4Price - oohLevelFourPrice;
+                string d4Str = d4.ToString();
+                if (d4 > 0)
+                {
+                    d4Str = "+" + d4;
+                }
+                labOOHLevel4QuoteDiff.Text = d4Str;
+
+                var wquote1 = importInstallQuoteList.Where(s => s.InstallUnitPrice == 1000).FirstOrDefault();
+                decimal wquote1Price = 0;
+                if (wquote1 != null)
+                {
+                    labWindowLevel1QuoteCount.Text = (wquote1.Quantity ?? 1).ToString();
+                    wquote1Price = (wquote1.Quantity ?? 1) * (wquote1.InstallUnitPrice ?? 0);
+                    labWindowLevel1Quote.Text = wquote1Price.ToString();
+
+                }
+                decimal d5 = wquote1Price - windowLevelOnePrice;
+                string d5Str = d5.ToString();
+                if (d5 > 0)
+                {
+                    d5Str = "+" + d5;
+                }
+                labWindowLevel1QuoteDiff.Text = d5Str;
+
+                var bquote1 = importInstallQuoteList.Where(s => s.InstallUnitPrice == 800).FirstOrDefault();
+                decimal bquote1Price = 0;
+                if (bquote1 != null)
+                {
+                    labBasicLevel1QuoteCount.Text = (bquote1.Quantity ?? 1).ToString();
+                    bquote1Price = (bquote1.Quantity ?? 1) * (bquote1.InstallUnitPrice ?? 0);
+                    labBasicLevel1Quote.Text = bquote1Price.ToString();
+
+                }
+                decimal d6 = bquote1Price - basicLevelOnePrice;
+                string d6Str = d6.ToString();
+                if (d6 > 0)
+                {
+                    d6Str = "+" + d6;
+                }
+                labBasicLevel1QuoteDiff.Text = d6Str;
+
+                var wquote2 = importInstallQuoteList.Where(s => s.InstallUnitPrice == 500 && s.MaterialSupport == "basic").FirstOrDefault();
+                decimal wquote2Price = 0;
+                if (wquote2 != null)
+                {
+                    labWindowLevel2QuoteCount.Text = (wquote2.Quantity ?? 1).ToString();
+                    wquote2Price = (wquote2.Quantity ?? 1) * (wquote2.InstallUnitPrice ?? 0);
+                    labWindowLevel2Quote.Text = wquote2Price.ToString();
+
+                }
+                decimal d7 = wquote2Price - windowLevelTwoPrice;
+                string d7Str = d7.ToString();
+                if (d7 > 0)
+                {
+                    d7Str = "+" + d7;
+                }
+                labWindowLevel2QuoteDiff.Text = d7Str;
+
+                var bquote2 = importInstallQuoteList.Where(s => s.InstallUnitPrice == 400).FirstOrDefault();
+                decimal bquote2Price = 0;
+                if (bquote2 != null)
+                {
+                    labBasicLevel2QuoteCount.Text = (bquote2.Quantity ?? 1).ToString();
+                    bquote2Price = (bquote2.Quantity ?? 1) * (bquote2.InstallUnitPrice ?? 0);
+                    labBasicLevel2Quote.Text = bquote2Price.ToString();
+
+                }
+                decimal d8 = bquote2Price - basicLevelTwoPrice;
+                string d8Str = d8.ToString();
+                if (d8 > 0)
+                {
+                    d8Str = "+" + d8;
+                }
+                labBasicLevel2QuoteDiff.Text = d8Str;
+
+                var wquote3 = importInstallQuoteList.Where(s => s.InstallUnitPrice == 200).FirstOrDefault();
+                decimal wquote3Price = 0;
+                if (wquote3 != null)
+                {
+                    labWindowLevel3QuoteCount.Text = (wquote3.Quantity ?? 1).ToString();
+                    wquote3Price = (wquote3.Quantity ?? 1) * (wquote3.InstallUnitPrice ?? 0);
+                    labWindowLevel3Quote.Text = wquote3Price.ToString();
+
+                }
+                decimal d9 = wquote3Price - windowLevelThreePrice;
+                string d9Str = d9.ToString();
+                if (d9 > 0)
+                {
+                    d9Str = "+" + d9;
+                }
+                labWindowLevel3QuoteDiff.Text = d9Str;
+
+                var bquote3 = importInstallQuoteList.Where(s => s.InstallUnitPrice == 150 && s.MaterialSupport == "basic").FirstOrDefault();
+                decimal bquote3Price = 0;
+                if (bquote3 != null)
+                {
+                    labBasicLevel3QuoteCount.Text = (bquote3.Quantity ?? 1).ToString();
+                    bquote3Price = (bquote3.Quantity ?? 1) * (bquote3.InstallUnitPrice ?? 0);
+                    labBasicLevel3Quote.Text = bquote3Price.ToString();
+
+                }
+                decimal d10 = bquote3Price - basicLevelThreePrice;
+                string d10Str = d10.ToString();
+                if (d10 > 0)
+                {
+                    d10Str = "+" + d10;
+                }
+                labBasicLevel3QuoteDiff.Text = d10Str;
+
+                var kwquote = importInstallQuoteList.Where(s => s.InstallUnitPrice == 500 && s.MaterialSupport == "others").FirstOrDefault();
+                decimal kwquotePrice = 0;
+                if (kwquote != null)
+                {
+                    labKidsWindowLevelQuoteCount.Text = (kwquote.Quantity ?? 1).ToString();
+                    kwquotePrice = (kwquote.Quantity ?? 1) * (kwquote.InstallUnitPrice ?? 0);
+                    labKidsWindowLevelQuote.Text = kwquotePrice.ToString();
+
+                }
+                decimal d11 = kwquotePrice - kidsWindowPrice;
+                string d11Str = d11.ToString();
+                if (d11 > 0)
+                {
+                    d11Str = "+" + d11;
+                }
+                labKidsWindowLevelQuoteDiff.Text = d11Str;
+
+                var kbquote = importInstallQuoteList.Where(s => s.InstallUnitPrice == 150 && s.MaterialSupport == "others").FirstOrDefault();
+                decimal kbquotePrice = 0;
+                if (kbquote != null)
+                {
+                    labKidsBasicLevelQuoteCount.Text = (kbquote.Quantity ?? 1).ToString();
+                    kbquotePrice = (kbquote.Quantity ?? 1) * (kbquote.InstallUnitPrice ?? 0);
+                    labKidsBasicLevelQuote.Text = kbquotePrice.ToString();
+
+                }
+                decimal d12 = kbquotePrice - kidsBasicPrice;
+                string d12Str = d12.ToString();
+                if (d12 > 0)
+                {
+                    d12Str = "+" + d12;
+                }
+                labKidsBasicLevelQuoteDiff.Text = d12Str;
+
+                var gquote = importInstallQuoteList.Where(s => s.InstallUnitPrice == 150 && s.MaterialSupport == "generic").FirstOrDefault();
+                decimal gquotePrice = 0;
+                if (gquote != null)
+                {
+                    labGenericLevelQuoteCount.Text = (gquote.Quantity ?? 1).ToString();
+                    gquotePrice = (gquote.Quantity ?? 1) * (gquote.InstallUnitPrice ?? 0);
+                    labGenericLevelQuote.Text = gquotePrice.ToString();
+
+                }
+                decimal d13 = gquotePrice - genericLevelPrice;
+                string d13Str = d13.ToString();
+                if (d13 > 0)
+                {
+                    d13Str = "+" + d13;
+                }
+                labGenericLevelQuoteDiff.Text = d13Str;
+
+                if (importInstallQuote > 0)
+                {
+                    labInstallPriceQuoteTotal.Text = importInstallQuote.ToString();
+                }
+            }
+            #endregion
 
 
 
@@ -1030,12 +2108,12 @@ namespace WebApp.QuoteOrderManager
             #endregion
             //快递费/物料费
             BindeExpressPrice(orderList);
-            hfQuoteTotalPrice.Value = Math.Round((popTotalPrice + installPriceTotal + expressTotalPrice), 2).ToString();
+            //hfQuoteTotalPrice.Value = Math.Round((popTotalPrice + installPriceTotal + expressTotalPrice), 2).ToString();
             //
             otherInstallPriceRepeater.DataSource = otherInstallPriceList.OrderByDescending(s => s.PriceType).ToList();
             otherInstallPriceRepeater.DataBind();
             OtherInstallPriceCombineCell();
-            SetTotalPrice();
+            //SetTotalPrice();
             if (InstallPriceQuoteModelList.Any())
             {
                 Session["InstallPriceQuoteModel"] = InstallPriceQuoteModelList;
@@ -1056,7 +2134,7 @@ namespace WebApp.QuoteOrderManager
                     int index = 0;
                     foreach (var ex in expressPriceList)
                     {
-                        if (ex.PriceType == "发货费" && ex.Price == (s.OrderPrice ?? 0))
+                        if (ex.PriceType == "快递费" && ex.Price == (s.OrderPrice ?? 0))
                         {
                             isExist = true;
                             break;
@@ -1072,7 +2150,8 @@ namespace WebApp.QuoteOrderManager
                         expressModel = new ExpressPriceClass();
                         expressModel.Count = 1;
                         expressModel.Price = (s.OrderPrice ?? 0);
-                        expressModel.PriceType = "发货费";
+                        expressModel.PriceType = OrderTypeEnum.快递费.ToString();
+                        expressModel.OrderType = OrderTypeEnum.快递费.ToString();
                         expressPriceList.Add(expressModel);
                     }
 
@@ -1095,7 +2174,7 @@ namespace WebApp.QuoteOrderManager
                             int index = 0;
                             foreach (var ex in expressPriceList)
                             {
-                                if (ex.PriceType == "发货费" && ex.Price == (s.ExpressPrice ?? 0))
+                                if (ex.PriceType == "快递费" && ex.Price == (s.ExpressPrice ?? 0))
                                 {
                                     isExist = true;
                                     break;
@@ -1111,7 +2190,8 @@ namespace WebApp.QuoteOrderManager
                                 expressModel = new ExpressPriceClass();
                                 expressModel.Count = 1;
                                 expressModel.Price = (s.ExpressPrice ?? 0);
-                                expressModel.PriceType = "发货费";
+                                expressModel.PriceType = OrderTypeEnum.快递费.ToString();
+                                expressModel.OrderType = OrderTypeEnum.快递费.ToString();
                                 expressPriceList.Add(expressModel);
                             }
                         });
@@ -1145,6 +2225,7 @@ namespace WebApp.QuoteOrderManager
                         expressModel.Count = 1;
                         expressModel.Price = (s.OrderPrice ?? 0);
                         expressModel.PriceType = s.Sheet;
+                        expressModel.OrderType = OrderTypeEnum.物料.ToString();
                         expressPriceList.Add(expressModel);
                     }
 
@@ -1153,6 +2234,42 @@ namespace WebApp.QuoteOrderManager
             expressPriceListRepeater.DataSource = expressPriceList;
             expressPriceListRepeater.DataBind();
         }
+
+
+        /// <summary>
+        /// 快递费和物料导入的实际报价
+        /// </summary>
+        void BindeExpressPriceImportQuote()
+        {
+            var quoteList = new ImportQuoteOrderBLL().GetList(s => s.ItemId == itemId && (s.OrderType == (int)OrderTypeEnum.快递费 || s.OrderType == (int)OrderTypeEnum.物料)).OrderBy(s => s.OrderType).ToList();
+            if (quoteList.Any())
+            {
+                List<ExpressPriceClass> expressPriceList = new List<ExpressPriceClass>();
+                ExpressPriceClass expressModel;
+                quoteList.ForEach(s =>
+                {
+                    expressModel = new ExpressPriceClass();
+                    expressModel.Count = s.Quantity ?? 1;
+                    expressModel.OrderType = CommonMethod.GeEnumName<OrderTypeEnum>(s.OrderType.ToString());
+                    expressModel.PriceType = s.Sheet;
+                    if (s.OrderType == (int)OrderTypeEnum.快递费)
+                    {
+                        expressModel.Price = s.ExpressUnitPrice ?? 0;
+
+                    }
+                    else
+                    {
+                        expressModel.Price = s.UnitPrice ?? 0;
+                    }
+                    expressPriceList.Add(expressModel);
+                });
+                popImportTotalPrice += expressPriceList.Sum(s => s.Count * s.Price);
+                expressPriceListRepeater1.DataSource = expressPriceList;
+                expressPriceListRepeater1.DataBind();
+                Panel_QuoteExpress.Visible = true;
+            }
+        }
+
 
         protected void expressPriceListRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
@@ -1173,6 +2290,14 @@ namespace WebApp.QuoteOrderManager
             }
         }
 
+        decimal popImportTotalPrice = 0;
+        decimal popImportTotalArea = 0;
+        decimal addRateTotalPrie = 0;
+        decimal otherQuoteTotalPrice = 0;
+
+        List<ImportQuoteOrder> importPOPQuoteList = new List<ImportQuoteOrder>();
+        List<QuoteOrderDetail> quoteOrderDetailList = new List<QuoteOrderDetail>();
+        List<QuoteDifferenceDetail> differenceDetailList = new List<QuoteDifferenceDetail>();
         protected void popList_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
             if (e.Item.ItemIndex != -1)
@@ -1182,13 +2307,165 @@ namespace WebApp.QuoteOrderManager
                 {
                     popTotalPrice += model.TotalPrice;
                     popTotalArea += model.Amount;
+
+
+                    //导入的报价
+                    if (!importPOPQuoteList.Any())
+                    {
+                        importPOPQuoteList =new ImportQuoteOrderBLL().GetList(s => s.ItemId == itemId && s.OrderType == (int)OrderTypeEnum.POP);
+                    }
+                    if (importPOPQuoteList.Any())
+                    {
+                        string sheet = StringHelper.ReplaceSpace(model.Sheet).ToLower();
+                        decimal importArea = importPOPQuoteList.Where(s => s.Sheet == sheet).Sum(s => s.POPArea ?? 0);
+                        decimal importPrice = importPOPQuoteList.Where(s => s.Sheet == sheet).Sum(s => s.POPPrice ?? 0);
+                        ((Label)e.Item.FindControl("labImportArea")).Text = Math.Round(importArea, 2).ToString();
+                        ((Label)e.Item.FindControl("labImportPrice")).Text = Math.Round(importPrice, 2).ToString();
+                        decimal differenceP = Math.Round((importPrice - model.TotalPrice), 2);
+                        string differencePStr = differenceP.ToString();
+                        if (differenceP > 0)
+                        {
+                            differencePStr = "+" + differenceP;
+                        }
+
+                        ((Label)e.Item.FindControl("labDifference")).Text = differencePStr;
+                        popImportTotalArea += importArea;
+                        popImportTotalPrice += importPrice;
+                    }
+
+                    if (!quoteOrderDetailList.Any())
+                    {
+                        quoteOrderDetailList = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && subjectIdList.Contains(s.SubjectId ?? 0) && (s.OrderType == (int)OrderTypeEnum.POP || s.OrderType == (int)OrderTypeEnum.道具) && s.Sheet != null);
+
+                    }
+                    var orderList = quoteOrderDetailList.Where(s => s.Sheet.ToLower() == model.PositionDescription.ToLower()).ToList();
+                    if (subjectIdList.Any())
+                    {
+                        orderList = orderList.Where(s => subjectIdList.Contains(s.SubjectId ?? 0)).ToList();
+                    }
+                    if (itemId > 0)
+                    {
+                        orderList = orderList.Where(s => (s.QuoteItemId ?? 0) == 0 || s.QuoteItemId == itemId).ToList();
+                    }
+                    else
+                    {
+                        orderList = orderList.Where(s => (s.QuoteItemId ?? 0) == 0).ToList();
+                    }
+                    if (orderList.Any())
+                    {
+                        decimal price = orderList.Sum(s => ((s.AutoAddTotalPrice ?? 0) - (s.DefaultTotalPrice ?? 0)));
+                        decimal rate = orderList[0].AddSizeRate ?? 0;
+                        Label labAddRate = (Label)e.Item.FindControl("labAddRate");
+                        labAddRate.Text = rate.ToString();
+                        string priceStr = "0";
+                        if (price > 0)
+                        {
+                            addRateTotalPrie += price;
+                            priceStr = "+" + Math.Round(price, 2);
+                            Label labAddRatePrice = (Label)e.Item.FindControl("labAddRatePrice");
+                            labAddRatePrice.Text = priceStr;
+                            labAddRatePrice.ForeColor = System.Drawing.Color.BlueViolet;
+                            labAddRate.ForeColor = System.Drawing.Color.BlueViolet;
+                        }
+
+                    }
+
+                    if (!differenceDetailList.Any())
+                    {
+                        differenceDetailList = new QuoteDifferenceDetailBLL().GetList(s => s.QuoteItemId == itemId);
+                    }
+                    if (differenceDetailList.Any())
+                    {
+                        var diffList = differenceDetailList.Where(s => s.Sheet.ToLower() == model.PositionDescription.ToLower()).ToList();
+                        if (diffList.Any())
+                        {
+                            //StringBuilder tr = new StringBuilder();
+
+                            HtmlTable AddExtendPOPPriceTable = (HtmlTable)e.Item.FindControl("AddExtendPOPPriceTable");
+                            HtmlTableRow headrow = new HtmlTableRow();
+                            headrow.Attributes.Add("class","tr_hui");
+                            headrow.Style.Add("font-weight", "bold");
+                            HtmlTableCell cell0 = new HtmlTableCell();
+                            cell0.InnerHtml = "类型";
+                            headrow.Cells.Add(cell0);
+                            cell0 = new HtmlTableCell();
+                            cell0.InnerHtml = "折算材质";
+                            headrow.Cells.Add(cell0);
+                            cell0 = new HtmlTableCell();
+                            cell0.InnerHtml = "面积㎡";
+                            headrow.Cells.Add(cell0);
+                            cell0 = new HtmlTableCell();
+                            cell0.InnerHtml = "金额";
+                            headrow.Cells.Add(cell0);
+                            cell0 = new HtmlTableCell();
+                            cell0.InnerHtml = "备注";
+                            headrow.Cells.Add(cell0);
+                            AddExtendPOPPriceTable.Rows.Add(headrow);
+                            decimal totalPrice = 0;
+                            diffList.ForEach(s =>
+                            {
+
+                                HtmlTableRow row = new HtmlTableRow();
+                               
+                                HtmlTableCell cell = new HtmlTableCell();
+                                cell.InnerHtml = s.AddPriceType;
+                                row.Cells.Add(cell);
+
+                                cell = new HtmlTableCell();
+                                cell.InnerHtml = s.MaterialName;
+                                row.Cells.Add(cell);
+
+                                cell = new HtmlTableCell();
+                                cell.InnerHtml =(s.AddArea??0).ToString();
+                                row.Cells.Add(cell);
+
+                                cell = new HtmlTableCell();
+                                decimal price=(s.AddArea ?? 0) * (s.MaterialUnitPrice ?? 0);
+                                cell.InnerHtml = Math.Round(price, 2).ToString();
+                                row.Cells.Add(cell);
+
+                                cell = new HtmlTableCell();
+                                cell.InnerHtml = s.Remark;
+                                row.Cells.Add(cell);
+
+                                
+                                row.Cells.Add(cell);
+                                AddExtendPOPPriceTable.Rows.Add(row);
+                                totalPrice += price;
+                                
+                            });
+                            HtmlTableRow row1 = new HtmlTableRow();
+                            HtmlTableCell cell1 = new HtmlTableCell();
+                            cell1.ColSpan = 3;
+                            cell1.InnerHtml = "合计：";
+                            cell1.Style.Add("text-align", "right");
+                            row1.Cells.Add(cell1);
+
+                            cell1 = new HtmlTableCell();
+                            cell1.InnerHtml = Math.Round(totalPrice, 2).ToString();
+                            cell1.Style.Add("color", "green");
+                            row1.Cells.Add(cell1);
+
+                            cell1 = new HtmlTableCell();
+                            cell1.InnerHtml = "";
+                            row1.Cells.Add(cell1);
+                            AddExtendPOPPriceTable.Rows.Add(row1);
+
+                            otherQuoteTotalPrice += totalPrice;
+                        }
+                    }
                 }
             }
             if (e.Item.ItemType == ListItemType.Footer)
             {
                 ((Label)e.Item.FindControl("labPOPTotalArea")).Text = Math.Round(popTotalArea, 2).ToString();
                 ((Label)e.Item.FindControl("labPOPTotalPrice")).Text = Math.Round(popTotalPrice, 2).ToString();
-                hfQuoteTotalArea.Value = popTotalArea.ToString();
+                ((Label)e.Item.FindControl("labAddRateTotalPrice")).Text = Math.Round(addRateTotalPrie, 2).ToString();
+
+                ((Label)e.Item.FindControl("labPOPImportTotalArea")).Text = Math.Round(popImportTotalArea, 2).ToString();
+                ((Label)e.Item.FindControl("labPOPImportTotalPrice")).Text = Math.Round(popImportTotalPrice, 2).ToString();
+
+                ((Label)e.Item.FindControl("labOtherQuoteTotalPrice")).Text = Math.Round(otherQuoteTotalPrice, 2).ToString();
             }
         }
 
@@ -1232,8 +2509,8 @@ namespace WebApp.QuoteOrderManager
 
         void SetTotalPrice()
         {
-            labQuoteTotalPrice.Text = Math.Round((popTotalPrice + installPriceTotal + expressTotalPrice + specialTotal), 2).ToString();
-            hfQuoteTotalPrice1.Value = Math.Round((popTotalPrice + installPriceTotal + expressTotalPrice + specialTotal), 2).ToString();
+            labSystemTotalPrice.Text = Math.Round((popTotalPrice + installPriceTotal + expressTotalPrice), 2).ToString();
+            labQuoteTotalPrice.Text = Math.Round(popImportTotalPrice, 2).ToString();
         }
 
         protected void otherInstallPriceRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
@@ -1249,14 +2526,43 @@ namespace WebApp.QuoteOrderManager
 
                     Panel panelOOH = (Panel)e.Item.FindControl("PanelOOH");
                     Panel panelBasic = (Panel)e.Item.FindControl("PanelBasic");
+                    Panel panelPOP = (Panel)e.Item.FindControl("PanelPOP");
+
+
                     if (item.PriceType == "户外安装费")
                     {
+                        decimal popSubTotal = 0;
+                        int installSubTotal = 0;
+                        //pop报价
+                        var popQuoteList = specialPriceQuoteDetailList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.POP && s.PriceType == (int)QuoteInstallPriceChangeTypeEnum.OOH).ToList();
+                        if (popQuoteList.Any())
+                        {
+                            
+                            StringBuilder popQuoteTable = new StringBuilder();
+                            popQuoteTable.Append("<table style='color:blue;margin-left:40px;'>");
+                            popQuoteList.ForEach(s =>
+                            {
+                                popQuoteTable.Append("<tr>");
+                                popQuoteTable.AppendFormat("<td style='padding:0px 5px;'>{0}</td>", s.Sheet);
+                                popQuoteTable.AppendFormat("<td style='padding:0px 5px;'>{0}</td>", s.GraphicMaterial);
+                                popQuoteTable.AppendFormat("<td style='padding:0px 5px;'>{0}平米</td>", s.AddArea);
+                                popQuoteTable.AppendFormat("<td style='padding:0px 5px;'>{0}/平米</td>", s.GraphicMaterialUnitPrice);
+                                decimal popSubPrice = (s.AddArea ?? 0) * (s.GraphicMaterialUnitPrice ?? 0);
+                                popSubTotal += popSubPrice;
+                                popQuoteTable.AppendFormat("<td style='padding:0px 5px;'>金额：{0}</td>", Math.Round(popSubPrice, 2));
+                                popQuoteTable.Append("</tr>");
+                            });
+                            popQuoteTable.Append("</table>");
+                            ((Label)e.Item.FindControl("labPOPQuoteList")).Text = popQuoteTable.ToString();
+                            ((Label)e.Item.FindControl("labPOPTotal")).Text = Math.Round(popSubTotal, 2).ToString();
+                            panelPOP.Visible = true;
+                        }
                         panelBasic.Visible = false;
                         var specialPriceDetailList0 = specialPriceQuoteDetailList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.OOH).ToList();
                         if (specialPriceDetailList0.Any())
                         {
                             InstallPriceQuoteModel installQuoteModel;
-                            int total = 0;
+                            
                             Label labOOHPriceCount1 = (Label)e.Item.FindControl("labOOHPriceCount1");
                             Label labOOHPriceCount2 = (Label)e.Item.FindControl("labOOHPriceCount2");
                             Label labOOHPriceCount3 = (Label)e.Item.FindControl("labOOHPriceCount3");
@@ -1280,7 +2586,7 @@ namespace WebApp.QuoteOrderManager
                                 {
                                     labOOHPriceCount4.Text = (s.Quantity ?? 0).ToString();
                                 }
-                                total += (s.Quantity ?? 0) * (s.InstallPriceLevel??0);
+                                installSubTotal += (s.Quantity ?? 0) * (s.InstallPriceLevel ?? 0);
 
                                 if (oohIndex == 0)
                                 {
@@ -1336,23 +2642,52 @@ namespace WebApp.QuoteOrderManager
                             //    total += (level4.Quantity ?? 0) * 600;
                             //}
                             #endregion
-                            labOOHTotal.Text = total.ToString();
-                            if (oohIndex == 0)
-                            {
-                                specialTotal += total;
-                                oohIndex++;
-                            }
+                            labOOHTotal.Text = installSubTotal.ToString();
 
+                        }
+                        if (oohIndex == 0)
+                        {
+                            specialTotal += installSubTotal;
+                            specialTotal += popSubTotal;
+                            oohIndex++;
                         }
                     }
                     else
                     {
+                        decimal popSubTotal = 0;
+                        decimal installSubTotal = 0;
+                        //pop报价
+                        var popQuoteList = specialPriceQuoteDetailList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.POP && s.PriceType == (int)QuoteInstallPriceChangeTypeEnum.Basic).ToList();
+                        if (popQuoteList.Any())
+                        {
+                            
+                            StringBuilder popQuoteTable = new StringBuilder();
+                            popQuoteTable.Append("<table style='color:blue;margin-left:40px;'>");
+                            popQuoteList.ForEach(s =>
+                            {
+                                popQuoteTable.Append("<tr>");
+                                popQuoteTable.AppendFormat("<td style='padding:0px 5px;'>{0}</td>", s.Sheet);
+                                popQuoteTable.AppendFormat("<td style='padding:0px 5px;'>{0}</td>", s.GraphicMaterial);
+                                popQuoteTable.AppendFormat("<td style='padding:0px 5px;'>{0}平米</td>", s.AddArea);
+                                popQuoteTable.AppendFormat("<td style='padding:0px 5px;'>{0}/平米</td>", s.GraphicMaterialUnitPrice);
+                                decimal popSubPrice = (s.AddArea ?? 0) * (s.GraphicMaterialUnitPrice ?? 0);
+                                popSubTotal += popSubPrice;
+                                popQuoteTable.AppendFormat("<td style='padding:0px 5px;'>金额：{0}</td>", Math.Round(popSubPrice, 2));
+                                popQuoteTable.Append("</tr>");
+                            });
+                            popQuoteTable.Append("</table>");
+                            ((Label)e.Item.FindControl("labPOPQuoteList")).Text = popQuoteTable.ToString();
+                            ((Label)e.Item.FindControl("labPOPTotal")).Text = Math.Round(popSubTotal, 2).ToString();
+                            panelPOP.Visible = true;
+                        }
+
+
                         panelOOH.Visible = false;
                         var specialPriceDetailList0 = specialPriceQuoteDetailList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.Basic).ToList();
                         if (specialPriceDetailList0.Any())
                         {
                             InstallPriceQuoteModel installQuoteModel;
-                            int total = 0;
+                            
                             Label labBasicPriceCount1 = (Label)e.Item.FindControl("labBasicPriceCount1");
                             Label labBasicPriceCount2 = (Label)e.Item.FindControl("labBasicPriceCount2");
                             Label labBasicPriceCount3 = (Label)e.Item.FindControl("labBasicPriceCount3");
@@ -1360,7 +2695,7 @@ namespace WebApp.QuoteOrderManager
                             Label labBasicTotal = (Label)e.Item.FindControl("labBasicTotal");
 
                             specialPriceDetailList0.ForEach(s => {
-                                total += (s.Quantity ?? 0) * (s.InstallPriceLevel??0);
+                                installSubTotal += (s.Quantity ?? 0) * (s.InstallPriceLevel ?? 0);
                                 if (s.InstallPriceLevel == 800)
                                 {
                                     labBasicPriceCount1.Text = (s.Quantity ?? 0).ToString();
@@ -1419,20 +2754,21 @@ namespace WebApp.QuoteOrderManager
                             //    total += (level3.Quantity ?? 0) * 150;
                             //}
                             #endregion
-                            labBasicTotal.Text = total.ToString();
-                            if (basicIndex == 0)
-                            {
-                                specialTotal += total;
-                                basicIndex++;
-                            }
-
+                            labBasicTotal.Text = installSubTotal.ToString();
+                        }
+                        if (basicIndex == 0)
+                        {
+                            specialTotal += installSubTotal;
+                            specialTotal += popSubTotal;
+                            basicIndex++;
                         }
                     }
                 }
             }
         }
 
-        protected void btnExport_Click(object sender, EventArgs e)
+        /*
+        protected void btnExport_Click1(object sender, EventArgs e)
         {
             List<QuoteModel> quoteOrderList = new List<QuoteModel>();
             List<InstallPriceQuoteModel> installPriceQuoteList = new List<InstallPriceQuoteModel>();
@@ -1450,8 +2786,12 @@ namespace WebApp.QuoteOrderManager
                 string templateFileName = "报价模板";
                 string path = ConfigurationManager.AppSettings["ExportTemplate"];
                 path = path.Replace("fileName", templateFileName);
-                FileStream outFile = new FileStream(Server.MapPath(path), FileMode.Open, FileAccess.Read, FileShare.Read);
-                ExcelPackage package = new ExcelPackage(outFile);
+                string newFilePath = "/TemplateFile/new报价模板.xls";
+                FileInfo newFile = new FileInfo(Server.MapPath(newFilePath)); 
+                //FileStream outFile = new FileStream(Server.MapPath(path), FileMode.Open, FileAccess.Read, FileShare.Read);
+                FileInfo template = new FileInfo(Server.MapPath(path));
+                ExcelPackage package = new ExcelPackage(newFile, template);
+                var book = package.Workbook;
                 ExcelWorksheet sheet = package.Workbook.Worksheets[1];
 
                 string vvipShopCount = labVVIPShop.Text;
@@ -1460,18 +2800,55 @@ namespace WebApp.QuoteOrderManager
                 sheet.Cells[6, 6].Value = vvipShopCount;
                 sheet.Cells[8, 6].Value = normalShopCount;
                 int rowIndex = 13;
-                quoteOrderList.ForEach(s => {
-                    while (StringHelper.ReplaceSpace(sheet.Cells[rowIndex, 1].Text) != StringHelper.ReplaceSpace(s.Sheet))
+                string currSheet = string.Empty;
+                int rowCount = 0;
+                int addRowCount = 0;
+                
+                quoteOrderList.Take(10).ToList().ForEach(s => {
+                    if (rowIndex == 13)
                     {
-                        rowIndex++;
+                        currSheet = s.Sheet;
+                        int listCount = quoteOrderList.Where(q => q.Sheet == currSheet).Count();
+                        if (listCount > 3)
+                        {
+                            var newRow = sheet.Row(rowIndex);
+                            sheet.InsertRow(15, listCount - 3);
+
+                            addRowCount += (listCount - 3);
+                        }
                     }
+                    else
+                    {
+                        if (currSheet == s.Sheet)
+                        {
+                            rowCount++;
+                        }
+                        else
+                        {
+                            currSheet = s.Sheet;
+                            rowCount = 0;
+                            int listCount = quoteOrderList.Where(q => q.Sheet == currSheet).Count();
+                            if (listCount > 3)
+                            {
+                                
+                                sheet.InsertRow(rowIndex + 3, listCount - 3);
+                                addRowCount += (listCount - 3);
+                            }
+                        }
+                    }
+                    sheet.Cells[rowIndex, 1].Value = s.Sheet;
                     sheet.Cells[rowIndex, 2].Value = s.PositionDescription;
                     sheet.Cells[rowIndex, 3].Value = s.QuoteGraphicMaterial;
                     sheet.Cells[rowIndex, 5].Value = s.Amount;
+                    if (rowCount > 0)
+                    {
+                        sheet.Cells[rowIndex, 1].Value = "";
+                    }
                     rowIndex++;
                 });
                 if (installPriceQuoteList.Any())
                 {
+                    
                     var oohInstallList = installPriceQuoteList.Where(s => s.ChargeItem == "OOHInstall").ToList();
                     if (oohInstallList.Any())
                     {
@@ -1479,19 +2856,19 @@ namespace WebApp.QuoteOrderManager
                         {
                             if (s.UnitPrice == 5000)
                             {
-                                sheet.Cells[156, 7].Value = s.Amount.ToString();
+                                sheet.Cells[46 + addRowCount, 7].Value = s.Amount.ToString();
                             }
                             if (s.UnitPrice == 2700)
                             {
-                                sheet.Cells[157, 7].Value = s.Amount.ToString();
+                                sheet.Cells[47 + addRowCount, 7].Value = s.Amount.ToString();
                             }
                             if (s.UnitPrice == 1800)
                             {
-                                sheet.Cells[158, 7].Value = s.Amount.ToString();
+                                sheet.Cells[48 + addRowCount, 7].Value = s.Amount.ToString();
                             }
                             if (s.UnitPrice == 600)
                             {
-                                sheet.Cells[159, 7].Value = s.Amount.ToString();
+                                sheet.Cells[49 + addRowCount, 7].Value = s.Amount.ToString();
                             }
                         });
                     }
@@ -1500,11 +2877,11 @@ namespace WebApp.QuoteOrderManager
                     {
                         windowInstallList.ForEach(s => {
                             if (s.UnitPrice==1000)
-                                sheet.Cells[160, 7].Value = s.Amount.ToString();
+                                sheet.Cells[50 + addRowCount, 7].Value = s.Amount.ToString();
                             if (s.UnitPrice == 500)
-                                sheet.Cells[162, 7].Value = s.Amount.ToString();
+                                sheet.Cells[52 + addRowCount, 7].Value = s.Amount.ToString();
                             if (s.UnitPrice == 200)
-                                sheet.Cells[164, 7].Value = s.Amount.ToString();
+                                sheet.Cells[54 + addRowCount, 7].Value = s.Amount.ToString();
                         });
                     }
                     var basicInstallList = installPriceQuoteList.Where(s => s.ChargeItem == "BasicInstall").ToList();
@@ -1513,40 +2890,294 @@ namespace WebApp.QuoteOrderManager
                         basicInstallList.ForEach(s => {
                             if (s.ChargeType == "generic")
                             {
-                                sheet.Cells[168, 7].Value = s.Amount.ToString();
+                                sheet.Cells[58 + addRowCount, 7].Value = s.Amount.ToString();
                             }
                             else if (s.ChargeType == "kids")
                             {
                                 if (s.UnitPrice == 500)
-                                    sheet.Cells[166, 7].Value = s.Amount.ToString();
+                                    sheet.Cells[56 + addRowCount, 7].Value = s.Amount.ToString();
                                 if (s.UnitPrice == 150)
-                                    sheet.Cells[167, 7].Value = s.Amount.ToString();
+                                    sheet.Cells[57 + addRowCount, 7].Value = s.Amount.ToString();
                             }
                             else
                             {
                                 if (s.UnitPrice == 800)
-                                    sheet.Cells[161, 7].Value = s.Amount.ToString();
+                                    sheet.Cells[51 + addRowCount, 7].Value = s.Amount.ToString();
                                 if (s.UnitPrice == 400)
-                                    sheet.Cells[163, 7].Value = s.Amount.ToString();
+                                    sheet.Cells[53 + addRowCount, 7].Value = s.Amount.ToString();
                                 if (s.UnitPrice == 150)
-                                    sheet.Cells[165, 7].Value = s.Amount.ToString();
+                                    sheet.Cells[55 + addRowCount, 7].Value = s.Amount.ToString();
                             }
                         });
                     }
                 }
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    package.SaveAs(ms);
-                    ms.Flush();
-                    sheet = null;
-                    OperateFile.DownLoadFile(ms, fileName);
+                package.Save();
+                sheet = null;
+                OperateFile.DownLoadFile(newFilePath, fileName);
 
-                }
+                //using (MemoryStream ms = new MemoryStream())
+                //{
+                //    package.Save();
+                //    //package.SaveAs(ms);
+                //    ms.Flush();
+                //    sheet = null;
+                //    //OperateFile.DownLoadFile(ms, fileName);
+                //    OperateFile.DownLoadFile(newFilePath, fileName);
+                //}
             }
         }
 
 
+        protected void btnExport_Click2(object sender, EventArgs e)
+        { 
+            List<QuoteModel> quoteOrderList = new List<QuoteModel>();
+            List<InstallPriceQuoteModel> installPriceQuoteList = new List<InstallPriceQuoteModel>();
+            if (Session["QuoteModel"] != null)
+            {
+                quoteOrderList = Session["QuoteModel"] as List<QuoteModel>;
+            }
+            if (Session["InstallPriceQuoteModel"] != null)
+            {
+                installPriceQuoteList = Session["InstallPriceQuoteModel"] as List<InstallPriceQuoteModel>;
+            }
+            if (quoteOrderList.Any())
+            {
+                string templateFileName = "报价模板";
+                string path = ConfigurationManager.AppSettings["ExportTemplate"];
+                path = path.Replace("fileName", templateFileName);
+                FileStream outFile = new FileStream(Server.MapPath(path), FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+                IWorkbook workBook = WorkbookFactory.Create(outFile, ImportOption.All);
+                ISheet sheet = workBook.GetSheetAt(0);
+                int startRow = 12;
+                int oneSheetRowCount=0;
+                string currSheet = string.Empty;
+                
+                quoteOrderList.Take(10).ToList().ForEach(s =>
+                {
+                    if (startRow == 12)
+                    {
+                        currSheet = s.Sheet;
+                        //int listCount = quoteOrderList.Where(q => q.Sheet == currSheet).Count();
+                        //if (listCount > 3)
+                        //{
+                            //sheet.ShiftRows(14, listCount - 3 + 14, listCount - 3);
+                            //InsertRow(sheet, 14, listCount - 3, sourceRow);
+                        //}
+                        IRow sourceRow = sheet.GetRow(startRow);
+                        InsertRow(sheet, 13, 10, sourceRow);
+                        sourceRow.GetCell(7).SetCellFormula(string.Format("SUM(G{0}:G{1})", startRow + 1, startRow + 10));
+                    }
 
+                    IRow dataRow = sheet.GetRow(startRow);
+                    if (dataRow == null)
+                        dataRow = sheet.CreateRow(startRow);
+                    for (int i = 0; i < 20; i++)
+                    {
+                        ICell cell = dataRow.GetCell(i);
+                        if (cell == null)
+                            cell = dataRow.CreateCell(i);
+
+                    }
+                    if (startRow == 12)
+                       dataRow.GetCell(0).SetCellValue(currSheet);
+                    
+                    dataRow.GetCell(1).SetCellValue(s.PositionDescription);
+                    dataRow.GetCell(2).SetCellValue(s.QuoteGraphicMaterial);
+                    dataRow.GetCell(4).SetCellValue(double.Parse(s.Amount.ToString()));
+                    startRow++;
+                });
+                sheet.ForceFormulaRecalculation=true;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    workBook.Write(ms);
+                    ms.Flush();
+                    sheet = null;
+                    workBook = null;
+                    OperateFile.DownLoadFile(ms, "活动报价模板");
+
+                }
+            }
+        }
+        */
+
+        /// <summary>
+        /// 导出报价单（客服的报价单）
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void btnExport_Click(object sender, EventArgs e)
+        {
+            QuotationItem model = quotationBll.GetModel(itemId);
+            if (model != null)
+            {
+                string fileUrl = model.QuoteFileUrl;
+                if (!string.IsNullOrWhiteSpace(fileUrl))
+                {
+                    OperateFile.DownLoadFile(fileUrl,model.QuoteSubjectName+"报价单");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Excel复制行
+        /// </summary>
+        /// <param name="wb"></param>
+        /// <param name="sheet"></param>
+        /// <param name="starRow"></param>
+        /// <param name="rows"></param>
+        //private void insertRow(ISheet sheet, int starRow, int rows)
+        //{
+        //    /*
+        //     * ShiftRows(int startRow, int endRow, int n, bool copyRowHeight, bool resetOriginalRowHeight); 
+        //     * 
+        //     * startRow 开始行
+        //     * endRow 结束行
+        //     * n 移动行数
+        //     * copyRowHeight 复制的行是否高度在移
+        //     * resetOriginalRowHeight 是否设置为默认的原始行的高度
+        //     * 
+        //     */
+
+        //    sheet.ShiftRows(starRow + 1, starRow + rows, rows, true, true);
+
+        //    starRow = starRow - 1;
+
+        //    for (int i = 0; i < rows; i++)
+        //    {
+
+        //        HSSFRow sourceRow = null;
+        //        HSSFRow targetRow = null;
+        //        HSSFCell sourceCell = null;
+        //        HSSFCell targetCell = null;
+
+        //        short m;
+
+        //        starRow = starRow + 1;
+        //        sourceRow = (HSSFRow)sheet.GetRow(starRow);
+        //        targetRow = (HSSFRow)sheet.CreateRow(starRow + 1);
+        //        targetRow.HeightInPoints = sourceRow.HeightInPoints;
+
+        //        for (m = (short)sourceRow.FirstCellNum; m < sourceRow.LastCellNum; m++)
+        //        {
+
+        //            sourceCell = (HSSFCell)sourceRow.GetCell(m);
+        //            targetCell = (HSSFCell)targetRow.CreateCell(m);
+
+        //            //targetCell.Encoding = sourceCell.Encoding;
+        //            targetCell.CellStyle = sourceCell.CellStyle;
+        //            targetCell.SetCellType(sourceCell.CellType);
+
+        //        }
+        //    }
+
+        //}
+
+        //插入
+        /*
+        private void InsertRow(ISheet sheet, int insertRowIndex, int insertRowCount, IRow formatRow)
+        {
+            //sheet.ShiftRows(insertRowIndex, sheet.LastRowNum, insertRowCount, true, false);
+            for (int i = insertRowIndex; i < insertRowIndex + insertRowCount; i++)
+            {
+                IRow targetRow = null;
+                ICell sourceCell = null;
+                ICell targetCell = null;
+                targetRow = sheet.CreateRow(i);
+                for (int m = formatRow.FirstCellNum; m < 7; m++)
+                {
+                    sourceCell = formatRow.GetCell(m);
+                    if (sourceCell == null)
+                    {
+                        continue;
+                    }
+                    targetCell = targetRow.CreateCell(m);
+                    targetCell.CellStyle = sourceCell.CellStyle;
+                    targetCell.SetCellType(sourceCell.CellType);
+                    try
+                    {
+                        //if (m == 3)
+                        //{
+                        //    targetCell.SetCellFormula(string.Format("=IF(ISBLANK(C14),\"\",VLOOKUP(C14,X:Z,3,0))",i));
+                        //}
+                        //if (m == 5)
+                        //{
+                        //    targetCell.SetCellFormula(string.Format("=IF(ISBLANK(C14),,VLOOKUP(C14,X:Y,2,0))", i));
+                        //}
+                        //if (m == 6)
+                        //{
+                        //    targetCell.SetCellFormula(string.Format("=F14*E14", i));
+                        //}
+                    }
+                    catch { }
+                }
+            }
+
+            for (int i = insertRowIndex; i < insertRowIndex + insertRowCount; i++)
+            {
+                IRow firstTargetRow = sheet.GetRow(i);
+                ICell firstSourceCell = null;
+                ICell firstTargetCell = null;
+
+                for (int m = formatRow.FirstCellNum; m < 7; m++)
+                {
+                    firstSourceCell = formatRow.GetCell(m, MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    if (firstSourceCell == null)
+                    {
+                        continue;
+                    }
+                    firstTargetCell = firstTargetRow.GetCell(m, MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    firstTargetCell.CellStyle = firstSourceCell.CellStyle;
+                    firstTargetCell.SetCellType(firstSourceCell.CellType);
+                    try
+                    {
+                        if (m == 3)
+                        {
+                            
+                            firstTargetCell.SetCellFormula(string.Format("IF(ISBLANK(C{0}),\"\",VLOOKUP(C{0},X:Z,3,0))",i+1));
+                            
+                        }
+                        if (m == 5)
+                        {
+                            firstTargetCell.SetCellFormula(string.Format("IF(ISBLANK(C{0}),,VLOOKUP(C{0},X:Y,2,0))",i+1));
+                        }
+                        if (m == 6)
+                        {
+                            firstTargetCell.SetCellFormula(string.Format("F{0}*E{0}",i+1));
+                        }
+                        if (m == 6)
+                        {
+                            firstTargetCell.SetCellFormula(string.Format("F{0}*E{0}", i + 1));
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+
+
+        }
+        */
+
+        decimal expressTotalPrice1 = 0;
+        protected void expressPriceListRepeater1_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+            if (e.Item.ItemIndex != -1)
+            {
+                ExpressPriceClass item = e.Item.DataItem as ExpressPriceClass;
+                if (item != null)
+                {
+
+                    decimal subPrice = item.Count * item.Price;
+                    expressTotalPrice1 += subPrice;
+                    ((Label)e.Item.FindControl("labSubPrice1")).Text = subPrice.ToString();
+
+                }
+            }
+            if (e.Item.ItemType == ListItemType.Footer)
+            {
+                ((Label)e.Item.FindControl("labExpressPriceTotal1")).Text = expressTotalPrice1.ToString();
+            }
+        }
     }
 
 

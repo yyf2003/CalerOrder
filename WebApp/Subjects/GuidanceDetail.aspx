@@ -27,10 +27,6 @@
             活动指引明细
         </p>
     </div>
-    
-   
-
-
     <div>
         <table class="table">
             <tr class="tr_bai">
@@ -41,10 +37,10 @@
                     <asp:Label ID="labCustomerName" runat="server" Text=""></asp:Label>
                 </td>
                 <td style="width: 120px;">
-                   
+                    类型：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                  
+                  <asp:Label ID="labAddType" runat="server" Text=""></asp:Label>
                 </td>
             </tr>
             <tr class="tr_bai">
@@ -151,7 +147,7 @@
             </tr>
         </table>
         <div style="margin-top: 20px; height:30px;">
-            
+            <asp:HiddenField ID="hfAddType" runat="server" />
             <asp:Button ID="btnAddSubject" runat="server" Visible="false" Text="新增项目" class="layui-btn layui-btn-small"
             style="width: 65px; height:26px; float:right; margin-right:30px;" 
                 onclick="btnAddSubject_Click"/>

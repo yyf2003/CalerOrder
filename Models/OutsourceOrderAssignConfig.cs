@@ -26,5 +26,6 @@ namespace Models
         public string ProvinceId { get; set; }
         public string CityId { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
+        public Nullable<bool> IsFullMatch { get; set; }
     }
 }

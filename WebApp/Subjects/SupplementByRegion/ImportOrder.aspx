@@ -127,7 +127,7 @@
     </asp:Panel>
     <asp:Panel ID="Panel2" runat="server" Visible="false">
        <div class="tab" style="margin-top: 10px;">
-            补单信息
+            订单信息
             <hr style="margin-top: 8px; margin-bottom: 5px; border: 1px solid; color: #000;" />
         </div>
         <div class="containerDiv1">

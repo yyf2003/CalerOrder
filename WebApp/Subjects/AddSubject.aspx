@@ -10,13 +10,10 @@
     <link href="../easyui1.4/themes/icon.css" rel="stylesheet" />
     <script src="../Scripts/jquery-1.7.2.js" type="text/javascript"></script>
     <script src="../easyui1.4/jquery.easyui.min.js"></script>
+    <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" /> 
+    <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script> 
     <script src="../My97DatePicker/WdatePicker.js" type="text/javascript"></script>
-    <style type="text/css">
-        .style1
-        {
-            width: 300px;
-        }
-    </style>
+    
 </head>
 <body>
     <form id="form1" runat="server">
@@ -34,61 +31,95 @@
         <ContentTemplate>
             <table class="table">
                 <tr class="tr_bai">
+                  <td>
+                    新增类型：
+                  </td>
+                  <td colspan="3" style="text-align: left; padding-left: 5px;">
+                      <asp:RadioButtonList ID="rblSubjectItemType" runat="server" 
+                          RepeatDirection="Horizontal" RepeatLayout="Flow" AutoPostBack="true" 
+                          onselectedindexchanged="rblSubjectItemType_SelectedIndexChanged">
+                      </asp:RadioButtonList>
+                      <span style="color:Blue;">(提示：如果是特殊活动要选‘上海增补’)</span>
+                  </td>
+                </tr>
+                <tr class="tr_bai">
                     <td>
                         所属客户：
                     </td>
-                    <td style="text-align: left; padding-left: 5px;">
+                    <td colspan="3" style="text-align: left; padding-left: 5px;">
                         <asp:DropDownList ID="ddlCustomer" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlCustomer_SelectedIndexChanged">
                         </asp:DropDownList>
                         <span style="color: Red;">*</span>
                     </td>
-                    <td style="width: 120px;">
-                        订单类型：
-                    </td>
-                    <td style="text-align: left; padding-left: 5px;">
-                        <asp:RadioButtonList ID="rblSubjectType" runat="server" 
+                    
+                </tr>
+                <tr class="tr_bai">
+                 <td>
+                    订单类型：
+                  </td>
+                  <td colspan="3" style="text-align: left; padding-left: 5px;">
+                     <asp:RadioButtonList ID="rblSubjectType" runat="server" 
                             RepeatDirection="Horizontal" AutoPostBack="true"
                             RepeatLayout="Flow" 
                             onselectedindexchanged="rblSubjectType_SelectedIndexChanged">
                         </asp:RadioButtonList>
-                    </td>
+                  </td>
                 </tr>
                 <tr class="tr_bai">
                     <td style="width: 120px;">
                         活动名称：
                     </td>
-                    <td style="text-align: left; padding-left: 5px; width: 300px;">
+                    <td colspan="3" style="text-align: left; padding-left: 5px; width: 300px;">
                         <asp:DropDownList ID="ddlGuidance" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlGuidance_SelectedIndexChanged">
                             <asp:ListItem Value="0">请选择</asp:ListItem>
                         </asp:DropDownList>
                         <span style="color: Red;">*</span>
                     </td>
-                    <td style="width: 120px;">
-                        项目名称：
+                    <%--<td style="width: 120px;">
+                        ：
                     </td>
                     <td style="text-align: left; padding-left: 5px;">
-                        <%--<asp:TextBox ID="txtOutName" runat="server" MaxLength="50" ></asp:TextBox>--%>
-                        <asp:TextBox ID="txtSubjectName" runat="server" MaxLength="50" Style="width: 200px;"></asp:TextBox>
+                       
+                    </td>--%>
+                </tr>
+                <tr class="tr_bai" id="supplementSubjectListTr" runat="server">
+                  <td>
+                    增补项目：
+                  </td>
+                  <td colspan="3" style="text-align: left; padding-left: 5px;">
+                     <asp:DropDownList ID="ddlSupplementSubjectList" runat="server" 
+                          AutoPostBack="true" 
+                          onselectedindexchanged="ddlSupplementSubjectList_SelectedIndexChanged">
+                            <asp:ListItem Value="0">--请选择项目--</asp:ListItem>
+                        </asp:DropDownList>
+                  </td>
+                </tr>
+                <tr class="tr_bai">
+                 <td>
+                    项目名称：
+                  </td>
+                  <td colspan="3" style="text-align: left; padding-left: 5px;">
+                     <asp:TextBox ID="txtSubjectName" runat="server" MaxLength="50" Style="width: 350px;"></asp:TextBox>
                         <asp:DropDownList ID="ddlSubjectName" runat="server" Visible="false">
                             <asp:ListItem Value="0">--请选择项目--</asp:ListItem>
                         </asp:DropDownList>
                         <span style="color: Red;">*</span>
                         <asp:Label ID="labMsg" runat="server" Text="" Style="color: Red;"></asp:Label>
-                    </td>
+                  </td>
                 </tr>
                 <tr class="tr_bai">
                     <td>
                         开始时间：
                     </td>
                     <td style="text-align: left; padding-left: 5px;">
-                        <asp:TextBox ID="txtBeginDate" runat="server" onclick="WdatePicker()" MaxLength="20"></asp:TextBox>
+                        <asp:TextBox ID="txtBeginDate" runat="server" autocomplete="off" onclick="WdatePicker()" MaxLength="20"></asp:TextBox>
                         <span style="color: Red;">*</span>
                     </td>
                     <td style="width: 120px;">
                         结束时间：
                     </td>
                     <td style="text-align: left; padding-left: 5px;">
-                        <asp:TextBox ID="txtEndDate" runat="server" onclick="WdatePicker()" MaxLength="20"></asp:TextBox>
+                        <asp:TextBox ID="txtEndDate" runat="server" autocomplete="off" onclick="WdatePicker()" MaxLength="20"></asp:TextBox>
                         <span style="color: Red;">*</span>
                     </td>
                 </tr>
@@ -154,7 +185,7 @@
                         备注：
                     </td>
                     <td colspan="3" style="text-align: left; padding-left: 5px;">
-                        <asp:TextBox ID="txtRemark" runat="server" Style="width: 280px;"></asp:TextBox>
+                        <asp:TextBox ID="txtRemark" runat="server" Style="width: 350px;"></asp:TextBox>
                     </td>
                 </tr>
             </table>
@@ -186,6 +217,3 @@
 </body>
 </html>
 <script src="js/addSubject.js" type="text/javascript"></script>
-<script type="text/javascript">
-  
-</script>

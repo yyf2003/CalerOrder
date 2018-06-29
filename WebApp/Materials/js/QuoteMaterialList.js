@@ -3,7 +3,7 @@ var pageSize = 15;
 var currCustomerId = 0;
 var currBasicMaterialId = 0;
 var currCustomerMaterialId = 0;
-
+var isAdd = 0;
 
 $(function () {
     CheckPrimission(url, null, $("#btnAdd"), $("#btnEdit"), $("#btnDelete"), null, $("#separator1"));
@@ -19,6 +19,7 @@ $(function () {
         CleanVal();
         Material.bindCustomer();
         Material.bindBasicCategory();
+        isAdd = 1;
         $("#editMaterialDiv").show().dialog({
             modal: true,
             width: 480,
@@ -47,6 +48,7 @@ $(function () {
 
     $("#btnEdit").click(function () {
         CleanVal();
+        isAdd = 0;
         var row = $("#tbQuoteMaterial").datagrid("getSelected");
         if (row == null) {
             alert("请选择要编辑的行");
@@ -103,9 +105,9 @@ $(function () {
     });
 
     $("#selCustomerMaterial").on("change", function () {
-        var unit = $("#selCustomerMaterial option:selected").data("unit") || 0;
-        var price = $("#selCustomerMaterial option:selected").data("price") || 0;
-        $("#labPrice").text(price);
+        var unit = $("#selCustomerMaterial option:selected").data("unitname") || 0;
+        //var price = $("#selCustomerMaterial option:selected").data("price") || 0;
+        //$("#labPrice").text(price);
         $("#labUnit").text(unit);
 
     })
@@ -115,7 +117,7 @@ $(function () {
     })
 
     $("#btnExport").click(function () {
-        
+
         $("#iframe1").attr("src", "ExportQuoteMaterial.aspx?customerId=" + currCustomerId);
     })
 })
@@ -202,13 +204,13 @@ var Material = {
     },
     bindCustomerMaterial: function () {
         document.getElementById("selCustomerMaterial").length = 1;
-        var customerId1 = $("#selCustomer").val();
-        customerId1 = customerId1 == 0 ? currCustomerId : customerId1;
+        //var customerId1 = $("#selCustomer").val();
+        //customerId1 = customerId1 == 0 ? currCustomerId : customerId1;
         var categoryId1 = $("#selCategory").val();
 
         $.ajax({
             type: "get",
-            url: "Handler/OrderMaterialMapping.ashx?type=getCustomerMaterial&customerId=" + customerId1 + "&categoryId=" + categoryId1,
+            url: "Handler/QuoteMaterialList.ashx?type=getBasicMaterial&categoryId=" + categoryId1 + "&customerId=" + currCustomerId + "&isAdd=" + isAdd,
             success: function (data) {
 
                 if (data != "") {
@@ -220,7 +222,7 @@ var Material = {
                             selected = "selected='selected'";
                             flag = true;
                         }
-                        var option = "<option value='" + json[i].Id + "' data-unit='" + json[i].Unit + "' data-price='" + json[i].Price + "' " + selected + ">" + json[i].CustomerMaterialName + "</option>";
+                        var option = "<option value='" + json[i].Id + "' data-unitname='" + json[i].UnitName + "' " + selected + ">" + json[i].BasicMaterialName + "</option>";
                         $("#selCustomerMaterial").append(option);
                     }
                     if (flag)
@@ -231,7 +233,7 @@ var Material = {
     },
     getMaterialList: function (pageIndex, pageSize) {
         var searchQuoteMaterialName = $("#txtSearchQuoteMaterialName").val();
-        
+
         $("#tbQuoteMaterial").datagrid({
             queryParams: { type: "getList", customerId: currCustomerId, currpage: pageIndex, pagesize: pageSize, searchQuoteMaterialName: searchQuoteMaterialName },
             method: 'get',
@@ -239,12 +241,12 @@ var Material = {
             columns: [[
                         { field: 'rowIndex', title: '序号' },
                         { field: 'CustomerName', title: '客户名称' },
-                        
+
                         { field: 'BasicCategoryName', title: '材质类型' },
                         { field: 'CustomerMaterialName', title: '客户材质名称' },
                         { field: 'QuoteMaterialName', title: '报价材质名称' },
-                        { field: 'Price', title: '价格' },
-                        { field: 'Unit', title: '单位' }
+            //{ field: 'Price', title: '价格' },
+                        {field: 'Unit', title: '单位' }
 
 
             ]],
@@ -280,7 +282,8 @@ var Material = {
 
         if (CheckVal()) {
             var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"QuoteMaterialName":"' + this.model.QuoteMaterialName + '","BasicCategoryId":' + this.model.BasicCategoryId + ',"CustomerMaterialId":' + this.model.CustomerMaterialId + '}';
-
+            //alert(escape(jsonStr));
+            //urlCodeStr(jsonStr)
             $.ajax({
                 type: "get",
                 url: "Handler/QuoteMaterialList.ashx",
@@ -370,10 +373,12 @@ function CleanVal() {
     $("#editMaterialDiv select").val("0");
     $("#editMaterialDiv span").html("");
     $("#editMaterialDiv input").val("");
+    document.getElementById("selCustomerMaterial").length = 1;
     
     currBasicMaterialId = 0;
     currCustomerMaterialId = 0;
-   
+
+    Material.model.Id = 0;
     Material.model.QuoteMaterialName = "";
     Material.model.CustomerId = 0;
     Material.model.BasicCategoryId = 0;

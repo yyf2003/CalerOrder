@@ -192,6 +192,7 @@ namespace WebApp.Subjects.ADOrders
                 model.Status = 4;//提交完成
                 model.ApproveState = 0;
                 model.SubmitUserId = CurrentUser.UserId;
+                model.SubmitDate = DateTime.Now;
                 subjectBll.Update(model);
                 string url = "/Subjects/SubjectList.aspx";
                 if (model.RegionOrderType == 2)

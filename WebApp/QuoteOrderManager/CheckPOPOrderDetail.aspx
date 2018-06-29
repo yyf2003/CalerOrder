@@ -27,15 +27,18 @@
                     订单导出
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:Button ID="btnExport" runat="server" Text="导 出"  
+                    <asp:Button ID="btnExport" runat="server" Text="导出原始订单"  
                         CssClass="layui-btn layui-btn-small" onclick="btnExport_Click"/>
+
+                        <asp:Button ID="btnExportNew" runat="server" Text="导出变更后订单" Visible="false" style=" margin-left:30px;"  
+                        CssClass="layui-btn layui-btn-small" onclick="btnExportNew_Click"/>
                 </td>
             </tr>
         </table>
         <div style=" width:100%; overflow:auto;">
         <asp:Repeater ID="CheckPOPOrderRepeater" runat="server">
             <HeaderTemplate>
-                <table class="table" style=" width:1600px;">
+                <table class="table" style=" width:1800px;">
                     <tr class="tr_hui">
                         <td>
                             序号
@@ -77,7 +80,10 @@
                             数量
                         </td>
                         <td>
-                            材质
+                            系统材质
+                        </td>
+                        <td>
+                            报价材质
                         </td>
                         <td>
                             单价
@@ -142,7 +148,11 @@
                         <%#Eval("order.Quantity")%>
                     </td>
                     <td>
-                        <%--材质--%>
+                        <%--系统材质--%>
+                        <%#Eval("order.GraphicMaterial")%>
+                    </td>
+                    <td>
+                        <%--报价材质--%>
                         <%#Eval("order.QuoteGraphicMaterial")%>
                     </td>
                     <td>
@@ -151,7 +161,7 @@
                     </td>
                     <td>
                         <%--金额--%>
-                        <%#Eval("order.TotalPrice")%>
+                        <%#Eval("order.DefaultTotalPrice") != null ? (Math.Round(decimal.Parse(Eval("order.DefaultTotalPrice").ToString()),2).ToString()) : ""%>
                     </td>
                     <td>
                         <%--备注--%>
@@ -163,7 +173,7 @@
                 <%if (CheckPOPOrderRepeater.Items.Count == 0)
                   { %>
                 <tr class="tr_bai">
-                    <td colspan="17" style="text-align: center;">
+                    <td colspan="18" style="text-align: center;">
                         --无数据--
                     </td>
                 </tr>

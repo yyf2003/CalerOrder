@@ -19,5 +19,7 @@ namespace Models
         public Nullable<int> ShopId { get; set; }
         public Nullable<decimal> ExpressPrice { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
+        public Nullable<int> QuoteItemId { get; set; }
+        public Nullable<bool> IsDelete { get; set; }
     }
 }

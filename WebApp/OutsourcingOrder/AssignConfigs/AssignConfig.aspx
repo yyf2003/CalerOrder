@@ -72,6 +72,10 @@
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:TextBox ID="txtMaterialName" runat="server" MaxLength="30"></asp:TextBox>
+                    &nbsp;
+                    <input type="checkbox" value="1" id="cbIsFullMatch"/>是否完全匹配
+                    <%--<asp:CheckBox ID="cbIsFullMatch" runat="server" />--%>
+                    <%--（提示：选择完全匹配：网格布≠网格布双喷绘，不选择完全匹配：网格布=网格布双喷绘）--%>
                 </td>
             </tr>
             <tr class="tr_bai">

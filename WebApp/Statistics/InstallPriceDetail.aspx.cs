@@ -139,7 +139,11 @@ namespace WebApp.Statistics
                 }
                 if (subjectIdList.Any())
                 {
-                    orderDetailList = orderDetailList.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
+                    orderDetailList = orderDetailList.Where(s => subjectIdList.Contains(s.subject.Id) || subjectIdList.Contains(s.subject.HandMakeSubjectId??0)).ToList();
+                }
+                else
+                {
+                    subjectIdList = orderDetailList.Select(s=>s.subject.Id).Distinct().ToList();
                 }
                 if (subjectChannel == 1)
                 {
@@ -210,6 +214,7 @@ namespace WebApp.Statistics
                                  && (guidance.ActivityTypeId != (int)GuidanceTypeEnum.Others)//不统计分区增补的安装费
                                  && (installShop.BasicPrice ?? 0) > 0
                                  && shopIdList.Contains(installShop.ShopId??0)
+                                 && subjectIdList.Contains(installShop.SubjectId??0)
                                  select new
                                  {
                                      installShop,

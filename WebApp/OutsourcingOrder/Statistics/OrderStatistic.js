@@ -3,7 +3,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
     var eleId = e.get_postBackElement().id;
     if (eleId.indexOf("ddlCustomer") != -1 || eleId.indexOf("txtGuidanceMonth") != -1 || eleId.indexOf("lbUp") != -1 || eleId.indexOf("lbDown") != -1) {
         $("#loadGuidance").show();
-
+        $("#loadPropGuidance").show();
     }
     if (eleId.indexOf("cblGuidanceList") != -1) {
         $("#loadCategory").show();
@@ -11,6 +11,13 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
         $("#loadOutsource").show();
 
     }
+
+    if (eleId.indexOf("cblPropGuidanceList") != -1) {
+        $("#loadPropSubject").show();
+
+
+    }
+
     if (eleId.indexOf("cblSubjectCategory") != -1) {
 
         $("#loadSubject").show();
@@ -33,20 +40,29 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
     if (eleId.indexOf("cblSubjects") != -1) {
         $("#loadOutsource").show();
     }
+    if (eleId.indexOf("cblOutsourceId") != -1) {
+        $("#loadMaterial").show();
+    }
     if (eleId.indexOf("cbAllGuidance") != -1) {
         $("#loadCategory").show();
         $("#loadSubject").show();
         $("#loadOutsource").show();
+    }
+    if (eleId.indexOf("cbAllPropGuidance") != -1) {
+        $("#loadPropSubject").show();
     }
 })
 
 
 Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
     $("#loadGuidance").hide();
+    $("#loadPropGuidance").hide();
     $("#loadCategory").hide();
     $("#loadProvince").hide();
     $("#loadCity").hide();
     $("#loadSubject").hide();
+    $("#loadPropSubject").hide();
+    $("#loadMaterial").hide();
     //$("#loadOutsource").hide();
     $("span[name='checkPOPOrderPrice']").click(function () {
 

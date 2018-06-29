@@ -20,13 +20,17 @@ namespace Models
         public Nullable<int> GuidanceMonth { get; set; }
         public string GuidanceId { get; set; }
         public string SubjectCategoryId { get; set; }
+        public string SubjectIds { get; set; }
+        public string QuoteSubjectName { get; set; }
+        public Nullable<int> QuoteSubjectId { get; set; }
+        public Nullable<int> QuoteSubjectCategoryId { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
         public Nullable<int> AddUserId { get; set; }
         public Nullable<decimal> TotalArea { get; set; }
         public Nullable<decimal> TotalPrice { get; set; }
         public Nullable<bool> IsDelete { get; set; }
-        public string SubjectIds { get; set; }
-        public string QuoteSubjectName { get; set; }
         public Nullable<decimal> AddRate { get; set; }
+        public Nullable<decimal> AddRatePrice { get; set; }
+        public string QuoteFileUrl { get; set; }
     }
 }

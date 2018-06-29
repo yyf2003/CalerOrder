@@ -381,18 +381,7 @@ var Order = {
 
 function GetOutsourceList() {
 
-    //    $.ajax({
-    //        type: 'get',
-    //        url: 'handler/OrderList.ashx?type=getOutsource',
-    //        success: function (data) {
-    //            if (data != "") {
-    //                var json = eval(data);
-
-    //                
-    //                
-    //            }
-    //        }
-    //    })
+ 
     $("#tbOutsource").datagrid({
         method: 'get',
         url: 'handler/OrderList.ashx?type=getOutsource',
@@ -580,7 +569,7 @@ $("#spanUp").click(function () {
         month1 = month1.replace(/-/g, "/");
         var date = new Date(month1);
         date.setMonth(date.getMonth() - 1);
-        $("#txtMonth").val(date.Format("yyyy-MM"));
+        $("#txtMonth").val(date.getFullYear() + "-" + (date.getMonth() + 1));
         GetGuidacneList();
     }
 
@@ -593,7 +582,7 @@ $("#spanDown").click(function () {
         month1 = month1.replace(/-/g, "/");
         var date = new Date(month1);
         date.setMonth(date.getMonth() + 1);
-        $("#txtMonth").val(date.Format("yyyy-MM"));
+        $("#txtMonth").val(date.getFullYear() + "-" + (date.getMonth() + 1));
         GetGuidacneList();
     }
 })
@@ -870,12 +859,21 @@ function changeOutsource() {
 
 function submitNewOutsource() {
     if (changeIds.length > 0) {
-        var newOutsourceId = $("#seleOutsource").val()||0;
+        var newOutsourceId = $("#seleOutsource").val() || 0;
+        var changeType = $("input[name$='rblChangeType']:checked").val() || 0;
+        if (newOutsourceId == 0) {
+            layer.msg("请选择外协");
+            return false;
+        }
+        if (changeType == 0) {
+            layer.msg("请选择更新类型");
+            return false;
+        }
         if (newOutsourceId > 0) {
             $.ajax({
                 type: "get",
                 url: "handler/OrderList.ashx",
-                data: { type: 'changeOutsource', orderId: changeIds, newOutsourceId: newOutsourceId },
+                data: { type: 'changeOutsource', orderId: changeIds, newOutsourceId: newOutsourceId,changeType:changeType },
                 success: function (data) {
                     if (data == "ok") {
                         Order.getOrderList(orderPageIndex, orderPageSize);

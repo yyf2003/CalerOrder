@@ -785,7 +785,7 @@ namespace WebApp.Subjects.ADOrders
                                     ds = new DataSet();
                                     da.Fill(ds);
                                     da.Dispose();
-                                    string sheetName1 = string.Empty;
+                                    //string sheetName1 = string.Empty;
                                     if (sheetName.ToLower() == "list$")
                                     {
                                         ImportTables tab = new ImportTables();
@@ -1492,7 +1492,7 @@ namespace WebApp.Subjects.ADOrders
                     string ChooseImg = string.Empty;
                     if (cols.Contains("选图"))
                         ChooseImg = StringHelper.ReplaceSpecialChar(dr["选图"].ToString().Trim());
-                    count = (count.IndexOf("无") != -1 || count.IndexOf("空") != -1) ? "0" : count;
+                    
 
                     int positionId = 0;
                     bool canSave = true;
@@ -1530,13 +1530,18 @@ namespace WebApp.Subjects.ADOrders
                         canSave = false;
                         msg.Append("性别 为空；");
                     }
+                    //count = (count.IndexOf("无") != -1 || count.IndexOf("空") != -1) ? "1" : count;
                     if (string.IsNullOrWhiteSpace(count) || !StringHelper.IsIntVal(count))
                     {
                        
                         msg.Append("数量填写不正确；系统自动改成1");
                         count = "1";
                     }
-
+                    if (StringHelper.IsInt(count)<1)
+                    {
+                        msg.Append("数量小于1；系统自动改成1");
+                        count = "1";
+                    }
                     bool IsHc = false;
                     bool IsShut = false;
                     Shop shopFromDB = null;
@@ -1714,7 +1719,8 @@ namespace WebApp.Subjects.ADOrders
                         popOrderModel.MaterialSupport = MaterialSupport1;
                         popOrderModel.POSScale = POSScale;
                         popOrderModel.ChooseImg = ChooseImg;
-                        popOrderModel.Quantity = int.Parse(count != "" ? count : "0");
+
+                        popOrderModel.Quantity = int.Parse(count != "" ? count : "1");
                         popOrderModel.GraphicLength = popFromDB.GraphicLength;
                         popOrderModel.GraphicMaterial = popFromDB.GraphicMaterial;
                         popOrderModel.GraphicWidth = popFromDB.GraphicWidth;
@@ -3713,18 +3719,21 @@ namespace WebApp.Subjects.ADOrders
                     }
                     if (string.IsNullOrWhiteSpace(num))
                     {
-                        canSave = false;
-                        msg.Append("数量 为空；");
+                        //canSave = false;
+                        msg.Append("数量 为空:已自动改成1；");
+                        num = "1";
                     }
                     else if (!StringHelper.IsIntVal(num))
                     {
-                        canSave = false;
-                        msg.Append("数量填写不正确；");
+                        //canSave = false;
+                        msg.Append("数量填写不正确:已自动改成1；");
+                        num = "1";
                     }
                     if (StringHelper.IsInt(num) == 0)
                     {
-                        canSave = false;
-                        msg.Append("数量必须大于1；");
+                        //canSave = false;
+                        msg.Append("数量必为0:已自动改成1；");
+                        num = "1";
                     }
 
                     if (string.IsNullOrWhiteSpace(width))

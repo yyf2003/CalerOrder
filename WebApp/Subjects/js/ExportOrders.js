@@ -28,7 +28,7 @@ $(function () {
             month1 = month1.replace(/-/g, "/");
             var date = new Date(month1);
             date.setMonth(date.getMonth() - 1);
-            $("#txtMonth").val(date.Format("yyyy-MM"));
+            $("#txtMonth").val(date.getFullYear() + "-" + (date.getMonth() + 1));
             GetGuidance1();
         }
 
@@ -41,7 +41,7 @@ $(function () {
             month1 = month1.replace(/-/g, "/");
             var date = new Date(month1);
             date.setMonth(date.getMonth() + 1);
-            $("#txtMonth").val(date.Format("yyyy-MM"));
+            $("#txtMonth").val(date.getFullYear() + "-" + (date.getMonth() + 1));
             GetGuidance1();
         }
     })

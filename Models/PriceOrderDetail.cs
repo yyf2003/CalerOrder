@@ -26,12 +26,12 @@ namespace Models
         public string Province { get; set; }
         public string City { get; set; }
         public string Address { get; set; }
+        public Nullable<int> Quantity { get; set; }
         public Nullable<decimal> Amount { get; set; }
         public Nullable<decimal> PayAmount { get; set; }
         public string Contents { get; set; }
         public string Remark { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
         public Nullable<int> ApproveState { get; set; }
-        public Nullable<int> Quantity { get; set; }
     }
 }

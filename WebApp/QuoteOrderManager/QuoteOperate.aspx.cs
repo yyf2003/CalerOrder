@@ -31,6 +31,8 @@ namespace WebApp.QuoteOrderManager
         {
             cblGuidanceList.Items.Clear();
             cblSubjectCategory.Items.Clear();
+            cblSubjectName.Items.Clear();
+            cbAllSubject.Checked = false;
             int customerId = int.Parse(ddlCustomer.SelectedValue);
             var list = (from guidance in CurrentContext.DbContext.SubjectGuidance
                         join subject in CurrentContext.DbContext.Subject
@@ -99,13 +101,14 @@ namespace WebApp.QuoteOrderManager
                     guidanceIdList.Add(int.Parse(li.Value));
                 }
             }
-            var orderList = (from order in CurrentContext.DbContext.OutsourceOrderDetail
+            var orderList = (from order in CurrentContext.DbContext.QuoteOrderDetail
                              join subject in CurrentContext.DbContext.Subject
                              on order.SubjectId equals subject.Id
                              join category1 in CurrentContext.DbContext.ADSubjectCategory
                              on subject.SubjectCategoryId equals category1.Id into categoryTemp
                              from category in categoryTemp.DefaultIfEmpty()
                              where guidanceIdList.Contains(order.GuidanceId??0)
+                             && (order.QuoteItemId??0)==0
                              select new
                              {
                                  order,
@@ -114,7 +117,7 @@ namespace WebApp.QuoteOrderManager
 
             if (orderList.Any())
             {
-                var categoryList = orderList.Select(s => s.category).Distinct().ToList();
+                var categoryList = orderList.Select(s => s.category).Distinct().OrderBy(s=>s.CategoryName).ToList();
 
                 bool isNull = false;
                 categoryList.ForEach(s =>
@@ -139,6 +142,7 @@ namespace WebApp.QuoteOrderManager
         void BindSubject()
         {
             cblSubjectName.Items.Clear();
+            cbAllSubject.Checked = false;
             List<int> guidanceIdList = new List<int>();
             foreach (ListItem li in cblGuidanceList.Items)
             {
@@ -155,15 +159,14 @@ namespace WebApp.QuoteOrderManager
                     subjectCategoryList.Add(int.Parse(li.Value));
                 }
             }
-            var orderList = (from order in CurrentContext.DbContext.OutsourceOrderDetail
-                             join subject in CurrentContext.DbContext.Subject
-                             on order.SubjectId equals subject.Id
-                             where guidanceIdList.Contains(order.GuidanceId ?? 0)
-                             select new
-                             {
-                                 order,
-                                 subject
-                             }).ToList();
+            //获取已提交报价的订单
+            List<int> quoteSubjectIdList = new List<int>();
+            var quoteOrderList = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId??0) && (s.QuoteItemId??0)>0);
+            if (quoteOrderList.Any())
+            {
+                quoteSubjectIdList = quoteOrderList.Select(s => s.SubjectId ?? 0).Distinct().ToList();
+            }
+            var subjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false) && ((s.HandMakeSubjectId ?? 0) == 0 && (s.SupplementRegion ?? "") == "") && !quoteSubjectIdList.Contains(s.Id));
             if (subjectCategoryList.Any())
             {
                 if (subjectCategoryList.Contains(0))
@@ -171,21 +174,21 @@ namespace WebApp.QuoteOrderManager
                     subjectCategoryList.Remove(0);
                     if (subjectCategoryList.Any())
                     {
-                        orderList = orderList.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0) || (s.subject.SubjectCategoryId == null || s.subject.SubjectCategoryId == 0)).ToList();
+                        subjectList = subjectList.Where(s => subjectCategoryList.Contains(s.SubjectCategoryId ?? 0) || (s.SubjectCategoryId == null || s.SubjectCategoryId == 0)).ToList();
                     }
                     else
-                        orderList = orderList.Where(s => s.subject.SubjectCategoryId == null || s.subject.SubjectCategoryId == 0).ToList();
+                        subjectList = subjectList.Where(s => s.SubjectCategoryId == null || s.SubjectCategoryId == 0).ToList();
                 }
                 else
-                    orderList = orderList.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0)).ToList();
+                    subjectList = subjectList.Where(s => subjectCategoryList.Contains(s.SubjectCategoryId ?? 0)).ToList();
             }
 
-            if (orderList.Any())
+            if (subjectList.Any())
             {
-                var subjectList = orderList.Select(s => s.subject).Distinct().ToList();
-                subjectList.ForEach(s => {
+                //var subjectList = orderList.Select(s => s.subject).Distinct().ToList();
+                subjectList.OrderBy(s=>s.SubjectName).ToList().ForEach(s => {
                     ListItem li = new ListItem();
-                    li.Text = s.SubjectName + "&nbsp;";
+                    li.Text = s.SubjectName + "&nbsp;&nbsp;&nbsp;";
                     li.Value = s.Id.ToString();
                     cblSubjectName.Items.Add(li);
                 });
@@ -285,7 +288,7 @@ namespace WebApp.QuoteOrderManager
                                 order.Id,
                                 order.CustomerId,
                                 order.GuidanceId,
-                                order.SubjectCategoryId,
+                                order.QuoteSubjectCategoryId,
                                 order.AddUserId,
                                 AddUserName= user.RealName
                             }
@@ -305,10 +308,15 @@ namespace WebApp.QuoteOrderManager
                 int id = int.Parse(e.CommandArgument.ToString());
                 new SpecialPriceQuoteDetailBLL().Delete(s=>s.ItemId==id);
                 new QuotationItemBLL().Delete(s=>s.Id==id);
+                new QuoteOrderDetailBLL().UpdateQuoteItemId("", "", id, "delete");
+                new ImportQuoteOrderBLL().Delete(s => s.ItemId == id);
+                BindSubjectCategory();
+                BindSubject();
                 GetQuoteList();
             }
         }
 
+        ImportQuoteOrderBLL importQuoteOrderBll = new ImportQuoteOrderBLL();
         protected void gvList_ItemDataBound(object sender, RepeaterItemEventArgs e)
         {
             if (e.Item.ItemIndex != -1)
@@ -317,9 +325,9 @@ namespace WebApp.QuoteOrderManager
                 if (item != null)
                 {
                     object guidanceIdObj = item.GetType().GetProperty("GuidanceId").GetValue(item, null);
-                    object subjectCategoryIdObj = item.GetType().GetProperty("SubjectCategoryId").GetValue(item, null);
+                    object subjectCategoryIdObj = item.GetType().GetProperty("QuoteSubjectCategoryId").GetValue(item, null);
                     string guidanceId = guidanceIdObj != null ? guidanceIdObj.ToString() : string.Empty;
-                    string subjectCategoryId = subjectCategoryIdObj != null ? subjectCategoryIdObj.ToString() : string.Empty;
+                    int subjectCategoryId = subjectCategoryIdObj != null ? int.Parse(subjectCategoryIdObj.ToString()) : 0;
 
 
 
@@ -333,17 +341,25 @@ namespace WebApp.QuoteOrderManager
                             ((Label)e.Item.FindControl("labGuidanceName")).Text = StringHelper.ListToString(guidanceNameList);
                         }
                     }
-                    if (!string.IsNullOrWhiteSpace(subjectCategoryId))
+                    if (subjectCategoryId > 0)
                     {
-                        object customerIdObj = item.GetType().GetProperty("CustomerId").GetValue(item, null);
-                        int customerId = customerIdObj != null ? int.Parse(customerIdObj.ToString()) : 0;
-                        List<int> subjectCategoryIdList = StringHelper.ToIntList(subjectCategoryId, ',');
-                        List<string> categoryNameList = subjectCategoryBll.GetList(s => s.CustomerId == customerId && subjectCategoryIdList.Contains(s.Id)).Select(s => s.CategoryName).ToList();
-                        if (categoryNameList.Any())
+                        ADSubjectCategory categoryModel = subjectCategoryBll.GetModel(subjectCategoryId);
+                        if (categoryModel != null)
                         {
-                            ((Label)e.Item.FindControl("labSubjectCategory")).Text = StringHelper.ListToString(categoryNameList);
+                            ((Label)e.Item.FindControl("labSubjectCategory")).Text = categoryModel.CategoryName;
                         }
                     }
+                    //if (!string.IsNullOrWhiteSpace(subjectCategoryId))
+                    //{
+                    //    object customerIdObj = item.GetType().GetProperty("CustomerId").GetValue(item, null);
+                    //    int customerId = customerIdObj != null ? int.Parse(customerIdObj.ToString()) : 0;
+                    //    List<int> subjectCategoryIdList = StringHelper.ToIntList(subjectCategoryId, ',');
+                    //    List<string> categoryNameList = subjectCategoryBll.GetList(s => s.CustomerId == customerId && subjectCategoryIdList.Contains(s.Id)).Select(s => s.CategoryName).ToList();
+                    //    if (categoryNameList.Any())
+                    //    {
+                    //        ((Label)e.Item.FindControl("labSubjectCategory")).Text = StringHelper.ListToString(categoryNameList);
+                    //    }
+                    //}
 
                     LinkButton lbDelete = (LinkButton)e.Item.FindControl("lbDelete");
                     LinkButton lbEdit = (LinkButton)e.Item.FindControl("lbEdit");
@@ -354,7 +370,26 @@ namespace WebApp.QuoteOrderManager
                     object itemIdObj = item.GetType().GetProperty("Id").GetValue(item, null);
                     int itemId = itemIdObj != null ? int.Parse(itemIdObj.ToString()) : 0;
 
+                    var importQuoteList = importQuoteOrderBll.GetList(s => s.ItemId == itemId);
+                    if (importQuoteList.Any())
+                    {
+                        var popList = importQuoteList.Where(s =>s.OrderType == (int)OrderTypeEnum.POP);
+                        decimal popPrice = popList.Sum(s => s.POPPrice ?? 0);
+                        decimal popArea = popList.Sum(s => s.POPArea ?? 0);
 
+                        var installList = importQuoteList.Where(s => s.OrderType == (int)OrderTypeEnum.安装费);
+                        decimal installPrice = installList.Sum(s => (s.InstallUnitPrice ?? 0) * (s.Quantity ?? 1));
+
+                        var expressList = importQuoteList.Where(s =>s.OrderType == (int)OrderTypeEnum.快递费).ToList();
+                        decimal expressPrice = expressList.Sum(s => (s.ExpressUnitPrice ?? 0) * (s.Quantity ?? 1));
+
+                        var materialList = importQuoteList.Where(s =>s.OrderType == (int)OrderTypeEnum.物料).ToList();
+                        decimal materialPrice = materialList.Sum(s => (s.UnitPrice ?? 0) * (s.Quantity ?? 1));
+
+                        ((Label)e.Item.FindControl("labTotalArea")).Text = popArea.ToString();
+                        ((Label)e.Item.FindControl("labTotalPrice")).Text = (popPrice + installPrice + expressPrice + materialPrice).ToString();
+
+                    }
                     if (addUserId == CurrentUser.UserId)
                     {
                         lbEdit.Enabled = true;
@@ -380,10 +415,20 @@ namespace WebApp.QuoteOrderManager
             }
         }
 
-        protected void btnRefresh_Click(object sender, EventArgs e)
+        protected void btnRefreshOrder_Click(object sender, EventArgs e)
         {
+            
             GetQuoteList();
         }
+
+
+        protected void btnRefreshGuidance_Click(object sender, EventArgs e)
+        {
+            BindSubjectCategory();
+            BindSubject();
+            GetQuoteList();
+        }
+
 
         protected void cblSubjectCategory_SelectedIndexChanged(object sender, EventArgs e)
         {

@@ -38,6 +38,12 @@ namespace WebApp.OutsourcingOrder.handler
             }
             switch (type)
             {
+                case "getProjectList":
+                    result = GetProjectList();
+                    break;
+                case "screenProject":
+                    result = SearchProjectList();
+                    break;
                 case "getRegion":
                     result = GetRegion();
                     break;
@@ -92,8 +98,220 @@ namespace WebApp.OutsourcingOrder.handler
             context.Response.Write(result);
         }
 
+        string GetProjectList()
+        {
+            string guidanceIds = string.Empty;
+            if (context1.Request.QueryString["guidanceIds"] != null)
+            {
+                guidanceIds = context1.Request.QueryString["guidanceIds"];
+            }
+            List<int> guidanceIdList = new List<int>();
+            if (!string.IsNullOrWhiteSpace(guidanceIds))
+                guidanceIdList = StringHelper.ToIntList(guidanceIds, ',');
+            string result = string.Empty;
+            StringBuilder subjectJsonStr = new StringBuilder();
+            StringBuilder subjectTypeJsonStr = new StringBuilder();
+            StringBuilder activityJsonStr = new StringBuilder();
 
-        string GetRegion()
+            List<string> regionList = new List<string>();
+            List<string> myRegion = new BasePage().GetResponsibleRegion;
+            if (myRegion.Any())
+            {
+                StringHelper.ToUpperOrLowerList(ref myRegion, LowerUpperEnum.ToLower);
+            }
+            List<FinalOrderDetailTemp> orderList = new FinalOrderDetailTempBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && s.OrderType != (int)OrderTypeEnum.物料 && !s.Sheet.Contains("光盘") && !s.PositionDescription.Contains("光盘"));
+
+            context1.Session["AssginOrderFinalOrderList"] = orderList;
+
+            List<int> subjectIdList = orderList.Select(s => s.SubjectId ?? 0).Distinct().ToList();
+            List<Subject> subjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && s.SubjectType != (int)SubjectTypeEnum.新开店安装费 && s.SubjectType != (int)SubjectTypeEnum.运费);
+            context1.Session["AssginOrderSubjctList"] = subjectList;
+            var subjectList0 = (from order in orderList
+                                join subject in subjectList
+                                on order.SubjectId equals subject.Id
+                                where subjectIdList.Contains(subject.Id)
+                                && (myRegion.Any() ? (subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(order.Region.ToLower())) : 1 == 1)
+                                select subject).Distinct().ToList();
+
+            var list = (from subject in subjectList0
+                        join subjectType1 in CurrentContext.DbContext.SubjectType
+                         on subject.SubjectTypeId equals subjectType1.Id into typeTemp
+                        join category1 in CurrentContext.DbContext.ADSubjectCategory
+                        on subject.SubjectCategoryId equals category1.Id into categoryTemp
+                        from subjectType in typeTemp.DefaultIfEmpty()
+                        from category in categoryTemp.DefaultIfEmpty()
+                        select new
+                        {
+                            subject.Id,
+                            subject.SubjectCategoryId,
+                            subject.SubjectName,
+                            subject.SubjectTypeId,
+                            subject.ActivityId,
+                            subject.Remark,
+                            subjectType.SubjectTypeName,
+                            category.CategoryName
+                        }).OrderBy(s => s.SubjectTypeId).ToList();
+            if (list.Any())
+            {
+
+
+                Dictionary<int, string> typeDic = new Dictionary<int, string>();
+                Dictionary<int, string> activityDic = new Dictionary<int, string>();
+                bool typeEmpty = false;
+                bool activityEmpty = false;
+                list.ForEach(s =>
+                {
+                    if ((s.SubjectTypeId ?? 0) == 0)
+                        typeEmpty = true;
+                    if ((s.SubjectCategoryId ?? 0) == 0)
+                        activityEmpty = true;
+                    if (!typeDic.Keys.Contains(s.SubjectTypeId ?? 0))
+                        typeDic.Add(s.SubjectTypeId ?? 0, s.SubjectTypeName);
+                    if (!activityDic.Keys.Contains(s.SubjectCategoryId ?? 0))
+                        activityDic.Add(s.SubjectCategoryId ?? 0, s.CategoryName);
+                    string subjectName = s.SubjectName;
+                    if (subjectName.Contains("补单") && !string.IsNullOrWhiteSpace(s.Remark))
+                        subjectName += "(" + s.Remark + ")";
+                    subjectJsonStr.Append("{\"Id\":\"" + s.Id + "\",\"SubjectName\":\"" + subjectName + "\"},");
+                });
+                foreach (KeyValuePair<int, string> item in typeDic)
+                {
+                    if (!string.IsNullOrWhiteSpace(item.Value))
+                        subjectTypeJsonStr.Append("{\"Id\":\"" + item.Key + "\",\"TypeName\":\"" + item.Value + "\"},");
+
+                }
+                if (typeEmpty)
+                {
+                    subjectTypeJsonStr.Append("{\"Id\":\"0\",\"TypeName\":\"空\"},");
+                }
+                foreach (KeyValuePair<int, string> item in activityDic)
+                {
+                    if (!string.IsNullOrWhiteSpace(item.Value))
+                        activityJsonStr.Append("{\"Id\":\"" + item.Key + "\",\"ActivityName\":\"" + item.Value + "\"},");
+                }
+                if (activityEmpty)
+                {
+                    activityJsonStr.Append("{\"Id\":\"0\",\"ActivityName\":\"空\"},");
+                }
+
+                //区域信息
+                StringBuilder regionJsonStr = new StringBuilder();
+
+                if (regionList.Any())
+                {
+                    bool isEmpty = false;
+                    regionList.Distinct().ToList().ForEach(s =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(s))
+                        {
+                            regionJsonStr.Append("{\"RegionName\":\"" + s + "\"},");
+                        }
+                        else
+                            isEmpty = true;
+                    });
+                    if (isEmpty)
+                        regionJsonStr.Append("{\"RegionName\":\"空\"},");
+                }
+
+
+                result = "[" + subjectJsonStr.ToString().TrimEnd(',') + "]" + "|[" + subjectTypeJsonStr.ToString().TrimEnd(',') + "]" + "|[" + activityJsonStr.ToString().TrimEnd(',') + "]|[" + regionJsonStr.ToString().TrimEnd(',') + "]";
+            }
+            return result;
+        }
+
+
+        string SearchProjectList()
+        {
+            string guidanceIds = string.Empty;
+            if (context1.Request.QueryString["guidanceIds"] != null)
+            {
+                guidanceIds = context1.Request.QueryString["guidanceIds"];
+            }
+            List<int> guidanceIdList = new List<int>();
+            //List<string> regionList = new List<string>();
+            List<int> activityList = new List<int>();
+            List<int> typeList = new List<int>();
+
+            if (!string.IsNullOrWhiteSpace(guidanceIds))
+                guidanceIdList = StringHelper.ToIntList(guidanceIds, ',');
+
+            string activityIds = string.Empty, typeIds = string.Empty;
+
+            //if (context1.Request.QueryString["region"] != null)
+            //{
+            //    regions = context1.Request.QueryString["region"];
+            //}
+            if (context1.Request.QueryString["activityId"] != null)
+            {
+                activityIds = context1.Request.QueryString["activityId"];
+            }
+            if (context1.Request.QueryString["typeId"] != null)
+            {
+                typeIds = context1.Request.QueryString["typeId"];
+            }
+
+            //if (!string.IsNullOrWhiteSpace(regions))
+            //{
+            //    regionList = StringHelper.ToStringList(regions, ',', LowerUpperEnum.ToLower);
+            //}
+            if (!string.IsNullOrWhiteSpace(activityIds))
+            {
+                activityList = StringHelper.ToIntList(activityIds, ',');
+            }
+            if (!string.IsNullOrWhiteSpace(typeIds))
+            {
+                typeList = StringHelper.ToIntList(typeIds, ',');
+            }
+
+            string result = string.Empty;
+
+
+
+            List<string> myRegion = new BasePage().GetResponsibleRegion;
+            if (myRegion.Any())
+            {
+                StringHelper.ToUpperOrLowerList(ref myRegion, LowerUpperEnum.ToLower);
+            }
+            List<FinalOrderDetailTemp> orderList = new FinalOrderDetailTempBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && s.OrderType != (int)OrderTypeEnum.物料 && !s.Sheet.Contains("光盘") && !s.PositionDescription.Contains("光盘"));
+            List<int> subjectIdList = orderList.Select(s => s.SubjectId ?? 0).Distinct().ToList();
+            List<Subject> subjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && s.SubjectType != (int)SubjectTypeEnum.新开店安装费 && s.SubjectType != (int)SubjectTypeEnum.运费);
+            var subjectList0 = (from order in orderList
+                                join subject in subjectList
+                                on order.SubjectId equals subject.Id
+                                where subjectIdList.Contains(subject.Id)
+                                && (myRegion.Any() ? (subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? (myRegion.Contains(subject.PriceBlongRegion.ToLower())) : (myRegion.Contains(order.Region.ToLower())) : 1 == 1)
+
+                                select subject).Distinct().OrderBy(s => s.SubjectName).ToList();
+            if (subjectList0.Any())
+            {
+                if (activityList.Any())
+                {
+                    subjectList0 = subjectList0.Where(s => activityList.Contains(s.SubjectCategoryId ?? 0)).ToList();
+
+                }
+                if (typeList.Any())
+                {
+                    subjectList0 = subjectList0.Where(s => typeList.Contains(s.SubjectTypeId ?? 0)).ToList();
+
+                }
+                if (subjectList0.Any())
+                {
+                    StringBuilder jsonStr = new StringBuilder();
+                    subjectList0.ForEach(s =>
+                    {
+                        string subjectName = s.SubjectName;
+                        if (subjectName.Contains("补单") && !string.IsNullOrWhiteSpace(s.Remark))
+                            subjectName += "(" + s.Remark + ")";
+                        jsonStr.Append("{\"Id\":\"" + s.Id + "\",\"SubjectName\":\"" + subjectName + "\"},");
+                    });
+                    result = "[" + jsonStr.ToString().TrimEnd(',') + "]";
+                }
+            }
+            return result;
+        }
+
+
+        string GetRegion_old()
         {
             context1.Session["orderAssign"] = null;
             context1.Session["shopAssign"] = null;
@@ -169,7 +387,61 @@ namespace WebApp.OutsourcingOrder.handler
             return "";
         }
 
-        string GetProvince()
+        string GetRegion()
+        {
+            List<string> myRegion = new BasePage().GetResponsibleRegion;
+            if (myRegion.Any())
+            {
+                StringHelper.ToUpperOrLowerList(ref myRegion, LowerUpperEnum.ToLower);
+            }
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            if (context1.Session["AssginOrderFinalOrderList"] != null)
+            {
+                orderList = context1.Session["AssginOrderFinalOrderList"] as List<FinalOrderDetailTemp>;
+            }
+           
+            string subjectIds = string.Empty;
+            List<int> subjectIdList = new List<int>();
+            if (context1.Request.Form["subjectIds"] != null)
+            {
+                subjectIds = context1.Request.Form["subjectIds"];
+                if (!string.IsNullOrWhiteSpace(subjectIds))
+                {
+                    subjectIdList = StringHelper.ToIntList(subjectIds, ',');
+                }
+            }
+            if (subjectIdList.Any())
+            {
+                orderList = orderList.Where(s => subjectIdList.Contains(s.SubjectId ?? 0)).ToList();
+            }
+            if (orderList.Any())
+            {
+                List<string> regionList = orderList.Select(s => s.Region ?? "").Distinct().OrderBy(s => s).ToList();
+                StringBuilder json = new StringBuilder();
+                bool isEmpty = false;
+                regionList.ForEach(s =>
+                {
+                    if (!string.IsNullOrWhiteSpace(s))
+                    {
+                        if (myRegion.Any())
+                        {
+                            if (myRegion.Contains(s.ToLower()))
+                                json.Append("{\"RegionName\":\"" + s + "\"},");
+                        }
+                        else
+                            json.Append("{\"RegionName\":\"" + s + "\"},");
+                    }
+                    else
+                        isEmpty = true;
+                });
+                if (isEmpty)
+                    json.Append("{\"RegionName\":\"空\"},");
+                return "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            return "";
+        }
+
+        string GetProvince_old()
         {
             string result = string.Empty;
             string regions = string.Empty;
@@ -234,7 +506,81 @@ namespace WebApp.OutsourcingOrder.handler
             return result;
         }
 
-        string GetCity()
+        string GetProvince() {
+            
+            List<int> subjectIdList = new List<int>();
+            if (context1.Request.Form["subjectIds"] != null)
+            {
+                string subjectIds = context1.Request.Form["subjectIds"];
+                if (!string.IsNullOrWhiteSpace(subjectIds))
+                {
+                    subjectIdList = StringHelper.ToIntList(subjectIds, ',');
+                }
+            }
+            List<string> regionList = new List<string>();
+            if (context1.Request.Form["region"] != null)
+            {
+                string regions = context1.Request.Form["region"];
+                if (!string.IsNullOrWhiteSpace(regions))
+                {
+                    regionList = StringHelper.ToStringList(regions, ',', LowerUpperEnum.ToLower);
+                }
+            }
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            if (context1.Session["AssginOrderFinalOrderList"] != null)
+            {
+                orderList = context1.Session["AssginOrderFinalOrderList"] as List<FinalOrderDetailTemp>;
+            }
+            if (subjectIdList.Any())
+            {
+                orderList = orderList.Where(s=>subjectIdList.Contains(s.SubjectId??0)).ToList();
+            }
+            if (regionList.Any())
+            {
+                
+                if (regionList.Contains("空"))
+                {
+                    regionList.Remove("空");
+                    if (regionList.Any())
+                    {
+                        orderList = orderList.Where(s => (s.Region != null && regionList.Contains(s.Region.ToLower())) || (s.Region == null || s.Region == "")).ToList();
+
+                    }
+                    else
+                    {
+                        orderList = orderList.Where(s => s.Region == null || s.Region == "").ToList();
+
+                    }
+                }
+                else
+                {
+                    orderList = orderList.Where(s => s.Region != null && regionList.Contains(s.Region.ToLower())).ToList();
+
+                }
+            }
+            if (orderList.Any())
+            {
+                List<string> provinceList = orderList.Select(s => s.Province ?? "").Distinct().OrderBy(s => s).ToList();
+                StringBuilder json = new StringBuilder();
+                bool isEmpty = false;
+                provinceList.ForEach(s =>
+                {
+                    if (!string.IsNullOrWhiteSpace(s))
+                    {
+                        json.Append("{\"ProvinceName\":\"" + s + "\"},");
+                    }
+                    else
+                        isEmpty = true;
+
+                });
+                if (isEmpty)
+                    json.Append("{\"ProvinceName\":\"空\"},");
+                return "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            return "";
+        }
+
+        string GetCity_old()
         {
             string result = string.Empty;
             string regions = string.Empty;
@@ -337,7 +683,108 @@ namespace WebApp.OutsourcingOrder.handler
             return result;
         }
 
-        string GetCustomerService()
+        string GetCity() {
+            List<int> subjectIdList = new List<int>();
+            if (context1.Request.Form["subjectIds"] != null)
+            {
+                string subjectIds = context1.Request.Form["subjectIds"];
+                if (!string.IsNullOrWhiteSpace(subjectIds))
+                {
+                    subjectIdList = StringHelper.ToIntList(subjectIds, ',');
+                }
+            }
+            List<string> regionList = new List<string>();
+            if (context1.Request.Form["region"] != null)
+            {
+                string regions = context1.Request.Form["region"];
+                if (!string.IsNullOrWhiteSpace(regions))
+                {
+                    regionList = StringHelper.ToStringList(regions, ',', LowerUpperEnum.ToLower);
+                }
+            }
+            List<string> provinceList = new List<string>();
+            if (context1.Request.Form["province"] != null)
+            {
+                string provinces = context1.Request.Form["province"];
+                if (!string.IsNullOrWhiteSpace(provinces))
+                {
+                    provinceList = StringHelper.ToStringList(provinces, ',');
+                }
+            }
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            if (context1.Session["AssginOrderFinalOrderList"] != null)
+            {
+                orderList = context1.Session["AssginOrderFinalOrderList"] as List<FinalOrderDetailTemp>;
+            }
+            if (subjectIdList.Any())
+            {
+                orderList = orderList.Where(s => subjectIdList.Contains(s.SubjectId ?? 0)).ToList();
+            }
+            if (regionList.Any())
+            {
+
+                if (regionList.Contains("空"))
+                {
+                    regionList.Remove("空");
+                    if (regionList.Any())
+                    {
+                        orderList = orderList.Where(s => (s.Region != null && regionList.Contains(s.Region.ToLower())) || (s.Region == null || s.Region == "")).ToList();
+
+                    }
+                    else
+                    {
+                        orderList = orderList.Where(s => s.Region == null || s.Region == "").ToList();
+                    }
+                }
+                else
+                {
+                    orderList = orderList.Where(s => s.Region != null && regionList.Contains(s.Region.ToLower())).ToList();
+                }
+            }
+            if (provinceList.Any())
+            {
+
+                if (provinceList.Contains("空"))
+                {
+                    provinceList.Remove("空");
+                    if (provinceList.Any())
+                    {
+                        orderList = orderList.Where(s => (s.Province != null && provinceList.Contains(s.Province)) || (s.Province == null || s.Province == "")).ToList();
+
+                    }
+                    else
+                    {
+                        orderList = orderList.Where(s => s.Province == null || s.Province == "").ToList();
+                    }
+                }
+                else
+                {
+                    orderList = orderList.Where(s => s.Province != null && provinceList.Contains(s.Province)).ToList();
+                }
+            }
+            if (orderList.Any())
+            {
+                List<string> cityList = orderList.Select(s => s.City ?? "").Distinct().OrderBy(s => s).ToList();
+                StringBuilder json = new StringBuilder();
+                bool isEmpty = false;
+                cityList.ForEach(s =>
+                {
+                    if (!string.IsNullOrWhiteSpace(s))
+                    {
+                        json.Append("{\"CityName\":\"" + s + "\"},");
+                    }
+                    else
+                        isEmpty = true;
+
+                });
+                if (isEmpty)
+                    json.Append("{\"CityName\":\"空\"},");
+                return "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            return "";
+        }
+
+        string GetCustomerService_old()
         {
             string result = string.Empty;
             string regions = string.Empty;
@@ -528,6 +975,136 @@ namespace WebApp.OutsourcingOrder.handler
             //    });
             //}
             if (isEmpty)
+            {
+                json.Append("{\"UserId\":\"0\",\"UserName\":\"无\"}");
+            }
+            if (json.Length > 0)
+                result = "[" + json.ToString().TrimEnd(',') + "]";
+            return result;
+        }
+
+        string GetCustomerService() {
+            string result = string.Empty;
+            List<int> subjectIdList = new List<int>();
+            if (context1.Request.Form["subjectIds"] != null)
+            {
+                string subjectIds = context1.Request.Form["subjectIds"];
+                if (!string.IsNullOrWhiteSpace(subjectIds))
+                {
+                    subjectIdList = StringHelper.ToIntList(subjectIds, ',');
+                }
+            }
+            List<string> regionList = new List<string>();
+            if (context1.Request.Form["region"] != null)
+            {
+                string regions = context1.Request.Form["region"];
+                if (!string.IsNullOrWhiteSpace(regions))
+                {
+                    regionList = StringHelper.ToStringList(regions, ',', LowerUpperEnum.ToLower);
+                }
+            }
+            List<string> provinceList = new List<string>();
+            if (context1.Request.Form["province"] != null)
+            {
+                string provinces = context1.Request.Form["province"];
+                if (!string.IsNullOrWhiteSpace(provinces))
+                {
+                    provinceList = StringHelper.ToStringList(provinces, ',');
+                }
+            }
+            List<string> cityList = new List<string>();
+            if (context1.Request.Form["city"] != null)
+            {
+                string city = context1.Request.Form["city"];
+                if (!string.IsNullOrWhiteSpace(city))
+                {
+                    cityList = StringHelper.ToStringList(city, ',');
+                }
+            }
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            if (context1.Session["AssginOrderFinalOrderList"] != null)
+            {
+                orderList = context1.Session["AssginOrderFinalOrderList"] as List<FinalOrderDetailTemp>;
+            }
+            if (subjectIdList.Any())
+            {
+                orderList = orderList.Where(s => subjectIdList.Contains(s.SubjectId ?? 0)).ToList();
+            }
+            if (regionList.Any())
+            {
+
+                if (regionList.Contains("空"))
+                {
+                    regionList.Remove("空");
+                    if (regionList.Any())
+                    {
+                        orderList = orderList.Where(s => (s.Region != null && regionList.Contains(s.Region.ToLower())) || (s.Region == null || s.Region == "")).ToList();
+
+                    }
+                    else
+                    {
+                        orderList = orderList.Where(s => s.Region == null || s.Region == "").ToList();
+                    }
+                }
+                else
+                {
+                    orderList = orderList.Where(s => s.Region != null && regionList.Contains(s.Region.ToLower())).ToList();
+                }
+            }
+            if (provinceList.Any())
+            {
+
+                if (provinceList.Contains("空"))
+                {
+                    provinceList.Remove("空");
+                    if (provinceList.Any())
+                    {
+                        orderList = orderList.Where(s => (s.Province != null && provinceList.Contains(s.Province)) || (s.Province == null || s.Province == "")).ToList();
+
+                    }
+                    else
+                    {
+                        orderList = orderList.Where(s => s.Province == null || s.Province == "").ToList();
+                    }
+                }
+                else
+                {
+                    orderList = orderList.Where(s => s.Province != null && provinceList.Contains(s.Province)).ToList();
+                }
+            }
+            if (cityList.Any())
+            {
+
+                if (cityList.Contains("空"))
+                {
+                    cityList.Remove("空");
+                    if (cityList.Any())
+                    {
+                        orderList = orderList.Where(s => (s.City != null && cityList.Contains(s.City)) || (s.City == null || s.City == "")).ToList();
+
+                    }
+                    else
+                    {
+                        orderList = orderList.Where(s => s.City == null || s.City == "").ToList();
+                    }
+                }
+                else
+                {
+                    orderList = orderList.Where(s => s.City != null && cityList.Contains(s.City)).ToList();
+                }
+            }
+            List<int> userIdList = orderList.Select(s=>s.CSUserId??0).Distinct().ToList();
+            bool hasEmpty = userIdList.Contains(0);
+            if (userIdList.Contains(0))
+            {
+                userIdList.Remove(0);
+            }
+            List<UserInfo> userList = new UserBLL().GetList(s => userIdList.Contains(s.UserId)).OrderBy(s=>s.UserName).ToList();
+            StringBuilder json = new StringBuilder();
+            userList.ForEach(s => {
+                json.Append("{\"UserId\":\"" + s.UserId + "\",\"UserName\":\"" + s.RealName + "\"},");
+            });
+            if (hasEmpty)
             {
                 json.Append("{\"UserId\":\"0\",\"UserName\":\"无\"}");
             }
@@ -2992,7 +3569,7 @@ namespace WebApp.OutsourcingOrder.handler
                         repeatCount = 0;
                         total = shopList0.Count;//店铺总数量
                         int assignShopCount = assignOrderDetalList.Select(s => s.assignOrder.ShopId ?? 0).Distinct().Count();//以分配店铺数量
-                        assignTotalOrderCount = assignOrderDetalList.Where(s=>s.assignOrder.SubjectId>0).Select(s => s.assignOrder).Count();//已分配订单数量
+                        assignTotalOrderCount = assignOrderDetalList.Where(s => s.assignOrder.SubjectId > 0).Select(s => s.assignOrder).Count();//已分配订单数量
                         notAssignShopCount = total - assignShopCount;//未分配店铺数量
                         notAssignTotalOrderCount = orderCount - assignTotalOrderCount;//未分配订单数量
                         notAssignTotalOrderCount = notAssignTotalOrderCount < 0 ? 0 : notAssignTotalOrderCount;
@@ -3605,22 +4182,22 @@ namespace WebApp.OutsourcingOrder.handler
                             assignModel.Shop = s;
                             assignModel.InstallOutsourceId = installOutsourceId;
                             assignModel.BCSCityTierList = BCSCityTierList;
-                           
+
                             var oneShopAssinList = assignOrderList.Where(a => a.ShopId == s.Id).ToList();
                             var oneShopAssinList0 = assignOrderList0.Where(a => a.ShopId == s.Id && a.SubjectId > 0).ToList();
                             List<int> assignOrderIdList = new List<int>();
                             if (oneShopAssinList.Any())
                             {
                                 assignOrderIdList = oneShopAssinList.Select(a => a.Id).ToList();
-                                outsourceOrderDetailBll.Delete(a => assignOrderIdList.Contains(a.Id) && a.SubjectId>0);
+                                outsourceOrderDetailBll.Delete(a => assignOrderIdList.Contains(a.Id) && a.SubjectId > 0);
                                 oneShopAssinList0 = oneShopAssinList0.Where(a => !assignOrderIdList.Contains(a.Id)).ToList();
                             }
                             assignModel.AssignedOrderList = oneShopAssinList0;
                             assignModel.AddInstallPrice = false;
                             //安装
-                            if (list[0].guidance.ActivityTypeId == (int)GuidanceTypeEnum.Install && (list[0].guidance.HasInstallFees??true) && orderType == (int)OutsourceOrderTypeEnum.Install)
+                            if (list[0].guidance.ActivityTypeId == (int)GuidanceTypeEnum.Install && (list[0].guidance.HasInstallFees ?? true) && orderType == (int)OutsourceOrderTypeEnum.Install)
                             {
-                                
+
                                 if (noInstallPrice == "1")
                                 {
                                     assignModel.AddInstallPrice = false;
@@ -4638,7 +5215,7 @@ namespace WebApp.OutsourcingOrder.handler
             {
                 ruanmo = int.Parse(context1.Request.Form["ruanmo"]);
             }
-           
+
             List<string> myRegionList = new BasePage().GetResponsibleRegion;
             if (myRegionList.Any())
             {

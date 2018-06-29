@@ -145,6 +145,11 @@ namespace Models
         public List<CustomerMaterialInfo> Materials { get; set; }
     }
 
+    public partial class OutsourceMaterialPriceItem
+    {
+        public List<OutsourceMaterialInfo> Materials { get; set; }
+    }
+
     public partial class HCSmallGraphicSize
     {
         public string GraphicSizes { get; set; }
@@ -177,7 +182,32 @@ namespace Models
         /// 应付发货单价
         /// </summary>
         public decimal? PayPriceSend { get; set; }
+        /// <summary>
+        /// 对应外协材质表的ID
+        /// </summary>
+        public int? OutsourceMaterialId { get; set; }
     }
+
+    public partial class InstallPriceShopInfo {
+        public decimal? PayPrice { get; set; }
+    }
+
+    public partial class ExpressPriceDetail
+    {
+        public decimal? PayPrice { get; set; }
+    }
+
+    public partial class PropOrderDetail {
+        public Nullable<int> PropOrderId { get; set; }
+        public string PayPackaging { get; set; }
+        public string OutsourceName { get; set; }
+        public Nullable<int> PayQuantity { get; set; }
+        public Nullable<decimal> PayUnitPrice { get; set; }
+        public string PayUnitName { get; set; }
+        public string PayRemark { get; set; }
+        public string PayMaterialName { get; set; }
+    }
+
 
     /// <summary>
     /// 与ERP对接的订单模型
@@ -296,5 +326,7 @@ namespace Models
         public decimal UnitPrice { get; set; }
         public decimal TotalPrice { get; set; }
     }
+
+    
 
 }

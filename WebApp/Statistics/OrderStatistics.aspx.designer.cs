@@ -67,6 +67,15 @@ namespace WebApp.Statistics {
         protected global::System.Web.UI.WebControls.DropDownList ddlCustomer;
         
         /// <summary>
+        /// rbOnGuidanceSearch 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton rbOnGuidanceSearch;
+        
+        /// <summary>
         /// txtGuidanceBegin 控件。
         /// </summary>
         /// <remarks>
@@ -148,6 +157,42 @@ namespace WebApp.Statistics {
         protected global::System.Web.UI.WebControls.LinkButton lbDown;
         
         /// <summary>
+        /// rbOnOrderSubjectSearch 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton rbOnOrderSubjectSearch;
+        
+        /// <summary>
+        /// txtSubjectBegin 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtSubjectBegin;
+        
+        /// <summary>
+        /// txtSubjectEnd 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtSubjectEnd;
+        
+        /// <summary>
+        /// btnGetProject 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnGetProject;
+        
+        /// <summary>
         /// cbCheckAllGuidance 控件。
         /// </summary>
         /// <remarks>
@@ -182,6 +227,42 @@ namespace WebApp.Statistics {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel Panel_EmptyGuidance;
+        
+        /// <summary>
+        /// cbCheckAllPropGuidance 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox cbCheckAllPropGuidance;
+        
+        /// <summary>
+        /// btnCheckAllPropGuidance 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCheckAllPropGuidance;
+        
+        /// <summary>
+        /// cblPropGuidanceList 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList cblPropGuidanceList;
+        
+        /// <summary>
+        /// Panel_EmptyPropGuidance 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel Panel_EmptyPropGuidance;
         
         /// <summary>
         /// cblSubjectChannel 控件。
@@ -256,33 +337,6 @@ namespace WebApp.Statistics {
         protected global::System.Web.UI.WebControls.CheckBoxList cblCustomerService;
         
         /// <summary>
-        /// txtSubjectBegin 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtSubjectBegin;
-        
-        /// <summary>
-        /// txtSubjectEnd 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtSubjectEnd;
-        
-        /// <summary>
-        /// btnGetProject 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnGetProject;
-        
-        /// <summary>
         /// cbShowSubjectNameList 控件。
         /// </summary>
         /// <remarks>
@@ -353,6 +407,33 @@ namespace WebApp.Statistics {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBoxList cblPriceSubjects;
+        
+        /// <summary>
+        /// cbAllPropDiv 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl cbAllPropDiv;
+        
+        /// <summary>
+        /// cbAllProp 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox cbAllProp;
+        
+        /// <summary>
+        /// cblPropSubject 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList cblPropSubject;
         
         /// <summary>
         /// Button1 控件。
@@ -506,6 +587,15 @@ namespace WebApp.Statistics {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label labRegionOtherPrice;
+        
+        /// <summary>
+        /// labPropPrice 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labPropPrice;
         
         /// <summary>
         /// labTotalPrice 控件。

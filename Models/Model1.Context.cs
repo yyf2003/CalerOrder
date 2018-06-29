@@ -64,6 +64,7 @@ namespace Models
         public DbSet<HCOrderDetail> HCOrderDetail { get; set; }
         public DbSet<HCPOP> HCPOP { get; set; }
         public DbSet<HCSmallGraphicSize> HCSmallGraphicSize { get; set; }
+        public DbSet<ImportQuoteOrder> ImportQuoteOrder { get; set; }
         public DbSet<Install> Install { get; set; }
         public DbSet<InstallPriceConfig> InstallPriceConfig { get; set; }
         public DbSet<InstallPriceDetail> InstallPriceDetail { get; set; }
@@ -125,6 +126,8 @@ namespace Models
         public DbSet<Position> Position { get; set; }
         public DbSet<POSScaleInfo> POSScaleInfo { get; set; }
         public DbSet<PriceOrderDetail> PriceOrderDetail { get; set; }
+        public DbSet<PropOrderDetail> PropOrderDetail { get; set; }
+        public DbSet<PropOutsourceOrderDetail> PropOutsourceOrderDetail { get; set; }
         public DbSet<ProvinceInOrderPlan> ProvinceInOrderPlan { get; set; }
         public DbSet<ProvinceInRegion> ProvinceInRegion { get; set; }
         public DbSet<QuotationAccount> QuotationAccount { get; set; }
@@ -134,6 +137,8 @@ namespace Models
         public DbSet<QuotationItem> QuotationItem { get; set; }
         public DbSet<Quotations> Quotations { get; set; }
         public DbSet<QuotationTaxRate> QuotationTaxRate { get; set; }
+        public DbSet<QuoteAddRateAtSize> QuoteAddRateAtSize { get; set; }
+        public DbSet<QuoteDifferenceDetail> QuoteDifferenceDetail { get; set; }
         public DbSet<QuoteMaterial> QuoteMaterial { get; set; }
         public DbSet<QuoteOrderDetail> QuoteOrderDetail { get; set; }
         public DbSet<QuoteOrderSetting> QuoteOrderSetting { get; set; }

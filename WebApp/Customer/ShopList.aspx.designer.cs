@@ -328,24 +328,6 @@ namespace WebApp.Customer {
         protected global::System.Web.UI.WebControls.Label labCityTier;
         
         /// <summary>
-        /// labInstall 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labInstall;
-        
-        /// <summary>
-        /// labBCSInstall 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBCSInstall;
-        
-        /// <summary>
         /// labContact1 控件。
         /// </summary>
         /// <remarks>
@@ -463,6 +445,24 @@ namespace WebApp.Customer {
         protected global::System.Web.UI.WebControls.Label labPOSAddress;
         
         /// <summary>
+        /// labRemark 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labRemark;
+        
+        /// <summary>
+        /// labInstall 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labInstall;
+        
+        /// <summary>
         /// labBasicInstallPrice 控件。
         /// </summary>
         /// <remarks>
@@ -470,15 +470,6 @@ namespace WebApp.Customer {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label labBasicInstallPrice;
-        
-        /// <summary>
-        /// labBCSInstallPrice 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labBCSInstallPrice;
         
         /// <summary>
         /// labOutsourceInstallPrice 控件。
@@ -490,6 +481,24 @@ namespace WebApp.Customer {
         protected global::System.Web.UI.WebControls.Label labOutsourceInstallPrice;
         
         /// <summary>
+        /// labBCSInstall 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labBCSInstall;
+        
+        /// <summary>
+        /// labBCSInstallPrice 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labBCSInstallPrice;
+        
+        /// <summary>
         /// labOutsourceBCSInstallPrice 控件。
         /// </summary>
         /// <remarks>
@@ -497,6 +506,33 @@ namespace WebApp.Customer {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label labOutsourceBCSInstallPrice;
+        
+        /// <summary>
+        /// labGenericInstall 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labGenericInstall;
+        
+        /// <summary>
+        /// labGenericInstallPrice 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labGenericInstallPrice;
+        
+        /// <summary>
+        /// labOutsourceGenericInstallPrice 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label labOutsourceGenericInstallPrice;
         
         /// <summary>
         /// labOutsourceName 控件。
@@ -533,15 +569,6 @@ namespace WebApp.Customer {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label labProductOutsourceName;
-        
-        /// <summary>
-        /// labRemark 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label labRemark;
         
         /// <summary>
         /// btnAddCheckChangeLog 控件。
@@ -697,6 +724,15 @@ namespace WebApp.Customer {
         protected global::System.Web.UI.WebControls.TextBox txtAddress;
         
         /// <summary>
+        /// txtRemark 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtRemark;
+        
+        /// <summary>
         /// txtBasicInstallPrice 控件。
         /// </summary>
         /// <remarks>
@@ -704,15 +740,6 @@ namespace WebApp.Customer {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtBasicInstallPrice;
-        
-        /// <summary>
-        /// txtBCSInstallPrice 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtBCSInstallPrice;
         
         /// <summary>
         /// txtOutsourceInstallPrice 控件。
@@ -724,6 +751,15 @@ namespace WebApp.Customer {
         protected global::System.Web.UI.WebControls.TextBox txtOutsourceInstallPrice;
         
         /// <summary>
+        /// txtBCSInstallPrice 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtBCSInstallPrice;
+        
+        /// <summary>
         /// txtOutsourceBCSInstallPrice 控件。
         /// </summary>
         /// <remarks>
@@ -733,12 +769,21 @@ namespace WebApp.Customer {
         protected global::System.Web.UI.WebControls.TextBox txtOutsourceBCSInstallPrice;
         
         /// <summary>
-        /// txtRemark 控件。
+        /// txtGenericInstallPrice 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtRemark;
+        protected global::System.Web.UI.WebControls.TextBox txtGenericInstallPrice;
+        
+        /// <summary>
+        /// txtOutsourceGenericInstallPrice 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtOutsourceGenericInstallPrice;
     }
 }

@@ -17,5 +17,41 @@ $(function () {
             }
 
         });
-    })
+    });
+
+    ChangeTextColor();
 })
+
+function ChangeTextColor() {
+    $(".output").each(function (e) {
+        var td = $(this);
+        var val = "";
+        var span = $(this).find("span");
+        if (span) {
+            val = $(span).html();
+        }
+        else {
+            val = $(this).html();
+        }
+        if (parseFloat(val) != 0) {
+            $(td).addClass("numberColor");
+        }
+    });
+    $(".differenceTClass").each(function (e) {
+        var td = $(this);
+        var val = "";
+        var span = $(this).find("span");
+        if (span) {
+            val = $(span).html();
+        }
+        else {
+            val = $(this).html();
+        }
+        if (parseFloat(val) > 0) {
+            $(td).addClass("differenceColor1");
+        }
+        if (parseFloat(val) < 0) {
+            $(td).addClass("differenceColor2");
+        }
+    })
+}

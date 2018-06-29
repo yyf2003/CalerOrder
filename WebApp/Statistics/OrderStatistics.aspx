@@ -22,15 +22,6 @@
         {
             margin-bottom: 50px;
         }
-        .style1
-        {
-            width: 120px;
-            height: 26px;
-        }
-        .style2
-        {
-            height: 26px;
-        }
     </style>
     <script type="text/javascript">
         
@@ -56,10 +47,10 @@
                 <asp:HiddenField ID="hfSubjectIds" runat="server" />
                 <table class="table">
                     <tr class="tr_bai">
-                        <td style="width: 120px;">
+                        <td class="style3">
                             客户
                         </td>
-                        <td style="text-align: left; padding-left: 5px;">
+                        <td style="text-align: left; padding-left: 5px;" class="style4">
                             <asp:DropDownList ID="ddlCustomer" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlCustomer_SelectedIndexChanged">
                             </asp:DropDownList>
                             <span style="color: Red; cursor: pointer;">*</span>
@@ -67,13 +58,17 @@
                     </tr>
                     <tr class="tr_bai">
                         <td style="width: 120px;">
-                            活动时间
+                            按活动时间查询
+                            <asp:RadioButton ID="rbOnGuidanceSearch" GroupName="rbSearchType" runat="server"
+                                Checked="true" AutoPostBack="true" OnCheckedChanged="rbOnGuidanceSearch_CheckedChanged" />
                         </td>
                         <td style="text-align: left;">
                             <div style="margin-left: 5px;">
-                                <asp:TextBox ID="txtGuidanceBegin" runat="server" onclick="WdatePicker()" CssClass="Wdate"></asp:TextBox>
+                                <asp:TextBox ID="txtGuidanceBegin" runat="server" onclick="WdatePicker()" autocomplete="off"
+                                    CssClass="Wdate"></asp:TextBox>
                                 —
-                                <asp:TextBox ID="txtGuidanceEnd" runat="server" onclick="WdatePicker()" CssClass="Wdate"></asp:TextBox>
+                                <asp:TextBox ID="txtGuidanceEnd" runat="server" onclick="WdatePicker()" autocomplete="off"
+                                    CssClass="Wdate"></asp:TextBox>
                                 &nbsp;&nbsp;
                                 <asp:Button ID="btnGetGuidance" runat="server" Text="获取活动" class="easyui-linkbutton"
                                     Style="width: 65px; height: 26px;" OnClick="btnGetGuidance_Click" OnClientClick="return CheckGuidanceDate()" />
@@ -95,7 +90,8 @@
                                         <td style="text-align: left; padding-left: 8px;">
                                             <%--<asp:Label ID="labGuidanceMonth" runat="server" Text=""></asp:Label>--%>
                                             <asp:TextBox ID="txtGuidanceMonth" runat="server" CssClass="Wdate" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM',isShowClear:false,readOnly:true,onpicked:getMonth})"
-                                                Style="width: 80px;" OnTextChanged="txtGuidanceMonth_TextChanged" AutoPostBack="true"></asp:TextBox>
+                                                Style="width: 80px;" OnTextChanged="txtGuidanceMonth_TextChanged" AutoPostBack="true"
+                                                autocomplete="off"></asp:TextBox>
                                             <asp:LinkButton ID="lbUp" runat="server" Style="margin-left: 20px; cursor: pointer;
                                                 color: Blue;" OnClick="lbUp_Click">上一个月</asp:LinkButton>
                                             <asp:LinkButton ID="lbDown" runat="server" Style="margin-left: 20px; cursor: pointer;
@@ -107,25 +103,71 @@
                         </td>
                     </tr>
                     <tr class="tr_bai">
+                        <td>
+                            按下单时间查询
+                            <asp:RadioButton ID="rbOnOrderSubjectSearch" GroupName="rbSearchType" AutoPostBack="true"
+                                runat="server" OnCheckedChanged="rbOnOrderSubjectSearch_CheckedChanged" />
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <asp:TextBox ID="txtSubjectBegin" runat="server" onclick="WdatePicker()" autocomplete="off"></asp:TextBox>
+                            —
+                            <asp:TextBox ID="txtSubjectEnd" runat="server" onclick="WdatePicker()" autocomplete="off"></asp:TextBox>
+                            &nbsp;&nbsp;
+                            <asp:Button ID="btnGetProject" runat="server" Text="查 询" class="easyui-linkbutton"
+                                Style="width: 65px; height: 26px;" OnClick="btnGetProject_Click" OnClientClick="return CheckProjectDate()" />
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
                         <td style="width: 120px;">
                             活动名称
                         </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <div id="loadGuidance" style="display: none;">
-                                <img src="../image/WaitImg/loadingA.gif" />
-                            </div>
-                            <div>
-                                <asp:CheckBox ID="cbCheckAllGuidance" runat="server" /><span style="color: Blue;">全选</span>
-                                <asp:Button ID="btnCheckAllGuidance" runat="server" Text="Button" OnClick="btnCheckAllGuidance_Click"
-                                    Style="display: none;" />
-                            </div>
-                            <asp:CheckBoxList ID="cblGuidanceList" runat="server" CssClass="cbl" CellSpacing="20"
-                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
-                                OnSelectedIndexChanged="cblGuidanceList_SelectedIndexChanged">
-                            </asp:CheckBoxList>
-                            <asp:Panel ID="Panel_EmptyGuidance" runat="server" Visible="false">
-                                <span style="color: Red;">无活动信息！</span>
-                            </asp:Panel>
+                        <td style="text-align: left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 80px; text-align: center; font-weight: bold;">
+                                        POP活动：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <div id="loadGuidance" style="display: none;">
+                                            <img src="../image/WaitImg/loadingA.gif" />
+                                        </div>
+                                        <div>
+                                            <asp:CheckBox ID="cbCheckAllGuidance" runat="server" /><span style="color: Blue;">全选</span>
+                                            <asp:Button ID="btnCheckAllGuidance" runat="server" Text="Button" OnClick="btnCheckAllGuidance_Click"
+                                                Style="display: none;" />
+                                        </div>
+                                        <asp:CheckBoxList ID="cblGuidanceList" runat="server" CssClass="cbl" CellSpacing="20"
+                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
+                                            OnSelectedIndexChanged="cblGuidanceList_SelectedIndexChanged">
+                                        </asp:CheckBoxList>
+                                        <asp:Panel ID="Panel_EmptyGuidance" runat="server" Visible="false">
+                                            <span style="color: Red;">无活动信息！</span>
+                                        </asp:Panel>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center; font-weight: bold;">
+                                        道具活动：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <div id="loadPropGuidance" style="display: none;">
+                                            <img src="../image/WaitImg/loadingA.gif" />
+                                        </div>
+                                        <div>
+                                            <asp:CheckBox ID="cbCheckAllPropGuidance" runat="server" /><span style="color: Blue;">全选</span>
+                                            <asp:Button ID="btnCheckAllPropGuidance" runat="server" Text="Button" OnClick="btnCheckAllPropGuidance_Click"
+                                                Style="display: none;" />
+                                        </div>
+                                        <asp:CheckBoxList ID="cblPropGuidanceList" runat="server" CssClass="cbl" CellSpacing="20"
+                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
+                                            OnSelectedIndexChanged="cblPropGuidanceList_SelectedIndexChanged">
+                                        </asp:CheckBoxList>
+                                        <asp:Panel ID="Panel_EmptyPropGuidance" runat="server" Visible="false">
+                                            <span style="color: Red;">无活动信息！</span>
+                                        </asp:Panel>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                     <tr class="tr_bai">
@@ -237,19 +279,6 @@
                             </asp:CheckBoxList>
                         </td>
                     </tr>
-                    <tr class="tr_bai">
-                        <td style="width: 120px;">
-                            下单时间
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:TextBox ID="txtSubjectBegin" runat="server" onclick="WdatePicker()"></asp:TextBox>
-                            —
-                            <asp:TextBox ID="txtSubjectEnd" runat="server" onclick="WdatePicker()"></asp:TextBox>
-                            &nbsp;&nbsp;
-                            <asp:Button ID="btnGetProject" runat="server" Text="查 询" class="easyui-linkbutton"
-                                Style="width: 65px; height: 26px;" OnClick="btnGetProject_Click" OnClientClick="return CheckProjectDate()" />
-                        </td>
-                    </tr>
                 </table>
                 <div class="tr">
                     >>项目名称 &nbsp;&nbsp;&nbsp;&nbsp;
@@ -297,6 +326,24 @@
                                 </asp:CheckBoxList>
                             </td>
                         </tr>
+                        <tr class="tr_bai">
+                            <td>
+                                道具项目
+                            </td>
+                            <td style="text-align: left; padding-left: 5px;">
+                                <div id="loadPropSubject" style="display: none;">
+                                    <img src="../image/WaitImg/loadingA.gif" />
+                                </div>
+                                <div id="cbAllPropDiv" runat="server" style="display: none; text-align: left;">
+                                    <asp:CheckBox ID="cbAllProp" runat="server" />全选
+                                    <hr align="left" style="width: 100px; margin-bottom: 5px;" />
+                                </div>
+                                <asp:CheckBoxList ID="cblPropSubject" runat="server" CssClass="cbl" CellSpacing="20"
+                                    RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
+                                    OnSelectedIndexChanged="cblPropSubject_SelectedIndexChanged">
+                                </asp:CheckBoxList>
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </ContentTemplate>
@@ -318,9 +365,8 @@
                     <input type="button" id="btnExport" value="导出订单明细" class="easyui-linkbutton" style="width: 95px;
                         height: 26px;" />
                     <img id="exportWaiting" style="display: none;" src="../image/WaitImg/loadingA.gif" />
-
-                    <input type="button" id="btnExportByShop" value="按店统计导出" class="easyui-linkbutton" style="width: 95px;
-                        height: 26px; margin-left:30px;" />
+                    <input type="button" id="btnExportByShop" value="按店统计导出" class="easyui-linkbutton"
+                        style="width: 95px; height: 26px; margin-left: 30px;" />
                     <img id="exportWaitingByShop" style="display: none;" src="../image/WaitImg/loadingA.gif" />
                 </td>
             </tr>
@@ -377,7 +423,7 @@
                     <asp:Label ID="labSecondInstallPrice" runat="server" Text="0"></asp:Label>
                 </td>
                 <td style="text-align: right;">
-                    物料费(道具)：
+                    物料费：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labMaterialPrice" runat="server" Text="0"></asp:Label>
@@ -430,10 +476,18 @@
                 </td>
             </tr>
             <tr class="tr_bai">
-                <td colspan="5" style="text-align: right; padding-right: 10px;">
+                <td style="text-align: right;">
+                    道具：
+                </td>
+                <td colspan="5" style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labPropPrice" runat="server" Text="0"></asp:Label>
+                </td>
+            </tr>
+            <tr class="tr_bai">
+                <td style="text-align: right; font-weight:bold;">
                     总金额：
                 </td>
-                <td style="text-align: left; padding-left: 5px;">
+                <td colspan="5" style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labTotalPrice" runat="server" Text="0"></asp:Label>
                 </td>
             </tr>
@@ -506,192 +560,239 @@
         <asp:CheckBox ID="cbShopSubjectList" runat="server" OnCheckedChanged="cbShopSubjectList_CheckedChanged"
             AutoPostBack="true" />显示项目明细
     </div>
-    <div style=" width:100%; overflow:auto;">
-    <asp:Repeater ID="gvList" Visible="false" runat="server" OnItemDataBound="gvList_ItemDataBound"
-        OnItemCommand="gvList_ItemCommand">
-        <HeaderTemplate>
-            <table class="table1" style="width: 1700px;">
-                <tr class="tr_hui">
-                    <td rowspan="2" style="width: 40px;">
-                        序号
+    <div style="width: 100%; overflow: auto;">
+        <asp:Repeater ID="gvList" Visible="false" runat="server" OnItemDataBound="gvList_ItemDataBound"
+            OnItemCommand="gvList_ItemCommand">
+            <HeaderTemplate>
+                <table class="table1" style="width: 2100px;">
+                    <tr class="tr_hui">
+                        <td rowspan="2" style="width: 40px;">
+                            序号
+                        </td>
+                        <td rowspan="2">
+                            项目名称
+                        </td>
+                        <td rowspan="2">
+                            项目类型
+                        </td>
+                        <td rowspan="2">
+                            订单类型
+                        </td>
+                        <td rowspan="2">
+                            所属客户
+                        </td>
+                        <td rowspan="2">
+                            下单时间
+                        </td>
+                        <td colspan="3">
+                            店铺数量
+                        </td>
+                        <td colspan="3">
+                            POP总面积(平米)
+                        </td>
+                        <td colspan="3">
+                            POP金额
+                        </td>
+                        <td colspan="3">
+                            安装费
+                        </td>
+                        <td colspan="3">
+                            物料费
+                        </td>
+                        <td colspan="3">
+                            新开店安装费
+                        </td>
+                        <td colspan="3">
+                            其他费用
+                        </td>
+                        <td rowspan="2">
+                            道具费用
+                        </td>
+                        <td rowspan="2">
+                            查看
+                        </td>
+                    </tr>
+                    <tr class="tr_hui" style="color: #000; font-weight: bold;">
+                        <td>
+                            系统(上海)
+                        </td>
+                        <td>
+                            分区
+                        </td>
+                        <td>
+                            合计
+                        </td>
+                        <td>
+                            系统(上海)
+                        </td>
+                        <td>
+                            分区
+                        </td>
+                        <td>
+                            合计
+                        </td>
+                        <td>
+                            系统(上海)
+                        </td>
+                        <td>
+                            分区
+                        </td>
+                        <td>
+                            合计
+                        </td>
+                        <td>
+                            系统(上海)
+                        </td>
+                        <td>
+                            分区
+                        </td>
+                        <td>
+                            合计
+                        </td>
+                        <td>
+                            系统(上海)
+                        </td>
+                        <td>
+                            分区
+                        </td>
+                        <td>
+                            合计
+                        </td>
+                        <td>
+                            系统(上海)
+                        </td>
+                        <td>
+                            分区
+                        </td>
+                        <td>
+                            合计
+                        </td>
+                        <td>
+                            系统(上海)
+                        </td>
+                        <td>
+                            分区
+                        </td>
+                        <td>
+                            合计
+                        </td>
+                    </tr>
+            </HeaderTemplate>
+            <ItemTemplate>
+                <tr>
+                    <td style="width: 40px;">
+                        <%--<%#(AspNetPager1.CurrentPageIndex-1)*AspNetPager1.PageSize+ Container.ItemIndex + 1%>--%>
+                        <%#Container.ItemIndex + 1%>
                     </td>
-                    <td rowspan="2">
-                        项目名称
-                    </td>
-                    <td rowspan="2">
-                        项目类型
-                    </td>
-                    <td rowspan="2">
-                        订单类型
-                    </td>
-                    <td rowspan="2">
-                        所属客户
-                    </td>
-                    <td rowspan="2">
-                        下单时间
-                    </td>
-                    <td colspan="2">
-                        店铺数量
-                    </td>
-                    <td colspan="2">
-                        POP总面积(平米)
-                    </td>
-                    <td colspan="2">
-                        POP金额
-                    </td>
-                    <td colspan="2">
-                        安装费
-                    </td>
-                    <td colspan="2">
-                        物料费
-                    </td>
-                    <td colspan="2">
-                        运费/新开店安装费
-                    </td>
-                    <td colspan="2">
-                        其他费用
-                    </td>
-                    <td rowspan="2">
-                        查看
-                    </td>
-                </tr>
-                <tr class="tr_hui" style="color:#000; font-weight:bold;">
                     <td>
-                        系统(上海)
+                        <%--<%#Eval("subject.SubjectName")%>--%>
+                        <asp:Label ID="labSubjectName" runat="server" Text=""></asp:Label>
                     </td>
-                    <td>
-                        分区
-                    </td>
-                    <td>
-                        系统(上海)
-                    </td>
-                    <td>
-                        分区
-                    </td>
-                    <td>
-                        系统(上海)
-                    </td>
-                    <td>
-                        分区
-                    </td>
-                    <td>
-                        系统(上海)
-                    </td>
-                    <td>
-                        分区
-                    </td>
-                    <td>
-                        系统(上海)
-                    </td>
-                    <td>
-                        分区
-                    </td>
-                    <td>
-                        系统(上海)
-                    </td>
-                    <td>
-                        分区
-                    </td>
-                    <td>
-                        系统(上海)
-                    </td>
-                    <td>
-                        分区
-                    </td>
-                   
-                </tr>
-        </HeaderTemplate>
-        <ItemTemplate>
-            <tr>
-                <td style="width: 40px;">
-                    <%--<%#(AspNetPager1.CurrentPageIndex-1)*AspNetPager1.PageSize+ Container.ItemIndex + 1%>--%>
-                    <%#Container.ItemIndex + 1%>
-                </td>
-                <td>
-                    <%--<%#Eval("subject.SubjectName")%>--%>
-                    <asp:Label ID="labSubjectName" runat="server" Text=""></asp:Label>
-                </td>
-                <%--<td>
+                    <%--<td>
                     <%#Eval("subject.SubjectNo")%>
                 </td>--%>
-                <td>
-                    <%#Eval("CategoryName")%>
-                </td>
-                <td>
-                    <asp:Label ID="labSubjectType" runat="server" Text=""></asp:Label>
-                </td>
-                <td>
-                    <%#Eval("CustomerName")%>
-                </td>
-                <td>
-                    <%#Eval("subject.AddDate")%>
-                </td>
-                <td>
-                    <%--店铺数量--%>
-                    <asp:Label ID="labShopCount" runat="server" Text=""></asp:Label>
-                </td>
-                <td>
-                    <%--店铺数量--%>
-                    <asp:Label ID="labShopCount1" runat="server" Text=""></asp:Label>
-                </td>
-                <td>
-                    <%--POP平米数--%>
-                    <asp:Label ID="labArea" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <%--POP平米数--%>
-                    <asp:Label ID="labArea1" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <%--POP金额--%>
-                    <asp:Label ID="labPOPPrice" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <%--POP金额--%>
-                    <asp:Label ID="labPOPPrice1" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <asp:Label ID="labInstallPrice" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <asp:Label ID="labInstallPrice1" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <asp:Label ID="labMaterial" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <asp:Label ID="labMaterial1" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <asp:Label ID="labNewShopInstallPrice" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <asp:Label ID="labNewShopInstallPrice1" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <asp:Label ID="labOtherPrice" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <asp:Label ID="labOtherPrice1" runat="server" Text="0"></asp:Label>
-                </td>
-                <td>
-                    <span name="spanCheckDetail" data-subjectid='<%#Eval("Id") %>' data-subjecttype='<%#Eval("SubjectType") %>'
-                        style="color: Blue; cursor: pointer;">查看</span>
-                </td>
-            </tr>
-        </ItemTemplate>
-        <FooterTemplate>
-            <%if (gvList.Items.Count == 0)
-              {%>
-            <tr class="tr_bai">
-                <td colspan="21" style="text-align: center;">
-                    --无数据--
-                </td>
-            </tr>
-            <%} %>
-            </table>
-        </FooterTemplate>
-    </asp:Repeater>
+                    <td>
+                        <%#Eval("CategoryName")%>
+                    </td>
+                    <td>
+                        <asp:Label ID="labSubjectType" runat="server" Text=""></asp:Label>
+                    </td>
+                    <td>
+                        <%#Eval("CustomerName")%>
+                    </td>
+                    <td>
+                        <%#Eval("subject.AddDate")%>
+                    </td>
+                    <td>
+                        <%--店铺数量--%>
+                        <asp:Label ID="labShopCount" runat="server" Text=""></asp:Label>
+                    </td>
+                    <td>
+                        <%--店铺数量--%>
+                        <asp:Label ID="labShopCount1" runat="server" Text=""></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labShopCountSub" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <%--POP平米数--%>
+                        <asp:Label ID="labArea" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <%--POP平米数--%>
+                        <asp:Label ID="labArea1" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labAreaSub" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <%--POP金额--%>
+                        <asp:Label ID="labPOPPrice" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <%--POP金额--%>
+                        <asp:Label ID="labPOPPrice1" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labPOPPriceSub" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labInstallPrice" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labInstallPrice1" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labInstallPriceSub" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labMaterial" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labMaterial1" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labMaterialSub" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labNewShopInstallPrice" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labNewShopInstallPrice1" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labNewShopInstallPriceSub" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labOtherPrice" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labOtherPrice1" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labOtherPriceSub" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <asp:Label ID="labPropPrice" runat="server" Text="0"></asp:Label>
+                    </td>
+                    <td>
+                        <span name="spanCheckDetail" data-subjectid='<%#Eval("Id") %>' data-subjecttype='<%#Eval("SubjectType") %>'
+                            style="color: Blue; cursor: pointer;">查看</span>
+                    </td>
+                </tr>
+            </ItemTemplate>
+            <FooterTemplate>
+                <%if (gvList.Items.Count == 0)
+                  {%>
+                <tr class="tr_bai">
+                    <td colspan="22" style="text-align: center;">
+                        --无数据--
+                    </td>
+                </tr>
+                <%} %>
+                </table>
+            </FooterTemplate>
+        </asp:Repeater>
     </div>
     <div style="display: none;">
         <iframe id="exportFrame" name="exportFrame" src=""></iframe>

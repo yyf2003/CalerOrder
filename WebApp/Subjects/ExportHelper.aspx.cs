@@ -987,45 +987,7 @@ namespace WebApp.Subjects
                 List<Order350Model> orderList = new List<Order350Model>();
                 if (list.Any())
                 {
-                    //InstallPriceShopInfoBLL installPriceBll = new InstallPriceShopInfoBLL();
-                    //bool SubmitInstallPrice = true;
-                    ////检查是否已经提交安装费
-                    //var installShopList = list.Where(s => s.guidance.ActivityTypeId == (int)GuidanceTypeEnum.Install && s.subject.SubjectType != (int)SubjectTypeEnum.二次安装).ToList();
-                    //if (installShopList.Any())
-                    //{
-                    //    List<int> guidaceIdList = installShopList.Select(s => s.guidance.ItemId).Distinct().ToList();
-                    //    List<int> FinishInstallPriceShopIdList = installPriceBll.GetList(s => guidaceIdList.Contains(s.GuidanceId ?? 0)).Select(s => s.ShopId ?? 0).Distinct().ToList();
-                    //    //三叶草安装费
-                    //    List<string> cityTierList = new List<string> { "T1", "T2", "T3" };
-                    //    List<int> installShopIdList1 = installShopList.Where(s => s.subject.CornerType == "三叶草" && (cityTierList.Contains(s.shop.CityTier) || ((s.shop.BCSInstallPrice ?? 0) > 0))).Select(s => s.shop.Id).Distinct().ToList();
-                    //    if (installShopIdList1.Any())
-                    //    {
-
-                    //        //List<int> c = FinishInstallPriceShopIdList.Except(installShopIdList).ToList();
-                    //        SubmitInstallPrice = StringHelper.IsContainsAll(FinishInstallPriceShopIdList, installShopIdList1);
-                    //    }
-                    //    //非三叶草
-                    //    List<int> installShopIdList2 = installShopList.Where(s => s.shop.IsInstall == "Y" && (string.IsNullOrWhiteSpace(s.subject.CornerType) || s.subject.CornerType != "三叶草")).Select(s => s.shop.Id).Distinct().ToList();
-                    //    if (installShopIdList2.Any())
-                    //    {
-                    //        if (!StringHelper.IsContainsAll(FinishInstallPriceShopIdList, installShopIdList2))
-                    //        {
-                    //            SubmitInstallPrice = false;
-                    //        }
-                    //    }
-                    //}
-                    //if (!SubmitInstallPrice)
-                    //{
-                    //    HttpCookie cookie = Request.Cookies["exportPHWBJ"];
-                    //    if (cookie == null)
-                    //    {
-                    //        cookie = new HttpCookie("exportPHWBJ");
-                    //    }
-                    //    cookie.Value = "3";//没有提交完安装费
-                    //    cookie.Expires = DateTime.Now.AddMinutes(30);
-                    //    Response.Cookies.Add(cookie);
-                    //    return;
-                    //}
+                   
                     guidanceIdList = list.Select(s=>s.guidance.ItemId).Distinct().ToList();
                     List<int> shopIdList = list.Select(s => s.shop.Id).Distinct().ToList();
                     string changePOPCountSheetStr = string.Empty;
@@ -1183,6 +1145,10 @@ namespace WebApp.Subjects
                     //                      guidance
                     //                  }).ToList();
                     #region 新
+
+                    List<int> genericShopIdList = list.Where(s => s.CategoryName != null && s.CategoryName.Contains("常规-非活动")).Select(s => s.order.ShopId ?? 0).ToList();
+                    List<int> normalShopIdList = list.Where(s => s.CategoryName == null || (s.CategoryName != null && !s.CategoryName.Contains("常规-非活动"))).Select(s => s.order.ShopId ?? 0).ToList();
+
                     var installList = (from install in CurrentContext.DbContext.InstallPriceTemp
                                        join shop in CurrentContext.DbContext.Shop
                                        on install.ShopId equals shop.Id
@@ -1198,11 +1164,62 @@ namespace WebApp.Subjects
                                            shop,
                                            guidance
                                        }).ToList();
+
                     #endregion
                     if (installList.Any())
                     {
-                        
-                        installList.ForEach(s => {
+
+                        var genericInstallList = installList.Where(s => genericShopIdList.Contains(s.install.ShopId ?? 0) && s.install.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费).ToList();
+                        var notGenericInstallList = installList.Where(s => normalShopIdList.Contains(s.install.ShopId ?? 0) && s.install.SubjectType == (int)InstallPriceSubjectTypeEnum.活动安装费).ToList();
+
+                        genericInstallList.ForEach(s =>
+                        {
+                            decimal installPrice = (s.install.BasicPrice ?? 0) + (s.install.OOHPrice ?? 0) + (s.install.WindowPrice ?? 0);
+                            //decimal installPrice = s.install.TotalPrice ?? 0;
+                            if (installPrice > 0)
+                            {
+                                Order350Model model = new Order350Model();
+                                model.UnitPrice = double.Parse(installPrice.ToString());
+                                model.ShopId = s.shop.Id;
+                                model.SubjectId = 0;
+                                model.GraphicNo = "";
+
+                                model.Area = 0;
+                                //model.Area = item.order.Area != null ? double.Parse(StringHelper.IsDecimal(item.order.Area.ToString()).ToString()) : 0;
+                                model.Category = "";
+                                model.ChooseImg = "";
+                                model.City = "";
+                                //model.County = item.shop.AreaName;
+                                model.CityTier = "";
+                                model.Contacts = "";
+                                model.Format = "";
+                                model.Gender = "";
+                                //model.GraphicLength = 0;
+                                model.GraphicMaterial = "安装费";
+                                //model.GraphicWidth = 0;
+                                model.POPAddress = "";
+                                model.PositionDescription = "";
+                                model.Province = "";
+                                // model.Quantity = item.order.Quantity != null ? double.Parse(item.order.Quantity.ToString()) : 0;
+                                model.Quantity = 1;
+                                model.Sheet = "";
+                                model.ShopName = s.shop.ShopName;
+                                model.ShopNo = s.shop.ShopNo;
+
+                                model.SubjectName = "";
+                                model.Tels = "";
+                                //model.OtherRemark = levelName;
+
+                                model.POSScale = "";
+                                model.MaterialSupport = "";
+                                model.GuidanceName = s.guidance != null ? s.guidance.ItemName : "";
+                                model.OrderType = "安装费";
+                                orderList.Add(model);
+                            }
+
+                        });
+                        notGenericInstallList.ForEach(s =>
+                        {
                             decimal installPrice = (s.install.BasicPrice ?? 0) + (s.install.OOHPrice ?? 0) + (s.install.WindowPrice ?? 0);
                             //decimal installPrice = s.install.TotalPrice ?? 0;
                             if (installPrice > 0)
@@ -1529,7 +1546,9 @@ namespace WebApp.Subjects
                             on order.SubjectId equals subject.Id
                             join guidance in CurrentContext.DbContext.SubjectGuidance
                             on subject.GuidanceId equals guidance.ItemId
-                           
+                            join category1 in CurrentContext.DbContext.ADSubjectCategory
+                              on subject.SubjectCategoryId equals category1.Id into temp1
+                            from category in temp1.DefaultIfEmpty()
                             //where subjectIdList.Contains(order.SubjectId ?? 0)
                             where (selectType == 1 ? subjectIdList.Contains(order.SubjectId ?? 0) : subjectIdList.Contains(order.RegionSupplementId ?? 0))
                             && ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || order.OrderType>1)
@@ -1545,7 +1564,8 @@ namespace WebApp.Subjects
                                 subject,
                                 shop,
                                 order,
-                                guidance
+                                guidance,
+                                CategoryName = category != null ? category.CategoryName : "",
                             }).ToList();
                 list = list.Where(s => ((s.order.Sheet!=null && s.order.Sheet.Contains("光盘")) || (s.order.PositionDescription != null && s.order.PositionDescription.Contains("光盘"))) ? ((s.order.Format != null && s.order.Format != "") && s.order.Format.ToLower().IndexOf("hc") == -1 && s.order.Format.ToLower().IndexOf("homecourt") == -1 && s.order.Format.ToLower().IndexOf("homecore") == -1 && s.order.Format.ToLower().IndexOf("ya") == -1) : 1 == 1).ToList();
                 if (!string.IsNullOrWhiteSpace(exportType))
@@ -1924,6 +1944,11 @@ namespace WebApp.Subjects
                     //                       shop,
                     //                       guidance
                     //                   }).ToList();
+
+                    List<int> genericShopIdList = list.Where(s => s.CategoryName != null && s.CategoryName.Contains("常规-非活动")).Select(s => s.order.ShopId ?? 0).ToList();
+                    List<int> normalShopIdList = list.Where(s => s.CategoryName == null || (s.CategoryName != null && !s.CategoryName.Contains("常规-非活动"))).Select(s => s.order.ShopId ?? 0).ToList();
+
+
                     var installList = (from install in CurrentContext.DbContext.InstallPriceTemp
                                        join shop in CurrentContext.DbContext.Shop
                                        on install.ShopId equals shop.Id
@@ -1940,11 +1965,58 @@ namespace WebApp.Subjects
                                        }).ToList();
                     if (installList.Any())
                     {
+                        var genericInstallList = installList.Where(s => genericShopIdList.Contains(s.install.ShopId ?? 0) && s.install.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费).ToList();
+                        var notGenericInstallList = installList.Where(s => normalShopIdList.Contains(s.install.ShopId ?? 0) && s.install.SubjectType == (int)InstallPriceSubjectTypeEnum.活动安装费).ToList();
 
-                        installList.ForEach(s =>
+                        genericInstallList.ForEach(s =>
                         {
                             decimal installPrice = (s.install.BasicPrice ?? 0) + (s.install.OOHPrice ?? 0) + (s.install.WindowPrice ?? 0);
-                            //decimal installPrice = s.install.TotalPrice ?? 0;
+                            
+                            if (installPrice > 0)
+                            {
+                                Order350Model model = new Order350Model();
+                                model.UnitPrice = double.Parse(installPrice.ToString());
+                                model.ShopId = s.shop.Id;
+                                model.SubjectId = 0;
+                                model.GraphicNo = "";
+
+                                //model.Area = 0;
+                                //model.Area = item.order.Area != null ? double.Parse(StringHelper.IsDecimal(item.order.Area.ToString()).ToString()) : 0;
+                                model.Category = "";
+                                model.ChooseImg = "";
+                                model.City = "";
+                                //model.County = item.shop.AreaName;
+                                model.CityTier = "";
+                                model.Contacts = "";
+                                model.Format = "";
+                                model.Gender = "";
+                                //model.GraphicLength = 0;
+                                model.GraphicMaterial = "安装费";
+                                //model.GraphicWidth = 0;
+                                model.POPAddress = "";
+                                model.PositionDescription = "";
+                                model.Province = "";
+                                // model.Quantity = item.order.Quantity != null ? double.Parse(item.order.Quantity.ToString()) : 0;
+                                model.Quantity = 1;
+                                model.Sheet = "";
+                                model.ShopName = s.shop.ShopName;
+                                model.ShopNo = s.shop.ShopNo;
+
+                                model.SubjectName = "";
+                                model.Tels = "";
+                                //model.OtherRemark = levelName;
+
+                                model.POSScale = "";
+                                model.MaterialSupport = "";
+                                model.GuidanceName = s.guidance != null ? s.guidance.ItemName : "";
+                                model.OrderType = "安装费";
+                                orderList.Add(model);
+                            }
+                        });
+                        notGenericInstallList.ForEach(s =>
+                        {
+                            decimal installPrice = (s.install.BasicPrice ?? 0) + (s.install.OOHPrice ?? 0) + (s.install.WindowPrice ?? 0);
+
                             if (installPrice > 0)
                             {
                                 Order350Model model = new Order350Model();
@@ -2140,35 +2212,7 @@ namespace WebApp.Subjects
                         {
                             if (lastItem.ShopId != item.ShopId)
                             {
-                                //if (promotionShopList.Contains(lastItem.ShopId))
-                                //{
-                                //    IRow dataRow0 = sheet.GetRow(startRow);
-                                //    if (dataRow0 == null)
-                                //        dataRow0 = sheet.CreateRow(startRow);
-                                //    for (int i = 0; i < 14; i++)
-                                //    {
-                                //        ICell cell0 = dataRow0.GetCell(i);
-                                //        if (cell0 == null)
-                                //            cell0 = dataRow0.CreateCell(i);
-
-                                //    }
-                                //    dataRow0.GetCell(0).SetCellValue("发货费");
-                                //    //dataRow.GetCell(1).SetCellValue(item.PositionDescription);
-                                //    //dataRow.GetCell(2).SetCellValue(Math.Round(item.GraphicWidth / 1000, 2));
-                                //    //dataRow.GetCell(3).SetCellValue(Math.Round(item.GraphicLength / 1000, 2));
-                                //    dataRow0.GetCell(4).SetCellValue(1);
-                                //    //dataRow.GetCell(5).SetCellValue("");
-                                //    //dataRow.GetCell(6).SetCellValue("");
-                                //    //dataRow.GetCell(7).SetCellValue("");
-                                //    //dataRow.GetCell(8).SetCellValue("");
-                                //    //dataRow.GetCell(9).SetCellValue("");
-                                //    dataRow0.GetCell(10).SetCellValue(lastItem.GuidanceName);
-                                //    //dataRow.GetCell(11).SetCellValue("");
-                                //    dataRow0.GetCell(12).SetCellValue(lastItem.ShopName);
-                                //    dataRow0.GetCell(13).SetCellValue("发货费");
-                                //    promotionShopList.Remove(lastItem.ShopId);
-                                //    startRow++;
-                                //}
+                              
                                 lastItem = item;
                             }
                         }
@@ -2786,6 +2830,7 @@ namespace WebApp.Subjects
                         model.County = item.shop.AreaName;
                         model.CityTier = item.order.CityTier;
                         model.Contacts = item.shop.Contact1 + "/" + item.shop.Contact2;
+                        model.Format = item.order.Channel;
                         model.Format = item.order.Format;
                         model.NewFormat = item.shop.Format;
                         model.Gender =!string.IsNullOrWhiteSpace(item.order.OrderGender)?item.order.OrderGender: item.order.Gender;
@@ -2849,7 +2894,7 @@ namespace WebApp.Subjects
                         IRow dataRow = sheet.GetRow(startRow);
                         if (dataRow == null)
                             dataRow = sheet.CreateRow(startRow);
-                        for (int i = 0; i < 30; i++)
+                        for (int i = 0; i < 31; i++)
                         {
                             ICell cell = dataRow.GetCell(i);
                             if (cell == null)
@@ -2864,35 +2909,36 @@ namespace WebApp.Subjects
                         dataRow.GetCell(4).SetCellValue(item.Province);
                         dataRow.GetCell(5).SetCellValue(item.City);
                         dataRow.GetCell(6).SetCellValue(item.CityTier);
-                        dataRow.GetCell(7).SetCellValue(item.Format);
-                        dataRow.GetCell(8).SetCellValue(item.POPAddress);
-                        dataRow.GetCell(9).SetCellValue(item.Contacts);
-                        dataRow.GetCell(10).SetCellValue(item.Tels);
+                        dataRow.GetCell(7).SetCellValue(item.Channel);
+                        dataRow.GetCell(8).SetCellValue(item.Format);
+                        dataRow.GetCell(9).SetCellValue(item.POPAddress);
+                        dataRow.GetCell(10).SetCellValue(item.Contacts);
+                        dataRow.GetCell(11).SetCellValue(item.Tels);
 
-                        dataRow.GetCell(11).SetCellValue(item.POSScale);
-                        dataRow.GetCell(12).SetCellValue(item.MaterialSupport);
-                        dataRow.GetCell(13).SetCellValue(item.SubjectName);
-                        dataRow.GetCell(14).SetCellValue(item.Gender);
-                        dataRow.GetCell(15).SetCellValue(item.ChooseImg);
+                        dataRow.GetCell(12).SetCellValue(item.POSScale);
+                        dataRow.GetCell(13).SetCellValue(item.MaterialSupport);
+                        dataRow.GetCell(14).SetCellValue(item.SubjectName);
+                        dataRow.GetCell(15).SetCellValue(item.Gender);
+                        dataRow.GetCell(16).SetCellValue(item.ChooseImg);
 
 
                         //dataRow.GetCell(12).SetCellValue(item.Category);
-                        dataRow.GetCell(16).SetCellValue(item.Sheet);
-                        dataRow.GetCell(17).SetCellValue(item.MachineFrame);
-                        dataRow.GetCell(18).SetCellValue(item.PositionDescription);
-                        dataRow.GetCell(19).SetCellValue(item.Quantity);
-                        dataRow.GetCell(20).SetCellValue(item.GraphicMaterial);
-                        dataRow.GetCell(21).SetCellValue(item.QuoteGraphicMaterial);
-                        dataRow.GetCell(22).SetCellValue(item.UnitPrice);
-                        dataRow.GetCell(23).SetCellValue(item.GraphicWidth);
-                        dataRow.GetCell(24).SetCellValue(item.GraphicLength);
-                        dataRow.GetCell(25).SetCellValue(item.Area);
+                        dataRow.GetCell(17).SetCellValue(item.Sheet);
+                        dataRow.GetCell(18).SetCellValue(item.MachineFrame);
+                        dataRow.GetCell(19).SetCellValue(item.PositionDescription);
+                        dataRow.GetCell(20).SetCellValue(item.Quantity);
+                        dataRow.GetCell(21).SetCellValue(item.GraphicMaterial);
+                        dataRow.GetCell(22).SetCellValue(item.QuoteGraphicMaterial);
+                        dataRow.GetCell(23).SetCellValue(item.UnitPrice);
+                        dataRow.GetCell(24).SetCellValue(item.GraphicWidth);
+                        dataRow.GetCell(25).SetCellValue(item.GraphicLength);
+                        dataRow.GetCell(26).SetCellValue(item.Area);
                         if (item.ReceivePrice>0)
-                          dataRow.GetCell(26).SetCellValue(item.ReceivePrice);
+                          dataRow.GetCell(27).SetCellValue(item.ReceivePrice);
                         //其他备注
-                        dataRow.GetCell(27).SetCellValue(item.OtherRemark);
-                        dataRow.GetCell(28).SetCellValue(item.IsInstall);
-                        dataRow.GetCell(29).SetCellValue(item.SupplimentSubjectName);
+                        dataRow.GetCell(28).SetCellValue(item.OtherRemark);
+                        dataRow.GetCell(29).SetCellValue(item.IsInstall);
+                        dataRow.GetCell(30).SetCellValue(item.SupplimentSubjectName);
                         //dataRow.GetCell(27).SetCellValue(item.NewFormat);
                         startRow++;
 

@@ -21,7 +21,6 @@ namespace WebApp.OutsourcingOrder
                 txtMonth.Text = date.ToString("yyyy-MM");
 
                 var orderTypeList = CommonMethod.GetEnumList<OrderTypeEnum>().ToList();
-
                 orderTypeList.ForEach(s =>
                 {
                     ListItem li = new ListItem();

@@ -33,7 +33,7 @@
     <div class="layui-tab layui-tab-brief" lay-filter="order">
         <ul class="layui-tab-title">
             <li class="layui-this" lay-id="1">正常归类</li>
-            <li lay-id="2">按项目提交</li>
+           <%-- <li lay-id="2">按项目提交</li>--%>
         </ul>
         <div class="layui-tab-content" style="overflow: auto;">
             <div class="layui-tab-item layui-show">
@@ -91,6 +91,22 @@
                                     <asp:CheckBoxList ID="cblSubjectName" runat="server" RepeatDirection="Horizontal"
                                         RepeatLayout="Flow" RepeatColumns="5" OnSelectedIndexChanged="cblSubjectName_SelectedIndexChanged"
                                         AutoPostBack="true">
+                                    </asp:CheckBoxList>
+                                </td>
+                            </tr>
+                            <tr class="tr_bai">
+                                <td>
+                                    城市级别：
+                                </td>
+                                <td style="text-align: left; padding-left: 5px;">
+                                    <div name="loadImg" id="imgLoadCityTier" style="display: none;">
+                                        <img src="../../image/WaitImg/loadingA.gif" />
+                                    </div>
+                                    <%--<asp:CheckBox ID="cbCityTier" runat="server" />全选--%>
+                                    <hr style="width: 50px; color: Blue;" />
+                                    <asp:CheckBoxList ID="cblCityTier" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow"
+                                         AutoPostBack="true" 
+                                        onselectedindexchanged="cblCityTier_SelectedIndexChanged">
                                     </asp:CheckBoxList>
                                 </td>
                             </tr>

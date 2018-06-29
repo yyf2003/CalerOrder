@@ -76,24 +76,6 @@ namespace WebApp.OutsourcingOrder.Statistics {
         protected global::System.Web.UI.WebControls.LinkButton lbDown;
         
         /// <summary>
-        /// txtBegin 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtBegin;
-        
-        /// <summary>
-        /// txtEnd 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEnd;
-        
-        /// <summary>
         /// cbAllGuidance 控件。
         /// </summary>
         /// <remarks>
@@ -119,6 +101,33 @@ namespace WebApp.OutsourcingOrder.Statistics {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.Panel Panel_EmptyGuidance;
+        
+        /// <summary>
+        /// cbAllPropGuidance 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox cbAllPropGuidance;
+        
+        /// <summary>
+        /// cblPropGuidanceList 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList cblPropGuidanceList;
+        
+        /// <summary>
+        /// Panel_EmptyPropGuidance 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel Panel_EmptyPropGuidance;
         
         /// <summary>
         /// cblSubjectCategory 控件。
@@ -184,6 +193,33 @@ namespace WebApp.OutsourcingOrder.Statistics {
         protected global::System.Web.UI.WebControls.CheckBoxList cblSubjects;
         
         /// <summary>
+        /// cbAllPropDiv 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl cbAllPropDiv;
+        
+        /// <summary>
+        /// cbAllProp 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox cbAllProp;
+        
+        /// <summary>
+        /// cblPropSubjects 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList cblPropSubjects;
+        
+        /// <summary>
         /// loadOutsource 控件。
         /// </summary>
         /// <remarks>
@@ -200,6 +236,42 @@ namespace WebApp.OutsourcingOrder.Statistics {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBoxList cblOutsourceId;
+        
+        /// <summary>
+        /// loadPropOutsource 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl loadPropOutsource;
+        
+        /// <summary>
+        /// cblPropOutsourceId 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList cblPropOutsourceId;
+        
+        /// <summary>
+        /// loadMaterial 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl loadMaterial;
+        
+        /// <summary>
+        /// cblMaterial 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBoxList cblMaterial;
         
         /// <summary>
         /// cblOutsourceType 控件。

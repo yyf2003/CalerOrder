@@ -62,6 +62,12 @@ $(function () {
             Confing.getRegionList();
             $("#seleConfigType").val(rows[0].TypeId);
             $("#txtMaterialName").val(rows[0].MaterialName);
+            
+            if (rows[0].IsFullMatch == 1) {
+                $("#cbIsFullMatch").prop("checked", true);
+            }
+            else
+                $("#cbIsFullMatch").prop("checked", false);
             if (rows[0].OutsourctId > 0)
                 $("#seleOutsource").val(rows[0].OutsourctId);
             //$("#txtChannel").val(rows[0].Channel);
@@ -233,18 +239,26 @@ var Confing = {
         this.CityId = "";
         this.Channel = "";
         this.Format = "";
-
+        this.IsFullMatch = 0;
     },
     getList: function () {
         $("#tbList").datagrid({
             method: 'get',
             url: 'AssignConfig.ashx?type=getList',
             columns: [[
-            //{ field: 'Id', hidden: true },
-               {field: 'RowIndex', title: "序号" },
+
+               { field: 'RowIndex', title: "序号" },
                { field: 'checked', checkbox: true },
                { field: 'TypeName', title: "类型" },
                { field: 'MaterialName', title: "材质名称" },
+               
+               { field: 'IsFullMatch', title: "是否完全匹配", formatter: function (val, row,index) {
+                   if (val == "1")
+                       return "是";
+                   else
+                       return "否";
+               }
+               },
                { field: 'OutsourctName', title: "生产外协" },
                { field: 'Channel', title: "店铺Channel" },
                { field: 'Format', title: "店铺Format" },
@@ -263,8 +277,7 @@ var Confing = {
             fit: false,
             iconCls: 'icon-save',
             emptyMsg: '没有相关记录',
-            //selectOnCheck: false,
-            //checkOnSelect:false,
+
             onClickRow: function (rowIndex, rowData) {
                 $(this).datagrid("unselectRow", rowIndex);
 
@@ -451,7 +464,7 @@ var Confing = {
     getChannel: function () {
         $("#cbAllChannel").prop("checked", false);
         $("#formatContainer").html("");
-        
+
         $.ajax({
             type: "get",
             url: "AssignConfig.ashx?type=getChannel",
@@ -468,7 +481,7 @@ var Confing = {
                     for (var i = 0; i < json.length; i++) {
                         var checked = "";
                         $.each(arr, function (key, val) {
-                            if (val== json[i].Channel) {
+                            if (val == json[i].Channel) {
                                 checked = "checked='checked'";
                                 flag = true;
                             }
@@ -524,7 +537,8 @@ var Confing = {
     },
     submit: function () {
         if (CheckVal()) {
-            var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"ConfigTypeId":' + this.model.ConfigTypeId + ',"MaterialName":"' + this.model.MaterialName + '","ProductOutsourctId":' + this.model.ProductOutsourctId + ',"Region":"' + this.model.Region + '","ProvinceId":"' + this.model.ProvinceId + '","CityId":"' + this.model.CityId + '","Channel":"' + this.model.Channel + '","Format":"' + this.model.Format + '"}';
+            var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"ConfigTypeId":' + this.model.ConfigTypeId + ',"MaterialName":"' + this.model.MaterialName + '","ProductOutsourctId":' + this.model.ProductOutsourctId + ',"Region":"' + this.model.Region + '","ProvinceId":"' + this.model.ProvinceId + '","CityId":"' + this.model.CityId + '","Channel":"' + this.model.Channel + '","Format":"' + this.model.Format + '","IsFullMatch":' + this.model.IsFullMatch + '}';
+            
             $.ajax({
                 type: "post",
                 url: "AssignConfig.ashx",
@@ -552,7 +566,11 @@ function CheckVal() {
     //var channel = $.trim($("#txtChannel").val());
     //var format = $.trim($("#txtFormat").val());
     var region = $("input[name='rdRegion']:checked").val() || "";
-
+    var isFullMatch = 0;
+    if ($("#cbIsFullMatch").is(':checked')) {
+        isFullMatch = 1;
+    }
+    
     var channel = "";
     $("input[name='cbChannel']:checked").each(function () {
         channel += $(this).val() + ",";
@@ -590,10 +608,7 @@ function CheckVal() {
         layer.msg("请选择区域");
         return false;
     }
-    //if (proviceId == "") {
-        //layer.msg("请选择省份");
-       // return false;
-   // }
+   
     Confing.model.CustomerId = customerId;
     Confing.model.ConfigTypeId = typeId;
     Confing.model.MaterialName = materialName;
@@ -603,7 +618,7 @@ function CheckVal() {
     Confing.model.CityId = cityId;
     Confing.model.Channel = channel;
     Confing.model.Format = format;
-   
+    Confing.model.IsFullMatch = isFullMatch ? 1 : 0;
     return true;
 }
 
@@ -629,4 +644,5 @@ function ClearVal() {
     Confing.model.CityId = "";
     Confing.model.Channel = "";
     Confing.model.Format = "";
+    Confing.model.IsFullMatch = 0;
 }

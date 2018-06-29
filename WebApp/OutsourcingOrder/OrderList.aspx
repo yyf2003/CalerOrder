@@ -200,7 +200,6 @@
 
 
 
-
      <div id="editDiv" title="编辑POP信息" style="display: none;">
         <table id="POPtable" class="table" style="width: 750px; text-align: center; margin-bottom: 50px;">
             <tr>
@@ -381,6 +380,7 @@
                 </td>
                 
             </tr>
+           
         </table>
     </div>
 
@@ -396,7 +396,18 @@
                 </select>
              </td>
            </tr>
-           
+           <tr>
+             <td style="  height:35px;">
+                更新类型：
+             </td>
+             <td style=" text-align:left; padding-left:10px;">
+                 
+                 <asp:RadioButtonList ID="rblChangeType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                    <asp:ListItem Value="1">整店更新&nbsp;</asp:ListItem>
+                    <asp:ListItem Value="2">只更新所选择记录</asp:ListItem>
+                 </asp:RadioButtonList> 
+             </td>
+           </tr>
        </table>
      </div>
 

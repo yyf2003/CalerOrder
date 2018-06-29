@@ -173,12 +173,12 @@
                 </td>
             </tr>
         </table>
-        <div id="itemContainer" style="height: 360px; overflow: auto;">
+        <div id="itemContainer" style=" overflow: auto;">
             <table class="table">
                 <thead>
                     <tr class="tr_hui">
                         <td style="width: 40px;">
-                           删除
+                            删除
                         </td>
                         <td style="width: 40px;">
                             序号
@@ -190,7 +190,10 @@
                             单位
                         </td>
                         <td style="width: 120px;">
-                            单价
+                            安装单价
+                        </td>
+                        <td style="width: 120px;">
+                            发货单价
                         </td>
                     </tr>
                 </thead>

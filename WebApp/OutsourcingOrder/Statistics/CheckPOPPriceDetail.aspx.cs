@@ -100,6 +100,9 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (!string.IsNullOrWhiteSpace(subjectId))
             {
                 subjectIdList = StringHelper.ToIntList(subjectId, ',');
+                //Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
+                List<int> hMSubjectIdList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
+                subjectIdList.AddRange(hMSubjectIdList);
             }
             if (!string.IsNullOrWhiteSpace(region))
             {

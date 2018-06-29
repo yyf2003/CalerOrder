@@ -15,6 +15,7 @@ namespace Models
     public partial class Subject
     {
         public int Id { get; set; }
+        public Nullable<int> SubjectItemType { get; set; }
         public Nullable<int> SubjectType { get; set; }
         public string SubjectName { get; set; }
         public string OutSubjectName { get; set; }
@@ -58,5 +59,7 @@ namespace Models
         public Nullable<int> OutsourceId { get; set; }
         public Nullable<bool> IsSecondInstall { get; set; }
         public Nullable<int> SecondBasicInstallPriceType { get; set; }
+        public Nullable<int> SupplementSubjectId { get; set; }
+        public Nullable<System.DateTime> SubmitDate { get; set; }
     }
 }

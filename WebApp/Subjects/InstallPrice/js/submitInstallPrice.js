@@ -176,6 +176,9 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function (sender, e
 
     })
 
+
+
+
     if (postBackId.indexOf("cblRegion") != -1) {
         $("#cbSubjects").attr("checked", false);
         $("#cbPOSScale").attr("checked", false);

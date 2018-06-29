@@ -17,6 +17,7 @@ namespace Models
         public int Id { get; set; }
         public Nullable<int> ItemId { get; set; }
         public Nullable<int> ChangeType { get; set; }
+        public Nullable<int> PriceType { get; set; }
         public string Sheet { get; set; }
         public string PositionDescription { get; set; }
         public string GraphicMaterial { get; set; }
@@ -26,6 +27,5 @@ namespace Models
         public Nullable<int> InstallPriceLevel { get; set; }
         public Nullable<int> AddUserId { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
-        public Nullable<int> PriceType { get; set; }
     }
 }

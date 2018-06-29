@@ -19,7 +19,7 @@ $(function () {
     //刷新
     $("#btnRefresh").click(function () {
         $("#tbMaterial").datagrid("reload");
-    })
+    });
     //添加报价
     $("#btnAdd").click(function () {
         CleanVal();
@@ -128,8 +128,8 @@ $(function () {
         //Material.bindPriceItem();
         $("#editPriceTypeDiv").show().dialog({
             modal: true,
-            width: 700,
-            height: 500,
+            width: 800,
+            height: '90%',
             iconCls: 'icon-add',
             resizable: false,
             buttons: [
@@ -152,6 +152,58 @@ $(function () {
         });
     });
 
+    $("#selOldPriceItem").on("change", function () {
+        $("#tbMaterialDetail").html("");
+        var itemId = $(this).val();
+        var customerId1 = $("#selOtherCustomer").val();
+        $.ajax({
+            type: "get",
+            url: 'ListHandler.ashx',
+            data: { type: "getList", customerId: customerId1, priceItemId: itemId, currpage: 1, pagesize: 1000 },
+            success: function (data) {
+                if (data != "") {
+
+                    //var json = eval(data);
+                    var json = JSON.parse(data);
+
+                    var rows = json.rows;
+
+                    if (json.total > 0) {
+                        var tbData = "";
+                        for (var i = 0; i < rows.length; i++) {
+                            tbData += "<tr class='tr_bai'>";
+                            tbData += "<td><span name='spanDelete' style='color:red;cursor:pointer;'>删除</span></td>";
+                            tbData += "<td>" + (i + 1) + "</td>";
+                            tbData += "<td>" + rows[i].MaterialName + "</td>";
+                            tbData += "<td>" + rows[i].Unit + "</td>";
+                            tbData += "<td><input name='txtNewInstallPrice' type='text' data-unitid='" + rows[i].UnitId + "' data-basiccategoryid='" + rows[i].BasicCategoryId + "' data-basicmaterialid='" + rows[i].BasicMaterialId + "' value='" + rows[i].InstallPrice + "' style='width:70%;text-align: center;'/></td>";
+                            tbData += "<td><input name='txtNewSendPrice' type='text' data-unitid='" + rows[i].UnitId + "' data-basiccategoryid='" + rows[i].BasicCategoryId + "' data-basicmaterialid='" + rows[i].BasicMaterialId + "' value='" + rows[i].SendPrice + "' style='width:70%;text-align: center;'/></td>";
+
+                            tbData += "</tr>";
+                        }
+                        $("#tbMaterialDetail").html(tbData);
+                    }
+                }
+            }
+        });
+    });
+
+    $("#btnChangeTypeState").click(function () {
+      
+        $.ajax({
+            type: "get",
+            url: 'ListHandler.ashx?type=changePriceItemState&id=' + currPriceItemId,
+            success: function (data) {
+                if (data == "ok") {
+                    Material.getPriceItem();
+                }
+                else {
+                    alert(data);
+                }
+            }
+        })
+
+    })
 })
 
 var pageIndex = 1;
@@ -203,9 +255,9 @@ var Material = {
                     { field: 'ItemName', title: '类型名称' },
                     { field: 'IsDelete', title: '状态', formatter: function (value, row) {
                         if (value == 1)
-                            return "<span>禁用</span>";
+                            return "<span style='color:red;'>禁用</span>";
                         else
-                            return "<span>启用</span>"; ;
+                            return "<span style='color:#000;'>启用</span>"; ;
                     }
                     }
 
@@ -454,13 +506,15 @@ var Material = {
             if (trs.length > 0) {
                 for (var i = 0; i < trs.length; i++) {
                     var tr = $(trs[i]);
-                    var priceNumInput = $(tr).find("input[name$='txtNewMaterialPrice']");
-                    if (priceNumInput) {
-                        var priceNum = $(priceNumInput).val() || 0;
-                        var unitId = $(priceNumInput).data("unitid") || 0;
-                        var basicCategoryId = $(priceNumInput).data("basiccategoryid") || 0;
-                        var basicMaterialId = $(priceNumInput).data("basicmaterialid") || 0;
-                        materialDetailJson += '{"CustomerId":' + currCustomerId + ',"UnitId":' + unitId + ',"Price":' + priceNum + ',"BasicCategoryId":' + basicCategoryId + ',"BasicMaterialId":' + basicMaterialId + '},';
+                    var installPriceInput = $(tr).find("input[name$='txtNewInstallPrice']");
+                    var sendPriceInput = $(tr).find("input[name$='txtNewSendPrice']");
+                    if (installPriceInput && sendPriceInput) {
+                        var installPrice = $(installPriceInput).val() || 0;
+                        var sendPrice = $(sendPriceInput).val() || 0;
+                        var unitId = $(installPriceInput).data("unitid") || 0;
+                        var basicCategoryId = $(installPriceInput).data("basiccategoryid") || 0;
+                        var basicMaterialId = $(installPriceInput).data("basicmaterialid") || 0;
+                        materialDetailJson += '{"CustomerId":' + currCustomerId + ',"UnitId":' + unitId + ',"InstallPrice":' + installPrice + ',"SendPrice":' + sendPrice + ',"BasicCategoryId":' + basicCategoryId + ',"BasicMaterialId":' + basicMaterialId + '},';
 
                     }
                 }
@@ -474,8 +528,8 @@ var Material = {
 
         $.ajax({
             type: "post",
-            url: 'ListHandler?type=addPriceItem',
-            data: { jsonStr: escape(jsonStr) },
+            url: 'ListHandler.ashx',
+            data: {type:"addPriceItem", jsonStr: escape(jsonStr) },
             success: function (data) {
                 if (data == "ok") {
                     $("#editPriceTypeDiv").dialog('close');

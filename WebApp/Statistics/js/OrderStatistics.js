@@ -2,9 +2,9 @@
 
 Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender, e) {
     var eleId = e.get_postBackElement().id;
-    if (eleId.indexOf("lbUp") != -1 || eleId.indexOf("lbDown") != -1) {
+    if (eleId.indexOf("lbUp") != -1 || eleId.indexOf("lbDown") != -1 || eleId.indexOf("btnGetProject")!=-1) {
         $("#loadGuidance").show();
-       
+        $("#loadPropGuidance").show();
     }
     if (eleId.indexOf("cblGuidanceList") != -1) {
         $("#loadShopType").show();
@@ -12,6 +12,10 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
         $("#loadCategory").show();
         $("#loadSubject0").show();
         $("#loadSubject").show();
+    }
+
+    if (eleId.indexOf("cblPropGuidanceList") != -1) {
+        $("#loadPropSubject").show();
     }
 
     if (eleId.indexOf("cblSubjectChannel") != -1) {
@@ -39,8 +43,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
     if (eleId.indexOf("cblProvince") != -1) {
         $("#loadCity").show();
         $("#loadCustomerService").show();
-        //$("#loadSubject0").show();
-        //$("#loadSubject").show();
+        
     }
     if (eleId.indexOf("btnCheckAllGuidance") != -1) {
         $("#loadShopType").show();
@@ -49,6 +52,11 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
         $("#loadSubject0").show();
         $("#loadSubject").show();
     }
+
+    if (eleId.indexOf("btnCheckAllPropGuidance") != -1) {
+        $("#loadPropSubject").show();
+    }
+
     if (eleId.indexOf("cbShowSubjectNameList") != -1) {
         $("#loadSubjectNames").show();
        
@@ -57,12 +65,14 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
 
 Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
     $("#loadGuidance").hide();
+    $("#loadPropGuidance").hide();
     $("#loadShopType").hide();
     $("#loadUser").hide();
     $("#loadCategory").hide();
     $("#loadProvince").hide();
     $("#loadCity").hide();
     $("#loadSubject").hide();
+    $("#loadPropSubject").hide();
     $("#loadCustomerService").hide();
     $("#loadSubjectNames").hide();
     $("#cbCheckAllGuidance").change(function () {
@@ -73,9 +83,24 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
         $("#btnCheckAllGuidance").click();
     })
 
+    $("#cbCheckAllPropGuidance").change(function () {
+        var checked = this.checked;
+        $("input[name^='cblPropGuidanceList']").each(function () {
+            this.checked = checked;
+        });
+        $("#btnCheckAllPropGuidance").click();
+    })
+
     $("#cbAll").change(function () {
         var checked = this.checked;
         $("input[name^='cblSubjects']").each(function () {
+            this.checked = checked;
+        });
+    })
+
+    $("#cbAllProp").change(function () {
+        var checked = this.checked;
+        $("input[name^='cblPropSubject']").each(function () {
             this.checked = checked;
         });
     })
@@ -87,6 +112,16 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
         else {
             var checked = $("input[name^='cblSubjects']:checked").length == $("input[name^='cblSubjects']").length;
             $("#cbAll").prop("checked", checked);
+        }
+    })
+
+    $("input[name^='cblPropSubject']").change(function () {
+        if (!this.checked) {
+            $("#cbAllProp").prop("checked", false);
+        }
+        else {
+            var checked = $("input[name^='cblPropSubject']:checked").length == $("input[name^='cblPropSubject']").length;
+            $("#cbAllProp").prop("checked", checked);
         }
     })
 
@@ -353,8 +388,10 @@ $(function () {
 
     //导出
     $("#btnExport").click(function () {
-        var guidanceIds = "";
-        var subjectIds = "";
+        var guidanceIds = ""; //pop活动
+        var subjectIds = ""; //pop项目
+        //var propGuidanceIds = "";//道具活动
+        //var propSubjectIds = ""; //道具项目
         var regions = "";
         var provinces = "";
         var citys = "";
@@ -363,6 +400,9 @@ $(function () {
         var customerServiceIds = "";
         var subjectCategory = "";
         $("input[name^='cblGuidanceList']:checked").each(function () {
+            guidanceIds += $(this).val() + ",";
+        })
+        $("input[name^='cblPropGuidanceList']:checked").each(function () {
             guidanceIds += $(this).val() + ",";
         })
         $("input[name^='cblRegion']:checked").each(function () {
@@ -381,11 +421,17 @@ $(function () {
         $("input[name^='cblSubjects']:checked").each(function () {
             subjectIds += $(this).val() + ",";
         })
+        $("input[name^='cblPropSubject']:checked").each(function () {
+            subjectIds += $(this).val() + ",";
+        })
         if (subjectIds == "") {
             $("input[name^='cblPriceSubjects']").each(function () {
                 subjectIds += $(this).val() + ",";
             })
             $("input[name^='cblSubjects']").each(function () {
+                subjectIds += $(this).val() + ",";
+            })
+            $("input[name^='cblPropSubject']").each(function () {
                 subjectIds += $(this).val() + ",";
             })
         }
@@ -574,6 +620,10 @@ $(function () {
             //二次安装费订单明细
             url += "&isCheck=1";
         }
+        //道具
+        if (subjectType == 15) {
+            url = "/PropSubject/CheckOrderDetail.aspx?subjectId=" + subjectId + "&&isCheck=1";
+        }
         $.fancybox({
             href: url,
             type: 'iframe',
@@ -605,11 +655,9 @@ function loading() {
         return false;
     }
     var guidanceCount = 0;
-    guidanceCount = $("input[name^='cblGuidanceList']:checked").length;
-    var subjectCount = 0;
-    //subjectCount += $("input[name^='cblSubjects']:checked").length;
-    //subjectCount += $("input[name^='cblPriceSubjects']:checked").length;
-    //subjectCount += $("input[name^='cblSecondInstallSubjects']:checked").length;
+    guidanceCount = $("input[name^='cblGuidanceList']:checked").length||0;
+    guidanceCount += $("input[name^='cblPropGuidanceList']:checked").length||0;
+    //var subjectCount = 0;
     if (guidanceCount == 0) {
         alert("请选择活动名称");
         return false;

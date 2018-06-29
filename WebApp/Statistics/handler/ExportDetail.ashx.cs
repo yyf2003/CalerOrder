@@ -111,7 +111,7 @@ namespace WebApp.Statistics.handler
                 OrderPriceDetail orderModel;
                 if (guidanceIdList.Any())
                 {
-
+                    #region pop订单费用
                     if (!string.IsNullOrWhiteSpace(regions))
                     {
                         regionList = StringHelper.ToStringList(regions, ',', LowerUpperEnum.ToLower);
@@ -157,28 +157,6 @@ namespace WebApp.Statistics.handler
                         shopTypeList = StringHelper.ToStringList(shopType, ',');
 
                     }
-
-
-
-                    //物料费用订单
-                    //var materialOrderList = (from order in CurrentContext.DbContext.OrderMaterial
-                    //                         join shop in CurrentContext.DbContext.Shop
-                    //                         on order.ShopId equals shop.Id
-                    //                         join subject in CurrentContext.DbContext.Subject
-                    //                         on order.SubjectId equals subject.Id
-                    //                         where guidanceIdList.Contains(subject.GuidanceId ?? 0)
-                    //                         && (subject.IsDelete == null || subject.IsDelete == false)
-                    //                         && subject.ApproveState == 1
-                    //                         && order.Price != null
-                    //                         && order.Price > 0
-                    //                         select new
-                    //                         {
-                    //                             order,
-                    //                             shop,
-                    //                             subject
-
-                    //                         }
-                    //                         ).ToList();
                     if (subjectCategoryList.Any())
                     {
                         if (subjectCategoryList.Contains(0))
@@ -238,10 +216,13 @@ namespace WebApp.Statistics.handler
                     }
                     if (subjectIdList.Any())
                     {
-                        orderList = orderList.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
+                        orderList = orderList.Where(s => subjectIdList.Contains(s.subject.Id) || subjectIdList.Contains(s.subject.HandMakeSubjectId??0)).ToList();
                         //materialOrderList = materialOrderList.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
                     }
-
+                    else
+                    {
+                        subjectIdList = orderList.Select(s=>s.subject.Id).Distinct().ToList();
+                    }
 
                     if (regionList.Any())
                     {
@@ -674,6 +655,7 @@ namespace WebApp.Statistics.handler
                                                           && installShopIdList.Contains(installShop.ShopId ?? 0)
                                                           && (guidance.ActivityTypeId != (int)GuidanceTypeEnum.Others)//不统计分区增补的安装费
                                                           && (installShop.BasicPrice ?? 0) > 0
+                                                          && subjectIdList.Contains(installShop.SubjectId??0)
                                                           select installShop).ToList();
 
                             if (installPriceDetailList.Any())
@@ -845,81 +827,46 @@ namespace WebApp.Statistics.handler
 
 
                     #endregion
+                    #endregion
 
+                    #region 道具订单费用
+                    var propOrderList = (from order in CurrentContext.DbContext.PropOrderDetail
+                                         join subject in CurrentContext.DbContext.Subject
+                                         on order.SubjectId equals subject.Id
+                                         where guidanceIdList.Contains(order.GuidanceId ?? 0)
+                                         select new { order, subject }).ToList();
+                    if (subjectIdList.Any())
+                    {
+                        propOrderList = propOrderList.Where(s => subjectIdList.Contains(s.order.SubjectId??0)).ToList();
+                    }
+                    if (propOrderList.Any())
+                    {
+                        propOrderList.ForEach(s => {
+                            orderModel = new OrderPriceDetail();
+                            orderModel.AddDate = s.subject.AddDate;
+                            orderModel.PriceType = "道具费";
+                            //orderModel.Area = double.Parse(totalArea.ToString());
+                            //orderModel.Gender = s.order.Gender;
+                            //orderModel.GraphicLength = double.Parse(length.ToString());
+                            //orderModel.GraphicWidth = double.Parse(width.ToString());
+                            orderModel.GraphicMaterial = s.order.MaterialType;
+                            orderModel.PositionDescription = s.order.MaterialName;
+                            orderModel.Quantity = s.order.Quantity??1;
+                            orderModel.Sheet = s.order.Sheet;
+                            //orderModel.ShopName = s.shop.ShopName;
+                            //orderModel.ShopNo = s.shop.ShopNo;
+                            //orderModel.Region = s.shop.RegionName;
+                            //orderModel.Province = s.shop.ProvinceName;
+                            //orderModel.City = s.shop.CityName;
+                            orderModel.SubjectName = s.subject.SubjectName;
+                            orderModel.SubjectNo = s.subject.SubjectNo;
+                            orderModel.TotalPrice = double.Parse(((s.order.Quantity??1)*(s.order.UnitPrice??0)).ToString());
+                            orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
+                            newOrderList.Add(orderModel);
+                        });
+                    }
+                    #endregion
 
-                    //如果有促销活动，统计运费（每个店35）
-                    //var cuxiaoShopList = orderList.Where(s => s.guindance.ActivityTypeId == 3).Select(s => s.shop).Distinct().ToList();
-                    //decimal cuxiaoFreight = 0;
-                    //if (!string.IsNullOrWhiteSpace(freight))
-                    //{
-                    //    if (freight.Contains("元"))
-                    //    {
-                    //        freight = freight.Replace("元", "");
-                    //    }
-                    //    cuxiaoFreight = StringHelper.IsDecimal(freight);
-                    //}
-                    //var expressPriceOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.发货费 && (s.guindance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Others).ToList();
-                    //if (expressPriceOrderList.Any())
-                    //{
-                    //    cuxiaoFreight += expressPriceOrderList.Sum(s=>s.order.OrderPrice??0);
-                    //}
-                    //if (cuxiaoFreight > 0)
-                    //{
-                    //    orderModel = new OrderPriceDetail();
-                    //    orderModel.AddDate = null;
-                    //    orderModel.PriceType = "快递费";
-                    //    orderModel.Area = 0;
-                    //    orderModel.Gender = string.Empty;
-                    //    orderModel.GraphicLength = 0;
-                    //    orderModel.GraphicWidth = 0;
-                    //    orderModel.GraphicMaterial = string.Empty;
-                    //    orderModel.PositionDescription = string.Empty;
-                    //    orderModel.Quantity = 1;
-                    //    orderModel.Sheet = string.Empty;
-                    //    orderModel.ShopName = string.Empty;
-                    //    orderModel.ShopNo = string.Empty;
-                    //    orderModel.Region = string.Empty;
-                    //    orderModel.Province = string.Empty;
-                    //    orderModel.City = string.Empty;
-                    //    string subjectName = guidanceName;
-                    //    if (!string.IsNullOrWhiteSpace(regions))
-                    //        subjectName += "(" + regions.Replace(',', '+') + ")";
-                    //    orderModel.SubjectName = subjectName;
-                    //    orderModel.SubjectNo = string.Empty;
-                    //    orderModel.UnitPrice = 0;
-                    //    orderModel.TotalPrice = double.Parse(cuxiaoFreight.ToString());
-                    //    newOrderList.Add(orderModel);
-                    //}
-                    //if (materialOrderList.Any())
-                    //{
-                    //    materialOrderList.ForEach(s =>
-                    //    {
-                    //        orderModel = new OrderPriceDetail();
-                    //        if (s.subject.AddDate != null)
-                    //            orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
-                    //        orderModel.PriceType = "物料费";
-                    //        orderModel.Area = 0;
-                    //        orderModel.Gender = string.Empty;
-                    //        orderModel.GraphicLength = 0;
-                    //        orderModel.GraphicWidth = 0;
-                    //        orderModel.GraphicMaterial = string.Empty;
-                    //        orderModel.PositionDescription = string.Empty;
-                    //        int num = s.order.MaterialCount ?? 1;
-                    //        decimal price = s.order.Price ?? 0;
-                    //        orderModel.Quantity = num;
-                    //        orderModel.Sheet = s.order.MaterialName;
-                    //        orderModel.ShopName = s.shop.ShopName;
-                    //        orderModel.ShopNo = s.shop.ShopNo;
-                    //        orderModel.Region = s.shop.RegionName;
-                    //        orderModel.Province = s.shop.ProvinceName;
-                    //        orderModel.City = s.shop.CityName;
-                    //        orderModel.SubjectName = s.subject.SubjectName;
-                    //        orderModel.SubjectNo = s.subject.SubjectNo;
-                    //        orderModel.UnitPrice = double.Parse(price.ToString());
-                    //        orderModel.TotalPrice = double.Parse((num * price).ToString());
-                    //        newOrderList.Add(orderModel);
-                    //    });
-                    //}
                     if (newOrderList.Any())
                     {
                         string templateFileName = "项目费用统计明细";
@@ -1146,7 +1093,7 @@ namespace WebApp.Statistics.handler
                     }
                     if (subjectIdList.Any())
                     {
-                        orderList = orderList.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
+                        orderList = orderList.Where(s => subjectIdList.Contains(s.subject.Id) || subjectIdList.Contains(s.subject.HandMakeSubjectId??0)).ToList();
 
                     }
 

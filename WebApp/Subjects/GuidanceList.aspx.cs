@@ -18,8 +18,34 @@ namespace WebApp.Subjects
             if (!IsPostBack)
             {
                 BindCustomerList(ref ddlCustomer);
+                BindAddType();
+                BindActivityType();
                 BindData();
             }
+        }
+
+        void BindAddType()
+        {
+            var enumList = CommonMethod.GetEnumList<GuidanceAddTypeEnum>();
+            enumList.ForEach(s =>
+            {
+                ListItem li = new ListItem();
+                li.Text = s.Desction + "&nbsp;&nbsp;";
+                li.Value = s.Value.ToString();
+                cblAddType.Items.Add(li);
+            });
+        }
+
+        void BindActivityType()
+        {
+            var enumList = CommonMethod.GetEnumList<GuidanceTypeEnum>();
+            enumList.ForEach(s =>
+            {
+                ListItem li = new ListItem();
+                li.Text = s.Desction + "&nbsp;&nbsp;";
+                li.Value = s.Value.ToString();
+                cblActivityType.Items.Add(li);
+            });
         }
 
         void BindData()
@@ -30,6 +56,20 @@ namespace WebApp.Subjects
                 int id = int.Parse(item.Value);
                 if (!curstomerList.Contains(id))
                     curstomerList.Add(id);
+            }
+
+            List<int> addTypeList = new List<int>();
+            foreach (ListItem item in cblAddType.Items)
+            {
+                if (item.Selected)
+                    addTypeList.Add(int.Parse(item.Value));
+            }
+
+            List<int> activityTypeList = new List<int>();
+            foreach (ListItem item in cblActivityType.Items)
+            {
+                if (item.Selected)
+                    activityTypeList.Add(int.Parse(item.Value));
             }
             
             var list = (from item in CurrentContext.DbContext.SubjectGuidance
@@ -43,6 +83,7 @@ namespace WebApp.Subjects
                        on item.CustomerId equals customer.Id
                        where (curstomerList.Any() ? (curstomerList.Contains(item.CustomerId ?? 0)) : 1 == 1)
                        select new {
+                           item.AddType,
                            item.ItemId,
                            item.CustomerId,
                            item.BeginDate,
@@ -71,6 +112,14 @@ namespace WebApp.Subjects
             if (!string.IsNullOrWhiteSpace(txtGuidanceName.Text.Trim()))
             {
                 list = list.Where(s => s.ItemName.ToUpper().Contains(txtGuidanceName.Text.Trim().ToUpper())).ToList();
+            }
+            if (addTypeList.Any())
+            {
+                list = list.Where(s => addTypeList.Contains(s.AddType??1)).ToList();
+            }
+            if (activityTypeList.Any())
+            {
+                list = list.Where(s => activityTypeList.Contains(s.ActivityTypeId ?? 0)).ToList();
             }
             AspNetPager1.RecordCount = list.Count;
             this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
@@ -131,26 +180,18 @@ namespace WebApp.Subjects
                     object IdObj = item.GetType().GetProperty("ItemId").GetValue(item, null);
                     int Id = IdObj != null ? int.Parse(IdObj.ToString()) :0;
 
+                    object addTypeObj = item.GetType().GetProperty("AddType").GetValue(item, null);
+                    int addType = addTypeObj != null ? int.Parse(addTypeObj.ToString()) : 1;
+                    Label labAddTypeName = (Label)e.Row.FindControl("labAddTypeName");
+                    labAddTypeName.Text = CommonMethod.GetEnumDescription<GuidanceAddTypeEnum>(addType.ToString());
+
+
                     object typeIdObj = item.GetType().GetProperty("ActivityTypeId").GetValue(item, null);
                     int typeId = typeIdObj != null ? int.Parse(typeIdObj.ToString()) : 1;
                     //Label labInstallPrice = (Label)e.Row.FindControl("labInstallPrice");
                     Label labActivityName = (Label)e.Row.FindControl("labActivityName");
                     labActivityName.Text = CommonMethod.GetEnumDescription<GuidanceTypeEnum>(typeId.ToString());
-                    //if (typeId == 1)
-                    //{
-                    //    //安装
-
-                    //    var list = new InstallPriceDetailBLL().GetList(s => s.GuidanceId == Id);
-                    //    if (list.Any())
-                    //        labInstallPrice.Text = "<span  id='InstallPrice'  data-itemid='" + Id + "' name='spanInstallPrice' style=' color:green; cursor:pointer;'>查看</span>";
-                    //    else
-                    //        labInstallPrice.Text = "<span  id='InstallPrice'  data-itemid='" + Id + "' name='spanInstallPrice' style=' color:Blue; cursor:pointer;'>查看</span>";
-                    //}
-                    //else
-                    //{
-                    //    labInstallPrice.Text = "查看";
-                    //}
-
+                    
                     object IsFinishObj = item.GetType().GetProperty("IsFinish").GetValue(item, null);
                     bool IsFinish = IsFinishObj != null ? bool.Parse(IsFinishObj.ToString()) : false;
                     Label labStatus = (Label)e.Row.FindControl("labStatus");

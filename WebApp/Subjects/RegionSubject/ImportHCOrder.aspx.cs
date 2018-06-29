@@ -350,13 +350,20 @@ namespace WebApp.Subjects.RegionSubject
                             }
                             if (string.IsNullOrWhiteSpace(num))
                             {
-                                canSave = false;
-                                msg.Append("数量 为空；");
+                                //canSave = false;
+                                msg.Append("数量为空:系统自动改成1；");
+                                num = "1";
                             }
                             else if (!StringHelper.IsIntVal(num))
                             {
-                                canSave = false;
-                                msg.Append("数量填写不正确；");
+                                //canSave = false;
+                                msg.Append("数量填写不正确:系统自动改成1；");
+                                num = "1";
+                            }
+                            if (StringHelper.IsInt(num) < 1)
+                            {
+                                msg.Append("数量小于1:系统自动改成1；");
+                                num = "1";
                             }
                             if (string.IsNullOrWhiteSpace(width))
                             {

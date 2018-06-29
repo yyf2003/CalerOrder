@@ -13,9 +13,14 @@ namespace BLL
     {
         private readonly IQuoteOrderDetailDAL dal = FactoryClass.DataAccess.CreateQuoteOrderDetail();
 
-        public void UpdateRate(string subjectId, decimal rate)
+        public void UpdateRate(string sheet,string subjectId, decimal rate, int quoteItemId)
         {
-            dal.UpdateRate(subjectId, rate);
+            dal.UpdateRate(sheet,subjectId, rate, quoteItemId);
+        }
+
+        public void UpdateQuoteItemId(string guidanceId, string subjectId, int quoteItemId,string type)
+        {
+            dal.UpdateQuoteItemId(guidanceId, subjectId, quoteItemId, type);
         }
     }
 }

@@ -240,6 +240,8 @@ namespace WebApp.Subjects
                     url = string.Format("HandMadeOrder/Approve.aspx?subjectId={0}", id);
                 else if (subjectType == (int)SubjectTypeEnum.费用订单)
                     url = string.Format("PriceOrder/Approve.aspx?subjectId={0}", id);
+                else if (subjectType == (int)SubjectTypeEnum.道具订单)
+                    url = string.Format("/PropSubject/Approve.aspx?subjectId={0}", id);
                 Response.Redirect(url, false);
             }
         }

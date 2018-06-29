@@ -184,7 +184,7 @@ namespace WebApp.Statistics
                                  //join guidance in CurrentContext.DbContext.SubjectGuidance
                                  //on subject.GuidanceId equals guidance.ItemId
                                  where (guidanceList.Any() ? guidanceList.Contains(order.GuidanceId ?? 0) : 1 == 1)
-                                 && (subjectList.Any() ? subjectList.Contains(subject.Id) : 1 == 1)
+                                 && (subjectList.Any() ? (subjectList.Contains(subject.Id) || subjectList.Contains(subject.HandMakeSubjectId??0)) : 1 == 1)
                                  && (subject.IsDelete == null || subject.IsDelete == false)
                                  && subject.ApproveState == 1
                                  && (order.IsDelete == null || order.IsDelete == false)

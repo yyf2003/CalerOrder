@@ -245,7 +245,8 @@ namespace WebApp.Subjects.SupplementByRegion
                         foreach (DataRow dr in ds.Tables[0].Rows)
                         {
                             StringBuilder msg = new StringBuilder();
-                            
+                            //是否特殊活动
+                            //bool isSpecialSubject = false;
                             
                             if (cols.Contains("项目名称"))
                                 subjectName = StringHelper.ReplaceSpecialChar(dr["项目名称"].ToString().Trim());
@@ -356,13 +357,14 @@ namespace WebApp.Subjects.SupplementByRegion
                                 installPositionDescription = StringHelper.ReplaceSpecialChar(dr["安装位置描述"].ToString().Trim());
                             
                             bool canSave = true;
-                            int supplementSubjectId = 0;
+                            //int supplementSubjectId = 0;
+                            Subject supplementSubject = null;
                             if (string.IsNullOrWhiteSpace(subjectName))
                             {
                                 canSave = false;
                                 msg.Append("项目名称 为空；");
                             }
-                            else if (!CheckSubject(subjectName, out supplementSubjectId))
+                            else if (!CheckSubject(subjectId,subjectName, out supplementSubject))
                             {
                                 canSave = false;
                                 msg.Append("项目名称填写不正确；");
@@ -551,6 +553,17 @@ namespace WebApp.Subjects.SupplementByRegion
                                         }
                                     }
                                 }
+                                //暂时注释掉，
+                                //if (supplementSubject != null && (supplementSubject.SubjectItemType ?? 1) == (int)SubjectItemTypeEnum.Supplement)
+                                //{ 
+                                //   //如果是上海增补（特殊活动），就检查增补项目位置是否存在
+                                //    if (!CheckSpecialSubjectSheet(supplementSubject.SupplementSubjectId??0, sheet))
+                                //    {
+                                //        canSave = false;
+                                //        msg.Append("活动项目不含该增补位置；");
+                                //    }
+                                //}
+
                             }
                             if (canSave)
                             {
@@ -574,7 +587,7 @@ namespace WebApp.Subjects.SupplementByRegion
                                     detailModel.Remark =remark;
                                     detailModel.ShopId = shopId;
                                     detailModel.SubjectId = subjectId;
-                                    detailModel.HandMakeSubjectId = supplementSubjectId;
+                                    detailModel.HandMakeSubjectId = supplementSubject.Id;
                                     detailModel.AddDate = DateTime.Now;
                                     detailModel.AddUserId = CurrentUser.UserId;
                                     detailModel.MaterialSupport = string.Empty;
@@ -594,7 +607,7 @@ namespace WebApp.Subjects.SupplementByRegion
                                     detailModel.Sheet = sheet;
                                     detailModel.ShopId = shopId;
                                     detailModel.SubjectId = subjectId;
-                                    detailModel.HandMakeSubjectId = supplementSubjectId;
+                                    detailModel.HandMakeSubjectId = supplementSubject.Id;
                                     detailModel.MaterialSupport = materialSupport;
                                     detailModel.POSScale = posScale;
                                     detailModel.MachineFrame = machineFrame;
@@ -1236,7 +1249,7 @@ namespace WebApp.Subjects.SupplementByRegion
 
 
        
-
+        /* 
         Dictionary<string, int> subjectList = new Dictionary<string, int>();
         bool CheckSubject(string subjectName, out int supplementSubjectId)
         {
@@ -1274,7 +1287,7 @@ namespace WebApp.Subjects.SupplementByRegion
             }
             return supplementSubjectId>0;
         }
-
+        */
         //提交
         protected void btnSubmit_Click(object sender, EventArgs e)
         {
@@ -1308,6 +1321,7 @@ namespace WebApp.Subjects.SupplementByRegion
                             //});
                             model.ApproveState = 0;
                             model.Status = 4;
+                            model.SubmitDate = DateTime.Now;
                             subjectBll.Update(model);
                             isOk = true;
                         }
@@ -1385,6 +1399,13 @@ namespace WebApp.Subjects.SupplementByRegion
                 }
             }
         }
+
+
+        
+
+        
+
+
        
     }
 }

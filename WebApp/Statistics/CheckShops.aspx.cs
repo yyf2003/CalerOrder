@@ -173,7 +173,7 @@ namespace WebApp.Statistics
                    }
                }
                if (subjectIdList.Any())
-                   orderList = orderList.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
+                   orderList = orderList.Where(s => subjectIdList.Contains(s.subject.Id) || subjectIdList.Contains(s.subject.HandMakeSubjectId??0)).ToList();
                //if (regionList.Any())
                //{
                //    //orderList = orderList.Where(s => regionList.Contains(s.shop.RegionName.ToLower())).ToList();

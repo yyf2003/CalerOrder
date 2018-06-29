@@ -46,7 +46,23 @@
                    <asp:TextBox ID="txtGuidanceName" runat="server" MaxLength="50"></asp:TextBox>
                 </td>
             </tr>
-           
+           <tr class="tr_bai">
+                <td style="width: 120px;">
+                    类型
+                </td>
+                <td style="text-align: left; padding-left: 5px; width: 250px;">
+                    <asp:CheckBoxList ID="cblAddType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                    </asp:CheckBoxList>
+                </td>
+                <td style="width: 120px;">
+                    活动类型
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    
+                    <asp:CheckBoxList ID="cblActivityType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                    </asp:CheckBoxList>
+                </td>
+            </tr>
             <tr class="tr_bai">
                 <td colspan="4" style="padding-right: 20px; text-align: right; height: 30px;">
                     <asp:Button ID="btnSearch" runat="server" Text="查 询" class="easyui-linkbutton" 
@@ -74,13 +90,16 @@
             </asp:TemplateField>
             <asp:BoundField DataField="CustomerName" HeaderText="客户名称" HeaderStyle-BorderColor="#dce0e9"/>
             <asp:BoundField DataField="ItemName" HeaderText="活动名称" HeaderStyle-BorderColor="#dce0e9"/>
-           
+            <asp:TemplateField HeaderText="类型"  HeaderStyle-BorderColor="#dce0e9">
+                <ItemTemplate>
+                    <asp:Label ID="labAddTypeName" runat="server" Text=""></asp:Label>
+                </ItemTemplate>
+                <HeaderStyle Width="50px"></HeaderStyle>
+             </asp:TemplateField>
             <asp:TemplateField HeaderText="活动类型"  HeaderStyle-BorderColor="#dce0e9">
                 <ItemTemplate>
                     <asp:Label ID="labActivityName" runat="server" Text=""></asp:Label>
-                    
                 </ItemTemplate>
-                
             </asp:TemplateField>
             <asp:BoundField DataField="BeginDate" DataFormatString={0:yyyy-MM-dd} HeaderText="开始时间" HeaderStyle-BorderColor="#dce0e9"/>
             <asp:BoundField DataField="EndDate" DataFormatString={0:yyyy-MM-dd} HeaderText="结束时间" HeaderStyle-BorderColor="#dce0e9"/>
@@ -111,13 +130,6 @@
                 </ItemTemplate>
                 <HeaderStyle Width="50px"></HeaderStyle>
             </asp:TemplateField>
-            <%--<asp:TemplateField HeaderText="安装费" Visible="false"  HeaderStyle-BorderColor="#dce0e9">
-                <ItemTemplate>
-                    <asp:Label ID="labInstallPrice" runat="server" Text=""></asp:Label>
-                
-                </ItemTemplate>
-                <HeaderStyle Width="60px"></HeaderStyle>
-            </asp:TemplateField>--%>
             
              <asp:TemplateField HeaderText="操作" Visible="false"  HeaderStyle-BorderColor="#dce0e9">
                 <ItemTemplate>

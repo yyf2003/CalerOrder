@@ -362,9 +362,15 @@ var shop = {
                     $("#labOOHOutsourceName").html(shop[0].OOHOutsourceName);
                     $("#labBCSOutsourceName").html(shop[0].BCSOutsourctName);
                     $("#labProductOutsourceName").html(shop[0].ProductOutsourctName);
+
+                    $("#labGenericInstall").html(shop[0].GenericIsInstall);
+                    $("#labGenericInstallPrice").html(shop[0].GenericInstallPrice);
+                    $("#labOutsourceGenericInstallPrice").html(shop[0].OutsourceGenericInstallPrice);
+
+
                     $("#checkDiv").show().dialog({
                         modal: true,
-                        width: 820,
+                        width: 880,
                         height: 595,
                         iconCls: 'icon-add',
                         resizable: false
@@ -429,6 +435,11 @@ var shop = {
                     $("#txtOutsourceInstallPrice").val(shopJson[0].OutsourceInstallPrice);
                     $("#txtOutsourceBCSInstallPrice").val(shopJson[0].OutsourceBCSInstallPrice);
                     $("#txtShopType").val(shopJson[0].ShopType);
+
+                    $("#seleGenericIsInstall").val(shopJson[0].GenericIsInstall);
+                    $("#txtGenericInstallPrice").val(shopJson[0].GenericInstallPrice);
+                    $("#txtOutsourceGenericInstallPrice").val(shopJson[0].OutsourceGenericInstallPrice);
+
                     CSUserId = shopJson[0].CSUserId || 0;
                     currCustomerId = shopJson[0].CustomerId;
                     outsourceId = shopJson[0].OutsourceId;
@@ -439,8 +450,8 @@ var shop = {
                     //shop.getOOHInstallOutsourceList();
                     $("#editDiv").show().dialog({
                         modal: true,
-                        width: 870,
-                        height: 602,
+                        width: 880,
+                        height: 610,
                         iconCls: 'icon-add',
                         resizable: false,
                         buttons: [
@@ -605,7 +616,7 @@ var shop = {
 
         $("#editDiv").show().dialog({
             modal: true,
-            width: 870,
+            width: 880,
             height: 602,
             iconCls: 'icon-add',
             resizable: false,
@@ -771,8 +782,7 @@ function CheckVal() {
     var AgentName = $.trim($("#txtAgentName").val());
     //var CityTier = $.trim($("#txtCityTier").val());
     var CityTier = $("#seleCityTier").val();
-    var IsInstall = $("#seleIsInstall").val();
-    var BCSIsInstall = $("#seleBCSIsInstall").val();
+   
     var Contact1 = $.trim($("#txtContact1").val());
     var Tel1 = $.trim($("#txtTel1").val());
     var Contact2 = $.trim($("#txtContact2").val());
@@ -782,7 +792,7 @@ function CheckVal() {
     var LocationType = $.trim($("#txtLocationType").val());
     var BusinessModel = $.trim($("#txtBusinessModel").val());
     var OpeningDate = $.trim($("#txtOpenDate").val());
-    //var Status = $.trim($("#txtStatus").val());
+    
 
     var Status = $("input:radio[name='rblStatus']:checked").val()||"正常";
     var POPAddress = $.trim($("#txtAddress").val());
@@ -790,15 +800,25 @@ function CheckVal() {
     var remark = $.trim($("#txtRemark").val());
 
     var shopLevel = $.trim($("#txtShopLevel").val());
+    var shopType = $.trim($("#txtShopType").val());
+
+    var IsInstall = $("#seleIsInstall").val();
+    var BCSIsInstall = $("#seleBCSIsInstall").val();
+    var genericIsInstall = $("#seleGenericIsInstall").val();
+
     var basicInstallPrice = $.trim($("#txtBasicInstallPrice").val());
     var bcsInstallPrice = $.trim($("#txtBCSInstallPrice").val());
     var osInstallPrice = $.trim($("#txtOutsourceInstallPrice").val());
     var osBCSInstallPrice = $.trim($("#txtOutsourceBCSInstallPrice").val());
-    var shopType = $.trim($("#txtShopType").val());
+
+    var genericInstallPrice = $.trim($("#txtGenericInstallPrice").val());
+    var osGenericInstallPrice = $.trim($("#txtOutsourceGenericInstallPrice").val());
+
     var outsourceId0 = $("#seleOutsource").val();
     var oohOutsourceId0 = $("#seleOOHInstallOutsource").val();
     var bcsOutsourceId0 = $("#seleBCSOutsource").val();
     var productOutsourceId0 = $("#seleProductOutsource").val();
+
     jsonStr = "";
     if (RegionId == "0") {
         alert("请填写客户");
@@ -833,15 +853,28 @@ function CheckVal() {
         return false;
     }
     if (basicInstallPrice != "" && isNaN(basicInstallPrice)) {
-        alert("基础安装费必须是数字");
-        return false;
-    }
-    if (bcsInstallPrice != "" && isNaN(bcsInstallPrice)) {
-        alert("三叶草特殊安装费必须是数字");
+        alert("大货安装费应收必须是数字");
         return false;
     }
     if (osInstallPrice != "" && isNaN(osInstallPrice)) {
-        alert("外协安装费必须是数字");
+        alert("大货安装费应付必须是数字");
+        return false;
+    }
+    if (bcsInstallPrice != "" && isNaN(bcsInstallPrice)) {
+        alert("三叶草安装费应收必须是数字");
+        return false;
+    }
+    if (osBCSInstallPrice != "" && isNaN(osBCSInstallPrice)) {
+        alert("三叶草安装费应付必须是数字");
+        return false;
+    }
+
+    if (genericInstallPrice != "" && isNaN(genericInstallPrice)) {
+        alert("常规安装费应收必须是数字");
+        return false;
+    }
+    if (osGenericInstallPrice != "" && isNaN(osGenericInstallPrice)) {
+        alert("常规安装费应付必须是数字");
         return false;
     }
     if (RegionName.toLowerCase() != 'west' && outsourceId0 == 0) {
@@ -852,7 +885,11 @@ function CheckVal() {
     bcsInstallPrice = bcsInstallPrice.length > 0 ? bcsInstallPrice : 0;
     osInstallPrice = osInstallPrice.length > 0 ? osInstallPrice : 0;
     osBCSInstallPrice = osBCSInstallPrice.length > 0 ? osBCSInstallPrice : 0;
-    jsonStr = '{"Id":' + currShopId + ',"CustomerId":' + customerId + ',"ShopName":"' + POSName + '","ShopNo":"' + POSCode + '","RegionId":' + RegionId + ',"RegionName":"' + RegionName + '","ProvinceId":' + ProvinceId + ',"ProvinceName":"' + ProvinceName + '","CityId":' + CityId + ',"CityName":"' + CityName + '","AreaId":' + AreaId + ',"AreaName":"' + AreaName + '","CityTier":"' + CityTier + '","IsInstall":"' + IsInstall + '","AgentCode":"' + AgentNo + '","AgentName":"' + AgentName + '","POPAddress":"' + POPAddress + '","Contact1":"' + Contact1 + '","Tel1":"' + Tel1 + '","Contact2":"' + Contact2 + '","Tel2":"' + Tel2 + '","Channel":"' + Channel + '","Format":"' + Format + '","LocationType":"' + LocationType + '","BusinessModel":"' + BusinessModel + '","OpeningDate":"' + OpeningDate + '","Status":"' + Status + '","CSUserId":' + csUserId + ',"Remark":"' + remark + '","BasicInstallPrice":' + basicInstallPrice + ',"ShopType":"' + shopType + '","BCSInstallPrice":' + bcsInstallPrice + ',"OutsourceInstallPrice":' + osInstallPrice + ',"OutsourceBCSInstallPrice":' + osBCSInstallPrice + ',"OutsourceId":' + outsourceId0 + ',"OOHInstallOutsourceId":' + oohOutsourceId0 + ',"BCSIsInstall":"' + BCSIsInstall + '","BCSOutsourceId":"' + bcsOutsourceId0 + '","ProductOutsourceId":"' + productOutsourceId0 + '"}';
+
+    genericInstallPrice = genericInstallPrice.length > 0 ? genericInstallPrice : 0;
+    osGenericInstallPrice = osGenericInstallPrice.length > 0 ? osGenericInstallPrice : 0;
+
+    jsonStr = '{"Id":' + currShopId + ',"CustomerId":' + customerId + ',"ShopName":"' + POSName + '","ShopNo":"' + POSCode + '","RegionId":' + RegionId + ',"RegionName":"' + RegionName + '","ProvinceId":' + ProvinceId + ',"ProvinceName":"' + ProvinceName + '","CityId":' + CityId + ',"CityName":"' + CityName + '","AreaId":' + AreaId + ',"AreaName":"' + AreaName + '","CityTier":"' + CityTier + '","IsInstall":"' + IsInstall + '","AgentCode":"' + AgentNo + '","AgentName":"' + AgentName + '","POPAddress":"' + POPAddress + '","Contact1":"' + Contact1 + '","Tel1":"' + Tel1 + '","Contact2":"' + Contact2 + '","Tel2":"' + Tel2 + '","Channel":"' + Channel + '","Format":"' + Format + '","LocationType":"' + LocationType + '","BusinessModel":"' + BusinessModel + '","OpeningDate":"' + OpeningDate + '","Status":"' + Status + '","CSUserId":' + csUserId + ',"Remark":"' + remark + '","BasicInstallPrice":' + basicInstallPrice + ',"ShopType":"' + shopType + '","BCSInstallPrice":' + bcsInstallPrice + ',"OutsourceInstallPrice":' + osInstallPrice + ',"OutsourceBCSInstallPrice":' + osBCSInstallPrice + ',"OutsourceId":' + outsourceId0 + ',"OOHInstallOutsourceId":' + oohOutsourceId0 + ',"BCSIsInstall":"' + BCSIsInstall + '","BCSOutsourceId":"' + bcsOutsourceId0 + '","ProductOutsourceId":"' + productOutsourceId0 + '","GenericIsInstall":"' + genericIsInstall + '","GenericInstallPrice":' + genericInstallPrice + ',"OutsourceGenericInstallPrice":' + osGenericInstallPrice + '}';
 
     return true;
 }

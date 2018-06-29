@@ -56,9 +56,10 @@
                     类型
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:RadioButtonList ID="rblType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
-                        <asp:ListItem Value="1" Selected="True">新建&nbsp;</asp:ListItem>
+                    <asp:RadioButtonList ID="rblAddType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                        <%--<asp:ListItem Value="1" Selected="True">新建&nbsp;</asp:ListItem>--%>
                        <%-- <asp:ListItem Value="2">二次安装&nbsp;</asp:ListItem>--%>
+
                     </asp:RadioButtonList>
                 </td>
             </tr>
@@ -78,7 +79,7 @@
                     活动月份
                 </td>
                 <td style="text-align: left; padding-left: 5px; width: 300px;">
-                    <asp:TextBox ID="txtGuidanceMonth" runat="server" CssClass="Wdate" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy年MM月'})"
+                    <asp:TextBox ID="txtGuidanceMonth" runat="server" CssClass="Wdate" autocomplete="off" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy年MM月'})"
                         MaxLength="20"></asp:TextBox>
                     <span style="color: Red;">*</span>
                 </td>
@@ -86,15 +87,15 @@
                     起始时间
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtBeginDate" runat="server" CssClass="Wdate" onclick="WdatePicker()"
+                    <asp:TextBox ID="txtBeginDate" runat="server" CssClass="Wdate" autocomplete="off" onclick="WdatePicker()"
                         MaxLength="20"></asp:TextBox>
                     —
-                    <asp:TextBox ID="txtEndDate" runat="server" CssClass="Wdate" onclick="WdatePicker()"
+                    <asp:TextBox ID="txtEndDate" runat="server" CssClass="Wdate" autocomplete="off" onclick="WdatePicker()"
                         MaxLength="20"></asp:TextBox>
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
-             <tr class="tr_bai">
+            <tr class="tr_bai">
                 <td>
                     活动类型
                 </td>
@@ -118,7 +119,7 @@
                     </asp:DropDownList>
                 </td>
              </tr>
-            <tr class="tr_bai">
+            <tr class="tr_bai poptr" >
                 <td>
                     材质价格方案
                 </td>
@@ -129,7 +130,7 @@
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
-            <tr class="tr_bai">
+            <tr class="tr_bai poptr">
                 <td>
                     项目分类
                 </td>
@@ -138,7 +139,7 @@
                     </div>
                 </td>
             </tr>
-            <tr class="tr_bai">
+            <tr class="tr_bai poptr">
                 <td>
                     项目命名规范
                 </td>
@@ -181,7 +182,7 @@
 <script type="text/javascript">
     function CheckVal() {
         var ItemName = $.trim($("#txtItemName").val());
-
+        var addType = $("input[name='rblAddType']:checked").val() || 1;
         var ActivityType = $("input:radio[name='rblActivityType']:checked").val() || -1;
 
         var month = $.trim($("#txtGuidanceMonth").val());
@@ -197,16 +198,6 @@
             alert("请输入活动名称");
             return false;
         }
-        if (ActivityType == -1) {
-            alert("请选择活动类型");
-            return false;
-        }
-        if (ActivityType == 2) {
-            if (experssPrice == 0) {
-                alert("请选择发货费");
-                return false;
-            }
-        }
         if (month == "") {
             alert("请选择活动月份");
             return false;
@@ -219,30 +210,42 @@
             alert("请选择结束时间");
             return false;
         }
-        var subjectTypes = "";
-        $("input[name='txtTypeName']").each(function () {
-            var str = "";
-            var text = $.trim($(this).val());
-            if (text != "") {
-                var id = $(this).data("typeid") || 0;
-                str = id + ":" + text;
-                subjectTypes += str + "|";
+        if (ActivityType == -1) {
+            alert("请选择活动类型");
+            return false;
+        }
+        if (ActivityType == 2 && addType==1) {
+            if (experssPrice == 0) {
+                alert("请选择发货费");
+                return false;
             }
-        })
-        if (subjectTypes.length > 0) {
-            subjectTypes = subjectTypes.substring(0, subjectTypes.length - 1);
-            $("#hfSubjectType").val(subjectTypes);
         }
-        else {
-            alert("至少填写一个项目分类");
-            return false;
-        }
+        
+        if (addType == 1) {
+            var subjectTypes = "";
+            $("input[name='txtTypeName']").each(function () {
+                var str = "";
+                var text = $.trim($(this).val());
+                if (text != "") {
+                    var id = $(this).data("typeid") || 0;
+                    str = id + ":" + text;
+                    subjectTypes += str + "|";
+                }
+            })
+            if (subjectTypes.length > 0) {
+                subjectTypes = subjectTypes.substring(0, subjectTypes.length - 1);
+                $("#hfSubjectType").val(subjectTypes);
+            }
+            else {
+                alert("至少填写一个项目分类");
+                return false;
+            }
 
-        if (SubjectNames == "") {
-            alert("请输入项目命名规范");
-            return false;
+            if (SubjectNames == "") {
+                alert("请输入项目命名规范");
+                return false;
+            }
         }
-
         if (confirm("是否提交？")) {
             $("#buttonDiv").hide();
             $("#waitingDiv").show();
@@ -252,6 +255,7 @@
     }
 
     $(function () {
+        changeAddType();
         show();
         $("body").keydown(function (event) {
 
@@ -268,7 +272,7 @@
         $("#typeContainer").delegate("span[name='deletetype']", "click", function () {
             var input = $(this).prev("input");
             var span = $(this);
-            
+
             var typeId = input.data("typeid") || 0;
             if (typeId > 0) {
                 $.ajax({
@@ -300,6 +304,10 @@
 
             show();
         })
+
+        $("input[name='rblAddType']").change(function () {
+            changeAddType();
+        })
     })
 
     function show() {
@@ -317,7 +325,16 @@
         else if (val == 3) {
             $("#rblHasExperssFees").show();
         }
-        
-       
+
+
+    }
+
+    function changeAddType() {
+        var addType = $("input[name='rblAddType']:checked").val() || 1;
+        if (addType == 1) {
+            $(".poptr").show();
+        }
+        else
+            $(".poptr").hide();
     }
 </script>

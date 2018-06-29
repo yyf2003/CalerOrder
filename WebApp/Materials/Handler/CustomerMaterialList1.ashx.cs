@@ -180,19 +180,27 @@ namespace WebApp.Materials.Handler
                     list = list.OrderBy(s => s.cm.BasicCategoryId).Skip((currPage - 1) * pageSize).Take(pageSize).ToList();
                     int index = 1;
                     OutsourceMaterialInfoBLL outMaterialBll = new OutsourceMaterialInfoBLL();
+                    var outsourceMaterialList = (from material in CurrentContext.DbContext.OutsourceMaterialInfo
+                                                 join priceItem in CurrentContext.DbContext.OutsourceMaterialPriceItem
+                                                 on material.PriceItemId equals priceItem.Id
+                                                 where (priceItem.IsDelete == null || priceItem.IsDelete == false)
+                                                 && material.CustomerId == customerId
+                                                 select material).ToList();
                     list.ForEach(s =>
                     {
                         decimal PayPriceInstall = 0;
                         decimal PayPriceSend = 0;
                         int materialId = s.cm.BasicMaterialId ?? 0;
-                        var omModel = outMaterialBll.GetList(o => o.BasicMaterialId == materialId).FirstOrDefault();
+                        int outsourceMaterialId = 0;
+                        var omModel = outsourceMaterialList.Where(o => o.BasicMaterialId == materialId).FirstOrDefault();
                         if (omModel != null)
                         {
                             PayPriceInstall = omModel.InstallPrice ?? 0;
                             PayPriceSend = omModel.SendPrice ?? 0;
+                            outsourceMaterialId = omModel.Id;
                         }
                         string state = s.cm.IsDelete != null && s.cm.IsDelete == true ? "已删除" : "正常";
-                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.cm.Id + "\",\"MaterialName\":\"" + s.MaterialName + "\",\"CustomerId\":\"" + s.cm.CustomerId + "\",\"CustomerName\":\"" + s.CustomerName + "\",\"UnitId\":\"" + s.cm.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"State\":\"" + state + "\",\"Price\":\"" + s.cm.Price + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"BasicMaterialId\":\"" + s.cm.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.cm.BasicCategoryId + "\",\"PayPriceInstall\":\"" + PayPriceInstall + "\",\"PayPriceSend\":\"" + PayPriceSend + "\"},");
+                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.cm.Id + "\",\"MaterialName\":\"" + s.MaterialName + "\",\"CustomerId\":\"" + s.cm.CustomerId + "\",\"CustomerName\":\"" + s.CustomerName + "\",\"UnitId\":\"" + s.cm.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"State\":\"" + state + "\",\"Price\":\"" + s.cm.Price + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"BasicMaterialId\":\"" + s.cm.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.cm.BasicCategoryId + "\",\"PayPriceInstall\":\"" + PayPriceInstall + "\",\"PayPriceSend\":\"" + PayPriceSend + "\",\"OutsourceMaterialId\":\"" + outsourceMaterialId + "\"},");
                         index++;
                     });
                     if (json.Length > 0)
@@ -231,8 +239,30 @@ namespace WebApp.Materials.Handler
             if (list.Any())
             {
                 StringBuilder json = new StringBuilder();
+                int customerId = 0;
+                if (context1.Request.QueryString["customerId"] != null)
+                {
+                    customerId = int.Parse(context1.Request.QueryString["customerId"]);
+                }
+                //外协材质报价
+                var outsourceMaterialList = (from material in CurrentContext.DbContext.OutsourceMaterialInfo
+                                             join priceItem in CurrentContext.DbContext.OutsourceMaterialPriceItem
+                                             on material.PriceItemId equals priceItem.Id
+                                             where (priceItem.IsDelete == null || priceItem.IsDelete == false)
+                                             && material.CustomerId == customerId
+                                             select material).ToList();
                 list.ForEach(s => {
-                    json.Append("{\"Id\":\""+s.Id+"\",\"UnitId\":\""+s.UnitId+"\",\"MaterialName\":\""+s.MaterialName+"\"},");
+                    decimal PayPriceInstall = 0;//应付安装价格
+                    decimal PayPriceSend = 0;//应付发货价格
+                    int outsourceMaterialId = 0;
+                    var omModel = outsourceMaterialList.Where(o => o.BasicMaterialId == s.Id).FirstOrDefault();
+                    if (omModel != null)
+                    {
+                        PayPriceInstall = omModel.InstallPrice ?? 0;
+                        PayPriceSend = omModel.SendPrice ?? 0;
+                        outsourceMaterialId = omModel.Id;
+                    }
+                    json.Append("{\"Id\":\"" + s.Id + "\",\"UnitId\":\"" + s.UnitId + "\",\"MaterialName\":\"" + s.MaterialName + "\",\"PayPriceInstall\":\"" + PayPriceInstall + "\",\"PayPriceSend\":\"" + PayPriceSend + "\",\"OutsourceMaterialId\":\"" + outsourceMaterialId + "\"},");
                 });
                 return "[" + json.ToString().TrimEnd(',') + "]";
             }
@@ -293,31 +323,53 @@ namespace WebApp.Materials.Handler
                                 model.IsDelete = false;
                                 bll.Add(model);
                             }
-                            outsourceMaterialInfoModel = outMaterialBll.GetList(s=>s.BasicMaterialId==model.BasicMaterialId).FirstOrDefault();
-                            if (outsourceMaterialInfoModel != null)
+                            if ((model.OutsourceMaterialId ?? 0) > 0)
                             {
-                                if (outsourceMaterialInfoModel.InstallPrice != model.PayPriceInstall || outsourceMaterialInfoModel.SendPrice != model.PayPriceSend)
+                                outsourceMaterialInfoModel = outMaterialBll.GetModel(model.OutsourceMaterialId ?? 0);
+                                if (outsourceMaterialInfoModel != null)
                                 {
-                                    outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
-                                    outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
-                                    outMaterialBll.Update(outsourceMaterialInfoModel);
+                                    if (outsourceMaterialInfoModel.InstallPrice != model.PayPriceInstall || outsourceMaterialInfoModel.SendPrice != model.PayPriceSend)
+                                    {
+                                        outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                                        outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
+                                        outMaterialBll.Update(outsourceMaterialInfoModel);
+                                    }
                                 }
                             }
                             else
                             {
-                                outsourceMaterialInfoModel = new OutsourceMaterialInfo();
-                                outsourceMaterialInfoModel.AddDate = DateTime.Now;
-                                outsourceMaterialInfoModel.AddUserId = new BasePage().CurrentUser.UserId;
-                                outsourceMaterialInfoModel.BasicCategoryId = model.BasicCategoryId;
-                                outsourceMaterialInfoModel.BasicMaterialId = model.BasicMaterialId;
-                                outsourceMaterialInfoModel.CustomerId = model.CustomerId;
-                                outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
-                                outsourceMaterialInfoModel.IsDelete = false;
-                                outsourceMaterialInfoModel.PriceItemId = 1;
-                                outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
-                                outsourceMaterialInfoModel.UnitId = model.UnitId;
-                                outMaterialBll.Add(outsourceMaterialInfoModel);
+                                //获取启用的外协报价项目
+                                OutsourceMaterialPriceItem itemModel = new OutsourceMaterialPriceItemBLL().GetList(s => s.IsDelete == null || s.IsDelete == false).FirstOrDefault();
+                                if (itemModel != null)
+                                {
+                                    outsourceMaterialInfoModel = new OutsourceMaterialInfo();
+                                    outsourceMaterialInfoModel.AddDate = DateTime.Now;
+                                    outsourceMaterialInfoModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                    outsourceMaterialInfoModel.BasicCategoryId = model.BasicCategoryId;
+                                    outsourceMaterialInfoModel.BasicMaterialId = model.BasicMaterialId;
+                                    outsourceMaterialInfoModel.CustomerId = model.CustomerId;
+                                    outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                                    outsourceMaterialInfoModel.IsDelete = false;
+                                    outsourceMaterialInfoModel.PriceItemId = itemModel.Id;
+                                    outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
+                                    outsourceMaterialInfoModel.UnitId = model.UnitId;
+                                    outMaterialBll.Add(outsourceMaterialInfoModel);
+                                }
                             }
+                            //outsourceMaterialInfoModel = outMaterialBll.GetList(s=>s.BasicMaterialId==model.BasicMaterialId).FirstOrDefault();
+                            //if (outsourceMaterialInfoModel != null)
+                            //{
+                            //    if (outsourceMaterialInfoModel.InstallPrice != model.PayPriceInstall || outsourceMaterialInfoModel.SendPrice != model.PayPriceSend)
+                            //    {
+                            //        outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                            //        outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
+                            //        outMaterialBll.Update(outsourceMaterialInfoModel);
+                            //    }
+                            //}
+                            //else
+                            //{
+                                
+                            //}
                         }
                     }
                     else
@@ -348,32 +400,64 @@ namespace WebApp.Materials.Handler
                                     orderMModel.IsDelete = false;
                                     orderMaterialBll.Add(orderMModel);
 
-
-                                    outsourceMaterialInfoModel = outMaterialBll.GetList(s => s.BasicMaterialId == model.BasicMaterialId).FirstOrDefault();
-                                    if (outsourceMaterialInfoModel != null)
+                                    if ((model.OutsourceMaterialId ?? 0) > 0)
                                     {
-                                        if (outsourceMaterialInfoModel.InstallPrice != model.PayPriceInstall || outsourceMaterialInfoModel.SendPrice != model.PayPriceSend)
+                                        outsourceMaterialInfoModel = outMaterialBll.GetModel(model.OutsourceMaterialId ?? 0);
+                                        if (outsourceMaterialInfoModel != null)
                                         {
-                                            outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
-                                            outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
-                                            outMaterialBll.Update(outsourceMaterialInfoModel);
+                                            if (outsourceMaterialInfoModel.InstallPrice != model.PayPriceInstall || outsourceMaterialInfoModel.SendPrice != model.PayPriceSend)
+                                            {
+                                                outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                                                outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
+                                                outMaterialBll.Update(outsourceMaterialInfoModel);
+                                            }
                                         }
                                     }
                                     else
                                     {
-                                        outsourceMaterialInfoModel = new OutsourceMaterialInfo();
-                                        outsourceMaterialInfoModel.AddDate = DateTime.Now;
-                                        outsourceMaterialInfoModel.AddUserId = new BasePage().CurrentUser.UserId;
-                                        outsourceMaterialInfoModel.BasicCategoryId = model.BasicCategoryId;
-                                        outsourceMaterialInfoModel.BasicMaterialId = model.BasicMaterialId;
-                                        outsourceMaterialInfoModel.CustomerId = model.CustomerId;
-                                        outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
-                                        outsourceMaterialInfoModel.IsDelete = false;
-                                        outsourceMaterialInfoModel.PriceItemId = 1;
-                                        outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
-                                        outsourceMaterialInfoModel.UnitId = model.UnitId;
-                                        outMaterialBll.Add(outsourceMaterialInfoModel);
+                                        //获取启用的外协报价项目
+                                        OutsourceMaterialPriceItem itemModel = new OutsourceMaterialPriceItemBLL().GetList(s => s.IsDelete == null || s.IsDelete == false).FirstOrDefault();
+                                        if (itemModel != null)
+                                        {
+                                            outsourceMaterialInfoModel = new OutsourceMaterialInfo();
+                                            outsourceMaterialInfoModel.AddDate = DateTime.Now;
+                                            outsourceMaterialInfoModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                            outsourceMaterialInfoModel.BasicCategoryId = model.BasicCategoryId;
+                                            outsourceMaterialInfoModel.BasicMaterialId = model.BasicMaterialId;
+                                            outsourceMaterialInfoModel.CustomerId = model.CustomerId;
+                                            outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                                            outsourceMaterialInfoModel.IsDelete = false;
+                                            outsourceMaterialInfoModel.PriceItemId = itemModel.Id;
+                                            outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
+                                            outsourceMaterialInfoModel.UnitId = model.UnitId;
+                                            outMaterialBll.Add(outsourceMaterialInfoModel);
+                                        }
                                     }
+                                    //outsourceMaterialInfoModel = outMaterialBll.GetList(s => s.BasicMaterialId == model.BasicMaterialId).FirstOrDefault();
+                                    //if (outsourceMaterialInfoModel != null)
+                                    //{
+                                    //    if (outsourceMaterialInfoModel.InstallPrice != model.PayPriceInstall || outsourceMaterialInfoModel.SendPrice != model.PayPriceSend)
+                                    //    {
+                                    //        outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                                    //        outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
+                                    //        outMaterialBll.Update(outsourceMaterialInfoModel);
+                                    //    }
+                                    //}
+                                    //else
+                                    //{
+                                    //    outsourceMaterialInfoModel = new OutsourceMaterialInfo();
+                                    //    outsourceMaterialInfoModel.AddDate = DateTime.Now;
+                                    //    outsourceMaterialInfoModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                    //    outsourceMaterialInfoModel.BasicCategoryId = model.BasicCategoryId;
+                                    //    outsourceMaterialInfoModel.BasicMaterialId = model.BasicMaterialId;
+                                    //    outsourceMaterialInfoModel.CustomerId = model.CustomerId;
+                                    //    outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                                    //    outsourceMaterialInfoModel.IsDelete = false;
+                                    //    outsourceMaterialInfoModel.PriceItemId = 1;
+                                    //    outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
+                                    //    outsourceMaterialInfoModel.UnitId = model.UnitId;
+                                    //    outMaterialBll.Add(outsourceMaterialInfoModel);
+                                    //}
                                 }
                                 
                             }

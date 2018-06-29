@@ -99,7 +99,7 @@ namespace WebApp.Statistics
                              join subject in CurrentContext.DbContext.Subject
                              on order.SubjectId equals subject.Id
                              where
-                             subjectIdList.Contains(subject.Id)
+                             (subjectIdList.Contains(subject.Id) || subjectIdList.Contains(subject.HandMakeSubjectId??0))
                              && (subject.IsDelete == null || subject.IsDelete == false)
                              && subject.ApproveState == 1
 
@@ -143,7 +143,7 @@ namespace WebApp.Statistics
                              join subject in CurrentContext.DbContext.Subject
                              on order.SubjectId equals subject.Id
                              where
-                              subjectIdList.Contains(subject.Id)
+                             (subjectIdList.Contains(subject.Id) || subjectIdList.Contains(subject.HandMakeSubjectId ?? 0))
                              && (subject.IsDelete == null || subject.IsDelete == false)
                            
                              && subject.ApproveState == 1

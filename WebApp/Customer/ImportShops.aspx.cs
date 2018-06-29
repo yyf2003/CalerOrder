@@ -99,33 +99,61 @@ namespace WebApp.Customer
                     ExcelConnStr = ExcelConnStr.Replace("ExcelPath", path);
                     conn = new OleDbConnection(ExcelConnStr);
                     conn.Open();
-                    string sql = "select * from [Sheet1$]";
-                    da = new OleDbDataAdapter(sql, conn);
-                    ds = new DataSet();
-                    da.Fill(ds);
-                    da.Dispose();
+                    
+                    
                     string fileType = rblImportType.SelectedValue;
                     switch (fileType)
                     {
-                        case "1":
+                        case "1"://店铺信息
+
+                            string sql1 = "select * from [pop$]";
+                            da = new OleDbDataAdapter(sql1, conn);
+                            ds = new DataSet();
+                            da.Fill(ds);
+                            da.Dispose();
                             ImportShop(ds);
                             regionList.Clear();
                             placeList.Clear();
                             break;
                         case "2":
+                            string sql2 = "select * from [pop$]";
+                            da = new OleDbDataAdapter(sql2, conn);
+                            ds = new DataSet();
+                            da.Fill(ds);
+                            da.Dispose();
                             ImportPOP(ds);
                             positionList.Clear();
                             break;
                         case "3":
+                            string sql3 = "select * from [器架$]";
+                            da = new OleDbDataAdapter(sql3, conn);
+                            ds = new DataSet();
+                            da.Fill(ds);
+                            da.Dispose();
                             ImportMachineFrame(ds);
                             break;
                         case "4":
+                            string sql4 = "select * from [Sheet1$]";
+                            da = new OleDbDataAdapter(sql4, conn);
+                            ds = new DataSet();
+                            da.Fill(ds);
+                            da.Dispose();
                             ImportShopCharges(ds);
                             break;
                         case "5":
+                            string sql5 = "select * from [Sheet1$]";
+                            da = new OleDbDataAdapter(sql5, conn);
+                            ds = new DataSet();
+                            da.Fill(ds);
+                            da.Dispose();
                             ImportOutsourceInstallPrice(ds);
                             break;
                         case "6":
+                            string sql6 = "select * from [Sheet1$]";
+                            da = new OleDbDataAdapter(sql6, conn);
+                            ds = new DataSet();
+                            da.Fill(ds);
+                            da.Dispose();
                             UpdateCustomerServiceId(ds);
                             break;
                     }
@@ -490,8 +518,8 @@ namespace WebApp.Customer
                     
                     if (string.IsNullOrWhiteSpace(region))
                     {
-                        //canSave = false;
-                        //errorMsg.Append("区域为空 ；");
+                        canSave = false;
+                        errorMsg.Append("区域为空 ；");
                     }
                     else
                     {
@@ -612,6 +640,7 @@ namespace WebApp.Customer
                     {
                         if (!GetOutsourceName(outsourceName, out outsourceId))
                         {
+                            canSave = false;
                             errorMsg.Append("外协名称填写不正确；");
                         }
                     }

@@ -31,6 +31,8 @@ namespace WebApp.Subjects
             }
             if (!IsPostBack)
             {
+                BindSubjectItemType();
+                ChangeSubjectItemType();
                 BindMyCustomerList(ddlCustomer);
                 BindSBCInstallType();
                 if (subjectId == 0)
@@ -44,8 +46,30 @@ namespace WebApp.Subjects
                 //ddlCustomer.SelectedIndex = 1;
                 BindSubjectCategory();
                 BindData();
+                ChangeSubjectItemType();
                 
 
+            }
+        }
+
+        void BindSubjectItemType()
+        {
+            var list = CommonMethod.GetEnumList<SubjectItemTypeEnum>();
+            if (list.Any())
+            {
+                //rblSubjectItemType.DataSource = list;
+                //rblSubjectItemType.DataTextField = "Desction";
+                //rblSubjectItemType.DataValueField = "Value";
+                //rblSubjectItemType.DataBind();
+                list.ForEach(s => {
+                    ListItem li = new ListItem();
+                    li.Text = s.Desction + "&nbsp;&nbsp;";
+                    li.Value = s.Value.ToString();
+                    rblSubjectItemType.Items.Add(li);
+                });
+
+
+                rblSubjectItemType.Items[0].Selected = true;
             }
         }
 
@@ -83,20 +107,8 @@ namespace WebApp.Subjects
             int currYear = DateTime.Now.Year;
             int currMonth = DateTime.Now.Month;
             DateTime now = DateTime.Now;
-            var list = new SubjectGuidanceBLL().GetList(s => s.CustomerId == customerId && s.ActivityTypeId != (int)GuidanceTypeEnum.Others && (s.IsFinish == null || s.IsFinish == false) && (s.IsDelete == null || s.IsDelete == false)).OrderByDescending(s => s.ItemId).ToList();
-            //if (ItemId == 0)
-            //{
-            //    if (subjectId == 0)
-            //    {
-            //        DateTime date = DateTime.Now;
-            //        DateTime newDate = new DateTime(date.Year, date.Month, 1);
-            //        DateTime beginDate = newDate.AddMonths(-1);
-            //        DateTime endDate = newDate.AddMonths(2);
-            //        list = list.Where(s => s.EndDate >= date).ToList();
-            //        //list = list.Where(s => s.BeginDate >= beginDate && s.BeginDate < endDate).ToList();
-            //    }
-
-            //}
+            var list = new SubjectGuidanceBLL().GetList(s =>(s.AddType??1)==(int)GuidanceAddTypeEnum.POP && s.CustomerId == customerId && s.ActivityTypeId != (int)GuidanceTypeEnum.Others && (s.IsFinish == null || s.IsFinish == false) && (s.IsDelete == null || s.IsDelete == false)).OrderByDescending(s => s.ItemId).ToList();
+            
             DateTime date = DateTime.Now;
             list = list.Where(s => s.EndDate >= date).ToList();
             if (list.Any())
@@ -204,6 +216,7 @@ namespace WebApp.Subjects
                 subjectModel = subjectBll.GetModel(subjectId);
                 if (subjectModel != null)
                 {
+                    
                     if (subjectModel.CustomerId != null)
                     {
                         ddlCustomer.SelectedValue = subjectModel.CustomerId.ToString();
@@ -218,6 +231,15 @@ namespace WebApp.Subjects
                         ddlGuidance.SelectedValue = subjectModel.GuidanceId.ToString();
                         BindSubjectType(subjectModel.GuidanceId ?? 0);
                     }
+                    if (subjectModel.SubjectItemType != null)
+                    {
+                        rblSubjectItemType.SelectedValue = (subjectModel.SubjectItemType ?? 0).ToString();
+                        if (subjectModel.SubjectItemType == (int)SubjectItemTypeEnum.Supplement)
+                        {
+                            BindSubject();
+                        }
+                    }
+                    ddlSupplementSubjectList.SelectedValue = (subjectModel.SupplementSubjectId ?? 0).ToString();
                     txtSubjectName.Text = subjectModel.SubjectName;
                     //txtOutName.Text = subjectModel.OutSubjectName;
                     txtBeginDate.Text = subjectModel.BeginDate != null ? DateTime.Parse(subjectModel.BeginDate.ToString()).ToShortDateString() : "";
@@ -283,6 +305,19 @@ namespace WebApp.Subjects
                 subjectModel.CompanyId = CurrentUser.CompanyId;
                 subjectModel.ApproveState = 0;
             }
+
+            int subjectItemType = int.Parse(rblSubjectItemType.SelectedValue);
+            if (subjectItemType == (int)SubjectItemTypeEnum.Supplement)
+            {
+                int supplementSubjectId = int.Parse(ddlSupplementSubjectList.SelectedValue);
+                subjectModel.SupplementSubjectId = supplementSubjectId;
+            }
+            else
+            {
+                subjectModel.SupplementSubjectId = 0;
+            }
+            subjectModel.SubjectItemType = subjectItemType;
+
             subjectModel.BeginDate = DateTime.Parse(txtBeginDate.Text.Trim());
             subjectModel.CustomerId = int.Parse(ddlCustomer.SelectedValue);
             subjectModel.EndDate = DateTime.Parse(txtEndDate.Text.Trim());
@@ -367,6 +402,7 @@ namespace WebApp.Subjects
             BindSubject();
             int itemId = int.Parse((sender as DropDownList).SelectedValue);
             BindSubjectType(itemId);
+           
         }
 
         /// <summary>
@@ -430,6 +466,17 @@ namespace WebApp.Subjects
                         subjectModel.CompanyId = CurrentUser.CompanyId;
 
                     }
+                    int subjectItemType = int.Parse(rblSubjectItemType.SelectedValue);
+                    if (subjectItemType == (int)SubjectItemTypeEnum.Supplement)
+                    {
+                        int supplementSubjectId = int.Parse(ddlSupplementSubjectList.SelectedValue);
+                        subjectModel.SupplementSubjectId = supplementSubjectId;
+                    }
+                    else
+                    {
+                        subjectModel.SupplementSubjectId = 0;
+                    }
+                    subjectModel.SubjectItemType = subjectItemType;
                     subjectModel.Status = 4;
                     subjectModel.ApproveState = 1;
                     subjectModel.BeginDate = DateTime.Parse(txtBeginDate.Text.Trim());
@@ -615,11 +662,30 @@ namespace WebApp.Subjects
             //}
         }
 
+        void ChangeSubjectItemType()
+        {
+            int type = 0;
+            if (rblSubjectItemType.SelectedValue != null)
+            {
+                type = int.Parse(rblSubjectItemType.SelectedValue);
+            }
+            if (type == (int)SubjectItemTypeEnum.Normal)
+            {
+                supplementSubjectListTr.Style.Add("display", "none");
+            }
+            else
+            {
+                supplementSubjectListTr.Style.Add("display", "");
+            }
+        }
+
         void BindSubject()
         {
             SubjectBLL subjectBll = new SubjectBLL();
             ddlSubjectName.Items.Clear();
             ddlSubjectName.Items.Add(new ListItem("--请选择项目--", "0"));
+            ddlSupplementSubjectList.Items.Clear();
+            ddlSupplementSubjectList.Items.Add(new ListItem("--请选择项目--", "0"));
             int guidanceId = int.Parse(ddlGuidance.SelectedValue);
             List<int> submitSubjectIdList = new List<int>();//已提交的分区订单
             
@@ -633,6 +699,7 @@ namespace WebApp.Subjects
                     li.Value = s.Id.ToString();
                     li.Text = s.SubjectName;
                     ddlSubjectName.Items.Add(li);
+                    ddlSupplementSubjectList.Items.Add(li);
                 });
             }
         }
@@ -647,6 +714,27 @@ namespace WebApp.Subjects
                 rblSecondInstallType.Items.Add(li);
             });
         }
+
+        protected void rblSubjectItemType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ChangeSubjectItemType();
+        }
+
+        protected void ddlSupplementSubjectList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int sId = int.Parse(ddlSupplementSubjectList.SelectedValue);
+            if (sId > 0)
+            {
+                string subjectName = ddlSupplementSubjectList.SelectedItem.Text;
+                txtSubjectName.Text = subjectName + "-增补项目";
+            }
+            else
+            {
+                txtSubjectName.Text = "";
+            }
+        }
+
+       
 
     }
 }

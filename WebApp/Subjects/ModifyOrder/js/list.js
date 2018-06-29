@@ -367,8 +367,10 @@ var Order = {
     },
     getSheetList: function () {
         var shopNo = $.trim($("#txtSearchShopNo").val());
+        document.getElementById("seleOrderType").length = 1;
         document.getElementById("seleSheet").length = 1;
         document.getElementById("seleGender").length = 1;
+
         $.ajax({
             type: "get",
             url: "handler/List.ashx",
@@ -377,8 +379,13 @@ var Order = {
                 if (data != "") {
 
                     var json = JSON.parse(data);
+                    var orderTypeJson = json[0].OrderType;
                     var sheetJson = json[0].Sheet;
                     var genderJson = json[0].Gender;
+                    for (var i = 0; i < orderTypeJson.length; i++) {
+                        var option = "<option value='" + orderTypeJson[i].OrderTypeId + "'>" + orderTypeJson[i].OrderTypeName + "</option>";
+                        $("#seleOrderType").append(option);
+                    }
                     for (var i = 0; i < sheetJson.length; i++) {
                         var option = "<option value='" + sheetJson[i].SheetName + "'>" + sheetJson[i].SheetName + "</option>";
                         $("#seleSheet").append(option);
@@ -395,6 +402,7 @@ var Order = {
         var loadIndex = layer.load(0, { shade: false });
         var pageSize = 20;
         var shopNo = $.trim($("#txtSearchShopNo").val());
+        var orderType = $("#seleOrderType").val();
         var sheet = $("#seleSheet").val();
         var gender = $("#seleGender").val();
         
@@ -403,6 +411,7 @@ var Order = {
             subjectId: subjectId,
             currPage: curr,
             pageSize: pageSize,
+            orderType: orderType,
             shopNo: shopNo,
             sheet: sheet,
             gender: gender

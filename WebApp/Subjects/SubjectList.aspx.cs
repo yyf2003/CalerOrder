@@ -399,10 +399,14 @@ namespace WebApp.Subjects
                     subjectType = model.SubjectType ?? 1;
                 }
                 string url = string.Format("AddSubject.aspx?subjectId={0}", id);
-
+                
                 if (subjectType == (int)SubjectTypeEnum.补单)
                 {
                     url = string.Format("/Subjects/HandMadeOrder/Add.aspx?subjectId={0}", id);
+                }
+                else if (subjectType == (int)SubjectTypeEnum.道具订单)
+                {
+                    url = string.Format("/PropSubject/AddSubject.aspx?subjectId={0}", id);
                 }
                 Response.Redirect(url, false);
 
@@ -413,7 +417,11 @@ namespace WebApp.Subjects
                 var model = new SubjectBLL().GetModel(id);
                 if (model != null)
                 {
-                    if (model.SubjectType == (int)SubjectTypeEnum.补单)
+                    if (model.SubjectType == (int)SubjectTypeEnum.道具订单)
+                    {
+                        url = string.Format("/PropSubject/CheckOrderDetail.aspx?subjectId={0}", id);
+                    }
+                    else if (model.SubjectType == (int)SubjectTypeEnum.补单)
                     {
                         url = string.Format("/Subjects/HandMadeOrder/CheckDetail.aspx?subjectId={0}", id);
                     }
@@ -436,6 +444,7 @@ namespace WebApp.Subjects
                     {
                         url = string.Format("/Subjects/OutsourceMaterialOrder/SubjectDetail.aspx?subjectId={0}", id);
                     }
+                    
                 }
 
 

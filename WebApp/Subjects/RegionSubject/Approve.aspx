@@ -13,7 +13,7 @@
     <link href="/easyui1.4/themes/icon.css" rel="stylesheet" />
     <script src="/Scripts/jquery-1.7.2.js" type="text/javascript"></script>
     <script src="/easyui1.4/jquery.easyui.min.js"></script>
-       <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
+    <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
     <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
     <script type="text/javascript">
        

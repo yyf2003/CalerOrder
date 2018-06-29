@@ -99,6 +99,7 @@ namespace WebApp.Subjects.ModifyOrder.handler
             }
             List<string> sheetList = new List<string>();
             List<string> genderList = new List<string>();
+            List<int> orderTypeIdList = new List<int>();
             if (orderList.Any())
             {
                 bool isEmpty0 = false;
@@ -116,12 +117,18 @@ namespace WebApp.Subjects.ModifyOrder.handler
                     }
                     else
                         isEmpty0 = true;
+
+                    if (!orderTypeIdList.Contains(order.OrderType ?? 1))
+                    {
+                        orderTypeIdList.Add(order.OrderType ?? 1);
+                    }
                 });
                 if (isEmpty0)
                     sheetList.Add("空");
             }
             StringBuilder sheetJson = new StringBuilder();
             StringBuilder genderJson = new StringBuilder();
+            StringBuilder orderTypeJson = new StringBuilder();
             sheetList.ForEach(sheet => {
                 sheetJson.Append("{\"SheetName\":\""+sheet+"\"},");
             });
@@ -129,8 +136,17 @@ namespace WebApp.Subjects.ModifyOrder.handler
             {
                 genderJson.Append("{\"GenderName\":\"" + gender + "\"},");
             });
+            orderTypeIdList.ForEach(ot => {
+                string s = CommonMethod.GeEnumName<OrderTypeEnum>(ot.ToString());
+                orderTypeJson.Append("{\"OrderTypeId\":\""+ot+"\",\"OrderTypeName\":\"" + s + "\"},");
+            });
             string sheetStr = "[]";
             string genderStr = "[]";
+            string otStr = "[]";
+            if (orderTypeJson.Length > 0)
+            {
+                otStr = "[" + (orderTypeJson.ToString().TrimEnd(',')) + "]";
+            }
             if (sheetJson.Length > 0)
             {
                 sheetStr = "[" + (sheetJson.ToString().TrimEnd(',')) + "]";
@@ -139,7 +155,8 @@ namespace WebApp.Subjects.ModifyOrder.handler
             {
                 genderStr = "[" + (genderJson.ToString().TrimEnd(',')) + "]";
             }
-            return "[{\"Sheet\":" + sheetStr + ",\"Gender\":" + genderStr + "}]";
+
+            return "[{\"Sheet\":" + sheetStr + ",\"Gender\":" + genderStr + ",\"OrderType\":" + otStr + "}]";
         }
 
         string GetOrderList()
@@ -148,6 +165,7 @@ namespace WebApp.Subjects.ModifyOrder.handler
             int subjectId = 0;
             int currPage = 1;
             int pageSize = 0;
+            int orderTypeId = 0;
             string shopNo = string.Empty;
             string sheet = string.Empty;
             string gender = string.Empty;
@@ -162,6 +180,10 @@ namespace WebApp.Subjects.ModifyOrder.handler
             if (context1.Request.QueryString["pageSize"] != null)
             {
                 pageSize = int.Parse(context1.Request.QueryString["pageSize"]);
+            }
+            if (context1.Request.QueryString["orderType"] != null)
+            {
+                orderTypeId = int.Parse(context1.Request.QueryString["orderType"]);
             }
             if (context1.Request.QueryString["shopNo"] != null)
             {
@@ -181,18 +203,20 @@ namespace WebApp.Subjects.ModifyOrder.handler
             FinalOrderDetailTempBLL orderBll = new FinalOrderDetailTempBLL();
             if (subjectModel != null)
             {
-               
-                if (subjectModel.SubjectType == (int)SubjectTypeEnum.HC订单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区补单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区增补 || subjectModel.SubjectType == (int)SubjectTypeEnum.新开店订单)
+                // || subjectModel.SubjectType == (int)SubjectTypeEnum.分区增补 || subjectModel.SubjectType == (int)SubjectTypeEnum.新开店订单
+                if (subjectModel.SubjectType == (int)SubjectTypeEnum.HC订单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区补单)
                 {
                     orderList = orderBll.GetList(s => s.RegionSupplementId == subjectId);
                 }
                 else
                 {
-                    orderList = orderBll.GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0);
+                    orderList = orderBll.GetList(s => s.SubjectId == subjectId);
                 }
             }
-
-
+            if (orderTypeId > 0)
+            {
+                orderList = orderList.Where(s => s.OrderType == orderTypeId).ToList();
+            }
             if (!string.IsNullOrWhiteSpace(shopNo))
             {
                 orderList = orderList.Where(s => s.ShopNo.ToLower() == shopNo.ToLower()).ToList();
@@ -528,30 +552,36 @@ namespace WebApp.Subjects.ModifyOrder.handler
         string Edit()
         {
             string result = "ok";
+            bool isOk = true;
             string jsonStr = string.Empty;
+            //int subjectId = 0;
+            int currSubjectId = 0;
+            Subject subjectModel0 = null;
             if (context1.Request.Form["jsonStr"] != null)
             {
                 jsonStr = context1.Request.Form["jsonStr"];
             }
             if (!string.IsNullOrWhiteSpace(jsonStr))
             {
-                using (TransactionScope tran = new TransactionScope())
-                {
+                //using (TransactionScope tran = new TransactionScope())
+                //{
                     try
                     {
-                        int currSubjectId = 0;
-                        bool isPriceOrder = false;
+                        
+                       // bool isPriceOrder = false;
                         FinalOrderDetailTemp orderModel = JsonConvert.DeserializeObject<FinalOrderDetailTemp>(jsonStr);
                         if (orderModel != null)
                         {
-                            int orderType= orderModel.OrderType ?? 1;
-                            string orderTypeDes = CommonMethod.GetEnumDescription<OrderTypeEnum>(orderType.ToString());
-                            if (orderTypeDes.Contains("费用订单"))
-                            {
-                                isPriceOrder = true;
-                            }
+                           
+                            //int orderType= orderModel.OrderType ?? 1;
+                            //string orderTypeDes = CommonMethod.GetEnumDescription<OrderTypeEnum>(orderType.ToString());
+                            //if (orderTypeDes.Contains("费用订单"))
+                            //{
+                            //    isPriceOrder = true;
+                            //}
+
                             currSubjectId = (orderModel.RegionSupplementId ?? 0) > 0 ? orderModel.RegionSupplementId ?? 0 : (orderModel.SubjectId ?? 0);
-                            Subject subjectModel0 = new SubjectBLL().GetModel(currSubjectId);
+                            subjectModel0 = new SubjectBLL().GetModel(currSubjectId);
 
 
                             FinalOrderDetailTempBLL orderBll = new FinalOrderDetailTempBLL();
@@ -659,11 +689,11 @@ namespace WebApp.Subjects.ModifyOrder.handler
                                             pop.GraphicLength = orderModel.GraphicLength;
                                             pop.GraphicWidth = orderModel.GraphicWidth;
                                             pop.Quantity = orderModel.Quantity;
-                                            int subjectId = orderModel.SubjectId ?? 0;
+                                            //int subjectId = orderModel.SubjectId ?? 0;
                                             SubjectGuidance guidanceModel = (from subject in CurrentContext.DbContext.Subject
                                                                              join guidance in CurrentContext.DbContext.SubjectGuidance
                                                                              on subject.GuidanceId equals guidance.ItemId
-                                                                             where subject.Id == subjectId
+                                                                             where subject.Id == currSubjectId
                                                                              select guidance).FirstOrDefault();
                                             if (guidanceModel != null)
                                             {
@@ -678,7 +708,8 @@ namespace WebApp.Subjects.ModifyOrder.handler
                                         newOrderModel.TotalPrice = totalPrice;
                                     }
                                     newOrderModel.SubjectId = orderModel.SubjectId;
-                                    newOrderModel.RegionSupplementId = orderModel.RegionSupplementId;
+                                    if ((orderModel.RegionSupplementId??0)>0)
+                                      newOrderModel.RegionSupplementId = orderModel.RegionSupplementId;
                                     newOrderModel.Remark = orderModel.Remark;
                                     orderBll.Update(newOrderModel);
 
@@ -750,12 +781,12 @@ namespace WebApp.Subjects.ModifyOrder.handler
                                 if (shopModel != null)
                                 {
 
-                                    int subjectId = orderModel.SubjectId ?? 0;
+                                    //int subjectId = orderModel.SubjectId ?? 0;
 
                                     SubjectGuidance guidanceModel = (from subject in CurrentContext.DbContext.Subject
                                                                      join guidance in CurrentContext.DbContext.SubjectGuidance
                                                                      on subject.GuidanceId equals guidance.ItemId
-                                                                     where subject.Id == subjectId
+                                                                     where subject.Id == currSubjectId
                                                                      select guidance).FirstOrDefault();
 
 
@@ -825,10 +856,10 @@ namespace WebApp.Subjects.ModifyOrder.handler
                                     newOrderModel.TotalPrice = totalPrice;
                                     newOrderModel.OrderPrice = orderModel.OrderPrice;
                                     newOrderModel.PayOrderPrice = orderModel.PayOrderPrice;
-                                    Subject subjectModel = new SubjectBLL().GetModel(subjectId);
-                                    if (subjectModel != null)
+                                    //Subject subjectModel = new SubjectBLL().GetModel(subjectId);
+                                    if (subjectModel0 != null)
                                     {
-                                        newOrderModel.GuidanceId = subjectModel.GuidanceId;
+                                        newOrderModel.GuidanceId = subjectModel0.GuidanceId;
                                     }
                                     if ((orderModel.RegionSupplementId??0)>0)
                                     {
@@ -893,49 +924,61 @@ namespace WebApp.Subjects.ModifyOrder.handler
                                     logModel.UnitName = newOrderModel.UnitName;
                                     logModel.UnitPrice = newOrderModel.UnitPrice;
                                     logBll.Add(logModel);
-                                    if (!isPriceOrder)
-                                    {
-                                        if (guidanceModel != null && (subjectModel0.SubjectType != (int)SubjectTypeEnum.二次安装 && subjectModel0.SubjectType != (int)SubjectTypeEnum.费用订单 && subjectModel0.SubjectType != (int)SubjectTypeEnum.新开店安装费))
-                                        {
-                                            if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
-                                            {
-                                                new BasePage().RecountInstallPrice(guidanceModel.ItemId, new List<int>() { shopModel.Id });
-                                            }
-                                            else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
-                                            {
-                                                new BasePage().SaveExpressPrice(guidanceModel.ItemId, subjectId, subjectModel0.SubjectType ?? 1);
-                                            }
-                                            else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
-                                            {
-                                                new BasePage().SaveExpressPriceForDelivery(guidanceModel.ItemId, subjectId, subjectModel0.SubjectType ?? 1, guidanceModel.ExperssPrice);
-                                            }
-                                        }
-                                    }
+                                    //if (!isPriceOrder)
+                                    //{
+                                    //    if (guidanceModel != null && (subjectModel0.SubjectType != (int)SubjectTypeEnum.二次安装 && subjectModel0.SubjectType != (int)SubjectTypeEnum.费用订单 && subjectModel0.SubjectType != (int)SubjectTypeEnum.新开店安装费))
+                                    //    {
+                                    //        if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
+                                    //        {
+                                    //            new BasePage().RecountInstallPrice(guidanceModel.ItemId, new List<int>() { shopModel.Id });
+                                    //        }
+                                    //        else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
+                                    //        {
+                                    //            new BasePage().SaveExpressPrice(guidanceModel.ItemId, subjectId, subjectModel0.SubjectType ?? 1);
+                                    //        }
+                                    //        else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
+                                    //        {
+                                    //            new BasePage().SaveExpressPriceForDelivery(guidanceModel.ItemId, subjectId, subjectModel0.SubjectType ?? 1, guidanceModel.ExperssPrice);
+                                    //        }
+                                    //    }
+                                    //}
                                 }
                                 else
                                 {
                                    // result = "提交失败：店铺不存在";
+
                                     throw new Exception("店铺不存在");
+                                    
                                 }
                             }
                            
-                            if (subjectModel0 != null)
-                            {
-                                //重新分外协订单
-                                new BasePage().AutoAssignOutsourceOrder(subjectModel0.Id, subjectModel0.SubjectType ?? 1);
-                            }
+                           
                         }
-                        tran.Complete();
+                        //tran.Complete();
                     }
                     catch (Exception ex)
                     {
                         result = "提交失败：" + ex.Message;
+                        isOk = false;
                     }
-                }
+                //}
             }
             else
             {
                 result = "提交失败！";
+                isOk = false;
+            }
+            if (isOk)
+            {
+                //Subject sModel = new SubjectBLL().GetModel(subjectId);
+                if (subjectModel0 != null)
+                {
+                    if (subjectModel0.SubjectType != (int)SubjectTypeEnum.新开店安装费 && subjectModel0.SubjectType != (int)SubjectTypeEnum.运费)
+                    {
+                        //重新计算安装费，分配外协订单
+                        new WebApp.Base.DelegateClass().SaveOutsourceOrder(subjectModel0.GuidanceId ?? 0, subjectModel0.Id);
+                    }
+                }
             }
             return result;
         }

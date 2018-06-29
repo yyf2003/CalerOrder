@@ -55,30 +55,50 @@
                     </tr>
                     <tr class="tr_bai">
                         <td>
-                            时间范围
-                        </td>
-                        <td colspan="3" style="text-align: left; padding-left: 5px;">
-                            <asp:TextBox ID="txtBegin" runat="server"></asp:TextBox>
-                            -
-                            <asp:TextBox ID="txtEnd" runat="server"></asp:TextBox>
-                        </td>
-                    </tr>
-                    <tr class="tr_bai">
-                        <td>
                             活动名称
                         </td>
-                        <td colspan="3" style="text-align: left; padding-left: 5px;">
-                            <div id="loadGuidance" style="display: none;">
-                                <img src="/image/WaitImg/loadingA.gif" />
-                            </div>
-                            <asp:CheckBox ID="cbAllGuidance" runat="server" AutoPostBack="true" />全选<br />
-                            <asp:CheckBoxList ID="cblGuidanceList" runat="server" CssClass="cbl" CellSpacing="20"
-                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
-                                OnSelectedIndexChanged="cblGuidanceList_SelectedIndexChanged">
-                            </asp:CheckBoxList>
-                            <asp:Panel ID="Panel_EmptyGuidance" runat="server" Visible="false">
-                                <span style="color: Red;">无活动信息！</span>
-                            </asp:Panel>
+                        <td colspan="3" style="text-align: left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 80px; text-align: center; font-weight: bold;">
+                                        POP活动：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <div id="loadGuidance" style="display: none;">
+                                            <img src="/image/WaitImg/loadingA.gif" />
+                                        </div>
+                                        <asp:CheckBox ID="cbAllGuidance" runat="server" AutoPostBack="true" />全选<br />
+                                        <asp:CheckBoxList ID="cblGuidanceList" runat="server" CssClass="cbl" CellSpacing="20"
+                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
+                                            OnSelectedIndexChanged="cblGuidanceList_SelectedIndexChanged">
+                                        </asp:CheckBoxList>
+                                        <asp:Panel ID="Panel_EmptyGuidance" runat="server" Visible="false">
+                                            <span style="color: Red;">无活动信息！</span>
+                                        </asp:Panel>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 80px; text-align: center; font-weight: bold;">
+                                        道具活动：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <div id="loadPropGuidance" style="display: none;">
+                                            <img src="/image/WaitImg/loadingA.gif" />
+                                        </div>
+                                        <div>
+                                            <asp:CheckBox ID="cbAllPropGuidance" runat="server" />
+                                            <span style="color: Blue;">全选</span>
+                                        </div>
+                                        <asp:CheckBoxList ID="cblPropGuidanceList" runat="server" AutoPostBack="true" CellSpacing="20"
+                                            CssClass="cbl" OnSelectedIndexChanged="cblPropGuidanceList_SelectedIndexChanged"
+                                            RepeatColumns="5" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                                        </asp:CheckBoxList>
+                                        <asp:Panel ID="Panel_EmptyPropGuidance" runat="server" Visible="false">
+                                            <span style="color: Red;">无活动信息！</span>
+                                        </asp:Panel>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                     <tr class="tr_bai">
@@ -137,31 +157,94 @@
                         <td>
                             项目名称
                         </td>
-                        <td colspan="3" style="text-align: left; padding-left: 5px;">
-                            <div id="loadSubject" style="display: none;">
-                                <img src="/image/WaitImg/loadingA.gif" />
-                            </div>
-                            <div id="cbAllDiv" runat="server" style="display: none; text-align: left;">
-                                <asp:CheckBox ID="cbAll" runat="server" />全选
-                                <hr align="left" style="width: 100px; margin-bottom: 5px;" />
-                            </div>
-                            <asp:CheckBoxList ID="cblSubjects" runat="server" CssClass="cbl" CellSpacing="20"
-                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
-                                OnSelectedIndexChanged="cblSubjects_SelectedIndexChanged">
-                            </asp:CheckBoxList>
+                        <td colspan="3" style="text-align: left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 80px; text-align: center; font-weight: bold;">
+                                        POP项目：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <div id="loadSubject" style="display: none;">
+                                            <img src="/image/WaitImg/loadingA.gif" />
+                                        </div>
+                                        <div id="cbAllDiv" runat="server" style="display: none; text-align: left;">
+                                            <asp:CheckBox ID="cbAll" runat="server" />全选
+                                            <hr align="left" style="width: 100px; margin-bottom: 5px;" />
+                                        </div>
+                                        <asp:CheckBoxList ID="cblSubjects" runat="server" CssClass="cbl" CellSpacing="20"
+                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
+                                            OnSelectedIndexChanged="cblSubjects_SelectedIndexChanged">
+                                        </asp:CheckBoxList>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 80px; text-align: center; font-weight: bold;">
+                                        道具项目：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <div id="loadPropSubject" style="display: none;">
+                                            <img src="/image/WaitImg/loadingA.gif" />
+                                        </div>
+                                        <div id="cbAllPropDiv" runat="server" style="display: none; text-align: left;">
+                                            <asp:CheckBox ID="cbAllProp" runat="server" />全选
+                                            <hr align="left" style="width: 100px; margin-bottom: 5px;" />
+                                        </div>
+                                        <asp:CheckBoxList ID="cblPropSubjects" runat="server" CssClass="cbl" CellSpacing="20"
+                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
+                                            OnSelectedIndexChanged="cblPropSubjects_SelectedIndexChanged">
+                                        </asp:CheckBoxList>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                     <tr class="tr_bai">
                         <td>
                             外协名称
                         </td>
+                        <td colspan="3" style="text-align: left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 80px; text-align: center; font-weight: bold;">
+                                        POP外协：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <div runat="server" id="loadOutsource" style="display: none;">
+                                            <img src="/image/WaitImg/loadingA.gif" />
+                                        </div>
+                                        <asp:CheckBoxList ID="cblOutsourceId" runat="server" CssClass="cbl" CellSpacing="20"
+                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="8" AutoPostBack="true"
+                                            OnSelectedIndexChanged="cblOutspurce_SelectedIndexChanged">
+                                        </asp:CheckBoxList>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 80px; text-align: center; font-weight: bold;">
+                                        道具外协：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <div runat="server" id="loadPropOutsource" style="display: none;">
+                                            <img src="/image/WaitImg/loadingA.gif" />
+                                        </div>
+                                        <asp:CheckBoxList ID="cblPropOutsourceId" runat="server" CssClass="cbl" CellSpacing="20"
+                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="8"
+                                            >
+                                        </asp:CheckBoxList>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            材质名称
+                        </td>
                         <td colspan="3" style="text-align: left; padding-left: 5px;">
-                            <div runat="server" id="loadOutsource" style="display: none;">
+                            <div runat="server" id="loadMaterial" style="display: none;">
                                 <img src="/image/WaitImg/loadingA.gif" />
                             </div>
-                            <asp:CheckBoxList ID="cblOutsourceId" runat="server" CssClass="cbl" CellSpacing="20"
-                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="8" AutoPostBack="true"
-                                OnSelectedIndexChanged="cblOutspurce_SelectedIndexChanged">
+                            <asp:CheckBoxList ID="cblMaterial" runat="server" CssClass="cbl" CellSpacing="20"
+                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="8">
                             </asp:CheckBoxList>
                         </td>
                     </tr>
@@ -196,11 +279,8 @@
                     <div id="toolbar" style="height: 28px; padding-top: 3px; font-size: 13px;">
                         <%-- <a id="btnExportDetail" style="float: left;" class="easyui-linkbutton l-btn l-btn-small l-btn-plain"  plain="true"
                             icon="icon-print">导出明细</a>--%>
-                        <span id="btnExportDetail" class="layui-btn layui-btn-primary layui-btn-small">
-                            <i class="layui-icon">&#xe61e;</i>
-                            导出明细
-                        </span>
-                        
+                        <span id="btnExportDetail" class="layui-btn layui-btn-primary layui-btn-small"><i
+                            class="layui-icon">&#xe61e;</i> 导出明细 </span>
                     </div>
                     <div style="margin-top: 15px;">
                         <table class="table">
@@ -338,7 +418,7 @@
             </div>
         </ContentTemplate>
     </asp:UpdatePanel>
-    <asp:Button ID="btnExport" runat="server" Text="" onclick="btnExport_Click" style=" display:none;"/>
+    <asp:Button ID="btnExport" runat="server" Text="" OnClick="btnExport_Click" Style="display: none;" />
     </form>
 </body>
 </html>

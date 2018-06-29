@@ -16,6 +16,7 @@ namespace Models
         public string City { get; set; }
         public string County { get; set; }
         public string CityTier { get; set; }
+        public string Channel { get; set; }
         public string Format { get; set; }
         public string NewFormat { get; set; }
         public string POPAddress { get; set; }

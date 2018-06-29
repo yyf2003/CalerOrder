@@ -344,7 +344,12 @@
     </div>
     <asp:HiddenField ID="hfIsFinishImport" runat="server" />
     <div id="checkDiv" title="查看店铺信息" style="display: none;">
-        <table class="table" style="width: 806px; text-align: center;">
+        <table class="table" style="width: 856px; text-align: center;">
+            <tr class="tr_hui">
+              <td colspan="6" style="color:Blue; font-weight:bold; text-align:left; padding-left:10px;">
+                 基础信息
+              </td>
+            </tr>
             <tr>
                 <td style="width: 100px; height: 30px;">
                     所属客户
@@ -407,21 +412,10 @@
                 <td style="height: 30px;">
                     城市级别
                 </td>
-                <td style="text-align: left; padding-left: 5px;">
+                <td colspan="5" style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labCityTier" runat="server" Text=""></asp:Label>
                 </td>
-                <td>
-                    大货安装级别
-                </td>
-                <td style="text-align: left; padding-left: 5px; width: 100px;">
-                    <asp:Label ID="labInstall" runat="server" Text=""></asp:Label>
-                </td>
-                <td style="width: 120px;">
-                    三叶草安装级别
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labBCSInstall" runat="server" Text=""></asp:Label>
-                </td>
+               
             </tr>
             <tr>
                 <td style="height: 30px;">
@@ -517,31 +511,81 @@
             </tr>
             <tr>
                 <td style="height: 30px;">
-                    SP特殊安装费
+                    备注
                 </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labBasicInstallPrice" runat="server" Text=""></asp:Label>
+                <td colspan="5" style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labRemark" runat="server" Text=""></asp:Label>
                 </td>
-                <td style="height: 30px;">
-                    三叶草特殊安装费
-                </td>
-                <td colspan="3" style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labBCSInstallPrice" runat="server" Text=""></asp:Label>
-                </td>
+            </tr>
+            <tr class="tr_hui">
+              <td colspan="6" style="color:Blue; font-weight:bold; text-align:left; padding-left:10px;">
+                 安装级别/安装费信息
+              </td>
             </tr>
             <tr>
                 <td style="height: 30px;">
-                    SP外协安装费
+                    大货安装级别
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labOutsourceInstallPrice" runat="server" Text=""></asp:Label>
+                   <asp:Label ID="labInstall" runat="server" Text=""></asp:Label>
                 </td>
                 <td style="height: 30px;">
-                    三叶草外协安装费
+                    大货安装费应收
                 </td>
-                <td colspan="3" style="text-align: left; padding-left: 5px;">
+                <td style="text-align: left; padding-left: 5px;width:150px;">
+                    <asp:Label ID="labBasicInstallPrice" runat="server" Text=""></asp:Label>
+                </td>
+                <td style="height: 30px; width:120px;">
+                    大货安装费应付
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                   <asp:Label ID="labOutsourceInstallPrice" runat="server" Text=""></asp:Label>
+                </td>
+            </tr>
+             <tr>
+                <td style="height: 30px;">
+                   三叶草安装级别
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labBCSInstall" runat="server" Text=""></asp:Label>
+                </td>
+                <td style="height: 30px;">
+                    三叶草安装费应收
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labBCSInstallPrice" runat="server" Text=""></asp:Label>
+                </td>
+                <td style="height: 30px;">
+                    三叶草安装费应付
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
                     <asp:Label ID="labOutsourceBCSInstallPrice" runat="server" Text=""></asp:Label>
                 </td>
+            </tr>
+            <tr>
+               <td style="height: 30px;">
+                   常规安装级别
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labGenericInstall" runat="server" Text=""></asp:Label>
+                </td>
+                <td>
+                   常规安装费应收
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labGenericInstallPrice" runat="server" Text=""></asp:Label>
+                </td>
+                <td>
+                    常规安装费应付
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:Label ID="labOutsourceGenericInstallPrice" runat="server" Text=""></asp:Label>
+                </td>
+            </tr>
+            <tr class="tr_hui">
+              <td colspan="6" style="color:Blue; font-weight:bold; text-align:left; padding-left:10px;">
+                 外协信息
+              </td>
             </tr>
             <tr>
                 <td style="height: 30px;">
@@ -573,14 +617,6 @@
             </tr>
             <tr>
                 <td style="height: 30px;">
-                    备注
-                </td>
-                <td colspan="5" style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labRemark" runat="server" Text=""></asp:Label>
-                </td>
-            </tr>
-            <tr>
-                <td style="height: 30px;">
                 </td>
                 <td colspan="5" style="text-align: left; padding-left: 5px;">
                     <asp:Button ID="btnAddCheckChangeLog" runat="server" Text="查看修改记录" Visible="false"
@@ -591,6 +627,11 @@
     </div>
     <div id="editDiv" title="编辑店铺信息" style="display: none;">
         <table class="table" style="width: 856px; text-align: center;">
+            <tr class="tr_hui">
+              <td colspan="6" style="color:Blue; font-weight:bold; text-align:left; padding-left:10px;">
+                 基础信息
+              </td>
+            </tr>
             <tr>
                 <td style="width: 100px; height: 30px;">
                     所属客户
@@ -646,7 +687,7 @@
                     店铺名称
                 </td>
                 <td colspan="3" style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtPOSName" runat="server" MaxLength="50" Style="width: 220px;"></asp:TextBox>
+                    <asp:TextBox ID="txtPOSName" runat="server" MaxLength="50" Style="width: 300px;"></asp:TextBox>
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
@@ -668,7 +709,7 @@
                 <td style="height: 30px;">
                     城市级别
                 </td>
-                <td style="text-align: left; padding-left: 5px;">
+                <td colspan="5" style="text-align: left; padding-left: 5px;">
                     <%--<asp:TextBox ID="txtCityTier" runat="server" MaxLength="10"></asp:TextBox>--%>
                     <select id="seleCityTier" style="min-width: 120px;">
                         <option value="">--请选择--</option>
@@ -682,27 +723,7 @@
                     </select>
                     <span style="color: Red;">*</span>
                 </td>
-                <td style="height: 30px;">
-                    大货安装级别
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <%-- <asp:TextBox ID="txtInstall" runat="server" MaxLength="10"></asp:TextBox>--%>
-                    <select id="seleIsInstall" style="min-width: 120px;">
-                        <option value="">--请选择--</option>
-                        <option value="Y">Y</option>
-                        <option value="N">N</option>
-                    </select>
-                </td>
-                <td>
-                    三叶草安装级别
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <select id="seleBCSIsInstall" style="min-width: 120px;">
-                        <option value="">--请选择--</option>
-                        <option value="Y">Y</option>
-                        <option value="N">N</option>
-                    </select>
-                </td>
+                
             </tr>
             <tr>
                 <td style="height: 30px;">
@@ -715,7 +736,7 @@
                     联系人电话1
                 </td>
                 <td colspan="3" style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtTel1" runat="server" MaxLength="50"></asp:TextBox>
+                    <asp:TextBox ID="txtTel1" runat="server" MaxLength="50" style=" width:250px;"></asp:TextBox>
                 </td>
             </tr>
             <tr>
@@ -729,7 +750,7 @@
                     联系人电话2
                 </td>
                 <td colspan="3" style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtTel2" runat="server" MaxLength="50"></asp:TextBox>
+                    <asp:TextBox ID="txtTel2" runat="server" MaxLength="50" style=" width:250px;"></asp:TextBox>
                 </td>
             </tr>
             <tr>
@@ -818,31 +839,93 @@
             </tr>
             <tr>
                 <td style="height: 30px;">
-                    SP特殊安装费
+                    备注
+                </td>
+                <td colspan="5" style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtRemark" runat="server" MaxLength="50" Style="width: 465px;"></asp:TextBox>
+                </td>
+            </tr>
+            <tr class="tr_hui">
+              <td colspan="6" style="color:Blue; font-weight:bold; text-align:left; padding-left:10px;">
+                 安装级别/安装费信息
+              </td>
+            </tr>
+            <tr>
+               <td style="height: 30px;">
+                   大货安装级别
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtBasicInstallPrice" runat="server" MaxLength="10"></asp:TextBox>
+                     <select id="seleIsInstall" style="width: 120px;">
+                        <option value="">--请选择--</option>
+                        <option value="Y">Y</option>
+                        <option value="N">N</option>
+                    </select>
                 </td>
                 <td style="height: 30px;">
-                    三叶草特殊安装费
+                     大货安装费应收
                 </td>
-                <td colspan="3" style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtBCSInstallPrice" runat="server" MaxLength="10"></asp:TextBox>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtBasicInstallPrice" runat="server" MaxLength="10" style="width: 100px;"></asp:TextBox>
+                </td>
+                <td style="height: 30px;">
+                    大货安装费应付
+                </td>
+                <td  style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtOutsourceInstallPrice" runat="server" MaxLength="10" style="width: 100px;"></asp:TextBox>
+                </td>
+            </tr>
+            <tr>
+               <td style="height: 30px;">
+                   三叶草安装级别
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                     <select id="seleBCSIsInstall" style="width: 120px;">
+                        <option value="">--请选择--</option>
+                        <option value="Y">Y</option>
+                        <option value="N">N</option>
+                    </select>
+                </td>
+                <td style="height: 30px;">
+                     三叶草安装费应收
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <asp:TextBox ID="txtBCSInstallPrice" runat="server" MaxLength="10" style="width: 100px;"></asp:TextBox>
+                </td>
+                <td style="height: 30px;">
+                    三叶草安装费应付
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                   <asp:TextBox ID="txtOutsourceBCSInstallPrice" runat="server" MaxLength="10" style="width: 100px;"></asp:TextBox>
                 </td>
             </tr>
             <tr>
                 <td style="height: 30px;">
-                    SP外协安装费
+                    常规安装级别
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtOutsourceInstallPrice" runat="server" MaxLength="10"></asp:TextBox>
+                   <select id="seleGenericIsInstall" style="width: 120px;">
+                        <option value="">--请选择--</option>
+                        <option value="Y">Y</option>
+                        <option value="N">N</option>
+                    </select>
                 </td>
                 <td style="height: 30px;">
-                    三叶草外协安装费
+                    常规安装费应收
                 </td>
-                <td colspan="3" style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtOutsourceBCSInstallPrice" runat="server" MaxLength="10"></asp:TextBox>
+                <td style="text-align: left; padding-left: 5px;">
+                   <asp:TextBox ID="txtGenericInstallPrice" runat="server" MaxLength="10" style="width: 100px;"></asp:TextBox>
                 </td>
+                <td style="height: 30px;">
+                    常规安装费应付
+                </td>
+                <td  style="text-align: left; padding-left: 5px;">
+                   <asp:TextBox ID="txtOutsourceGenericInstallPrice" runat="server" MaxLength="10" style="width: 100px;"></asp:TextBox>
+                 </td>
+            </tr>
+            <tr class="tr_hui">
+              <td colspan="6" style="color:Blue; font-weight:bold; text-align:left; padding-left:10px;">
+                 外协信息
+              </td>
             </tr>
             <tr>
                 <td style="height: 30px;">
@@ -880,14 +963,7 @@
                     </select>
                 </td>
             </tr>
-            <tr>
-                <td style="height: 30px;">
-                    备注
-                </td>
-                <td colspan="5" style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtRemark" runat="server" MaxLength="50" Style="width: 250px;"></asp:TextBox>
-                </td>
-            </tr>
+            
         </table>
     </div>
     </form>

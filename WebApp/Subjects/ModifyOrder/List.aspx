@@ -112,23 +112,24 @@
             <span id="btnDelete" class="layui-btn layui-btn-small"><i class="layui-icon">&#xe640;</i>删除</span>
             <span id="btnRecover" class="layui-btn layui-btn-small"><i class="layui-icon">&#xe652;</i>恢复</span>
             <span id="btnEditShop" class="layui-btn layui-btn-small"><i class="layui-icon">&#xe642;</i>修改店铺信息</span>
+        </div>
+        <div class="layui-inline" style=" padding-top:6px;">
             <input type="text" id="txtSearchShopNo" placeholder="请输入店铺编号" maxlength="20" style="height: 25px;
-                border-radius: 3px; border: 1px solid #888; margin-left: 20px;">
-            <span>
-            POP位置：
-            <select id="seleSheet" style="height: 25px;">
-               <option value="">--请选择--</option>
-            </select>
-            &nbsp;&nbsp;
-            性别：
-            <select id="seleGender"  style="height: 25px;">
-               <option value="">--请选择--</option>
-            </select>
-            </span>
-            &nbsp;&nbsp;
-            <span id="btnSearch" class="layui-btn layui-btn-small layui-btn-primary"><i class="layui-icon">
-                &#xe615;</i>搜索</span>
-            
+                border-radius: 3px; border: 1px solid #888;">
+            <span>订单类型：
+                <select id="seleOrderType" style="height: 25px;">
+                    <option value="0">--请选择--</option>
+                </select>
+                &nbsp;&nbsp; POP位置：
+                <select id="seleSheet" style="height: 25px;">
+                    <option value="">--请选择--</option>
+                </select>
+                &nbsp;&nbsp; 性别：
+                <select id="seleGender" style="height: 25px;">
+                    <option value="">--请选择--</option>
+                </select>
+            </span>&nbsp;&nbsp; <span id="btnSearch" class="layui-btn layui-btn-small">
+                <i class="layui-icon">&#xe615;</i>搜索</span>
         </div>
     </div>
     <div class="containerDiv" class="layui-form">
@@ -157,7 +158,6 @@
                     <th>
                         店铺名称
                     </th>
-                    
                     <th>
                         区域
                     </th>
@@ -246,7 +246,7 @@
     <div id="editDiv" title="编辑POP信息" style="display: none;">
         <table id="POPtable" class="table" style="width: 750px; text-align: center; margin-bottom: 50px;">
             <tr>
-                <td style="height: 30px;width: 100px; ">
+                <td style="height: 30px; width: 100px;">
                     类型
                 </td>
                 <td colspan="3" style="text-align: left; padding-left: 5px;">
@@ -255,17 +255,16 @@
                     </asp:RadioButtonList>
                 </td>
             </tr>
-            <tr class="showSubjectList" style=" display:none;">
+            <tr class="showSubjectList" style="display: none;">
                 <td style="width: 100px; height: 30px;">
                     所属项目
                 </td>
                 <td colspan="3" style="text-align: left; padding-left: 5px;">
                     <asp:DropDownList ID="ddlSubjectList" runat="server">
-                       <asp:ListItem Value="0">--请选择项目--</asp:ListItem>
+                        <asp:ListItem Value="0">--请选择项目--</asp:ListItem>
                     </asp:DropDownList>
                     <span style="color: Red;">*</span>
                 </td>
-                
             </tr>
             <tr>
                 <td style="width: 100px; height: 30px;">
@@ -364,7 +363,7 @@
                 <td style="height: 30px;">
                     POP宽
                 </td>
-                <td style="text-align: left; padding-left: 5px;width: 250px;">
+                <td style="text-align: left; padding-left: 5px; width: 250px;">
                     <asp:TextBox ID="txtGraphicWidth" runat="server" MaxLength="8" CssClass="inputClass"></asp:TextBox>(mm)
                     <span style="color: Red;">*</span>
                 </td>
@@ -389,7 +388,6 @@
                     </asp:DropDownList>
                 </td>
             </tr>
-            
             <tr class="pop">
                 <td style="height: 30px;">
                     选图
@@ -404,11 +402,11 @@
                     <asp:TextBox ID="txtRemark" runat="server" MaxLength="50" Style="width: 200px;"></asp:TextBox>
                 </td>
             </tr>
-            <tr class="price" style=" display:none;">
-                <td style="height: 30px;width: 100px;">
+            <tr class="price" style="display: none;">
+                <td style="height: 30px; width: 100px;">
                     应收费用
                 </td>
-                <td style="text-align: left;width: 250px; padding-left: 5px;">
+                <td style="text-align: left; width: 250px; padding-left: 5px;">
                     <asp:TextBox ID="txtReceivePrice" runat="server" MaxLength="20" CssClass="inputClass"></asp:TextBox>
                     <span style="color: Red;">*</span>
                 </td>
@@ -420,14 +418,13 @@
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
-            <tr class="price" style=" display:none;">
+            <tr class="price" style="display: none;">
                 <td style="height: 30px;">
                     费用备注
                 </td>
                 <td colspan="3" style="text-align: left; padding-left: 5px;">
                     <asp:TextBox ID="txtPriceRemark" runat="server" MaxLength="100" Style="width: 500px;"></asp:TextBox>
                 </td>
-                
             </tr>
         </table>
     </div>
@@ -453,7 +450,6 @@
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:TextBox ID="tb_shopPOSScale" runat="server" MaxLength="20"></asp:TextBox>
-                   
                 </td>
                 <td style="height: 30px;">
                     物料支持级别
@@ -478,7 +474,7 @@
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:TextBox ID="tb_ShopChannel" runat="server" MaxLength="20"></asp:TextBox>
                 </td>
-                <td style=" height: 30px;">
+                <td style="height: 30px;">
                     Format
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
@@ -486,11 +482,11 @@
                 </td>
             </tr>
             <tr>
-                <td style=" height: 30px;">
+                <td style="height: 30px;">
                     城市级别
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                   <asp:DropDownList ID="ddl_ShopCityTier" runat="server">
+                    <asp:DropDownList ID="ddl_ShopCityTier" runat="server">
                         <asp:ListItem Value="">--请选择--</asp:ListItem>
                         <asp:ListItem Value="T1">T1</asp:ListItem>
                         <asp:ListItem Value="T2">T2</asp:ListItem>
@@ -506,7 +502,7 @@
                     是否安装
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                   <asp:DropDownList ID="ddl_IsInstall" runat="server">
+                    <asp:DropDownList ID="ddl_IsInstall" runat="server">
                         <asp:ListItem Value="">--请选择--</asp:ListItem>
                         <asp:ListItem Value="Y">Y</asp:ListItem>
                         <asp:ListItem Value="N">N</asp:ListItem>
@@ -515,26 +511,23 @@
                 </td>
             </tr>
             <tr>
-                <td style=" height: 30px;">
+                <td style="height: 30px;">
                     店铺状态
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:RadioButtonList ID="rbl_ShopStatus" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
-                      <asp:ListItem Value="正常">正常&nbsp;</asp:ListItem>
-                      <asp:ListItem Value="关闭">关闭&nbsp;</asp:ListItem>
+                    <asp:RadioButtonList ID="rbl_ShopStatus" runat="server" RepeatDirection="Horizontal"
+                        RepeatLayout="Flow">
+                        <asp:ListItem Value="正常">正常&nbsp;</asp:ListItem>
+                        <asp:ListItem Value="关闭">关闭&nbsp;</asp:ListItem>
                     </asp:RadioButtonList>
                 </td>
                 <td style="height: 30px;">
-                   
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                  
                 </td>
             </tr>
         </table>
     </div>
-
-
     <asp:HiddenField ID="hfIsRegionSubject" runat="server" />
     </form>
 </body>

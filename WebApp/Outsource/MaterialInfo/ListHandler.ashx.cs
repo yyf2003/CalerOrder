@@ -7,6 +7,7 @@ using BLL;
 using DAL;
 using Models;
 using Newtonsoft.Json;
+using System.Transactions;
 
 namespace WebApp.Outsource.MaterialInfo
 {
@@ -57,6 +58,12 @@ namespace WebApp.Outsource.MaterialInfo
                 case "delete":
                     int Id = int.Parse(context.Request["Id"]);
                     result = DeleteMaterial(Id);
+                    break;
+                case "addPriceItem":
+                    result = AddPriceItem();
+                    break;
+                case "changePriceItemState":
+                    result = ChangePriceItemState();
                     break;
             }
             context.Response.Write(result);
@@ -269,6 +276,120 @@ namespace WebApp.Outsource.MaterialInfo
             }
             return result;
         }
+
+        string AddPriceItem()
+        {
+            string result = "ok";
+            string jsonStr = string.Empty;
+            if (context1.Request["jsonStr"] != null)
+            {
+                jsonStr = context1.Request["jsonStr"];
+            }
+            if (!string.IsNullOrWhiteSpace(jsonStr))
+            {
+                using (TransactionScope tran = new TransactionScope())
+                {
+                    try
+                    {
+                        //jsonStr = HttpUtility.UrlDecode(jsonStr);
+                        if (!string.IsNullOrWhiteSpace(jsonStr))
+                        {
+                            jsonStr = jsonStr.Replace("+", "%2B");
+                            jsonStr = HttpUtility.UrlDecode(jsonStr);
+                        }
+                        OutsourceMaterialPriceItem itemModel = JsonConvert.DeserializeObject<OutsourceMaterialPriceItem>(jsonStr);
+                        if (itemModel != null)
+                        {
+                            OutsourceMaterialPriceItemBLL itemBll = new OutsourceMaterialPriceItemBLL();
+                            var itemList = itemBll.GetList(s => s.ItemName.ToLower() == itemModel.ItemName.Trim().ToLower());
+                            if (itemList.Any())
+                            {
+                                result = "类型名称重复";
+                            }
+                            else
+                            {
+                                List<OutsourceMaterialInfo> materialList = new List<OutsourceMaterialInfo>();
+                                if (itemModel.Materials != null && itemModel.Materials.Any())
+                                {
+                                    materialList = itemModel.Materials;
+                                }
+                                itemModel.Materials = null;
+                                itemModel.ItemName = itemModel.ItemName.Trim();
+                                itemModel.IsDelete = true;
+                                itemBll.Add(itemModel);
+                                if (materialList.Any())
+                                {
+                                    OutsourceMaterialInfo detailModel;
+                                    OutsourceMaterialInfoBLL detailBll = new OutsourceMaterialInfoBLL();
+                                    materialList.ForEach(s =>
+                                    {
+                                        detailModel = new OutsourceMaterialInfo();
+                                        detailModel.AddDate = DateTime.Now;
+                                        detailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                        detailModel.BasicCategoryId = s.BasicCategoryId;
+                                        detailModel.BasicMaterialId = s.BasicMaterialId;
+                                        detailModel.CustomerId = itemModel.CustomerId;
+                                        detailModel.IsDelete = false;
+                                        detailModel.InstallPrice = s.InstallPrice;
+                                        detailModel.SendPrice = s.SendPrice;
+                                        detailModel.PriceItemId = itemModel.Id;
+                                        detailModel.UnitId = s.UnitId;
+                                        detailBll.Add(detailModel);
+                                    });
+                                }
+                                tran.Complete();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        result = ex.Message;
+                    }
+                }
+
+            }
+            return result;
+        }
+
+
+
+        string ChangePriceItemState()
+        {
+            string result = "ok";
+            int itemId = 0;
+            if (context1.Request.QueryString["id"] != null)
+            {
+                itemId = int.Parse(context1.Request.QueryString["id"]);
+            }
+            OutsourceMaterialPriceItemBLL itemBll = new OutsourceMaterialPriceItemBLL();
+            OutsourceMaterialPriceItem model = itemBll.GetModel(itemId);
+            if (model != null)
+            {
+                //原来是禁用的，（不能同时有2个启用）
+                if (model.IsDelete ?? false)
+                {
+                    var list = itemBll.GetList(s => (s.IsDelete ?? false) == false);
+                    if (list.Any())
+                    {
+                        result = "更新失败：不能同时有2个启用的项目，请先禁用其他项目！";
+                    }
+                    else
+                    {
+                        model.IsDelete = false;
+                        itemBll.Update(model);
+                    }
+                }
+                else
+                {
+                    model.IsDelete = true;
+                    itemBll.Update(model);
+                }
+            }
+            else
+                result = "更新失败！";
+            return result;
+        }
+
 
         public bool IsReusable
         {

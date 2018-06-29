@@ -50,6 +50,9 @@ namespace WebApp.Subjects
             {
                 labCustomerName.Text =model.CustomerName;
                 labItemName.Text = model.guidance.ItemName;
+                int addType = model.guidance.AddType ?? 1;
+                labAddType.Text = CommonMethod.GetEnumDescription<GuidanceAddTypeEnum>(addType.ToString());
+                hfAddType.Value = addType.ToString();
                 string activityTypeName = CommonMethod.GetEnumDescription<GuidanceTypeEnum>((model.guidance.ActivityTypeId ?? 1).ToString());
                 if (!string.IsNullOrWhiteSpace(activityTypeName))
                 {
@@ -364,7 +367,13 @@ namespace WebApp.Subjects
 
         protected void btnAddSubject_Click(object sender, EventArgs e)
         {
-            Response.Redirect("AddSubject.aspx?itemId="+itemId, false);
+            string addType = hfAddType.Value;
+            if (!string.IsNullOrWhiteSpace(addType) && StringHelper.IsInt(addType)==(int)GuidanceAddTypeEnum.Prop)
+            {
+                Response.Redirect("/PropSubject/AddSubject.aspx?itemId=" + itemId, false);
+            }
+            else
+               Response.Redirect("AddSubject.aspx?itemId="+itemId, false);
         }
 
         protected void btnChangeState_Click(object sender, EventArgs e)

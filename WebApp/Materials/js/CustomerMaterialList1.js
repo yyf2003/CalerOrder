@@ -1,8 +1,9 @@
-﻿
+﻿  
 
 var currCustomerId = 0;
 var currPriceItemId = 0;
 var currBasicMaterialId = 0;
+var currOutsourceMaterialId = 0;
 $(function () {
     //权限判断
     //CheckPrimission(url, null, $("#btnAdd"), $("#btnEdit"), $("#btnDelete"), null, $("#separator1"));
@@ -60,6 +61,7 @@ $(function () {
 
             Material.model.MaterialId = row.Id;
             currBasicMaterialId = row.BasicMaterialId;
+            currOutsourceMaterialId = row.OutsourceMaterialId;
             Material.bindCustomer();
 
             Material.bindBasicCategory(row.BasicCategoryId);
@@ -117,8 +119,18 @@ $(function () {
     });
 
     $("#selBasicMaterial").on("change", function () {
-        var unitId = $("#selBasicMaterial option:selected").data("unitid") || 0;
+
+        var option = $("#selBasicMaterial option:selected");
+        var unitId = $(option).data("unitid") || 0;
+        var payInstallPrice = $(option).data("installprice") || 0;
+        var paySendPrice = $(option).data("sentprice") || 0;
+        var outsourceMaterialId = $(option).data("outsourcematerialid") || 0;
+        currOutsourceMaterialId = outsourceMaterialId;
         $("#selUnit").val(unitId);
+        if (payInstallPrice>0)
+            $("#txtPayPriceInstall").val(payInstallPrice);
+        if (paySendPrice > 0)
+            $("#txtPayPriceSend").val(paySendPrice);
     });
 
 
@@ -315,9 +327,9 @@ var Material = {
                     {field: 'ItemName', title: '类型名称' },
                     { field: 'IsDelete', title: '状态', formatter: function (value, row) {
                         if (value == 1)
-                            return "<span>禁用</span>";
+                            return "<span style='color:red;'>禁用</span>";
                         else
-                            return "<span>启用</span>"; ;
+                            return "<span style='color:#000;'>启用</span>";
                     }
                     }
 
@@ -400,7 +412,7 @@ var Material = {
         document.getElementById("selBasicMaterial").length = 1;
         $.ajax({
             type: "get",
-            url: "./Handler/CustomerMaterialList1.ashx?type=getBasicMaterial&categoryId=" + categoryId,
+            url: "./Handler/CustomerMaterialList1.ashx?type=getBasicMaterial&categoryId=" + categoryId + "&customerId="+currCustomerId,
             success: function (data) {
 
                 if (data != "") {
@@ -409,7 +421,7 @@ var Material = {
                         var selected = "";
                         if (currBasicMaterialId == json[i].Id)
                             selected = "selected='selected'";
-                        var option = "<option value='" + json[i].Id + "' data-unitid='" + json[i].UnitId + "' " + selected + ">" + json[i].MaterialName + "</option>";
+                        var option = "<option value='" + json[i].Id + "' data-unitid='" + json[i].UnitId + "' data-installprice='" + json[i].PayPriceInstall + "' data-sentprice='" + json[i].PayPriceSend + "' data-outsourcematerialid='" + json[i].OutsourceMaterialId + "' " + selected + ">" + json[i].MaterialName + "</option>";
                         $("#selBasicMaterial").append(option);
                     }
                 }
@@ -493,7 +505,7 @@ var Material = {
 
         if (CheckVal()) {
             //var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"MaterialName":"' + this.model.MaterialName + '","UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + '}';
-            var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + ',"PayPriceInstall":' + this.model.PayPriceInstall + ',"PayPriceSend":' + this.model.PayPriceSend + '}';
+            var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + ',"PayPriceInstall":' + this.model.PayPriceInstall + ',"PayPriceSend":' + this.model.PayPriceSend + ',"OutsourceMaterialId":'+currOutsourceMaterialId+'}';
 
             $.ajax({
                 type: "get",
@@ -687,6 +699,7 @@ function CheckVal() {
 function CleanVal() {
     Material.model.MaterialId = 0;
     currBasicMaterialId = 0;
+    currOutsourceMaterialId = 0;
     $("#selCustomer").val("0");
     //$("#txtCustomerMaterialName").val("");
     $("#selCategory").val("0");

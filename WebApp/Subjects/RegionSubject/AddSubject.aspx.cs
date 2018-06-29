@@ -334,7 +334,7 @@ namespace WebApp.Subjects.RegionSubject
             string url = string.Format("AddOrderDetail.aspx?subjectId=" + subjectModel.Id);
             if (subjectType == (int)SubjectTypeEnum.二次安装)
                 url = "/Subjects/SecondInstallFee/AddOrderDetail.aspx?subjectId=" + subjectModel.Id;
-            if (subjectType==(int)SubjectTypeEnum.分区补单)
+            if (subjectType==(int)SubjectTypeEnum.分区补单)//分区反导
                 url="/Subjects/SupplementByRegion/ImportOrder.aspx?subjectId=" + subjectModel.Id;
             if (subjectType == (int)SubjectTypeEnum.正常单)
                 url = "/Subjects/ADOrders/ImportOrder.aspx?fromRegion=1&subjectId=" + subjectModel.Id + "&realSubjectId=" + realSubjectId;

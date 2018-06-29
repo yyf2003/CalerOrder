@@ -70,10 +70,14 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (!string.IsNullOrWhiteSpace(guidanceId))
             {
                 guidanceIdList = StringHelper.ToIntList(guidanceId, ',');
+
             }
             if (!string.IsNullOrWhiteSpace(subjectId))
             {
                 subjectIdList = StringHelper.ToIntList(subjectId, ',');
+                Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
+                List<int> hMSubjectIdList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
+                subjectIdList.AddRange(hMSubjectIdList);
             }
             if (!string.IsNullOrWhiteSpace(region))
             {
@@ -257,9 +261,208 @@ namespace WebApp.OutsourcingOrder.Statistics
             
         }
 
+        void GetDataNew()
+        {
+            List<int> outsourceIdList = new List<int>();
+            List<int> guidanceIdList = new List<int>();
+            List<int> subjectIdList = new List<int>();
+            List<string> regionList = new List<string>();
+            List<string> provinceList = new List<string>();
+            List<string> cityList = new List<string>();
+            if (!string.IsNullOrWhiteSpace(outsourceId))
+            {
+                outsourceIdList = StringHelper.ToIntList(outsourceId, ',');
+            }
+            if (!string.IsNullOrWhiteSpace(guidanceId))
+            {
+                guidanceIdList = StringHelper.ToIntList(guidanceId, ',');
+
+            }
+            bool selectedSubject = false;
+            if (!string.IsNullOrWhiteSpace(subjectId))
+            {
+                subjectIdList = StringHelper.ToIntList(subjectId, ',');
+                Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
+                List<int> hMSubjectIdList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
+                subjectIdList.AddRange(hMSubjectIdList);
+                selectedSubject = true;
+            }
+            if (!string.IsNullOrWhiteSpace(region))
+            {
+                regionList = StringHelper.ToStringList(region, ',', LowerUpperEnum.ToLower);
+            }
+            if (!string.IsNullOrWhiteSpace(province))
+            {
+                provinceList = StringHelper.ToStringList(province, ',');
+            }
+            if (!string.IsNullOrWhiteSpace(city))
+            {
+                cityList = StringHelper.ToStringList(city, ',');
+            }
+
+            int shopid = 1;
+            guidanceIdList.ForEach(gid =>
+            {
+
+                var orderList0 = (from orderDetail in CurrentContext.DbContext.OutsourceOrderDetail
+                                  join guidance in CurrentContext.DbContext.SubjectGuidance
+                                  on orderDetail.GuidanceId equals guidance.ItemId
+                                  where outsourceIdList.Contains(orderDetail.OutsourceId ?? 0)
+                                  && orderDetail.GuidanceId == gid
+                                  && (orderDetail.IsDelete == null || orderDetail.IsDelete == false)
+                                  select new
+                                  {
+                                      orderDetail,
+                                      guidance
+                                  }).ToList();
+                if (regionList.Any())
+                {
+                    orderList0 = orderList0.Where(s => s.orderDetail.Region != null && regionList.Contains(s.orderDetail.Region.ToLower())).ToList();
+                }
+                if (provinceList.Any())
+                {
+                    orderList0 = orderList0.Where(s => provinceList.Contains(s.orderDetail.Province)).ToList();
+                }
+                if (cityList.Any())
+                {
+                    orderList0 = orderList0.Where(s => cityList.Contains(s.orderDetail.City)).ToList();
+                }
+                var orderList = orderList0.Where(s => s.orderDetail.SubjectId > 0).ToList();
+                if (subjectIdList.Any())
+                {
+
+                    orderList = orderList.Where(s => subjectIdList.Contains(s.orderDetail.SubjectId ?? 0)).ToList();
+                    
+                }
+
+                List<int> shopIdList = orderList.Select(s => s.orderDetail.ShopId ?? 0).ToList();
+                //List<int> installShopIdList = shopIdList;
+               
+                if (orderList.Any())
+                {
+
+                    var assignShopList = (from assignShop in CurrentContext.DbContext.OutsourceAssignShop
+                                          join shop in CurrentContext.DbContext.Shop
+                                          on assignShop.ShopId equals shop.Id
+                                          join guidance in CurrentContext.DbContext.SubjectGuidance
+                                          on assignShop.GuidanceId equals guidance.ItemId
+                                          where assignShop.GuidanceId == gid
+                                          && shopIdList.Contains(assignShop.ShopId ?? 0)
+                                          && outsourceIdList.Contains(assignShop.OutsourceId ?? 0)
+                                          && (assignShop.PayInstallPrice ?? 0) > 0
+                                          select new
+                                          {
+                                              assignShop,
+                                              shop,
+                                              guidance
+                                          }).ToList();
+                    if (regionList.Any())
+                    {
+                        assignShopList = assignShopList.Where(s => s.shop.RegionName != null && regionList.Contains(s.shop.RegionName.ToLower())).ToList();
+                    }
+                    assignShopList.ForEach(s =>
+                    {
+
+                        Shop shopModel = new Shop();
+                        decimal installPrice = s.assignShop.PayInstallPrice ?? 0;
+                        decimal rInstallPrice = s.assignShop.ReceiveInstallPrice ?? 0;
+                        shopModel.Id = shopid++;
+                        shopModel.ShopNo = s.shop.ShopNo;
+                        shopModel.ShopName = s.shop.ShopName;
+                        shopModel.RegionName = s.shop.RegionName;
+                        shopModel.ProvinceName = s.shop.ProvinceName;
+                        shopModel.CityName = s.shop.CityName;
+                        shopModel.CityTier = s.shop.CityTier;
+                        shopModel.IsInstall = s.shop.IsInstall;
+                        shopModel.POSScale = s.shop.POSScale;
+                        shopModel.MaterialSupport = s.shop.MaterialSupport;
+                        shopModel.BasicInstallPrice = installPrice;
+                        shopModel.ReceiveInstallPrice = rInstallPrice;
+                        shopModel.GuidanceName = s.guidance.ItemName;
+                        shopList.Add(shopModel);
+
+                    });
+                }
+                //安装费订单
+                var orderList2 = orderList.Where(s => s.orderDetail.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                if (orderList2.Any())
+                {
+                    orderList2.ForEach(s =>
+                    {
+                        decimal installPrice = s.orderDetail.PayOrderPrice ?? 0;
+                        decimal rInstallPrice = s.orderDetail.ReceiveOrderPrice ?? 0;
+                        Shop shopModel = new Shop();
+                        shopModel.Id = shopid++;
+                        shopModel.ShopNo = s.orderDetail.ShopNo;
+                        shopModel.ShopName = s.orderDetail.ShopName;
+                        shopModel.RegionName = s.orderDetail.Region;
+                        shopModel.ProvinceName = s.orderDetail.Province;
+                        shopModel.CityName = s.orderDetail.City;
+                        shopModel.CityTier = s.orderDetail.CityTier;
+                        shopModel.IsInstall = s.orderDetail.IsInstall;
+                        shopModel.POSScale = s.orderDetail.POSScale;
+                        shopModel.MaterialSupport = s.orderDetail.MaterialSupport;
+                        shopModel.BasicInstallPrice = installPrice;
+                        shopModel.ReceiveInstallPrice = rInstallPrice;
+                        shopModel.GuidanceName = s.guidance.ItemName;
+                        shopModel.Remark = s.orderDetail.Remark;
+                        shopList.Add(shopModel);
+
+                    });
+                }
+                //var orderList3 = orderList0.Where(s => (shopIdList.Any() ? installShopIdList.Contains(s.orderDetail.ShopId ?? 0) : 1 == 1) && s.orderDetail.SubjectId == 0 && s.orderDetail.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                //活动安装费
+                var orderList3 = orderList0.Where(s => s.orderDetail.SubjectId == 0 && s.orderDetail.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                if (subjectIdList.Any())
+                {
+                    if (selectedSubject && orderList3.Where(s => (s.orderDetail.BelongSubjectId ?? 0) > 0).Any())
+                    {
+                        orderList3 = orderList3.Where(s => subjectIdList.Contains(s.orderDetail.BelongSubjectId ?? 0)).ToList();
+                    }
+                    else if (shopIdList.Any())
+                    {
+                        orderList3 = orderList3.Where(s => shopIdList.Contains(s.orderDetail.ShopId??0)).ToList();
+                    }
+                }
+                if (orderList3.Any())
+                {
+                    orderList3.ForEach(s =>
+                    {
+                        decimal installPrice = s.orderDetail.PayOrderPrice ?? 0;
+                        decimal rInstallPrice = s.orderDetail.ReceiveOrderPrice ?? 0;
+                        Shop shopModel = new Shop();
+                        shopModel.Id = shopid++;
+                        shopModel.ShopNo = s.orderDetail.ShopNo;
+                        shopModel.ShopName = s.orderDetail.ShopName;
+                        shopModel.RegionName = s.orderDetail.Region;
+                        shopModel.ProvinceName = s.orderDetail.Province;
+                        shopModel.CityName = s.orderDetail.City;
+                        shopModel.CityTier = s.orderDetail.CityTier;
+                        shopModel.IsInstall = s.orderDetail.IsInstall;
+                        shopModel.POSScale = s.orderDetail.POSScale;
+                        shopModel.MaterialSupport = s.orderDetail.MaterialSupport;
+                        shopModel.BasicInstallPrice = installPrice;
+                        shopModel.ReceiveInstallPrice = rInstallPrice;
+                        shopModel.GuidanceName = s.guidance.ItemName;
+                        shopModel.Remark = s.orderDetail.Remark;
+                        shopList.Add(shopModel);
+
+                    });
+                }
+            });
+
+
+            if (!string.IsNullOrWhiteSpace(txtShopNo.Text.Trim()))
+            {
+                string shopNo = txtShopNo.Text.Trim();
+                shopList = shopList.Where(s => s.ShopNo.ToLower().Contains(shopNo.ToLower())).ToList();
+            }
+
+        }
+
         void BindData()
         {
-            GetData();
+            GetDataNew();
             
             labShopCount.Text = shopList.Select(s=>s.Id).Distinct().Count().ToString();
             decimal totalPrice = shopList.Sum(s => s.BasicInstallPrice ?? 0);
@@ -276,7 +479,7 @@ namespace WebApp.OutsourcingOrder.Statistics
 
         protected void btnExport_Click(object sender, EventArgs e)
         {
-            GetData();
+            GetDataNew();
             var list = shopList.OrderBy(s => s.GuidanceId).ThenBy(s => s.ShopNo).ToList();
 
             if (list.Any())
