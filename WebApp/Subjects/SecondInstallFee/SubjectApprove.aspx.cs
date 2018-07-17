@@ -109,6 +109,8 @@ namespace WebApp.Subjects.SecondInstallFee
             bool isApproveOk = false;
             string msg = string.Empty;
             string url = string.Empty;
+            int subjectType = 1;
+            int guidanceId = 0;
             using (TransactionScope tran = new TransactionScope())
             {
                 try
@@ -117,6 +119,8 @@ namespace WebApp.Subjects.SecondInstallFee
                     Models.Subject model = subjectBll.GetModel(subjectId);
                     if (model != null)
                     {
+                        guidanceId = model.GuidanceId ?? 0;
+                        subjectType = model.SubjectType ?? 1;
                         var list = (from order in CurrentContext.DbContext.RegionOrderDetail
                                     join shop in CurrentContext.DbContext.Shop
                                     on order.ShopId equals shop.Id
@@ -125,8 +129,8 @@ namespace WebApp.Subjects.SecondInstallFee
                                     join guidance in CurrentContext.DbContext.SubjectGuidance
                                     on subject.GuidanceId equals guidance.ItemId
                                     where order.SubjectId == subjectId
-                                    && order.IsSubmit == 1
-                                    && order.ApproveState != 1
+                                    //&& order.IsSubmit == 1
+                                    //&& order.ApproveState != 1
                                     select new
                                     {
                                         order,
@@ -162,6 +166,7 @@ namespace WebApp.Subjects.SecondInstallFee
                                     
                                     finalOrderTempModel = new FinalOrderDetailTemp();
                                     finalOrderTempModel.AgentCode = o.shop.AgentCode;
+                                    finalOrderTempModel.AddDate = o.order.AddDate;
                                     finalOrderTempModel.AgentName = o.shop.AgentName;
                                     finalOrderTempModel.BusinessModel = o.shop.BusinessModel;
                                     finalOrderTempModel.Channel = o.shop.Channel;
@@ -261,6 +266,10 @@ namespace WebApp.Subjects.SecondInstallFee
             }
             if (isApproveOk)
             {
+                if (result == 1 && subjectType != (int)SubjectTypeEnum.新开店安装费 && subjectType != (int)SubjectTypeEnum.运费)
+                {
+                    new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId);
+                }
                 Alert("审批成功！", url);
             }
             else

@@ -3,6 +3,7 @@ var currPOPId = 0;
 var currCornerType = "";
 var currFrameName = "";
 var jsonStr = "";
+var produceOutsourceId = 0;
 $(function () {
     $("span[name='editPOP']").on("click", function () {
 
@@ -30,8 +31,8 @@ $(function () {
 
         $("#txtSheet").val($(this).html());
         $("#divSheetMenu").hide();
-        if (currPOPId==0)
-           GetGraphicNoPrefix();
+        if (currPOPId == 0)
+            GetGraphicNoPrefix();
         POP.getCornerType();
     })
     $("#ddlGenderMenu").delegate("li", "click", function () {
@@ -44,6 +45,12 @@ $(function () {
     $("#ddlCornerType").change(function () {
         POP.getFrameList();
     })
+
+    $("input[name='radioIsValid']").on("change", function () {
+        ChangeProduceType();
+    })
+
+    
 })
 var currOrderGraphicMaterialId = 0;
 var POP = {
@@ -144,7 +151,7 @@ var POP = {
         document.getElementById("ddlFrameName").length = 1;
         $.ajax({
             type: "get",
-            url: "/Customer/Handler/POPList.ashx?type=getFrameList&sheet=" + sheet + "&cornerType=" + cornerType+ "&shopId=" + shopId+ "&gender=" + gender,
+            url: "/Customer/Handler/POPList.ashx?type=getFrameList&sheet=" + sheet + "&cornerType=" + cornerType + "&shopId=" + shopId + "&gender=" + gender,
             success: function (data) {
 
                 if (data != "") {
@@ -160,6 +167,31 @@ var POP = {
                         $("#ddlFrameName").append(option);
                     }
 
+                }
+            }
+        })
+    },
+    getOutsourceList: function () {
+        document.getElementById("selProduceOutsource").length = 1;
+        $.ajax({
+            type: "get",
+            url: "/Customer/Handler/Shops.ashx",
+            data: { type: "getOutsource" },
+            complete: function () { ChangeProduceType(); },
+            success: function (data) {
+
+                if (data != "") {
+                    var json = eval(data);
+                    for (var i = 0; i < json.length; i++) {
+                        var obj = $("#selProduceOutsource").find("option[value='" + json[i].Id + "']");
+                        if (($(obj).val() || "") == "") {
+                            var selected = "";
+                            if (produceOutsourceId == json[i].Id)
+                                selected = "selected='selected'";
+                            var option = "<option value='" + json[i].Id + "' " + selected + ">" + json[i].OutsourceName + "</option>";
+                            $("#selProduceOutsource").append(option);
+                        }
+                    }
                 }
             }
         })
@@ -188,7 +220,9 @@ var POP = {
                     $("#seleWindowLeftSide").val(json[0].LeftSideStick);
                     $("#seleWindowRightSide").val(json[0].RightSideStick);
                     $("#seleWindowFloor").val(json[0].Floor);
+                    produceOutsourceId = json[0].ProduceOutsourceId;
 
+                    POP.getOutsourceList();
                     currOrderGraphicMaterialId = json[0].OrderGraphicMaterialId;
                     POP.getMaterialCategory(json[0].MaterialCategoryId);
                     //                    $("#txtGlass").val(json[0].Glass);
@@ -256,12 +290,11 @@ var POP = {
         })
     },
     add: function (ShopNo) {
-        currPOPId = 0;
         ClearVal();
         if (ShopNo) {
             $("#txteditShopNo").val(ShopNo);
         }
-
+        POP.getOutsourceList();
         $("#editDiv").show().dialog({
             modal: true,
             width: 750,
@@ -343,18 +376,18 @@ function CheckVal() {
     var GraphicLength = $.trim($("#txtGraphicLength").val());
     var WindowWide = $.trim($("#txtWindowWide").val()) || 0;
     var WindowHigh = $.trim($("#txtWindowHigh").val()) || 0;
-    var WindowDeep = $.trim($("#txtWindowDeep").val())||0;
+    var WindowDeep = $.trim($("#txtWindowDeep").val()) || 0;
     var WindowSize = $.trim($("#txtWindowSize").val());
     //var GraphicMaterial = $.trim($("#txtGraphicMaterial").val());
     var MaterialCategoryId = $("#ddlMaterialCategory").val();
     var OrderGraphicMaterialId = $("#ddlMaterial").val();
     var GraphicMaterial = $("#ddlMaterial option:selected").text();
-//    var DoubleFace = $.trim($("#txtDoubleFace").val());
-//    var Glass = $.trim($("#txtGlass").val());
-//    var Backdrop = $.trim($("#txtBackdrop").val());
-//    var Category = $.trim($("#txtCategory").val());
-//    var IsElectricity = $.trim($("#txtIsElectricity").val());
-//    var IsHang = $.trim($("#txtIsHang").val());
+    //    var DoubleFace = $.trim($("#txtDoubleFace").val());
+    //    var Glass = $.trim($("#txtGlass").val());
+    //    var Backdrop = $.trim($("#txtBackdrop").val());
+    //    var Category = $.trim($("#txtCategory").val());
+    //    var IsElectricity = $.trim($("#txtIsElectricity").val());
+    //    var IsHang = $.trim($("#txtIsHang").val());
     //    var DoorPosition = $.trim($("#txtDoorPosition").val());
 
     var CornerType = $("#ddlCornerType").val();
@@ -367,7 +400,7 @@ function CheckVal() {
     var LeftSide = $("#seleWindowLeftSide").val();
     var RightSide = $("#seleWindowRightSide").val();
     var Floor = $("#seleWindowFloor").val();
-
+    var productOSId = $("#selProduceOutsource").val()||0;
     if (ShopNo == "") {
         alert("请填写店铺编号");
         return false;
@@ -436,12 +469,12 @@ function CheckVal() {
     OSOOHInstallPrice = OSOOHInstallPrice.length > 0 ? OSOOHInstallPrice : "0";
     //jsonStr = '{"Id":' + currPOPId + ',"ShopNo":"' + ShopNo + '","PositionDescription":"' + PositionDescription + '","GraphicNo":"' + GraphicNo + '","Sheet":"' + Sheet + '","Gender":"' + Gender + '","Quantity":' + Quantity + ',"GraphicWidth":"' + GraphicWidth + '","GraphicLength":"' + GraphicLength + '","WindowWide":"' + WindowWide + '","WindowHigh":"' + WindowHigh + '","WindowDeep":"' + WindowDeep + '","WindowSize":"' + WindowSize + '","GraphicMaterial":"' + GraphicMaterial + '","DoubleFace":"' + DoubleFace + '","Glass":"' + Glass + '","Backdrop":"' + Backdrop + '","Category":"' + Category + '","IsElectricity":"' + IsElectricity + '","IsHang":"' + IsHang + '","DoorPosition":"' + DoorPosition + '","Remark":"' + Remark + '","IsValid":' + IsValid + ',"OOHInstallPrice":"' + OOHInstallPrice + '","MaterialCategoryId":' + MaterialCategoryId + ',"OrderGraphicMaterialId":' + OrderGraphicMaterialId + ',"CornerType":"' + CornerType + '"}';
 
-    jsonStr = '{"Id":' + currPOPId + ',"ShopId":' + shopId + ',"ShopNo":"' + ShopNo + '","PositionDescription":"' + PositionDescription + '","GraphicNo":"' + GraphicNo + '","Sheet":"' + Sheet + '","Gender":"' + Gender + '","Quantity":' + Quantity + ',"GraphicWidth":"' + GraphicWidth + '","GraphicLength":"' + GraphicLength + '","WindowWide":"' + WindowWide + '","WindowHigh":"' + WindowHigh + '","WindowDeep":"' + WindowDeep + '","WindowSize":"' + WindowSize + '","GraphicMaterial":"' + GraphicMaterial + '","Remark":"' + Remark + '","IsValid":' + IsValid + ',"OOHInstallPrice":"' + OOHInstallPrice + '","MaterialCategoryId":' + MaterialCategoryId + ',"OrderGraphicMaterialId":' + OrderGraphicMaterialId + ',"CornerType":"' + CornerType + '","MachineFrameName":"' + frameName + '","OSOOHInstallPrice":"' + OSOOHInstallPrice + '","LeftSideStick":"' + LeftSide + '","RightSideStick":"' + RightSide + '","Floor":"' + Floor + '"}';
+    jsonStr = '{"Id":' + currPOPId + ',"ShopId":' + shopId + ',"ShopNo":"' + ShopNo + '","PositionDescription":"' + PositionDescription + '","GraphicNo":"' + GraphicNo + '","Sheet":"' + Sheet + '","Gender":"' + Gender + '","Quantity":' + Quantity + ',"GraphicWidth":"' + GraphicWidth + '","GraphicLength":"' + GraphicLength + '","WindowWide":"' + WindowWide + '","WindowHigh":"' + WindowHigh + '","WindowDeep":"' + WindowDeep + '","WindowSize":"' + WindowSize + '","GraphicMaterial":"' + GraphicMaterial + '","Remark":"' + Remark + '","IsValid":' + IsValid + ',"OOHInstallPrice":"' + OOHInstallPrice + '","MaterialCategoryId":' + MaterialCategoryId + ',"OrderGraphicMaterialId":' + OrderGraphicMaterialId + ',"CornerType":"' + CornerType + '","MachineFrameName":"' + frameName + '","OSOOHInstallPrice":"' + OSOOHInstallPrice + '","LeftSideStick":"' + LeftSide + '","RightSideStick":"' + RightSide + '","Floor":"' + Floor + '","ProduceOutsourceId":'+productOSId+'}';
     return true;
 }
 
 function ClearVal() {
-    $("#editDiv").find("input").val("");
+    $("#editDiv").find("input:not([name='radioIsValid'])").val("");
     $("#txtSheet").attr("disabled", false);
     document.getElementById("ddlCornerType").length = 1;
     document.getElementById("ddlFrameName").length = 1;
@@ -450,10 +483,12 @@ function ClearVal() {
     $("#seleWindowLeftSide").val("");
     $("#seleWindowRightSide").val("");
     $("#seleWindowFloor").val("");
+    currPOPId = 0;
+    produceOutsourceId = 0;
 }
 
 function loadingSearch() {
-   
+
     $("#loadingSearch").show();
     return true;
 }
@@ -487,7 +522,7 @@ function checkExport() {
 
 function loadSearch() {
     $("#loadingSearch").show();
-   
+
     return true;
 }
 
@@ -501,4 +536,14 @@ function GetGraphicNoPrefix() {
             $("#txtGraphicNo").val(data);
         }
     })
+}
+
+function ChangeProduceType() {
+    var type = $("input[name='radioIsValid']:checked").val();
+    if (type == 0) {
+        $("#selProduceOutsource").attr("disabled", true).val("0");
+    }
+    else {
+        $("#selProduceOutsource").attr("disabled", false).val(produceOutsourceId);
+    }
 }

@@ -33,6 +33,9 @@ namespace WebApp.Statistics.handler
         string customerServiceIds = string.Empty;
         string subjectCategory = string.Empty;
         string exportType = string.Empty;
+        string begin = string.Empty;
+        string end = string.Empty;
+        int dateSearchType = 1;
         public void ProcessRequest(HttpContext context)
         {
             context1 = context;
@@ -49,8 +52,7 @@ namespace WebApp.Statistics.handler
                 citys = context.Request.QueryString["citys"];
             if (context.Request.QueryString["isExportInstall"] != null)
                 isExportInstall = int.Parse(context.Request.QueryString["isExportInstall"]);
-            //if (context.Request.QueryString["installPrice"] != null)
-            //installPrice = context.Request.QueryString["installPrice"];
+            
             if (context.Request.QueryString["freight"] != null)
                 freight = context.Request.QueryString["freight"];
 
@@ -73,6 +75,14 @@ namespace WebApp.Statistics.handler
             if (context.Request.QueryString["exportType"] != null)
             {
                 exportType = context.Request.QueryString["exportType"];
+            }
+            if (context.Request.QueryString["beginDate"] != null)
+            {
+                begin = context.Request.QueryString["beginDate"];
+            }
+            if (context.Request.QueryString["endDate"] != null)
+            {
+                end = context.Request.QueryString["endDate"];
             }
             if (exportType == "byShop")
                 ExportByShop();
@@ -131,16 +141,13 @@ namespace WebApp.Statistics.handler
                                      on order.SubjectId equals subject.Id
                                      join guindance in CurrentContext.DbContext.SubjectGuidance
                                      on order.GuidanceId equals guindance.ItemId
-                                     //join pop1 in CurrentContext.DbContext.POP
-                                     //on new { order.ShopId, order.Sheet, order.GraphicNo } equals new { pop1.ShopId, pop1.Sheet, pop1.GraphicNo } into popTemp
+                                     join user1 in CurrentContext.DbContext.UserInfo
+                                     on order.CSUserId equals user1.UserId into userTemp
+                                     from user in userTemp.DefaultIfEmpty()
                                      where guidanceIdList.Contains(order.GuidanceId ?? 0)
                                     && (subject.IsDelete == null || subject.IsDelete == false)
                                     && (subject.ApproveState == 1)
-                                    && (order.IsDelete == null || order.IsDelete == false)
-                                         //&& ((order.OrderType == 1 && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || (order.OrderType >3))
-                                         //&& (shop.Status == null || shop.Status == "" || shop.Status == "正常")
-                                         //&& (order.OrderType != (int)OrderTypeEnum.物料)
-                                         //&& (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
+                                    && (order.IsDelete == null || order.IsDelete == false)   
                                      && (regionList.Any() ? regionList.Contains(order.Region.ToLower()) : 1 == 1)
 
                                      select new
@@ -148,10 +155,32 @@ namespace WebApp.Statistics.handler
                                          order,
                                          shop,
                                          subject,
-                                         guindance
+                                         guindance,
+                                         CSName=user!=null?user.RealName:""
 
                                      }).ToList();
-
+                    if (!string.IsNullOrWhiteSpace(begin))
+                    {
+                        DateTime beginDate = DateTime.Parse(begin);
+                        if (dateSearchType == 1)
+                        {
+                            orderList = orderList.Where(s => s.subject.AddDate >= beginDate).ToList();
+                            if (!string.IsNullOrWhiteSpace(end))
+                            {
+                                DateTime endDate = DateTime.Parse(end).AddDays(1);
+                                orderList = orderList.Where(s => s.subject.AddDate < endDate).ToList();
+                            }
+                        }
+                        else
+                        {
+                            orderList = orderList.Where(s => s.order.AddDate >= beginDate).ToList();
+                            if (!string.IsNullOrWhiteSpace(end))
+                            {
+                                DateTime endDate = DateTime.Parse(end).AddDays(1);
+                                orderList = orderList.Where(s => s.order.AddDate < endDate).ToList();
+                            }
+                        }
+                    }
                     if (!string.IsNullOrWhiteSpace(shopType))
                     {
                         shopTypeList = StringHelper.ToStringList(shopType, ',');
@@ -214,36 +243,34 @@ namespace WebApp.Statistics.handler
                             //materialOrderList = materialOrderList.Where(s => shopTypeList.Contains(s.shop.ShopType)).ToList();
                         }
                     }
+                    List<int> allSubjectIdList = new List<int>();
                     if (subjectIdList.Any())
                     {
-                        orderList = orderList.Where(s => subjectIdList.Contains(s.subject.Id) || subjectIdList.Contains(s.subject.HandMakeSubjectId??0)).ToList();
+                        //orderList = orderList.Where(s => subjectIdList.Contains(s.subject.Id) || subjectIdList.Contains(s.subject.HandMakeSubjectId??0)).ToList();
                         //materialOrderList = materialOrderList.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
+                        List<int> hMSubjectIdList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).Distinct().ToList();
+                        subjectIdList.AddRange(hMSubjectIdList);
+                        allSubjectIdList = subjectIdList;
                     }
                     else
                     {
-                        subjectIdList = orderList.Select(s=>s.subject.Id).Distinct().ToList();
+                        allSubjectIdList = orderList.Select(s => s.order.SubjectId??0).Distinct().ToList();
                     }
 
-                    if (regionList.Any())
+                    if (!string.IsNullOrWhiteSpace(provinces))
                     {
-
-
-                        //materialOrderList = materialOrderList.Where(s => regionList.Contains(s.shop.RegionName.ToLower())).ToList();
-                        if (!string.IsNullOrWhiteSpace(provinces))
+                        provinceList = StringHelper.ToStringList(provinces, ',');
+                        if (provinceList.Any())
                         {
-                            provinceList = StringHelper.ToStringList(provinces, ',');
-                            if (provinceList.Any())
+                            orderList = orderList.Where(s => provinceList.Contains(s.order.Province.Trim())).ToList();
+                            //materialOrderList = materialOrderList.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();
+                            if (!string.IsNullOrWhiteSpace(citys))
                             {
-                                orderList = orderList.Where(s => provinceList.Contains(s.order.Province)).ToList();
-                                //materialOrderList = materialOrderList.Where(s => provinceList.Contains(s.shop.ProvinceName)).ToList();
-                                if (!string.IsNullOrWhiteSpace(citys))
+                                cityList = StringHelper.ToStringList(citys, ',');
+                                if (cityList.Any())
                                 {
-                                    cityList = StringHelper.ToStringList(citys, ',');
-                                    if (cityList.Any())
-                                    {
-                                        orderList = orderList.Where(s => cityList.Contains(s.order.City)).ToList();
-                                        //materialOrderList = materialOrderList.Where(s => cityList.Contains(s.shop.CityName)).ToList();
-                                    }
+                                    orderList = orderList.Where(s => cityList.Contains(s.order.City.Trim())).ToList();
+                                    //materialOrderList = materialOrderList.Where(s => cityList.Contains(s.shop.CityName)).ToList();
                                 }
                             }
                         }
@@ -255,18 +282,18 @@ namespace WebApp.Statistics.handler
                             customerServiceList.Remove(0);
                             if (customerServiceList.Any())
                             {
-                                orderList = orderList.Where(s => customerServiceList.Contains(s.shop.CSUserId ?? 0) || (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
+                                orderList = orderList.Where(s => customerServiceList.Contains(s.order.CSUserId ?? 0) || (s.order.CSUserId == null || s.order.CSUserId == 0)).ToList();
                                 //materialOrderList = materialOrderList.Where(s => customerServiceList.Contains(s.shop.CSUserId ?? 0) || (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
                             }
                             else
                             {
-                                orderList = orderList.Where(s => (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
+                                orderList = orderList.Where(s => (s.order.CSUserId == null || s.order.CSUserId == 0)).ToList();
                                 //materialOrderList = materialOrderList.Where(s => (s.shop.CSUserId == null || s.shop.CSUserId == 0)).ToList();
                             }
                         }
                         else
                         {
-                            orderList = orderList.Where(s => customerServiceList.Contains(s.shop.CSUserId ?? 0)).ToList();
+                            orderList = orderList.Where(s => customerServiceList.Contains(s.order.CSUserId ?? 0)).ToList();
                             //materialOrderList = materialOrderList.Where(s => customerServiceList.Contains(s.shop.CSUserId ?? 0)).ToList();
                         }
                     }
@@ -284,284 +311,333 @@ namespace WebApp.Statistics.handler
                         }
                     }
                     var popOrder = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.POP || s.order.OrderType == (int)OrderTypeEnum.道具 || s.order.OrderType == (int)OrderTypeEnum.物料).ToList();
-                    #region pop费用
-                    if (popOrder.Any())
+                    //var popOrder = orderList.Select(s=>s).ToList();
+                    try
                     {
-
-                        var nameList = popOrder.Select(s => s.guindance.ItemName).Distinct().ToList(); ;
-                        guidanceName = StringHelper.ListToString(nameList, "+");
-
-                        decimal totalPrice = 0;
-                        decimal totalArea = 0;
-                        List<int> shopList = new List<int>();
-
-                        InstallBLL installBll = new InstallBLL();
-
+                        #region pop费用
                         if (popOrder.Any())
                         {
-                            popOrder = popOrder.OrderBy(s => s.order.ShopNo).ToList();
 
-                            popOrder.ForEach(s =>
+                            var nameList = popOrder.Select(s => s.guindance.ItemName).Distinct().ToList(); ;
+                            guidanceName = StringHelper.ListToString(nameList, "+");
+
+                            //decimal totalPrice = 0;
+                            //decimal totalArea = 0;
+                            List<int> shopList = new List<int>();
+
+                            InstallBLL installBll = new InstallBLL();
+
+                            if (popOrder.Any())
                             {
-                                #region 旧的
-                                //totalPrice = 0;
-                                //totalArea = 0;
-                                //decimal newPOPArea = 0;
-                                //if (s.order.GraphicWidth != null && s.order.GraphicLength != null)
-                                //{
-                                //    newPOPArea = ((s.order.GraphicWidth ?? 0) * (s.order.GraphicLength ?? 0)) / 1000000;
-                                //}
-                                //if (!string.IsNullOrWhiteSpace(s.order.GraphicMaterial))
-                                //{
-                                //    unitName = string.Empty;
-                                //    decimal defaultUnitPrice = new BasePage().GetMaterialPrice(s.order.GraphicMaterial, out unitName);
-                                //    if (s.order.UnitPrice != null && s.order.UnitPrice > 0)
-                                //    {
+                                popOrder = popOrder.OrderBy(s => s.order.ShopNo).ToList();
 
-                                //        if (unitName == "个")
-                                //        {
-                                //            totalPrice = (s.order.UnitPrice ?? 0) * (s.order.Quantity ?? 1);
-                                //        }
-                                //        else
-                                //        {
-                                //            totalArea = newPOPArea * (s.order.Quantity ?? 1);
-                                //            totalPrice = newPOPArea * (s.order.UnitPrice ?? 0) * (s.order.Quantity ?? 1);
-                                //        }
-                                //        orderModel = new OrderPriceDetail();
-                                //        if (s.subject.AddDate != null)
-                                //            orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
-                                //        orderModel.PriceType = s.order.OrderType == 2 ? "道具" : "POP";
-                                //        orderModel.Area = double.Parse(totalArea.ToString());
-                                //        orderModel.Gender = s.order.Gender;
-                                //        orderModel.GraphicLength = double.Parse((s.order.GraphicLength ?? 0).ToString());
-                                //        orderModel.GraphicWidth = double.Parse((s.order.GraphicWidth ?? 0).ToString());
-                                //        orderModel.GraphicMaterial = s.order.GraphicMaterial;
-                                //        orderModel.PositionDescription = s.order.PositionDescription;
-                                //        orderModel.Quantity = s.order.Quantity ?? 1;
-                                //        orderModel.Sheet = s.order.Sheet;
-                                //        orderModel.ShopName = s.shop.ShopName;
-                                //        orderModel.ShopNo = s.shop.ShopNo;
-                                //        orderModel.SubjectName = s.subject.SubjectName;
-                                //        orderModel.SubjectNo = s.subject.SubjectNo;
-                                //        orderModel.TotalPrice = double.Parse(totalPrice.ToString());
-                                //        orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
-                                //        newOrderList.Add(orderModel);
-                                //    }
-                                //    else
-                                //    {
-                                //        if (s.order.GraphicMaterial.IndexOf("+挂轴") != -1)
-                                //        {
-                                //            string material0 = s.order.GraphicMaterial.Replace("+挂轴", "").Replace("+上挂轴", "").Replace("+下挂轴", "");
-                                //            decimal unitPrice0 = new BasePage().GetMaterialPrice(material0, out unitName);
-                                //            decimal unitPrice1 = new BasePage().GetMaterialPrice("挂轴", out unitName);
-                                //            decimal popPrice0 = newPOPArea * unitPrice0 * (s.order.Quantity ?? 1);
-                                //            decimal popPrice1 = (s.order.GraphicWidth ?? 0) / 1000 * 2 * unitPrice1 * (s.order.Quantity ?? 1);
-                                //            if (s.order.GraphicMaterial.IndexOf("上挂轴") != -1 || s.order.GraphicMaterial.IndexOf("下挂轴") != -1)
-                                //            {
-                                //                popPrice1 = (s.order.GraphicWidth ?? 0) / 1000 * unitPrice1 * (s.order.Quantity ?? 1);
-                                //            }
-                                //            //totalPrice = (popPrice0 + popPrice1);
-                                //            totalArea = newPOPArea * (s.order.Quantity ?? 1);
-
-                                //            orderModel = new OrderPriceDetail();
-                                //            if (s.subject.AddDate != null)
-                                //                orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
-                                //            orderModel.PriceType = s.order.OrderType == 2 ? "道具" : "POP";
-                                //            orderModel.Area = double.Parse(totalArea.ToString());
-                                //            orderModel.Gender = s.order.Gender;
-                                //            orderModel.GraphicLength = double.Parse((s.order.GraphicLength ?? 0).ToString());
-                                //            orderModel.GraphicWidth = double.Parse((s.order.GraphicWidth ?? 0).ToString());
-                                //            orderModel.GraphicMaterial = material0;
-                                //            orderModel.PositionDescription = s.order.PositionDescription;
-                                //            orderModel.Quantity = s.order.Quantity ?? 1;
-                                //            orderModel.Sheet = s.order.Sheet;
-                                //            orderModel.ShopName = s.shop.ShopName;
-                                //            orderModel.ShopNo = s.shop.ShopNo;
-                                //            orderModel.SubjectName = s.subject.SubjectName;
-                                //            orderModel.SubjectNo = s.subject.SubjectNo;
-                                //            orderModel.UnitPrice = double.Parse(unitPrice0.ToString());
-                                //            orderModel.TotalPrice = double.Parse(popPrice0.ToString());
-                                //            newOrderList.Add(orderModel);
-
-                                //            orderModel = new OrderPriceDetail();
-                                //            if (s.subject.AddDate != null)
-                                //                orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
-                                //            orderModel.PriceType = s.order.OrderType == 2 ? "道具" : "POP";
-                                //            orderModel.Area = double.Parse(totalArea.ToString());
-                                //            orderModel.Gender = s.order.Gender;
-                                //            orderModel.GraphicLength = double.Parse((s.order.GraphicLength ?? 0).ToString());
-                                //            orderModel.GraphicWidth = double.Parse((s.order.GraphicWidth ?? 0).ToString());
-                                //            orderModel.PositionDescription = s.order.PositionDescription;
-                                //            orderModel.Quantity = s.order.Quantity ?? 1;
-                                //            orderModel.Sheet = s.order.Sheet;
-                                //            orderModel.ShopName = s.shop.ShopName;
-                                //            orderModel.ShopNo = s.shop.ShopNo;
-                                //            orderModel.SubjectName = s.subject.SubjectName;
-                                //            orderModel.SubjectNo = s.subject.SubjectNo;
-                                //            orderModel.GraphicMaterial = "挂轴";
-                                //            if (s.order.GraphicMaterial.IndexOf("上挂轴") != -1)
-                                //            {
-                                //                orderModel.GraphicMaterial = "上挂轴";
-                                //            }
-                                //            if (s.order.GraphicMaterial.IndexOf("下挂轴") != -1)
-                                //            {
-                                //                orderModel.GraphicMaterial = "下挂轴";
-                                //            }
-                                //            orderModel.UnitPrice = double.Parse(unitPrice1.ToString());
-                                //            orderModel.TotalPrice = double.Parse(popPrice1.ToString());
-                                //            newOrderList.Add(orderModel);
-                                //        }
-                                //        else
-                                //        {
-                                //            if (unitName == "个")
-                                //            {
-                                //                totalPrice = defaultUnitPrice * (s.order.Quantity ?? 1);
-                                //            }
-                                //            else
-                                //            {
-                                //                totalArea = newPOPArea * (s.order.Quantity ?? 1);
-                                //                totalPrice = newPOPArea * defaultUnitPrice * (s.order.Quantity ?? 1);
-                                //            }
-                                //            orderModel = new OrderPriceDetail();
-                                //            if (s.subject.AddDate != null)
-                                //                orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
-                                //            orderModel.PriceType = s.order.OrderType == 2 ? "道具" : "POP";
-                                //            orderModel.Area = double.Parse(totalArea.ToString());
-                                //            orderModel.Gender = s.order.Gender;
-                                //            orderModel.GraphicLength = double.Parse((s.order.GraphicLength ?? 0).ToString());
-                                //            orderModel.GraphicWidth = double.Parse((s.order.GraphicWidth ?? 0).ToString());
-                                //            orderModel.GraphicMaterial = s.order.GraphicMaterial;
-                                //            orderModel.PositionDescription = s.order.PositionDescription;
-                                //            orderModel.Quantity = s.order.Quantity ?? 1;
-                                //            orderModel.Sheet = s.order.Sheet;
-                                //            orderModel.ShopName = s.shop.ShopName;
-                                //            orderModel.ShopNo = s.shop.ShopNo;
-                                //            orderModel.SubjectName = s.subject.SubjectName;
-                                //            orderModel.SubjectNo = s.subject.SubjectNo;
-                                //            orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
-                                //            orderModel.TotalPrice = double.Parse(totalPrice.ToString());
-                                //            newOrderList.Add(orderModel);
-
-                                //        }
-
-                                //    }
-                                //}
-                                #endregion
-                                string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
-                                decimal width = s.order.GraphicWidth ?? 0;
-                                decimal length = s.order.GraphicLength ?? 0;
-                                int Quantity = s.order.Quantity ?? 1;
-                                string GraphicMaterial = s.order.GraphicMaterial;
-                                if (!string.IsNullOrWhiteSpace(GraphicMaterial))
+                                popOrder.ForEach(s =>
                                 {
-                                    if (GraphicMaterial.Contains("挂轴"))
+                                    #region 旧的
+                                    //totalPrice = 0;
+                                    //totalArea = 0;
+                                    //decimal newPOPArea = 0;
+                                    //if (s.order.GraphicWidth != null && s.order.GraphicLength != null)
+                                    //{
+                                    //    newPOPArea = ((s.order.GraphicWidth ?? 0) * (s.order.GraphicLength ?? 0)) / 1000000;
+                                    //}
+                                    //if (!string.IsNullOrWhiteSpace(s.order.GraphicMaterial))
+                                    //{
+                                    //    unitName = string.Empty;
+                                    //    decimal defaultUnitPrice = new BasePage().GetMaterialPrice(s.order.GraphicMaterial, out unitName);
+                                    //    if (s.order.UnitPrice != null && s.order.UnitPrice > 0)
+                                    //    {
+
+                                    //        if (unitName == "个")
+                                    //        {
+                                    //            totalPrice = (s.order.UnitPrice ?? 0) * (s.order.Quantity ?? 1);
+                                    //        }
+                                    //        else
+                                    //        {
+                                    //            totalArea = newPOPArea * (s.order.Quantity ?? 1);
+                                    //            totalPrice = newPOPArea * (s.order.UnitPrice ?? 0) * (s.order.Quantity ?? 1);
+                                    //        }
+                                    //        orderModel = new OrderPriceDetail();
+                                    //        if (s.subject.AddDate != null)
+                                    //            orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
+                                    //        orderModel.PriceType = s.order.OrderType == 2 ? "道具" : "POP";
+                                    //        orderModel.Area = double.Parse(totalArea.ToString());
+                                    //        orderModel.Gender = s.order.Gender;
+                                    //        orderModel.GraphicLength = double.Parse((s.order.GraphicLength ?? 0).ToString());
+                                    //        orderModel.GraphicWidth = double.Parse((s.order.GraphicWidth ?? 0).ToString());
+                                    //        orderModel.GraphicMaterial = s.order.GraphicMaterial;
+                                    //        orderModel.PositionDescription = s.order.PositionDescription;
+                                    //        orderModel.Quantity = s.order.Quantity ?? 1;
+                                    //        orderModel.Sheet = s.order.Sheet;
+                                    //        orderModel.ShopName = s.shop.ShopName;
+                                    //        orderModel.ShopNo = s.shop.ShopNo;
+                                    //        orderModel.SubjectName = s.subject.SubjectName;
+                                    //        orderModel.SubjectNo = s.subject.SubjectNo;
+                                    //        orderModel.TotalPrice = double.Parse(totalPrice.ToString());
+                                    //        orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
+                                    //        newOrderList.Add(orderModel);
+                                    //    }
+                                    //    else
+                                    //    {
+                                    //        if (s.order.GraphicMaterial.IndexOf("+挂轴") != -1)
+                                    //        {
+                                    //            string material0 = s.order.GraphicMaterial.Replace("+挂轴", "").Replace("+上挂轴", "").Replace("+下挂轴", "");
+                                    //            decimal unitPrice0 = new BasePage().GetMaterialPrice(material0, out unitName);
+                                    //            decimal unitPrice1 = new BasePage().GetMaterialPrice("挂轴", out unitName);
+                                    //            decimal popPrice0 = newPOPArea * unitPrice0 * (s.order.Quantity ?? 1);
+                                    //            decimal popPrice1 = (s.order.GraphicWidth ?? 0) / 1000 * 2 * unitPrice1 * (s.order.Quantity ?? 1);
+                                    //            if (s.order.GraphicMaterial.IndexOf("上挂轴") != -1 || s.order.GraphicMaterial.IndexOf("下挂轴") != -1)
+                                    //            {
+                                    //                popPrice1 = (s.order.GraphicWidth ?? 0) / 1000 * unitPrice1 * (s.order.Quantity ?? 1);
+                                    //            }
+                                    //            //totalPrice = (popPrice0 + popPrice1);
+                                    //            totalArea = newPOPArea * (s.order.Quantity ?? 1);
+
+                                    //            orderModel = new OrderPriceDetail();
+                                    //            if (s.subject.AddDate != null)
+                                    //                orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
+                                    //            orderModel.PriceType = s.order.OrderType == 2 ? "道具" : "POP";
+                                    //            orderModel.Area = double.Parse(totalArea.ToString());
+                                    //            orderModel.Gender = s.order.Gender;
+                                    //            orderModel.GraphicLength = double.Parse((s.order.GraphicLength ?? 0).ToString());
+                                    //            orderModel.GraphicWidth = double.Parse((s.order.GraphicWidth ?? 0).ToString());
+                                    //            orderModel.GraphicMaterial = material0;
+                                    //            orderModel.PositionDescription = s.order.PositionDescription;
+                                    //            orderModel.Quantity = s.order.Quantity ?? 1;
+                                    //            orderModel.Sheet = s.order.Sheet;
+                                    //            orderModel.ShopName = s.shop.ShopName;
+                                    //            orderModel.ShopNo = s.shop.ShopNo;
+                                    //            orderModel.SubjectName = s.subject.SubjectName;
+                                    //            orderModel.SubjectNo = s.subject.SubjectNo;
+                                    //            orderModel.UnitPrice = double.Parse(unitPrice0.ToString());
+                                    //            orderModel.TotalPrice = double.Parse(popPrice0.ToString());
+                                    //            newOrderList.Add(orderModel);
+
+                                    //            orderModel = new OrderPriceDetail();
+                                    //            if (s.subject.AddDate != null)
+                                    //                orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
+                                    //            orderModel.PriceType = s.order.OrderType == 2 ? "道具" : "POP";
+                                    //            orderModel.Area = double.Parse(totalArea.ToString());
+                                    //            orderModel.Gender = s.order.Gender;
+                                    //            orderModel.GraphicLength = double.Parse((s.order.GraphicLength ?? 0).ToString());
+                                    //            orderModel.GraphicWidth = double.Parse((s.order.GraphicWidth ?? 0).ToString());
+                                    //            orderModel.PositionDescription = s.order.PositionDescription;
+                                    //            orderModel.Quantity = s.order.Quantity ?? 1;
+                                    //            orderModel.Sheet = s.order.Sheet;
+                                    //            orderModel.ShopName = s.shop.ShopName;
+                                    //            orderModel.ShopNo = s.shop.ShopNo;
+                                    //            orderModel.SubjectName = s.subject.SubjectName;
+                                    //            orderModel.SubjectNo = s.subject.SubjectNo;
+                                    //            orderModel.GraphicMaterial = "挂轴";
+                                    //            if (s.order.GraphicMaterial.IndexOf("上挂轴") != -1)
+                                    //            {
+                                    //                orderModel.GraphicMaterial = "上挂轴";
+                                    //            }
+                                    //            if (s.order.GraphicMaterial.IndexOf("下挂轴") != -1)
+                                    //            {
+                                    //                orderModel.GraphicMaterial = "下挂轴";
+                                    //            }
+                                    //            orderModel.UnitPrice = double.Parse(unitPrice1.ToString());
+                                    //            orderModel.TotalPrice = double.Parse(popPrice1.ToString());
+                                    //            newOrderList.Add(orderModel);
+                                    //        }
+                                    //        else
+                                    //        {
+                                    //            if (unitName == "个")
+                                    //            {
+                                    //                totalPrice = defaultUnitPrice * (s.order.Quantity ?? 1);
+                                    //            }
+                                    //            else
+                                    //            {
+                                    //                totalArea = newPOPArea * (s.order.Quantity ?? 1);
+                                    //                totalPrice = newPOPArea * defaultUnitPrice * (s.order.Quantity ?? 1);
+                                    //            }
+                                    //            orderModel = new OrderPriceDetail();
+                                    //            if (s.subject.AddDate != null)
+                                    //                orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
+                                    //            orderModel.PriceType = s.order.OrderType == 2 ? "道具" : "POP";
+                                    //            orderModel.Area = double.Parse(totalArea.ToString());
+                                    //            orderModel.Gender = s.order.Gender;
+                                    //            orderModel.GraphicLength = double.Parse((s.order.GraphicLength ?? 0).ToString());
+                                    //            orderModel.GraphicWidth = double.Parse((s.order.GraphicWidth ?? 0).ToString());
+                                    //            orderModel.GraphicMaterial = s.order.GraphicMaterial;
+                                    //            orderModel.PositionDescription = s.order.PositionDescription;
+                                    //            orderModel.Quantity = s.order.Quantity ?? 1;
+                                    //            orderModel.Sheet = s.order.Sheet;
+                                    //            orderModel.ShopName = s.shop.ShopName;
+                                    //            orderModel.ShopNo = s.shop.ShopNo;
+                                    //            orderModel.SubjectName = s.subject.SubjectName;
+                                    //            orderModel.SubjectNo = s.subject.SubjectNo;
+                                    //            orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
+                                    //            orderModel.TotalPrice = double.Parse(totalPrice.ToString());
+                                    //            newOrderList.Add(orderModel);
+
+                                    //        }
+
+                                    //    }
+                                    //}
+                                    #endregion
+                                    string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
+                                    decimal width = s.order.GraphicWidth ?? 0;
+                                    decimal length = s.order.GraphicLength ?? 0;
+                                    int Quantity = s.order.Quantity ?? 0;
+                                    string GraphicMaterial = s.order.GraphicMaterial;
+                                    if (!string.IsNullOrWhiteSpace(GraphicMaterial))
                                     {
-                                        if (GraphicMaterial.Contains("+挂轴") || GraphicMaterial.Contains("+上挂轴") || GraphicMaterial.Contains("+下挂轴"))
+                                        #region
+                                        //if (GraphicMaterial.Contains("挂轴"))
+                                        //{
+                                        //    if (GraphicMaterial.Contains("+挂轴") || GraphicMaterial.Contains("+上挂轴") || GraphicMaterial.Contains("+下挂轴"))
+                                        //    {
+
+                                        //        string materialName1 = GraphicMaterial.Substring(0, GraphicMaterial.LastIndexOf('+'));
+
+                                        //        string unitName = string.Empty;
+                                        //        decimal unitPrice1 = new BasePage().GetMaterialPrice(s.guindance.PriceItemId ?? 0, materialName1, out unitName);
+
+                                        //        decimal totalPrice1 = 0;
+                                        //        if (unitName == "个")
+                                        //        {
+                                        //            totalPrice1 = unitPrice1 * Quantity;
+                                        //        }
+                                        //        else
+                                        //        {
+                                        //            totalPrice1 = ((width * length) / 1000000) * unitPrice1 * Quantity;
+                                        //        }
+                                        //        totalArea = (width * length) / 1000000 * Quantity;
+                                        //        orderModel = new OrderPriceDetail();
+                                        //        orderModel.AddDate = s.subject.AddDate;
+                                        //        //orderModel.PriceType = s.order.OrderType == 2 ? "道具" : "POP";
+                                        //        orderModel.PriceType = orderType;
+                                        //        orderModel.Area = double.Parse(totalArea.ToString());
+                                        //        orderModel.Gender = s.order.Gender;
+                                        //        orderModel.GraphicWidth = double.Parse(width.ToString());
+                                        //        orderModel.GraphicLength = double.Parse(length.ToString());
+                                        //        orderModel.GraphicMaterial = materialName1;
+                                        //        orderModel.PositionDescription = s.order.PositionDescription;
+                                        //        orderModel.Quantity = Quantity;
+                                        //        orderModel.Sheet = s.order.Sheet;
+                                        //        orderModel.ShopName = s.shop.ShopName;
+                                        //        orderModel.ShopNo = s.shop.ShopNo;
+                                        //        orderModel.Region = s.shop.RegionName;
+                                        //        orderModel.Province = s.shop.ProvinceName;
+                                        //        orderModel.City = s.shop.CityName;
+                                        //        orderModel.SubjectName = s.subject.SubjectName;
+                                        //        orderModel.SubjectNo = s.subject.SubjectNo;
+                                        //        orderModel.TotalPrice = double.Parse(totalPrice1.ToString());
+                                        //        orderModel.UnitPrice = double.Parse(unitPrice1.ToString());
+                                        //        newOrderList.Add(orderModel);
+
+                                        //        //添加挂轴的pop
+                                        //        string materialName2 = GraphicMaterial.Replace(materialName1 + "+", "");//挂轴
+                                        //        unitPrice1 = new BasePage().GetMaterialPrice(s.guindance.PriceItemId ?? 0, "挂轴", out unitName);
+                                        //        totalArea = (width / 1000) * 2 * Quantity;
+                                        //        if (materialName2.Contains("上挂轴") || materialName2.Contains("下挂轴"))
+                                        //        {
+                                        //            totalArea = (width / 1000) * Quantity;
+                                        //        }
+                                        //        totalPrice1 = totalArea * unitPrice1;
+                                        //        orderModel = new OrderPriceDetail();
+                                        //        orderModel.AddDate = s.subject.AddDate;
+                                        //        orderModel.PriceType = orderType;
+                                        //        orderModel.Area = double.Parse(totalArea.ToString());
+                                        //        orderModel.Gender = s.order.Gender;
+                                        //        orderModel.GraphicWidth = double.Parse(width.ToString());
+                                        //        orderModel.GraphicLength = double.Parse(length.ToString());
+                                        //        orderModel.GraphicMaterial = materialName2;
+                                        //        orderModel.PositionDescription = s.order.PositionDescription;
+                                        //        orderModel.Quantity = Quantity;
+                                        //        orderModel.Sheet = s.order.Sheet;
+                                        //        orderModel.ShopName = s.shop.ShopName;
+                                        //        orderModel.ShopNo = s.shop.ShopNo;
+                                        //        orderModel.Region = s.shop.RegionName;
+                                        //        orderModel.Province = s.shop.ProvinceName;
+                                        //        orderModel.City = s.shop.CityName;
+                                        //        orderModel.SubjectName = s.subject.SubjectName;
+                                        //        orderModel.SubjectNo = s.subject.SubjectNo;
+                                        //        orderModel.TotalPrice = double.Parse(totalPrice1.ToString());
+                                        //        orderModel.UnitPrice = double.Parse(unitPrice1.ToString());
+                                        //        newOrderList.Add(orderModel);
+                                        //    }
+                                        //    else
+                                        //    {
+                                        //        totalArea = (width / 1000) * 2 * Quantity;
+                                        //        orderModel = new OrderPriceDetail();
+                                        //        orderModel.AddDate = s.subject.AddDate;
+                                        //        orderModel.PriceType = orderType;
+                                        //        orderModel.Area = double.Parse(totalArea.ToString());
+                                        //        orderModel.Gender = s.order.Gender;
+                                        //        orderModel.GraphicWidth = double.Parse(width.ToString());
+                                        //        orderModel.GraphicLength = double.Parse(length.ToString());
+                                        //        orderModel.GraphicMaterial = s.order.GraphicMaterial;
+                                        //        orderModel.PositionDescription = s.order.PositionDescription;
+                                        //        orderModel.Quantity = Quantity;
+                                        //        orderModel.Sheet = s.order.Sheet;
+                                        //        orderModel.ShopName = s.shop.ShopName;
+                                        //        orderModel.ShopNo = s.shop.ShopNo;
+                                        //        orderModel.Region = s.shop.RegionName;
+                                        //        orderModel.Province = s.shop.ProvinceName;
+                                        //        orderModel.City = s.shop.CityName;
+                                        //        orderModel.SubjectName = s.subject.SubjectName;
+                                        //        orderModel.SubjectNo = s.subject.SubjectNo;
+                                        //        orderModel.TotalPrice = double.Parse((s.order.TotalPrice ?? 0).ToString());
+                                        //        orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
+                                        //        newOrderList.Add(orderModel);
+                                        //    }
+                                        //}
+                                        //else
+                                        //{
+
+                                        //    totalArea = (width * length) / 1000000 * Quantity;
+                                        //    orderModel = new OrderPriceDetail();
+                                        //    orderModel.AddDate = s.subject.AddDate;
+                                        //    orderModel.PriceType = orderType;
+                                        //    orderModel.Area = double.Parse(totalArea.ToString());
+                                        //    orderModel.Gender = s.order.Gender;
+                                        //    orderModel.GraphicLength = double.Parse(length.ToString());
+                                        //    orderModel.GraphicWidth = double.Parse(width.ToString());
+                                        //    orderModel.GraphicMaterial = s.order.GraphicMaterial;
+                                        //    orderModel.PositionDescription = s.order.PositionDescription;
+                                        //    orderModel.Quantity = Quantity;
+                                        //    orderModel.Sheet = s.order.Sheet;
+                                        //    orderModel.ShopName = s.shop.ShopName;
+                                        //    orderModel.ShopNo = s.shop.ShopNo;
+                                        //    orderModel.Region = s.shop.RegionName;
+                                        //    orderModel.Province = s.shop.ProvinceName;
+                                        //    orderModel.City = s.shop.CityName;
+                                        //    orderModel.SubjectName = s.subject.SubjectName;
+                                        //    orderModel.SubjectNo = s.subject.SubjectNo;
+                                        //    orderModel.TotalPrice = double.Parse((s.order.TotalPrice ?? 0).ToString());
+                                        //    orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
+                                        //    newOrderList.Add(orderModel);
+                                        //}
+                                        #endregion
+                                        ////totalArea = (width * length) / 1000000 * Quantity;
+                                        decimal area = ((width * length) / 1000000) * Quantity;
+                                        if (GraphicMaterial.Contains("挂轴"))
                                         {
 
-                                            string materialName1 = GraphicMaterial.Substring(0, GraphicMaterial.LastIndexOf('+'));
-
-                                            string unitName = string.Empty;
-                                            decimal unitPrice1 = new BasePage().GetMaterialPrice(s.guindance.PriceItemId ?? 0, materialName1, out unitName);
-
-                                            decimal totalPrice1 = 0;
-                                            if (unitName == "个")
+                                            if (GraphicMaterial.Contains("+挂轴") || GraphicMaterial.Contains("+上挂轴") || GraphicMaterial.Contains("+下挂轴"))
                                             {
-                                                totalPrice1 = unitPrice1 * Quantity;
+                                                //如果是+挂轴，要加上挂轴面积
+                                                area = ((width * length) / 1000000) * Quantity;
+                                                if (GraphicMaterial.Contains("+挂轴"))
+                                                    area += (width / 1000) * 2 * Quantity;
+                                                else
+                                                    area += (width / 1000) * Quantity;
                                             }
                                             else
                                             {
-                                                totalPrice1 = ((width * length) / 1000000) * unitPrice1 * Quantity;
+                                                //只有挂轴
+                                                area = (width / 1000) * 2 * Quantity;
                                             }
-                                            totalArea = (width * length) / 1000000 * Quantity;
-                                            orderModel = new OrderPriceDetail();
-                                            orderModel.AddDate = s.subject.AddDate;
-                                            //orderModel.PriceType = s.order.OrderType == 2 ? "道具" : "POP";
-                                            orderModel.PriceType = orderType;
-                                            orderModel.Area = double.Parse(totalArea.ToString());
-                                            orderModel.Gender = s.order.Gender;
-                                            orderModel.GraphicWidth = double.Parse(width.ToString());
-                                            orderModel.GraphicLength = double.Parse(length.ToString());
-                                            orderModel.GraphicMaterial = materialName1;
-                                            orderModel.PositionDescription = s.order.PositionDescription;
-                                            orderModel.Quantity = Quantity;
-                                            orderModel.Sheet = s.order.Sheet;
-                                            orderModel.ShopName = s.shop.ShopName;
-                                            orderModel.ShopNo = s.shop.ShopNo;
-                                            orderModel.Region = s.shop.RegionName;
-                                            orderModel.Province = s.shop.ProvinceName;
-                                            orderModel.City = s.shop.CityName;
-                                            orderModel.SubjectName = s.subject.SubjectName;
-                                            orderModel.SubjectNo = s.subject.SubjectNo;
-                                            orderModel.TotalPrice = double.Parse(totalPrice1.ToString());
-                                            orderModel.UnitPrice = double.Parse(unitPrice1.ToString());
-                                            newOrderList.Add(orderModel);
 
-                                            //添加挂轴的pop
-                                            string materialName2 = GraphicMaterial.Replace(materialName1 + "+", "");//挂轴
-                                            unitPrice1 = new BasePage().GetMaterialPrice(s.guindance.PriceItemId ?? 0, "挂轴", out unitName);
-                                            totalArea = (width / 1000) * 2 * Quantity;
-                                            if (materialName2.Contains("上挂轴") || materialName2.Contains("下挂轴"))
-                                            {
-                                                totalArea = (width / 1000) * Quantity;
-                                            }
-                                            totalPrice1 = totalArea * unitPrice1;
-                                            orderModel = new OrderPriceDetail();
-                                            orderModel.AddDate = s.subject.AddDate;
-                                            orderModel.PriceType = orderType;
-                                            orderModel.Area = double.Parse(totalArea.ToString());
-                                            orderModel.Gender = s.order.Gender;
-                                            orderModel.GraphicWidth = double.Parse(width.ToString());
-                                            orderModel.GraphicLength = double.Parse(length.ToString());
-                                            orderModel.GraphicMaterial = materialName2;
-                                            orderModel.PositionDescription = s.order.PositionDescription;
-                                            orderModel.Quantity = Quantity;
-                                            orderModel.Sheet = s.order.Sheet;
-                                            orderModel.ShopName = s.shop.ShopName;
-                                            orderModel.ShopNo = s.shop.ShopNo;
-                                            orderModel.Region = s.shop.RegionName;
-                                            orderModel.Province = s.shop.ProvinceName;
-                                            orderModel.City = s.shop.CityName;
-                                            orderModel.SubjectName = s.subject.SubjectName;
-                                            orderModel.SubjectNo = s.subject.SubjectNo;
-                                            orderModel.TotalPrice = double.Parse(totalPrice1.ToString());
-                                            orderModel.UnitPrice = double.Parse(unitPrice1.ToString());
-                                            newOrderList.Add(orderModel);
                                         }
-                                        else
-                                        {
-                                            totalArea = (width / 1000) * 2 * Quantity;
-                                            orderModel = new OrderPriceDetail();
-                                            orderModel.AddDate = s.subject.AddDate;
-                                            orderModel.PriceType = orderType;
-                                            orderModel.Area = double.Parse(totalArea.ToString());
-                                            orderModel.Gender = s.order.Gender;
-                                            orderModel.GraphicWidth = double.Parse(width.ToString());
-                                            orderModel.GraphicLength = double.Parse(length.ToString());
-                                            orderModel.GraphicMaterial = s.order.GraphicMaterial;
-                                            orderModel.PositionDescription = s.order.PositionDescription;
-                                            orderModel.Quantity = Quantity;
-                                            orderModel.Sheet = s.order.Sheet;
-                                            orderModel.ShopName = s.shop.ShopName;
-                                            orderModel.ShopNo = s.shop.ShopNo;
-                                            orderModel.Region = s.shop.RegionName;
-                                            orderModel.Province = s.shop.ProvinceName;
-                                            orderModel.City = s.shop.CityName;
-                                            orderModel.SubjectName = s.subject.SubjectName;
-                                            orderModel.SubjectNo = s.subject.SubjectNo;
-                                            orderModel.TotalPrice = double.Parse((s.order.TotalPrice ?? 0).ToString());
-                                            orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
-                                            newOrderList.Add(orderModel);
-                                        }
-                                    }
-                                    else
-                                    {
 
-                                        totalArea = (width * length) / 1000000 * Quantity;
                                         orderModel = new OrderPriceDetail();
-                                        orderModel.AddDate = s.subject.AddDate;
+                                        orderModel.AddDate = s.order.AddDate;
                                         orderModel.PriceType = orderType;
-                                        orderModel.Area = double.Parse(totalArea.ToString());
+                                        orderModel.Area = double.Parse(area.ToString());
                                         orderModel.Gender = s.order.Gender;
                                         orderModel.GraphicLength = double.Parse(length.ToString());
                                         orderModel.GraphicWidth = double.Parse(width.ToString());
@@ -578,44 +654,202 @@ namespace WebApp.Statistics.handler
                                         orderModel.SubjectNo = s.subject.SubjectNo;
                                         orderModel.TotalPrice = double.Parse((s.order.TotalPrice ?? 0).ToString());
                                         orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
+                                        orderModel.Channel = s.order.Channel;
+                                        orderModel.Format = s.order.Format;
+                                        orderModel.CustomServiceName = s.CSName;
                                         newOrderList.Add(orderModel);
                                     }
-                                }
-                                else
-                                {
+                                    else
+                                    {
 
+                                        orderModel = new OrderPriceDetail();
+                                        orderModel.AddDate = s.order.AddDate;
+                                        orderModel.PriceType = orderType;
+                                        orderModel.Area = 0;
+                                        orderModel.Gender = string.Empty;
+                                        orderModel.GraphicLength = 0;
+                                        orderModel.GraphicWidth = 0;
+                                        orderModel.GraphicMaterial = string.Empty;
+                                        orderModel.PositionDescription = string.Empty;
+                                        orderModel.Quantity = s.order.Quantity ?? 1;
+                                        orderModel.Sheet = string.Empty;
+                                        orderModel.ShopName = s.shop.ShopName;
+                                        orderModel.ShopNo = s.shop.ShopNo;
+                                        orderModel.Region = s.shop.RegionName;
+                                        orderModel.Province = s.shop.ProvinceName;
+                                        orderModel.City = s.shop.CityName;
+                                        orderModel.SubjectName = s.subject.SubjectName;
+                                        orderModel.SubjectNo = s.subject.SubjectNo;
+                                        orderModel.UnitPrice = 0;
+                                        orderModel.TotalPrice = double.Parse(((s.order.OrderPrice ?? 0) * (s.order.Quantity ?? 1)).ToString());
+                                        orderModel.Remark = s.order.Remark;
+                                        orderModel.Channel = s.order.Channel;
+                                        orderModel.Format = s.order.Format;
+                                        orderModel.CustomServiceName = s.CSName;
+                                        newOrderList.Add(orderModel);
+                                    }
+                                });
+                            }
+                        }
+                        #endregion
+                        #region 安装费
+                        //if (isExportInstall == 1)
+                        //{
+                            var installPriceOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.安装费 || s.order.OrderType == (int)OrderTypeEnum.测量费 || s.order.OrderType == (int)OrderTypeEnum.其他费用 || s.order.OrderType == (int)OrderTypeEnum.印刷费).ToList();
+                            installPriceOrderList.ForEach(s =>
+                            {
+                                string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
+                                orderModel = new OrderPriceDetail();
+                                orderModel.AddDate = s.subject.AddDate;
+                                orderModel.PriceType = orderType;
+                                orderModel.Area = 0;
+                                orderModel.Gender = string.Empty;
+                                orderModel.GraphicLength = 0;
+                                orderModel.GraphicWidth = 0;
+                                orderModel.GraphicMaterial = string.Empty;
+                                orderModel.PositionDescription = string.Empty;
+                                orderModel.Quantity = s.order.Quantity ?? 1;
+                                orderModel.Sheet = string.Empty;
+                                orderModel.ShopName = s.shop.ShopName;
+                                orderModel.ShopNo = s.shop.ShopNo;
+                                orderModel.Region = s.shop.RegionName;
+                                orderModel.Province = s.shop.ProvinceName;
+                                orderModel.City = s.shop.CityName;
+                                orderModel.SubjectName = s.subject.SubjectName;
+                                orderModel.SubjectNo = s.subject.SubjectNo;
+                                orderModel.UnitPrice = double.Parse((s.order.OrderPrice ?? 0).ToString()); ;
+                                orderModel.TotalPrice = double.Parse(((s.order.OrderPrice ?? 0) * (s.order.Quantity ?? 1)).ToString());
+                                orderModel.Remark = s.order.Remark;
+                                orderModel.Channel = s.shop.Channel;
+                                orderModel.Format = s.shop.Format;
+                                newOrderList.Add(orderModel);
+                            });
+                            decimal totalInstallPrice = 0;
+                            guidanceIdList.ForEach(gid =>
+                            {
+                                List<int> installShopIdList = orderList.Where(s => s.order.GuidanceId == gid && s.order.OrderType != (int)OrderTypeEnum.物料 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单).Select(s => s.order.ShopId ?? 0).Distinct().ToList();
+                                var installPriceDetailList = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
+                                                              join guidance in CurrentContext.DbContext.SubjectGuidance
+                                                              on installShop.GuidanceId equals guidance.ItemId
+                                                              join subject in CurrentContext.DbContext.Subject
+                                                              on installShop.SubjectId equals subject.Id
+                                                              where
+                                                              installShop.GuidanceId == gid
+                                                              && installShopIdList.Contains(installShop.ShopId ?? 0)
+                                                              && (guidance.ActivityTypeId != (int)GuidanceTypeEnum.Others)//不统计分区增补的安装费
+                                                              && (installShop.BasicPrice ?? 0) > 0
+                                                              && allSubjectIdList.Contains(installShop.SubjectId ?? 0)
+                                                              select installShop).ToList();
+
+                                if (installPriceDetailList.Any())
+                                {
+                                    totalInstallPrice += (installPriceDetailList.Sum(s => ((s.BasicPrice ?? 0) + (s.WindowPrice ?? 0) + (s.OOHPrice ?? 0))));
+                                }
+                            });
+                            if (totalInstallPrice > 0)
+                            {
+                                orderModel = new OrderPriceDetail();
+                                orderModel.AddDate = null;
+                                orderModel.PriceType = "活动安装费";
+                                orderModel.Area = 0;
+                                orderModel.Gender = string.Empty;
+                                orderModel.GraphicLength = 0;
+                                orderModel.GraphicWidth = 0;
+                                orderModel.GraphicMaterial = string.Empty;
+                                orderModel.PositionDescription = string.Empty;
+                                orderModel.Quantity = 1;
+                                orderModel.Sheet = string.Empty;
+                                orderModel.ShopName = string.Empty;
+                                orderModel.ShopNo = string.Empty;
+                                orderModel.Region = string.Empty;
+                                orderModel.Province = string.Empty;
+                                orderModel.City = string.Empty;
+                                orderModel.SubjectName = string.Empty;
+                                orderModel.SubjectNo = string.Empty;
+                                orderModel.UnitPrice = 0;
+                                orderModel.TotalPrice = double.Parse(totalInstallPrice.ToString());
+
+                                newOrderList.Add(orderModel);
+                            }
+
+                            //新开店装修费
+                            var newShopInstallList = (from order in CurrentContext.DbContext.PriceOrderDetail
+                                                      join subject in CurrentContext.DbContext.Subject
+                                                      on order.SubjectId equals subject.Id
+                                                      where subjectIdList.Contains(order.SubjectId ?? 0)
+                                                      && (subject.SubjectType == (int)SubjectTypeEnum.新开店安装费 || subject.SubjectType == (int)SubjectTypeEnum.运费)
+                                                      select new
+                                                      {
+                                                          order,
+                                                          subject
+                                                      }).ToList();
+                            if (!string.IsNullOrWhiteSpace(regions))
+                            {
+                                regionList = StringHelper.ToStringList(regions, ',', LowerUpperEnum.ToLower);
+                            }
+                            else
+                            {
+                                new BasePage().GetResponsibleRegion.ForEach(s =>
+                                {
+                                    regionList.Add(s.ToLower());
+                                });
+
+                            }
+                            if (regionList.Any())
+                            {
+
+                                newShopInstallList = newShopInstallList.Where(s => regionList.Contains(s.order.Region.ToLower())).ToList();
+                                if (!string.IsNullOrWhiteSpace(provinces))
+                                {
+                                    provinceList = StringHelper.ToStringList(provinces, ',');
+                                    if (provinceList.Any())
+                                    {
+                                        newShopInstallList = newShopInstallList.Where(s => provinceList.Contains(s.order.Province)).ToList();
+                                        if (!string.IsNullOrWhiteSpace(citys))
+                                        {
+                                            cityList = StringHelper.ToStringList(citys, ',');
+                                            if (cityList.Any())
+                                                newShopInstallList = newShopInstallList.Where(s => cityList.Contains(s.order.City)).ToList();
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (newShopInstallList.Any())
+                            {
+
+                                newShopInstallList.ForEach(s =>
+                                {
                                     orderModel = new OrderPriceDetail();
-                                    orderModel.AddDate = s.subject.AddDate;
-                                    orderModel.PriceType = orderType;
+                                    if (s.subject.AddDate != null)
+                                        orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
+                                    orderModel.PriceType = CommonMethod.GeEnumName<SubjectTypeEnum>((s.subject.SubjectType ?? 0).ToString());
                                     orderModel.Area = 0;
                                     orderModel.Gender = string.Empty;
                                     orderModel.GraphicLength = 0;
                                     orderModel.GraphicWidth = 0;
                                     orderModel.GraphicMaterial = string.Empty;
                                     orderModel.PositionDescription = string.Empty;
-                                    orderModel.Quantity = s.order.Quantity??1;
+                                    orderModel.Quantity = 1;
                                     orderModel.Sheet = string.Empty;
-                                    orderModel.ShopName = s.shop.ShopName;
-                                    orderModel.ShopNo = s.shop.ShopNo;
-                                    orderModel.Region = s.shop.RegionName;
-                                    orderModel.Province = s.shop.ProvinceName;
-                                    orderModel.City = s.shop.CityName;
+                                    orderModel.ShopName = s.order.ShopName;
+                                    orderModel.ShopNo = "";
+                                    orderModel.Region = s.order.Region;
+                                    orderModel.Province = s.order.Province;
+                                    orderModel.City = s.order.City;
                                     orderModel.SubjectName = s.subject.SubjectName;
                                     orderModel.SubjectNo = s.subject.SubjectNo;
                                     orderModel.UnitPrice = 0;
-                                    orderModel.TotalPrice = double.Parse(((s.order.OrderPrice ?? 0)*(s.order.Quantity??1)).ToString());
                                     orderModel.Remark = s.order.Remark;
+                                    orderModel.TotalPrice = double.Parse((s.order.Amount ?? 0).ToString());
                                     newOrderList.Add(orderModel);
-                                }
-                            });
-                        }
-                    }
-                    #endregion
-                    #region 安装费
-                    if (isExportInstall == 1)
-                    {
-                        var installPriceOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.安装费 || s.order.OrderType == (int)OrderTypeEnum.测量费 || s.order.OrderType == (int)OrderTypeEnum.其他费用 || s.order.OrderType == (int)OrderTypeEnum.印刷费).ToList();
-                        installPriceOrderList.ForEach(s =>
+                                });
+                            }
+                        //}
+                        #endregion
+                        #region 快递费
+                        var expressPriceOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.快递费 || s.order.OrderType == (int)OrderTypeEnum.运费).ToList();
+                        expressPriceOrderList.ForEach(s =>
                         {
                             string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
                             orderModel = new OrderPriceDetail();
@@ -627,7 +861,7 @@ namespace WebApp.Statistics.handler
                             orderModel.GraphicWidth = 0;
                             orderModel.GraphicMaterial = string.Empty;
                             orderModel.PositionDescription = string.Empty;
-                            orderModel.Quantity = s.order.Quantity??1;
+                            orderModel.Quantity = 1;
                             orderModel.Sheet = string.Empty;
                             orderModel.ShopName = s.shop.ShopName;
                             orderModel.ShopNo = s.shop.ShopNo;
@@ -636,38 +870,24 @@ namespace WebApp.Statistics.handler
                             orderModel.City = s.shop.CityName;
                             orderModel.SubjectName = s.subject.SubjectName;
                             orderModel.SubjectNo = s.subject.SubjectNo;
-                            orderModel.UnitPrice = double.Parse((s.order.OrderPrice ?? 0).ToString()); ;
-                            orderModel.TotalPrice = double.Parse(((s.order.OrderPrice ?? 0)*(s.order.Quantity??1)).ToString());
+                            orderModel.UnitPrice = 0;
+                            orderModel.TotalPrice = double.Parse((s.order.OrderPrice ?? 0).ToString());
                             orderModel.Remark = s.order.Remark;
                             newOrderList.Add(orderModel);
                         });
-                        decimal totalInstallPrice = 0;
-                        guidanceIdList.ForEach(gid =>
+                        decimal totalExpressPrice = 0;
+                        List<int> totalShopIdList = popOrder.Select(s => s.shop.Id).Distinct().ToList();
+                        var expressPriceDetailList = new ExpressPriceDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && totalShopIdList.Contains(s.ShopId ?? 0));
+                        if (expressPriceDetailList.Any())
                         {
-                            List<int> installShopIdList = orderList.Where(s => s.order.GuidanceId == gid && s.order.OrderType != (int)OrderTypeEnum.物料 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单).Select(s => s.order.ShopId ?? 0).Distinct().ToList();
-                            var installPriceDetailList = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
-                                                          join guidance in CurrentContext.DbContext.SubjectGuidance
-                                                          on installShop.GuidanceId equals guidance.ItemId
-                                                          join subject in CurrentContext.DbContext.Subject
-                                                          on installShop.SubjectId equals subject.Id
-                                                          where
-                                                          installShop.GuidanceId == gid
-                                                          && installShopIdList.Contains(installShop.ShopId ?? 0)
-                                                          && (guidance.ActivityTypeId != (int)GuidanceTypeEnum.Others)//不统计分区增补的安装费
-                                                          && (installShop.BasicPrice ?? 0) > 0
-                                                          && subjectIdList.Contains(installShop.SubjectId??0)
-                                                          select installShop).ToList();
+                            totalExpressPrice = expressPriceDetailList.Sum(s => s.ExpressPrice ?? 0);
+                        }
 
-                            if (installPriceDetailList.Any())
-                            {
-                                totalInstallPrice += (installPriceDetailList.Sum(s => ((s.BasicPrice ?? 0) + (s.WindowPrice ?? 0) + (s.OOHPrice ?? 0))));
-                            }
-                        });
-                        if (totalInstallPrice > 0)
+                        if (totalExpressPrice > 0)
                         {
                             orderModel = new OrderPriceDetail();
                             orderModel.AddDate = null;
-                            orderModel.PriceType = "活动安装费";
+                            orderModel.PriceType = "活动快递费";
                             orderModel.Area = 0;
                             orderModel.Gender = string.Empty;
                             orderModel.GraphicLength = 0;
@@ -684,189 +904,69 @@ namespace WebApp.Statistics.handler
                             orderModel.SubjectName = string.Empty;
                             orderModel.SubjectNo = string.Empty;
                             orderModel.UnitPrice = 0;
-                            orderModel.TotalPrice = double.Parse(totalInstallPrice.ToString());
+                            orderModel.TotalPrice = double.Parse(totalExpressPrice.ToString());
                             newOrderList.Add(orderModel);
                         }
 
-                        //新开店装修费
-                        var newShopInstallList = (from order in CurrentContext.DbContext.PriceOrderDetail
-                                                  join subject in CurrentContext.DbContext.Subject
-                                                  on order.SubjectId equals subject.Id
-                                                  where subjectIdList.Contains(order.SubjectId ?? 0)
-                                                  && (subject.SubjectType == (int)SubjectTypeEnum.新开店安装费 || subject.SubjectType == (int)SubjectTypeEnum.运费)
-                                                  select new
-                                                  {
-                                                      order,
-                                                      subject
-                                                  }).ToList();
-                        if (!string.IsNullOrWhiteSpace(regions))
-                        {
-                            regionList = StringHelper.ToStringList(regions, ',', LowerUpperEnum.ToLower);
-                        }
-                        else
-                        {
-                            new BasePage().GetResponsibleRegion.ForEach(s =>
-                            {
-                                regionList.Add(s.ToLower());
-                            });
 
-                        }
-                        if (regionList.Any())
-                        {
 
-                            newShopInstallList = newShopInstallList.Where(s => regionList.Contains(s.order.Region.ToLower())).ToList();
-                            if (!string.IsNullOrWhiteSpace(provinces))
+                        #endregion
+                    #endregion
+
+                        #region 道具订单费用
+                        var propOrderList = (from order in CurrentContext.DbContext.PropOrderDetail
+                                             join subject in CurrentContext.DbContext.Subject
+                                             on order.SubjectId equals subject.Id
+                                             where guidanceIdList.Contains(order.GuidanceId ?? 0)
+                                             select new { order, subject }).ToList();
+                        if (!string.IsNullOrWhiteSpace(begin))
+                        {
+                            DateTime beginDate = DateTime.Parse(begin);
+                            propOrderList = propOrderList.Where(s => s.subject.AddDate >= beginDate).ToList();
+                            if (!string.IsNullOrWhiteSpace(end))
                             {
-                                provinceList = StringHelper.ToStringList(provinces, ',');
-                                if (provinceList.Any())
-                                {
-                                    newShopInstallList = newShopInstallList.Where(s => provinceList.Contains(s.order.Province)).ToList();
-                                    if (!string.IsNullOrWhiteSpace(citys))
-                                    {
-                                        cityList = StringHelper.ToStringList(citys, ',');
-                                        if (cityList.Any())
-                                            newShopInstallList = newShopInstallList.Where(s => cityList.Contains(s.order.City)).ToList();
-                                    }
-                                }
+                                DateTime endDate = DateTime.Parse(end).AddDays(1);
+                                propOrderList = propOrderList.Where(s => s.subject.AddDate < endDate).ToList();
                             }
                         }
-
-                        if (newShopInstallList.Any())
+                        if (subjectIdList.Any())
                         {
-
-                            newShopInstallList.ForEach(s =>
+                            propOrderList = propOrderList.Where(s => subjectIdList.Contains(s.order.SubjectId ?? 0)).ToList();
+                        }
+                        if (propOrderList.Any())
+                        {
+                            propOrderList.ForEach(s =>
                             {
                                 orderModel = new OrderPriceDetail();
-                                if (s.subject.AddDate != null)
-                                    orderModel.AddDate = DateTime.Parse(s.subject.AddDate.ToString());
-                                orderModel.PriceType = CommonMethod.GeEnumName<SubjectTypeEnum>((s.subject.SubjectType ?? 0).ToString());
-                                orderModel.Area = 0;
-                                orderModel.Gender = string.Empty;
-                                orderModel.GraphicLength = 0;
-                                orderModel.GraphicWidth = 0;
-                                orderModel.GraphicMaterial = string.Empty;
-                                orderModel.PositionDescription = string.Empty;
-                                orderModel.Quantity = 1;
-                                orderModel.Sheet = string.Empty;
-                                orderModel.ShopName = s.order.ShopName;
-                                orderModel.ShopNo = "";
-                                orderModel.Region = s.order.Region;
-                                orderModel.Province = s.order.Province;
-                                orderModel.City = s.order.City;
+                                orderModel.AddDate = s.subject.AddDate;
+                                orderModel.PriceType = "道具费";
+                                //orderModel.Area = double.Parse(totalArea.ToString());
+                                //orderModel.Gender = s.order.Gender;
+                                //orderModel.GraphicLength = double.Parse(length.ToString());
+                                //orderModel.GraphicWidth = double.Parse(width.ToString());
+                                orderModel.GraphicMaterial = s.order.MaterialType;
+                                orderModel.PositionDescription = s.order.MaterialName;
+                                orderModel.Quantity = s.order.Quantity ?? 1;
+                                orderModel.Sheet = s.order.Sheet;
+                                //orderModel.ShopName = s.shop.ShopName;
+                                //orderModel.ShopNo = s.shop.ShopNo;
+                                //orderModel.Region = s.shop.RegionName;
+                                //orderModel.Province = s.shop.ProvinceName;
+                                //orderModel.City = s.shop.CityName;
                                 orderModel.SubjectName = s.subject.SubjectName;
                                 orderModel.SubjectNo = s.subject.SubjectNo;
-                                orderModel.UnitPrice = 0;
-                                orderModel.Remark = s.order.Remark;
-                                orderModel.TotalPrice = double.Parse((s.order.Amount ?? 0).ToString());
+                                orderModel.TotalPrice = double.Parse(((s.order.Quantity ?? 1) * (s.order.UnitPrice ?? 0)).ToString());
+                                orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
                                 newOrderList.Add(orderModel);
                             });
                         }
+                        #endregion
                     }
-                    #endregion
-                    #region 快递费
-                    var expressPriceOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.快递费 || s.order.OrderType == (int)OrderTypeEnum.运费).ToList();
-                    expressPriceOrderList.ForEach(s =>
-                    {
-                        string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
-                        orderModel = new OrderPriceDetail();
-                        orderModel.AddDate = s.subject.AddDate;
-                        orderModel.PriceType = orderType;
-                        orderModel.Area = 0;
-                        orderModel.Gender = string.Empty;
-                        orderModel.GraphicLength = 0;
-                        orderModel.GraphicWidth = 0;
-                        orderModel.GraphicMaterial = string.Empty;
-                        orderModel.PositionDescription = string.Empty;
-                        orderModel.Quantity = 1;
-                        orderModel.Sheet = string.Empty;
-                        orderModel.ShopName = s.shop.ShopName;
-                        orderModel.ShopNo = s.shop.ShopNo;
-                        orderModel.Region = s.shop.RegionName;
-                        orderModel.Province = s.shop.ProvinceName;
-                        orderModel.City = s.shop.CityName;
-                        orderModel.SubjectName = s.subject.SubjectName;
-                        orderModel.SubjectNo = s.subject.SubjectNo;
-                        orderModel.UnitPrice = 0;
-                        orderModel.TotalPrice = double.Parse((s.order.OrderPrice ?? 0).ToString());
-                        orderModel.Remark = s.order.Remark;
-                        newOrderList.Add(orderModel);
-                    });
-                    decimal totalExpressPrice = 0;
-                    List<int> totalShopIdList = popOrder.Select(s => s.shop.Id).Distinct().ToList();
-                    var expressPriceDetailList = new ExpressPriceDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && totalShopIdList.Contains(s.ShopId ?? 0));
-                    if (expressPriceDetailList.Any())
-                    {
-                        totalExpressPrice = expressPriceDetailList.Sum(s => s.ExpressPrice ?? 0);
+                    catch(Exception ex)
+                    { 
+                    
                     }
-
-                    if (totalExpressPrice > 0)
-                    {
-                        orderModel = new OrderPriceDetail();
-                        orderModel.AddDate = null;
-                        orderModel.PriceType = "活动快递费";
-                        orderModel.Area = 0;
-                        orderModel.Gender = string.Empty;
-                        orderModel.GraphicLength = 0;
-                        orderModel.GraphicWidth = 0;
-                        orderModel.GraphicMaterial = string.Empty;
-                        orderModel.PositionDescription = string.Empty;
-                        orderModel.Quantity = 1;
-                        orderModel.Sheet = string.Empty;
-                        orderModel.ShopName = string.Empty;
-                        orderModel.ShopNo = string.Empty;
-                        orderModel.Region = string.Empty;
-                        orderModel.Province = string.Empty;
-                        orderModel.City = string.Empty;
-                        orderModel.SubjectName = string.Empty;
-                        orderModel.SubjectNo = string.Empty;
-                        orderModel.UnitPrice = 0;
-                        orderModel.TotalPrice = double.Parse(totalExpressPrice.ToString());
-                        newOrderList.Add(orderModel);
-                    }
-
-
-
-                    #endregion
-                    #endregion
-
-                    #region 道具订单费用
-                    var propOrderList = (from order in CurrentContext.DbContext.PropOrderDetail
-                                         join subject in CurrentContext.DbContext.Subject
-                                         on order.SubjectId equals subject.Id
-                                         where guidanceIdList.Contains(order.GuidanceId ?? 0)
-                                         select new { order, subject }).ToList();
-                    if (subjectIdList.Any())
-                    {
-                        propOrderList = propOrderList.Where(s => subjectIdList.Contains(s.order.SubjectId??0)).ToList();
-                    }
-                    if (propOrderList.Any())
-                    {
-                        propOrderList.ForEach(s => {
-                            orderModel = new OrderPriceDetail();
-                            orderModel.AddDate = s.subject.AddDate;
-                            orderModel.PriceType = "道具费";
-                            //orderModel.Area = double.Parse(totalArea.ToString());
-                            //orderModel.Gender = s.order.Gender;
-                            //orderModel.GraphicLength = double.Parse(length.ToString());
-                            //orderModel.GraphicWidth = double.Parse(width.ToString());
-                            orderModel.GraphicMaterial = s.order.MaterialType;
-                            orderModel.PositionDescription = s.order.MaterialName;
-                            orderModel.Quantity = s.order.Quantity??1;
-                            orderModel.Sheet = s.order.Sheet;
-                            //orderModel.ShopName = s.shop.ShopName;
-                            //orderModel.ShopNo = s.shop.ShopNo;
-                            //orderModel.Region = s.shop.RegionName;
-                            //orderModel.Province = s.shop.ProvinceName;
-                            //orderModel.City = s.shop.CityName;
-                            orderModel.SubjectName = s.subject.SubjectName;
-                            orderModel.SubjectNo = s.subject.SubjectNo;
-                            orderModel.TotalPrice = double.Parse(((s.order.Quantity??1)*(s.order.UnitPrice??0)).ToString());
-                            orderModel.UnitPrice = double.Parse((s.order.UnitPrice ?? 0).ToString());
-                            newOrderList.Add(orderModel);
-                        });
-                    }
-                    #endregion
-
+                    #region 导出
                     if (newOrderList.Any())
                     {
                         string templateFileName = "项目费用统计明细";
@@ -881,7 +981,7 @@ namespace WebApp.Statistics.handler
                             IRow dataRow = sheet.GetRow(startRow);
                             if (dataRow == null)
                                 dataRow = sheet.CreateRow(startRow);
-                            for (int i = 0; i < 20; i++)
+                            for (int i = 0; i < 25; i++)
                             {
                                 ICell cell = dataRow.GetCell(i);
                                 if (cell == null)
@@ -902,19 +1002,23 @@ namespace WebApp.Statistics.handler
                             dataRow.GetCell(6).SetCellValue(s.Province);
                             dataRow.GetCell(7).SetCellValue(s.City);
 
-                            dataRow.GetCell(8).SetCellValue(s.Sheet);
-                            dataRow.GetCell(9).SetCellValue(s.PositionDescription);
-                            dataRow.GetCell(10).SetCellValue(s.Gender);
-                            dataRow.GetCell(11).SetCellValue(s.GraphicMaterial);
+                            dataRow.GetCell(8).SetCellValue(s.Channel);
+                            dataRow.GetCell(9).SetCellValue(s.Format);
+                            dataRow.GetCell(10).SetCellValue(s.CustomServiceName);
 
-                            dataRow.GetCell(12).SetCellValue(s.GraphicWidth);
-                            dataRow.GetCell(13).SetCellValue(s.GraphicLength);
-                            dataRow.GetCell(14).SetCellValue(s.Area);
-                            dataRow.GetCell(15).SetCellValue(s.UnitPrice);
-                            dataRow.GetCell(16).SetCellValue(s.Quantity);
-                            dataRow.GetCell(17).SetCellValue(s.TotalPrice);
-                            dataRow.GetCell(18).SetCellValue(s.SubjectName);
-                            dataRow.GetCell(19).SetCellValue(s.Remark);
+                            dataRow.GetCell(11).SetCellValue(s.Sheet);
+                            dataRow.GetCell(12).SetCellValue(s.PositionDescription);
+                            dataRow.GetCell(13).SetCellValue(s.Gender);
+                            dataRow.GetCell(14).SetCellValue(s.GraphicMaterial);
+
+                            dataRow.GetCell(15).SetCellValue(s.GraphicWidth);
+                            dataRow.GetCell(16).SetCellValue(s.GraphicLength);
+                            dataRow.GetCell(17).SetCellValue(s.Area);
+                            dataRow.GetCell(18).SetCellValue(s.UnitPrice);
+                            dataRow.GetCell(19).SetCellValue(s.Quantity);
+                            dataRow.GetCell(20).SetCellValue(s.TotalPrice);
+                            dataRow.GetCell(21).SetCellValue(s.SubjectName);
+                            dataRow.GetCell(22).SetCellValue(s.Remark);
                             startRow++;
                         });
                         HttpCookie cookie = context1.Request.Cookies["项目费用统计明细"];
@@ -947,6 +1051,7 @@ namespace WebApp.Statistics.handler
                         cookie.Expires = DateTime.Now.AddMinutes(30);
                         context1.Response.Cookies.Add(cookie);
                     }
+                    #endregion
                 }
                 else
                 {
@@ -1015,6 +1120,7 @@ namespace WebApp.Statistics.handler
                                      on order.SubjectId equals subject.Id
                                      join guindance in CurrentContext.DbContext.SubjectGuidance
                                      on order.GuidanceId equals guindance.ItemId
+                                     
                                      where guidanceIdList.Contains(order.GuidanceId ?? 0)
                                     && (subject.IsDelete == null || subject.IsDelete == false)
                                     && (subject.ApproveState == 1)
@@ -1025,9 +1131,32 @@ namespace WebApp.Statistics.handler
                                          order,
                                          shop,
                                          subject,
-                                         guindance
-
+                                         guindance,
+                                        
                                      }).ToList();
+
+                    if (!string.IsNullOrWhiteSpace(begin))
+                    {
+                        DateTime beginDate = DateTime.Parse(begin);
+                        if (dateSearchType == 1)
+                        {
+                            orderList = orderList.Where(s => s.subject.AddDate >= beginDate).ToList();
+                            if (!string.IsNullOrWhiteSpace(end))
+                            {
+                                DateTime endDate = DateTime.Parse(end).AddDays(1);
+                                orderList = orderList.Where(s => s.subject.AddDate < endDate).ToList();
+                            }
+                        }
+                        else
+                        {
+                            orderList = orderList.Where(s => s.order.AddDate >= beginDate).ToList();
+                            if (!string.IsNullOrWhiteSpace(end))
+                            {
+                                DateTime endDate = DateTime.Parse(end).AddDays(1);
+                                orderList = orderList.Where(s => s.order.AddDate < endDate).ToList();
+                            }
+                        }
+                    }
 
                     if (!string.IsNullOrWhiteSpace(shopType))
                     {
@@ -1160,6 +1289,8 @@ namespace WebApp.Statistics.handler
                         List<int> shopIdList = shopList.Select(s => s.Id).ToList();
                         List<InstallPriceShopInfo> installPriceList = new InstallPriceShopInfoBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (subjectIdList.Any()?subjectIdList.Contains(s.SubjectId??0):1==1) && shopIdList.Contains(s.ShopId ?? 0));
                         List<Models.ExpressPriceDetail> expressPriceList=new ExpressPriceDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && shopIdList.Contains(s.ShopId??0));
+                        Dictionary<int, string> userDic = new Dictionary<int, string>();
+                        UserBLL userBll = new UserBLL();
                         for (int i = 0; i < shopList.Count; i++)
                         {
                             Shop model = shopList[i];
@@ -1199,6 +1330,22 @@ namespace WebApp.Statistics.handler
                             model.MaterialPrice = materialPrice;
                             otherPrice = shopOrderList.Where(s => (s.OrderType == (int)OrderTypeEnum.其他费用 || s.OrderType == (int)OrderTypeEnum.印刷费) && (s.OrderPrice ?? 0) > 0).Sum(s => ((s.OrderPrice ?? 0)*(s.Quantity??1)));
                             model.OtherPrice = otherPrice;
+                            int csUserId = model.CSUserId ?? 0;
+                            string csUserName = string.Empty;
+                            if (userDic.Keys.Contains(csUserId))
+                            {
+                                csUserName = userDic[csUserId];
+                            }
+                            else
+                            {
+                                UserInfo userModel = userBll.GetModel(csUserId);
+                                if (userModel != null)
+                                {
+                                    csUserName = userModel.RealName;
+                                    userDic.Add(csUserId, csUserName);
+                                }
+                            }
+                            model.CSUserName = csUserName;
                         }
                         string templateFileName = "项目统计-按店统计";
                         string path = ConfigurationManager.AppSettings["ExportTemplate"];
@@ -1226,18 +1373,19 @@ namespace WebApp.Statistics.handler
                             dataRow.GetCell(4).SetCellValue(s.CityName);
                             dataRow.GetCell(5).SetCellValue(s.CityTier);
                             dataRow.GetCell(6).SetCellValue(s.IsInstall);
-                            dataRow.GetCell(7).SetCellValue(s.Channel);
-                            dataRow.GetCell(8).SetCellValue(s.Format);
-                            dataRow.GetCell(9).SetCellValue(double.Parse(s.POPArea.ToString()));
-                            dataRow.GetCell(10).SetCellValue(double.Parse(s.POPPrice.ToString()));
-                            dataRow.GetCell(11).SetCellValue(double.Parse(s.InstallPrice.ToString()));
-                            dataRow.GetCell(12).SetCellValue(double.Parse(s.MeasurePrice.ToString()));
-                            dataRow.GetCell(13).SetCellValue(double.Parse(s.ExpressPrice.ToString()));
-                            dataRow.GetCell(14).SetCellValue(double.Parse(s.MaterialPrice.ToString()));
-                            dataRow.GetCell(15).SetCellValue(double.Parse(s.OtherPrice.ToString()));
+                            dataRow.GetCell(7).SetCellValue(s.CSUserName);
+                            dataRow.GetCell(8).SetCellValue(s.Channel);
+                            dataRow.GetCell(9).SetCellValue(s.Format);
+                            dataRow.GetCell(10).SetCellValue(double.Parse(s.POPArea.ToString()));
+                            dataRow.GetCell(11).SetCellValue(double.Parse(s.POPPrice.ToString()));
+                            dataRow.GetCell(12).SetCellValue(double.Parse(s.InstallPrice.ToString()));
+                            dataRow.GetCell(13).SetCellValue(double.Parse(s.MeasurePrice.ToString()));
+                            dataRow.GetCell(14).SetCellValue(double.Parse(s.ExpressPrice.ToString()));
+                            dataRow.GetCell(15).SetCellValue(double.Parse(s.MaterialPrice.ToString()));
+                            dataRow.GetCell(16).SetCellValue(double.Parse(s.OtherPrice.ToString()));
                             decimal total = s.POPPrice + (s.InstallPrice??0) + s.MeasurePrice + s.ExpressPrice + s.MaterialPrice + s.OtherPrice;
                             total = Math.Round(total, 2);
-                            dataRow.GetCell(16).SetCellValue(double.Parse(total.ToString()));
+                            dataRow.GetCell(17).SetCellValue(double.Parse(total.ToString()));
                             startRow++;
                         });
                         HttpCookie cookie = context1.Request.Cookies["项目费用统计-按店统计"];

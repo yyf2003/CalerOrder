@@ -631,11 +631,16 @@ namespace WebApp.Customer
                     {
 
                     }
-                    else if (region.ToLower()!="west" && string.IsNullOrWhiteSpace(outsourceName))
+                    else if (region.ToLower() == "north" && string.IsNullOrWhiteSpace(outsourceName))
                     {
                         canSave = false;
                         errorMsg.Append("请填写外协名称；");
                     }
+                    //else if (region.ToLower()!="west" && string.IsNullOrWhiteSpace(outsourceName))
+                    //{
+                    //    canSave = false;
+                    //    errorMsg.Append("请填写外协名称；");
+                    //}
                     if (!string.IsNullOrWhiteSpace(outsourceName))
                     {
                         if (!GetOutsourceName(outsourceName, out outsourceId))
@@ -2390,7 +2395,11 @@ namespace WebApp.Customer
             if (Session["errorTb"] != null)
             {
                 DataTable dt = (DataTable)Session["errorTb"];
-                OperateFile.ExportExcel(dt, "导入失败信息");
+                string sheetName = "pop";
+                string fileType = rblImportType.SelectedValue;
+                if (fileType=="3")
+                    sheetName = "器架";
+                OperateFile.ExportExcel(dt, "导入失败信息", fileType);
             }
         }
 

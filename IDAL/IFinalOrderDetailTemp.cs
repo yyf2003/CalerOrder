@@ -17,5 +17,7 @@ namespace IDAL
         DataSet GetOrderList(string subjectIds,string whereSql,string isFilter);
 
         DataSet ExportOutsourceOrderList(string whereSql);
+
+        void UpdateAddDate(int subjectId, string addDate, int type);
     }
 }

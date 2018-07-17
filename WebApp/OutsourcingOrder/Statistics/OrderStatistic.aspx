@@ -339,8 +339,10 @@
                                     <asp:Label ID="labOtherPrice" runat="server" Text="0"></asp:Label>
                                 </td>
                                 <td>
+                                   道具费用：
                                 </td>
                                 <td style="text-align: left; padding-left: 5px;">
+                                   <asp:Label ID="labPropPrice" runat="server" Text="0"></asp:Label>
                                 </td>
                             </tr>
                             <tr class="tr_bai">

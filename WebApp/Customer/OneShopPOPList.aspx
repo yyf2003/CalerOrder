@@ -112,6 +112,7 @@
                         <asp:BoundField DataField="pop.Sheet" HeaderText="位置" HeaderStyle-BorderColor="#dce0e9" />
                         <asp:BoundField DataField="pop.GraphicNo" HeaderText="POP编号" HeaderStyle-BorderColor="#dce0e9" />
                         <asp:BoundField DataField="pop.MachineFrameName" HeaderText="器架名称" HeaderStyle-BorderColor="#dce0e9" />
+                        <asp:BoundField DataField="ProduceOutsourceName" HeaderText="生产外协" HeaderStyle-BorderColor="#dce0e9" />
                         <asp:BoundField DataField="pop.OOHInstallPrice" HeaderText="应收户外安装费" HeaderStyle-BorderColor="#dce0e9" />
                         <asp:BoundField DataField="pop.OSOOHInstallPrice" HeaderText="应付户外安装费" HeaderStyle-BorderColor="#dce0e9" />
                         <asp:BoundField DataField="pop.Gender" HeaderText="性别" HeaderStyle-BorderColor="#dce0e9" />
@@ -313,7 +314,6 @@
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
-            
             <tr>
                 <td style="height: 30px;">
                     角落类型
@@ -352,15 +352,23 @@
                     是否生产
                 </td>
                 <td  style="text-align: left; padding-left: 5px;">
-                   <input type="radio" name="radioIsValid" value="1" />是
+                    <input type="radio" name="radioIsValid" value="1" />是
                     <input type="radio" name="radioIsValid" style="margin-left: 10px;" value="0" />否
                 </td>
                 <td style="height: 30px;">
-                    备注
+                    生产外协
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtRemark" runat="server" MaxLength="100" Style="width: 200px;"></asp:TextBox>
+                    <select id="selProduceOutsource">
+                       <option value="0">--请选择生产外协--</option>
+                    </select>
                 </td>
+            </tr>
+            <tr>
+              <td style="height: 30px;">备注</td>
+              <td colspan="3" style="text-align: left; padding-left: 5px;">
+              <asp:TextBox ID="txtRemark" runat="server" MaxLength="100" Style="width: 200px;"></asp:TextBox>
+              </td>
             </tr>
         </table>
     </div>

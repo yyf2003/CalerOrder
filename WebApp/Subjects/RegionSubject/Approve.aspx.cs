@@ -409,6 +409,7 @@ namespace WebApp.Subjects.RegionSubject
                                     int OrderType=o.order.OrderType ?? 1;
                                     
                                     finalOrderTempModel = new FinalOrderDetailTemp();
+                                    finalOrderTempModel.AddDate = o.order.AddDate;
                                     finalOrderTempModel.AgentCode = o.shop.AgentCode;
                                     finalOrderTempModel.AgentName = o.shop.AgentName;
                                     finalOrderTempModel.BusinessModel = o.shop.BusinessModel;

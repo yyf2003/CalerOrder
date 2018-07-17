@@ -17,9 +17,10 @@ namespace WebApp.Customer.Handler
     /// </summary>
     public class POPList : IHttpHandler
     {
-
+        HttpContext context1;
         public void ProcessRequest(HttpContext context)
         {
+            context1 = context;
             context.Response.ContentType = "text/plain";
             string type = string.Empty;
             string result = string.Empty;
@@ -90,6 +91,9 @@ namespace WebApp.Customer.Handler
                         sheet1 = context.Request.QueryString["sheet"];
                     result=GetGraphicNoPrefix(shopId1, sheet1);
                     break;
+                case "getOutsource":
+
+                    break;
             }
 
             context.Response.Write(result);
@@ -111,7 +115,7 @@ namespace WebApp.Customer.Handler
             {
                 StringBuilder json = new StringBuilder();
                 string IsValid = model.pop.IsValid == false ? "0" : "1";
-                json.Append("{\"Id\":\"" + model.pop.Id + "\",\"ShopNo\":\"" + model.ShopNo + "\",\"Sheet\":\"" + model.pop.Sheet + "\",\"GraphicNo\":\"" + model.pop.GraphicNo + "\",\"Gender\":\"" + model.pop.Gender + "\",\"Quantity\":\"" + model.pop.Quantity + "\",\"WindowWide\":\"" + model.pop.WindowWide + "\",\"WindowHigh\":\"" + model.pop.WindowHigh + "\",\"WindowDeep\":\"" + model.pop.WindowDeep + "\",\"WindowSize\":\"" + model.pop.WindowSize + "\",\"GraphicWidth\":\"" + model.pop.GraphicWidth + "\",\"GraphicLength\":\"" + model.pop.GraphicLength + "\",\"DoubleFace\":\"" + model.pop.DoubleFace + "\",\"GraphicMaterial\":\"" + model.pop.GraphicMaterial + "\",\"Glass\":\"" + model.pop.Glass + "\",\"Backdrop\":\"" + model.pop.Backdrop + "\",\"PositionDescription\":\"" + model.pop.PositionDescription + "\",\"Area\":\"" + model.pop.Area + "\",\"Remark\":\"" + model.pop.Remark + "\",\"IsElectricity\":\"" + model.pop.IsElectricity + "\",\"IsHang\":\"" + model.pop.IsHang + "\",\"DoorPosition\":\"" + model.pop.DoorPosition + "\",\"IsValid\":\"" + IsValid + "\",\"OOHInstallPrice\":\"" + model.pop.OOHInstallPrice + "\",\"OSOOHInstallPrice\":\"" + model.pop.OSOOHInstallPrice + "\",\"MaterialCategoryId\":\"" + model.pop.MaterialCategoryId + "\",\"OrderGraphicMaterialId\":\"" + model.pop.OrderGraphicMaterialId + "\",\"Category\":\"" + model.pop.Category + "\",\"CornerType\":\"" + model.pop.CornerType + "\",\"FrameName\":\"" + model.pop.MachineFrameName + "\",\"LeftSideStick\":\"" + model.pop.LeftSideStick + "\",\"RightSideStick\":\"" + model.pop.RightSideStick + "\",\"Floor\":\"" + model.pop.Floor + "\"}");
+                json.Append("{\"Id\":\"" + model.pop.Id + "\",\"ShopNo\":\"" + model.ShopNo + "\",\"Sheet\":\"" + model.pop.Sheet + "\",\"GraphicNo\":\"" + model.pop.GraphicNo + "\",\"Gender\":\"" + model.pop.Gender + "\",\"Quantity\":\"" + model.pop.Quantity + "\",\"WindowWide\":\"" + model.pop.WindowWide + "\",\"WindowHigh\":\"" + model.pop.WindowHigh + "\",\"WindowDeep\":\"" + model.pop.WindowDeep + "\",\"WindowSize\":\"" + model.pop.WindowSize + "\",\"GraphicWidth\":\"" + model.pop.GraphicWidth + "\",\"GraphicLength\":\"" + model.pop.GraphicLength + "\",\"DoubleFace\":\"" + model.pop.DoubleFace + "\",\"GraphicMaterial\":\"" + model.pop.GraphicMaterial + "\",\"Glass\":\"" + model.pop.Glass + "\",\"Backdrop\":\"" + model.pop.Backdrop + "\",\"PositionDescription\":\"" + model.pop.PositionDescription + "\",\"Area\":\"" + model.pop.Area + "\",\"Remark\":\"" + model.pop.Remark + "\",\"IsElectricity\":\"" + model.pop.IsElectricity + "\",\"IsHang\":\"" + model.pop.IsHang + "\",\"DoorPosition\":\"" + model.pop.DoorPosition + "\",\"IsValid\":\"" + IsValid + "\",\"OOHInstallPrice\":\"" + model.pop.OOHInstallPrice + "\",\"OSOOHInstallPrice\":\"" + model.pop.OSOOHInstallPrice + "\",\"MaterialCategoryId\":\"" + model.pop.MaterialCategoryId + "\",\"OrderGraphicMaterialId\":\"" + model.pop.OrderGraphicMaterialId + "\",\"Category\":\"" + model.pop.Category + "\",\"CornerType\":\"" + model.pop.CornerType + "\",\"FrameName\":\"" + model.pop.MachineFrameName + "\",\"LeftSideStick\":\"" + model.pop.LeftSideStick + "\",\"RightSideStick\":\"" + model.pop.RightSideStick + "\",\"Floor\":\"" + model.pop.Floor + "\",\"ProduceOutsourceId\":\"" + (model.pop.ProduceOutsourceId??0) + "\"}");
                 return "["+json.ToString().TrimEnd(',')+"]";
             }
             else
@@ -205,92 +209,117 @@ namespace WebApp.Customer.Handler
                 
                 if (model != null)
                 {
+                    int outsourceId = 0;
                     int shopId = model.ShopId ?? 0;
-                    if (shopId==0)
-                      shopId = GetShopId(model.ShopNo);
+                    if (shopId == 0 || (model.ProduceOutsourceId ?? 0) > 0)
+                        shopId = GetShopId(model.ShopNo, out outsourceId);
                     if (shopId > 0)
                     {
                         
                         model.ShopId = shopId;
                         if (!CheckPOP(model))
                         {
-                            if (model.Id > 0)
+                            bool canSave = true;
+                            //if ((model.ProduceOutsourceId ?? 0) > 0 && outsourceId>0 && model.ProduceOutsourceId == outsourceId)
+                            //{
+                            //    result = "生产外协与店铺主外协不能相同";
+                            //    canSave = false;
+                            //}
+                            #region 保存
+                            if (canSave)
                             {
-                                //更新
-                                POP newModel = popBll.GetModel(model.Id);
-                                if (newModel != null)
+                                if (model.Id > 0)
                                 {
-                                    //newModel.Area = (model.GraphicLength * model.GraphicWidth) / 1000000;
-                                    //newModel.Backdrop = model.Backdrop;
-                                    //newModel.DoorPosition = model.DoorPosition;
-                                    //newModel.DoubleFace = model.DoubleFace;
-                                    //newModel.Category = model.Category;
-                                    //newModel.FixtureType = model.FixtureType;
-                                    //newModel.Gender = model.Gender;
-                                    //newModel.Glass = model.Glass;
-                                    //newModel.GraphicLength = model.GraphicLength;
-                                    //newModel.GraphicMaterial = model.GraphicMaterial;
-                                    //newModel.GraphicNo = model.GraphicNo.ToUpper();
-                                    //newModel.GraphicWidth = model.GraphicWidth;
-                                    //newModel.IsElectricity = model.IsElectricity;
-                                    //newModel.IsHang = model.IsHang;
-                                    //newModel.IsValid = model.IsValid;
-                                    //newModel.PositionDescription = model.PositionDescription;
-                                    //newModel.Quantity = model.Quantity;
-                                    //newModel.Remark = model.Remark;
-                                    //newModel.Sheet = model.Sheet;
-                                    //newModel.ShopId = model.ShopId;
-                                    //newModel.WindowDeep = model.WindowDeep;
-                                    //newModel.WindowHigh = model.WindowHigh;
-                                    //newModel.WindowSize = model.WindowSize;
-                                    //newModel.WindowWide = model.WindowWide;
-                                    //newModel.OOHInstallPrice = model.OOHInstallPrice;
-                                    //newModel.MaterialCategoryId = model.MaterialCategoryId;
-                                    //newModel.OrderGraphicMaterialId = model.OrderGraphicMaterialId;
-                                    //newModel.CornerType = model.CornerType;
+                                    //更新
+                                    POP newModel = popBll.GetModel(model.Id);
+                                    if (newModel != null)
+                                    {
+
+                                        model.GraphicNo = model.GraphicNo.ToUpper();
+                                        popBll.Update(model);
+                                        result = "ok";
+
+                                        BaseDataChangeLog logModel = new BaseDataChangeLog();
+                                        logModel.AddDate = DateTime.Now;
+                                        logModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                        logModel.ItemType = (int)BaseDataChangeItemEnum.POP;
+                                        logModel.ChangeType = (int)DataChangeTypeEnum.Edit;
+                                        logModel.ShopId = shopId;
+                                        changeLogBll.Add(logModel);
+
+                                        changeDetailModel = new POPChangeDetail();
+                                        changeDetailModel.AddDate = DateTime.Now;
+                                        changeDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                        changeDetailModel.Category = newModel.Category;
+                                        changeDetailModel.ChangeType = "修改前";
+                                        changeDetailModel.CornerType = newModel.CornerType;
+                                        changeDetailModel.Gender = newModel.Gender;
+                                        changeDetailModel.GraphicLength = newModel.GraphicLength;
+                                        changeDetailModel.GraphicMaterial = newModel.GraphicMaterial;
+                                        changeDetailModel.GraphicNo = newModel.GraphicNo;
+                                        changeDetailModel.GraphicWidth = newModel.GraphicWidth;
+                                        changeDetailModel.IsValid = newModel.IsValid;
+                                        changeDetailModel.OOHInstallPrice = newModel.OOHInstallPrice;
+                                        changeDetailModel.PositionDescription = newModel.PositionDescription;
+                                        changeDetailModel.Quantity = newModel.Quantity;
+                                        changeDetailModel.Remark = newModel.Remark;
+                                        changeDetailModel.Sheet = newModel.Sheet;
+                                        changeDetailModel.ShopId = newModel.ShopId;
+                                        changeDetailModel.WindowDeep = newModel.WindowDeep;
+                                        changeDetailModel.WindowHigh = newModel.WindowHigh;
+                                        changeDetailModel.WindowSize = newModel.WindowSize;
+                                        changeDetailModel.WindowWide = newModel.WindowWide;
+                                        changeDetailModel.LogId = logModel.Id;
+                                        changeDetailModel.FrameName = newModel.MachineFrameName;
+                                        changeDetailBll.Add(changeDetailModel);
+
+                                        changeDetailModel = new POPChangeDetail();
+                                        changeDetailModel.AddDate = DateTime.Now.AddSeconds(1);
+                                        changeDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
+                                        changeDetailModel.Category = model.Category;
+                                        changeDetailModel.ChangeType = "修改后";
+                                        changeDetailModel.CornerType = model.CornerType;
+                                        changeDetailModel.Gender = model.Gender;
+                                        changeDetailModel.GraphicLength = model.GraphicLength;
+                                        changeDetailModel.GraphicMaterial = model.GraphicMaterial;
+                                        changeDetailModel.GraphicNo = model.GraphicNo;
+                                        changeDetailModel.GraphicWidth = model.GraphicWidth;
+                                        changeDetailModel.IsValid = model.IsValid;
+                                        changeDetailModel.OOHInstallPrice = model.OOHInstallPrice;
+                                        changeDetailModel.PositionDescription = model.PositionDescription;
+                                        changeDetailModel.Quantity = model.Quantity;
+                                        changeDetailModel.Remark = model.Remark;
+                                        changeDetailModel.Sheet = model.Sheet;
+                                        changeDetailModel.ShopId = model.ShopId;
+                                        changeDetailModel.WindowDeep = model.WindowDeep;
+                                        changeDetailModel.WindowHigh = model.WindowHigh;
+                                        changeDetailModel.WindowSize = model.WindowSize;
+                                        changeDetailModel.WindowWide = model.WindowWide;
+                                        changeDetailModel.LogId = logModel.Id;
+
+                                        changeDetailModel.FrameName = model.MachineFrameName;
+                                        changeDetailBll.Add(changeDetailModel);
+                                    }
+                                }
+                                else
+                                {
+
                                     model.GraphicNo = model.GraphicNo.ToUpper();
-                                    popBll.Update(model);
-                                    result = "ok";
+                                    popBll.Add(model);
 
                                     BaseDataChangeLog logModel = new BaseDataChangeLog();
                                     logModel.AddDate = DateTime.Now;
                                     logModel.AddUserId = new BasePage().CurrentUser.UserId;
                                     logModel.ItemType = (int)BaseDataChangeItemEnum.POP;
-                                    logModel.ChangeType = (int)DataChangeTypeEnum.Edit;
+                                    logModel.ChangeType = (int)DataChangeTypeEnum.Add;
                                     logModel.ShopId = shopId;
                                     changeLogBll.Add(logModel);
 
                                     changeDetailModel = new POPChangeDetail();
                                     changeDetailModel.AddDate = DateTime.Now;
                                     changeDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
-                                    changeDetailModel.Category = newModel.Category;
-                                    changeDetailModel.ChangeType = "修改前";
-                                    changeDetailModel.CornerType = newModel.CornerType;
-                                    changeDetailModel.Gender = newModel.Gender;
-                                    changeDetailModel.GraphicLength = newModel.GraphicLength;
-                                    changeDetailModel.GraphicMaterial = newModel.GraphicMaterial;
-                                    changeDetailModel.GraphicNo = newModel.GraphicNo;
-                                    changeDetailModel.GraphicWidth = newModel.GraphicWidth;
-                                    changeDetailModel.IsValid = newModel.IsValid;
-                                    changeDetailModel.OOHInstallPrice = newModel.OOHInstallPrice;
-                                    changeDetailModel.PositionDescription = newModel.PositionDescription;
-                                    changeDetailModel.Quantity = newModel.Quantity;
-                                    changeDetailModel.Remark = newModel.Remark;
-                                    changeDetailModel.Sheet = newModel.Sheet;
-                                    changeDetailModel.ShopId = newModel.ShopId;
-                                    changeDetailModel.WindowDeep = newModel.WindowDeep;
-                                    changeDetailModel.WindowHigh = newModel.WindowHigh;
-                                    changeDetailModel.WindowSize = newModel.WindowSize;
-                                    changeDetailModel.WindowWide = newModel.WindowWide;
-                                    changeDetailModel.LogId = logModel.Id;
-                                    changeDetailModel.FrameName = newModel.MachineFrameName;
-                                    changeDetailBll.Add(changeDetailModel);
-
-                                    changeDetailModel = new POPChangeDetail();
-                                    changeDetailModel.AddDate = DateTime.Now.AddSeconds(1);
-                                    changeDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
                                     changeDetailModel.Category = model.Category;
-                                    changeDetailModel.ChangeType = "修改后";
+                                    changeDetailModel.ChangeType = "新增";
                                     changeDetailModel.CornerType = model.CornerType;
                                     changeDetailModel.Gender = model.Gender;
                                     changeDetailModel.GraphicLength = model.GraphicLength;
@@ -309,85 +338,12 @@ namespace WebApp.Customer.Handler
                                     changeDetailModel.WindowSize = model.WindowSize;
                                     changeDetailModel.WindowWide = model.WindowWide;
                                     changeDetailModel.LogId = logModel.Id;
-                                    
-                                    changeDetailModel.FrameName = model.MachineFrameName;
                                     changeDetailBll.Add(changeDetailModel);
+                                    result = "ok";
+
                                 }
                             }
-                            else
-                            { 
-                               //新增
-                                //POP newModel = new POP();
-                                //newModel.Area = (model.GraphicLength * model.GraphicWidth) / 1000000;
-                                //newModel.Backdrop = model.Backdrop;
-                                //newModel.DoorPosition = model.DoorPosition;
-                                //newModel.DoubleFace = model.DoubleFace;
-                                //newModel.FixtureType = model.FixtureType;
-                                //newModel.Category = model.Category;
-                                //newModel.Gender = model.Gender;
-                                //newModel.Glass = model.Glass;
-                                //newModel.GraphicLength = model.GraphicLength;
-                                //newModel.GraphicMaterial = model.GraphicMaterial;
-                                //newModel.GraphicNo = model.GraphicNo.ToUpper();
-                                //newModel.GraphicWidth = model.GraphicWidth;
-                                //newModel.IsElectricity = model.IsElectricity;
-                                //newModel.IsHang = model.IsHang;
-                                //newModel.IsValid = model.IsValid;
-                                //newModel.PositionDescription = model.PositionDescription;
-                                //newModel.Quantity = model.Quantity;
-                                //newModel.Remark = model.Remark;
-                                //newModel.Sheet = model.Sheet;
-                                //newModel.ShopId = model.ShopId;
-                                //newModel.WindowDeep = model.WindowDeep;
-                                //newModel.WindowHigh = model.WindowHigh;
-                                //newModel.WindowSize = model.WindowSize;
-                                //newModel.WindowWide = model.WindowWide;
-                                //newModel.OOHInstallPrice = model.OOHInstallPrice;
-                                //newModel.MaterialCategoryId = model.MaterialCategoryId;
-                                //newModel.OrderGraphicMaterialId = model.OrderGraphicMaterialId;
-                                //newModel.CornerType = model.CornerType;
-                                model.GraphicNo = model.GraphicNo.ToUpper();
-                                popBll.Add(model);
-
-                                BaseDataChangeLog logModel = new BaseDataChangeLog();
-                                logModel.AddDate = DateTime.Now;
-                                logModel.AddUserId = new BasePage().CurrentUser.UserId;
-                                logModel.ItemType = (int)BaseDataChangeItemEnum.POP;
-                                logModel.ChangeType = (int)DataChangeTypeEnum.Add;
-                                logModel.ShopId = shopId;
-                                changeLogBll.Add(logModel);
-
-                                changeDetailModel = new POPChangeDetail();
-                                changeDetailModel.AddDate = DateTime.Now;
-                                changeDetailModel.AddUserId = new BasePage().CurrentUser.UserId;
-                                changeDetailModel.Category = model.Category;
-                                changeDetailModel.ChangeType = "新增";
-                                changeDetailModel.CornerType = model.CornerType;
-                                changeDetailModel.Gender = model.Gender;
-                                changeDetailModel.GraphicLength = model.GraphicLength;
-                                changeDetailModel.GraphicMaterial = model.GraphicMaterial;
-                                changeDetailModel.GraphicNo = model.GraphicNo;
-                                changeDetailModel.GraphicWidth = model.GraphicWidth;
-                                changeDetailModel.IsValid = model.IsValid;
-                                changeDetailModel.OOHInstallPrice = model.OOHInstallPrice;
-                                changeDetailModel.PositionDescription = model.PositionDescription;
-                                changeDetailModel.Quantity = model.Quantity;
-                                changeDetailModel.Remark = model.Remark;
-                                changeDetailModel.Sheet = model.Sheet;
-                                changeDetailModel.ShopId = model.ShopId;
-                                changeDetailModel.WindowDeep = model.WindowDeep;
-                                changeDetailModel.WindowHigh = model.WindowHigh;
-                                changeDetailModel.WindowSize = model.WindowSize;
-                                changeDetailModel.WindowWide = model.WindowWide;
-                                changeDetailModel.LogId = logModel.Id;
-                                changeDetailBll.Add(changeDetailModel);
-
-
-
-                                result = "ok";
-                                   
-                            }
-                            
+                            #endregion
 
                         }
                         else
@@ -408,11 +364,13 @@ namespace WebApp.Customer.Handler
             return list.Any();
         }
 
-        int GetShopId(string shopNo)
+        int GetShopId(string shopNo,out int outsourceId)
         {
+            outsourceId = 0;
             var model = new ShopBLL().GetList(s => s.ShopNo.ToUpper() == shopNo.ToUpper()).FirstOrDefault();
             if (model != null)
             {
+                outsourceId = model.OutsourceId ?? 0;
                 return model.Id;
             }
             else
@@ -446,6 +404,9 @@ namespace WebApp.Customer.Handler
             }
             return "";
         }
+
+       
+
 
         public bool IsReusable
         {

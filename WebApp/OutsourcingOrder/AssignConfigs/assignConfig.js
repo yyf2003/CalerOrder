@@ -4,6 +4,8 @@ var currFormat = "";
 var currRegion = 0;
 var currProvinceId = "";
 var currCityId = "";
+var currMaterial = "";
+var isLoadMaterial = 0;
 $(function () {
     CheckPrimission(url, null, $("#btnAdd"), $("#btnEdit"), $("#btnDelete"), null, $("#separator1"));
     Confing.getList();
@@ -22,7 +24,7 @@ $(function () {
             time: 0,
             title: '新增设置',
             skin: 'layui-layer-rim', //加上边框
-            area: ['800px', '500px'],
+            area: ['90%', '90%'],
             content: $("#editDiv"),
             id: 'popLayer',
             btn: ['提 交'],
@@ -58,11 +60,12 @@ $(function () {
             currRegion = rows[0].RegionId;
             currProvinceId = rows[0].ProvinceId;
             currCityId = rows[0].CityId;
+            currMaterial = rows[0].MaterialName;
             $("#seleCustomer").val(rows[0].CustomerId);
             Confing.getRegionList();
             $("#seleConfigType").val(rows[0].TypeId);
-            $("#txtMaterialName").val(rows[0].MaterialName);
-            
+            //$("#txtMaterialName").val(rows[0].MaterialName);
+            ChangeConfigType();
             if (rows[0].IsFullMatch == 1) {
                 $("#cbIsFullMatch").prop("checked", true);
             }
@@ -81,7 +84,8 @@ $(function () {
                 time: 0,
                 title: '新增设置',
                 skin: 'layui-layer-rim', //加上边框
-                area: ['800px', '500px'],
+                //area: ['800px', '500px'],
+                area: ['90%', '90%'],
                 content: $("#editDiv"),
                 id: 'popLayer',
                 btn: ['提 交'],
@@ -148,26 +152,13 @@ $(function () {
     })
 
     $("#seleConfigType").change(function () {
-        var val = $(this).val();
-        if (val == "1") {
-            $("#txtMaterialName").attr("disabled", false);
-            $("#seleOutsource").val("-1").attr("disabled", false);
+        ChangeConfigType();
 
-        }
-        else {
-            $("#txtMaterialName").val("").attr("disabled", "disabled");
-            $("#seleOutsource").val("-1").attr("disabled", "disabled");
-        }
     })
 
 
 
-    //    $("#cbAllCity").change(function () {
-    //        var checked = this.checked;
-    //        $("input[name='cbCity']").each(function () {
-    //            this.checked = checked;
-    //        });
-    //    })
+
 
     $("#cityContainer").delegate("input[name='cbAllCity']", "click", function () {
         var checked = this.checked;
@@ -226,6 +217,23 @@ $(function () {
 
 })
 
+function ChangeConfigType() {
+    var type = $("#seleConfigType").val();
+    if (type == "1") {
+        //$("#txtMaterialName").attr("disabled", false);
+        $("#materialDiv").show();
+        if (isLoadMaterial==0)
+           Confing.getMaterialList();
+        $("#seleOutsource").val("-1").attr("disabled", false);
+
+    }
+    else {
+        //$("#txtMaterialName").val("").attr("disabled", "disabled");
+        $("#materialDiv").hide();
+        $("#seleOutsource").val("-1").attr("disabled", "disabled");
+    }
+};
+
 var Confing = {
     model: function () {
         this.Id = 0;
@@ -251,8 +259,8 @@ var Confing = {
                { field: 'checked', checkbox: true },
                { field: 'TypeName', title: "类型" },
                { field: 'MaterialName', title: "材质名称" },
-               
-               { field: 'IsFullMatch', title: "是否完全匹配", formatter: function (val, row,index) {
+
+               { field: 'IsFullMatch', title: "是否完全匹配", formatter: function (val, row, index) {
                    if (val == "1")
                        return "是";
                    else
@@ -535,14 +543,46 @@ var Confing = {
             }
         })
     },
+    getMaterialList: function () {
+        $("#materialContainer").html("");
+        $("#loadMaterial").show();
+        $.ajax({
+            type: "get",
+            url: "AssignConfig.ashx?type=getMaterial",
+            cache: false,
+            complete: function () { $("#loadMaterial").hide(); isLoadMaterial = 1; },
+            success: function (data) {
+                if (data != "") {
+                    var json = eval(data);
+                    var div = "";
+                    var arr = [];
+                    if ($.trim(currMaterial) != "") {
+                        arr = currMaterial.split(',');
+                    }
+                    for (var i = 0; i < json.length; i++) {
+                        var checked = "";
+                        $.each(arr, function (key, val) {
+                            if (val == json[i].MaterialName) {
+                                checked = "checked='checked'";
+
+                            }
+                        });
+                        div += "<div style='float:left;'><input type='checkbox' name='cbMaterial' value='" + json[i].MaterialName + "' " + checked + "/>" + json[i].MaterialName + "&nbsp;&nbsp;</div>";
+                    }
+                    $("#materialContainer").html(div);
+
+                }
+            }
+        })
+    },
     submit: function () {
         if (CheckVal()) {
             var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"ConfigTypeId":' + this.model.ConfigTypeId + ',"MaterialName":"' + this.model.MaterialName + '","ProductOutsourctId":' + this.model.ProductOutsourctId + ',"Region":"' + this.model.Region + '","ProvinceId":"' + this.model.ProvinceId + '","CityId":"' + this.model.CityId + '","Channel":"' + this.model.Channel + '","Format":"' + this.model.Format + '","IsFullMatch":' + this.model.IsFullMatch + '}';
-            
+
             $.ajax({
                 type: "post",
                 url: "AssignConfig.ashx",
-                data: { type: "edit", jsonStr: escape(jsonStr) },
+                data: { type: "edit", jsonStr: urlCodeStr(jsonStr) },
                 success: function (data) {
                     if (data == "ok") {
                         layer.closeAll();
@@ -561,7 +601,11 @@ var Confing = {
 function CheckVal() {
     var customerId = $("#seleCustomer").val();
     var typeId = $("#seleConfigType").val();
-    var materialName = $.trim($("#txtMaterialName").val());
+    //var materialName = $.trim($("#txtMaterialName").val());
+    var materialName = "";
+    $("input[name='cbMaterial']:checked").each(function () {
+        materialName += $(this).val() + ",";
+    })
     var outsourceId = $("#seleOutsource").val();
     //var channel = $.trim($("#txtChannel").val());
     //var format = $.trim($("#txtFormat").val());
@@ -596,7 +640,7 @@ function CheckVal() {
     }
     if (typeId == 1) {
         if (materialName == "") {
-            layer.msg("请填写材质名称");
+            layer.msg("请选择材质名称");
             return false;
         }
         if (outsourceId == "-1") {
@@ -634,6 +678,7 @@ function ClearVal() {
     currRegion = 0;
     currProvinceId = "";
     currCityId = "";
+    currMaterial = "";
     Confing.model.Id = 0;
     Confing.model.CustomerId = 0;
     Confing.model.ConfigTypeId = 0;

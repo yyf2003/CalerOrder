@@ -514,7 +514,7 @@ namespace WebApp
             ClientScript.RegisterClientScriptBlock(GetType(), "al", js);
         }
 
-        public void ExcuteJs(string fun, string msg,string url)
+        public void ExcuteJs(string fun, string msg, string url)
         {
             string js = "<script>" + fun + "();</script>";
             if (!string.IsNullOrWhiteSpace(msg))
@@ -665,39 +665,40 @@ namespace WebApp
                     decimal area = 0;
                     decimal width = s.GraphicWidth ?? 0;
                     decimal length = s.GraphicLength ?? 0;
+                    int Quantity = s.Quantity ?? 0;
                     string GraphicMaterial = s.GraphicMaterial ?? "";
                     if (width > 0 && length > 0 && !string.IsNullOrWhiteSpace(GraphicMaterial))
                     {
 
                         if (GraphicMaterial.Contains("挂轴"))
                         {
-                            
+
                             if (GraphicMaterial.Contains("+挂轴") || GraphicMaterial.Contains("+上挂轴") || GraphicMaterial.Contains("+下挂轴"))
                             {
                                 //如果是+挂轴，要加上挂轴面积
-                                area = ((width * length) / 1000000) * (s.Quantity ?? 1);
+                                area = ((width * length) / 1000000) * Quantity;
                                 if (GraphicMaterial.Contains("+挂轴"))
-                                    area += (width / 1000) * 2 * (s.Quantity ?? 1);
+                                    area += (width / 1000) * 2 * Quantity;
                                 else
-                                    area += (width / 1000) * (s.Quantity ?? 1);
+                                    area += (width / 1000) * Quantity;
                             }
                             else
                             {
                                 //只有挂轴
-                                area = (width / 1000) * 2 * (s.Quantity ?? 1);
+                                area = (width / 1000) * 2 * Quantity;
                             }
 
                         }
                         else
                         {
-                            area = ((width * length) / 1000000) * (s.Quantity ?? 1);
+                            area = ((width * length) / 1000000) * Quantity;
                         }
-                        
+
                     }
                     model.Area = area;
                     list.Add(model);
                 });
-                
+
             }
             return list;
         }
@@ -1895,9 +1896,9 @@ namespace WebApp
                     {
                         if (materialName.Contains("+挂轴") || materialName.Contains("+上挂轴") || materialName.Contains("+下挂轴"))
                         {
-                            decimal unitPrice1 = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, "挂轴", pop.OutsourceType ?? 0,pop.PriceItemId, out unitName);
+                            decimal unitPrice1 = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, "挂轴", pop.OutsourceType ?? 0, pop.PriceItemId, out unitName);
                             string newMaterial = materialName.Substring(0, materialName.LastIndexOf('+'));
-                            unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, newMaterial, pop.OutsourceType ?? 0,pop.PriceItemId, out unitName);
+                            unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, newMaterial, pop.OutsourceType ?? 0, pop.PriceItemId, out unitName);
                             decimal totalPrice0 = 0;
                             if (unitName == "平米")
                             {
@@ -1921,13 +1922,13 @@ namespace WebApp
                         else
                         {
 
-                            unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, materialName, pop.OutsourceType ?? 0,pop.PriceItemId, out unitName);
+                            unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, materialName, pop.OutsourceType ?? 0, pop.PriceItemId, out unitName);
                             totalPrice = (width / 1000) * 2 * quantity * unitPrice;
                         }
                     }
                     else
                     {
-                        unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, materialName, pop.OutsourceType ?? 0,pop.PriceItemId,out unitName);
+                        unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, materialName, pop.OutsourceType ?? 0, pop.PriceItemId, out unitName);
                         if (unitName == "平米")
                         {
                             totalPrice = ((width * length) / 1000000) * quantity * unitPrice;
@@ -1960,7 +1961,7 @@ namespace WebApp
             decimal price = 0;
             if (!string.IsNullOrWhiteSpace(materialName))
             {
-                string key = materialName.ToLower() +"-"+outsourceType;
+                string key = materialName.ToLower() + "-" + outsourceType;
                 if (outsourcePriceDic.Keys.Contains(key))
                 {
                     Dictionary<decimal, string> dic = outsourcePriceDic[key];
@@ -1987,10 +1988,11 @@ namespace WebApp
                                  where basicM.MaterialName.ToLower() == name
                                  && (osMprice.IsDelete == null || osMprice.IsDelete == false)
                                  && (osMprice.CustomerId == customerId)
-                                 && (priceItemId>0?(priceItem.Id==priceItemId):(priceItem.IsDelete == null || priceItem.IsDelete == false))
+                                 && (priceItemId > 0 ? (priceItem.Id == priceItemId) : (priceItem.IsDelete == null || priceItem.IsDelete == false))
                                  select new
                                  {
                                      osMprice.InstallPrice,
+                                     osMprice.InstallAndProductPrice,
                                      osMprice.SendPrice,
                                      unit.UnitName
                                  }).FirstOrDefault();
@@ -2001,6 +2003,10 @@ namespace WebApp
                         if (outsourceType == (int)OutsourceOrderTypeEnum.Install)
                         {
                             price = model.InstallPrice ?? 0;
+                        }
+                        else if (outsourceType == (int)OutsourceOrderTypeEnum.InstallAndProduce)
+                        {
+                            price = model.InstallAndProductPrice ?? 0;
                         }
                         else
                         {
@@ -2061,34 +2067,35 @@ namespace WebApp
         /// </summary>
         /// <param name="basicMaterial"></param>
         /// <returns></returns>
-        public List<string> GetOrderMaterialByBasicMaterial(string basicMaterialName, LowerUpperEnum? LetterType=null)
+        public List<string> GetOrderMaterialByBasicMaterial(string basicMaterialName, LowerUpperEnum? LetterType = null)
         {
-             List<string> orderMaterialList = new List<string>();
-             var list = (from orderMM in CurrentContext.DbContext.OrderMaterialMpping
-                         join basicMaterial in CurrentContext.DbContext.BasicMaterial
-                         on orderMM.BasicMaterialId equals basicMaterial.Id
-                         where basicMaterial.MaterialName.ToLower() == basicMaterialName.ToLower()
-                         
-                         select orderMM).ToList();
-             if (list.Any())
-             {
-                 list.ForEach(s => {
-                     if (LetterType != null)
-                     {
-                         if (LetterType == LowerUpperEnum.ToLower)
-                         {
-                             orderMaterialList.Add(s.OrderMaterialName.ToLower());
-                         }
-                         else if (LetterType == LowerUpperEnum.ToUpper)
-                             orderMaterialList.Add(s.OrderMaterialName.ToUpper());
-                         else
-                             orderMaterialList.Add(s.OrderMaterialName);
-                     }
-                     else
-                         orderMaterialList.Add(s.OrderMaterialName);
-                 });
-             }
-             return orderMaterialList;
+            List<string> orderMaterialList = new List<string>();
+            var list = (from orderMM in CurrentContext.DbContext.OrderMaterialMpping
+                        join basicMaterial in CurrentContext.DbContext.BasicMaterial
+                        on orderMM.BasicMaterialId equals basicMaterial.Id
+                        where basicMaterial.MaterialName.ToLower() == basicMaterialName.ToLower()
+
+                        select orderMM).ToList();
+            if (list.Any())
+            {
+                list.ForEach(s =>
+                {
+                    if (LetterType != null)
+                    {
+                        if (LetterType == LowerUpperEnum.ToLower)
+                        {
+                            orderMaterialList.Add(s.OrderMaterialName.ToLower());
+                        }
+                        else if (LetterType == LowerUpperEnum.ToUpper)
+                            orderMaterialList.Add(s.OrderMaterialName.ToUpper());
+                        else
+                            orderMaterialList.Add(s.OrderMaterialName);
+                    }
+                    else
+                        orderMaterialList.Add(s.OrderMaterialName);
+                });
+            }
+            return orderMaterialList;
         }
 
         /// <summary>
@@ -4760,7 +4767,7 @@ namespace WebApp
                     var assignedList = outsourceOrderDetailBll.GetList(s => s.GuidanceId == subjectModel.gudiance.ItemId && s.SubjectId > 0);
                     shopList.ForEach(shop =>
                     {
-                        
+
 
                         bool isInstallShop = shop.IsInstall == "Y";//大货是否安装
                         bool isBCSInstallShop = shop.BCSIsInstall == "Y";//三叶草是否安装
@@ -5574,7 +5581,7 @@ namespace WebApp
                                             outsourceOrderDetailModel.OutsourceId = calerOutsourceId;
                                             outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
                                         }
-                                        
+
                                         outsourceOrderDetailModel.FinalOrderId = s.order.Id;
                                         outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
                                     }
@@ -5703,7 +5710,7 @@ namespace WebApp
                             });
                             #endregion
                         }
-                        
+
                         //如果不是费用订单才计算安装费
                         if (popList.Any())
                         {
@@ -6065,8 +6072,8 @@ namespace WebApp
 
         //保存外协活动安装费
         public void SaveOutsourceInstallPrice(int subjectId, int subjectType)
-        { 
-            
+        {
+
         }
 
         //重新计算外协安装费
@@ -6769,15 +6776,15 @@ namespace WebApp
         public void AutoAssignPriceOrder(int subjectId)
         {
 
-            List<int> priceOrderTypeList = CommonMethod.GetEnumList<OrderTypeEnum>().Where(s => s.Desction.Contains("费用订单")).Select(s=>s.Value).ToList();
-           
+            List<int> priceOrderTypeList = CommonMethod.GetEnumList<OrderTypeEnum>().Where(s => s.Desction.Contains("费用订单")).Select(s => s.Value).ToList();
+
             var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                              join shop in CurrentContext.DbContext.Shop
                              on order.ShopId equals shop.Id
                              where order.SubjectId == subjectId
                              && (order.IsDelete == null || order.IsDelete == false)
-                             //&& (order.OrderType == (int)OrderTypeEnum.安装费 || order.OrderType == (int)OrderTypeEnum.测量费 || order.OrderType == (int)OrderTypeEnum.发货费 || order.OrderType == (int)OrderTypeEnum.其他费用)
-                             && priceOrderTypeList.Contains(order.OrderType??1)
+                                 //&& (order.OrderType == (int)OrderTypeEnum.安装费 || order.OrderType == (int)OrderTypeEnum.测量费 || order.OrderType == (int)OrderTypeEnum.发货费 || order.OrderType == (int)OrderTypeEnum.其他费用)
+                             && priceOrderTypeList.Contains(order.OrderType ?? 1)
                              select new
                              {
                                  order,
@@ -7077,181 +7084,200 @@ namespace WebApp
         /// 保存报价订单
         /// </summary>
         List<MachineFrameSize> taiKaSizeList = new List<MachineFrameSize>();//台卡尺寸List
-        public void SaveQuotationOrder(int guidanceId, int subjectId, int subjectType)
+        public void SaveQuotationOrder(int guidanceId, int subjectId, int subjectType, List<string> graphicMaterialList=null)
         {
-            
+
             int priceItemId = 0;
             SubjectGuidance guidanceModel = new SubjectGuidanceBLL().GetModel(guidanceId);
-            if (guidanceModel!=null)
+            if (guidanceModel != null)
             {
                 priceItemId = guidanceModel.PriceItemId ?? 0;
-            }
-            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
-            if (subjectType == (int)SubjectTypeEnum.HC订单 || subjectType == (int)SubjectTypeEnum.分区补单 || subjectType == (int)SubjectTypeEnum.分区增补 || subjectType == (int)SubjectTypeEnum.新开店订单)
-            {
-                quoteOrderBll.Delete(s => s.RegionSupplementId == subjectId);
-                orderList = new FinalOrderDetailTempBLL().GetList(s => s.RegionSupplementId == subjectId && (s.IsDelete == null || s.IsDelete == false));
-            }
-            else
-            {
-                quoteOrderBll.Delete(s => s.SubjectId == subjectId);
-                orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0 && (s.IsDelete == null || s.IsDelete == false));
-            }
-            if (orderList.Any())
-            {
-                if (!taiKaSizeList.Any())
+
+                List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+                if (subjectId > 0)
                 {
-                    taiKaSizeList = new List<MachineFrameSize>();
-                    taiKaSizeList = (from size in CurrentContext.DbContext.MachineFrameSize
-                                     join mType in CurrentContext.DbContext.MachineFrameType
-                                     on size.MachineFrameTypeId equals mType.Id
-                                     where mType.Sheet == "台卡"
-                                     select size).ToList();
-                }
-                orderList.ForEach(order =>
-                {
-
-
-                    
-
-                    quoteOrderModel = new QuoteOrderDetail();
-                    quoteOrderModel.AddDate = DateTime.Now;
-                    quoteOrderModel.AddUserId = order.AddUserId;
-                    quoteOrderModel.AgentCode = order.AgentCode;
-                    quoteOrderModel.AgentName = order.AgentName;
-
-                    quoteOrderModel.BCSIsInstall = order.BCSIsInstall;
-                    quoteOrderModel.BusinessModel = order.BusinessModel;
-                    quoteOrderModel.Category = order.Category;
-                    quoteOrderModel.Channel = order.Channel;
-                    quoteOrderModel.Format = order.Format;
-                    quoteOrderModel.ChooseImg = order.ChooseImg;
-                    quoteOrderModel.City = order.City;
-                    quoteOrderModel.CityTier = order.CityTier;
-                    quoteOrderModel.Contact = order.Contact;
-                    quoteOrderModel.CornerType = order.CornerType;
-                    quoteOrderModel.CSUserId = order.CSUserId;
-                    quoteOrderModel.CustomerMaterialId = order.CustomerMaterialId;
-                    quoteOrderModel.FinalOrderId = order.Id;
-                    quoteOrderModel.Gender = order.Gender;
-
-                    quoteOrderModel.GraphicMaterial = order.GraphicMaterial;
-                    
-                    quoteOrderModel.GraphicNo = order.GraphicNo;
-
-                    quoteOrderModel.GuidanceId = order.GuidanceId;
-                    quoteOrderModel.InstallPositionDescription = order.InstallPositionDescription;
-                    quoteOrderModel.InstallPriceMaterialSupport = order.InstallPriceMaterialSupport;
-                    quoteOrderModel.InstallPricePOSScale = order.InstallPricePOSScale;
-                    quoteOrderModel.IsFromRegion = order.IsFromRegion;
-                    quoteOrderModel.IsInstall = order.IsInstall;
-                    quoteOrderModel.IsValid = order.IsValid;
-                    quoteOrderModel.LocationType = order.LocationType;
-                    quoteOrderModel.MachineFrame = order.MachineFrame;
-                    quoteOrderModel.MaterialSupport = order.MaterialSupport;
-                    quoteOrderModel.OrderGender = order.OrderGender;
-                    quoteOrderModel.OrderPrice = order.OrderPrice;
-                    quoteOrderModel.OrderType = order.OrderType;
-                    quoteOrderModel.PayOrderPrice = order.PayOrderPrice;
-                    quoteOrderModel.POPAddress = order.POPAddress;
-                    quoteOrderModel.POPName = order.POPName;
-                    quoteOrderModel.POPType = order.POPType;
-                    quoteOrderModel.PositionDescription = order.PositionDescription;
-                    quoteOrderModel.POSScale = order.POSScale;
-                    quoteOrderModel.PriceBlongRegion = order.PriceBlongRegion;
-                    quoteOrderModel.Province = order.Province;
-                    quoteOrderModel.Quantity = order.Quantity;
-                    quoteOrderModel.Region = order.Region;
-                    quoteOrderModel.RegionSupplementId = order.RegionSupplementId;
-                    quoteOrderModel.Remark = order.Remark;
-                    quoteOrderModel.RightSideStick = order.RightSideStick;
-                    quoteOrderModel.Sheet = order.Sheet;
-                    quoteOrderModel.ShopId = order.ShopId;
-                    quoteOrderModel.ShopName = order.ShopName;
-                    quoteOrderModel.ShopNo = order.ShopNo;
-                    quoteOrderModel.ShopStatus = order.ShopStatus;
-                    quoteOrderModel.SmallMaterialId = order.SmallMaterialId;
-                    quoteOrderModel.SubjectId = order.SubjectId;
-                    quoteOrderModel.Tel = order.Tel;
-
-                    //原始尺寸
-                    quoteOrderModel.GraphicWidth = order.GraphicWidth;
-                    quoteOrderModel.GraphicLength = order.GraphicLength;
-                    quoteOrderModel.TotalGraphicWidth = order.GraphicWidth;
-                    quoteOrderModel.TotalGraphicLength = order.GraphicLength;
-                    quoteOrderModel.Area = order.Area;
-                    quoteOrderModel.DefaultTotalPrice = order.TotalPrice;
-                    quoteOrderModel.AutoAddTotalPrice = order.TotalPrice;
-                    //增加的尺寸
-                    //quoteOrderModel.AutoAddGraphicWidth = widthAdd;
-                    //quoteOrderModel.AutoAddGraphicLength = lengthAdd;
-                    //quoteOrderModel.AutoAddArea = areaAdd;
-                    //quoteOrderModel.AutoAddTotalPrice = addTotalPrice;
-
-                    //增加后尺寸
-                   
-                    //quoteOrderModel.TotalPrice = totalPriceAfterAdd;
-                    //quoteOrderModel.TotalArea = totalAreaAfterAdd;
-
-                    quoteOrderModel.UnitPrice = order.UnitPrice;
-                    quoteOrderModel.UnitName = order.UnitName;
-                    quoteOrderModel.WindowDeep = order.WindowDeep;
-                    quoteOrderModel.WindowHigh = order.WindowHigh;
-                    quoteOrderModel.WindowSize = order.WindowSize;
-                    quoteOrderModel.WindowStick = order.WindowStick;
-                    quoteOrderModel.WindowWide = order.WindowWide;
-
-
-                    if (!string.IsNullOrWhiteSpace(order.GraphicMaterial))
+                    if (subjectType == (int)SubjectTypeEnum.HC订单 || subjectType == (int)SubjectTypeEnum.分区补单 || subjectType == (int)SubjectTypeEnum.分区增补 || subjectType == (int)SubjectTypeEnum.新开店订单)
                     {
-                        decimal width = order.GraphicWidth ?? 0;
-                        decimal length = order.GraphicLength ?? 0;
-                        string GraphicMaterial = order.GraphicMaterial;
-                        bool isTaiKa = false;
-                        if ((order.Sheet != null && order.Sheet.Contains("台卡")) || (order.GraphicNo != null && order.GraphicNo.Contains("台卡")) || (order.Remark != null && order.Remark.Contains("台卡")) || (order.PositionDescription != null && order.PositionDescription.Contains("台卡")))
+                        quoteOrderBll.Delete(s => s.RegionSupplementId == subjectId);
+                        orderList = new FinalOrderDetailTempBLL().GetList(s => s.RegionSupplementId == subjectId && (s.IsDelete == null || s.IsDelete == false));
+                    }
+                    else
+                    {
+                        quoteOrderBll.Delete(s => s.SubjectId == subjectId);
+                        orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0 && (s.IsDelete == null || s.IsDelete == false));
+                    }
+                }
+                else
+                {
+                    if (graphicMaterialList != null && graphicMaterialList.Any())
+                    {
+                        quoteOrderBll.Delete(s => s.GuidanceId == guidanceId && s.GraphicMaterial!=null && graphicMaterialList.Contains(s.GraphicMaterial.ToLower()));
+                        orderList = new FinalOrderDetailTempBLL().GetList(s => s.GuidanceId == guidanceId && (s.IsDelete == null || s.IsDelete == false) && s.GraphicMaterial != null && graphicMaterialList.Contains(s.GraphicMaterial.ToLower()));
+
+                    }
+                    else
+                    {
+                        quoteOrderBll.Delete(s => s.GuidanceId == guidanceId);
+                        orderList = new FinalOrderDetailTempBLL().GetList(s => s.GuidanceId == guidanceId && (s.IsDelete == null || s.IsDelete == false));
+
+                    }
+                }
+                if (orderList.Any())
+                {
+                    if (!taiKaSizeList.Any())
+                    {
+                        taiKaSizeList = new List<MachineFrameSize>();
+                        taiKaSizeList = (from size in CurrentContext.DbContext.MachineFrameSize
+                                         join mType in CurrentContext.DbContext.MachineFrameType
+                                         on size.MachineFrameTypeId equals mType.Id
+                                         where mType.Sheet == "台卡"
+                                         select size).ToList();
+                    }
+                    orderList.ForEach(order =>
+                    {
+
+
+
+
+                        quoteOrderModel = new QuoteOrderDetail();
+                        quoteOrderModel.AddDate = DateTime.Now;
+                        quoteOrderModel.AddUserId = order.AddUserId;
+                        quoteOrderModel.AgentCode = order.AgentCode;
+                        quoteOrderModel.AgentName = order.AgentName;
+
+                        quoteOrderModel.BCSIsInstall = order.BCSIsInstall;
+                        quoteOrderModel.BusinessModel = order.BusinessModel;
+                        quoteOrderModel.Category = order.Category;
+                        quoteOrderModel.Channel = order.Channel;
+                        quoteOrderModel.Format = order.Format;
+                        quoteOrderModel.ChooseImg = order.ChooseImg;
+                        quoteOrderModel.City = order.City;
+                        quoteOrderModel.CityTier = order.CityTier;
+                        quoteOrderModel.Contact = order.Contact;
+                        quoteOrderModel.CornerType = order.CornerType;
+                        quoteOrderModel.CSUserId = order.CSUserId;
+                        quoteOrderModel.CustomerMaterialId = order.CustomerMaterialId;
+                        quoteOrderModel.FinalOrderId = order.Id;
+                        quoteOrderModel.Gender = order.Gender;
+
+                        quoteOrderModel.GraphicMaterial = order.GraphicMaterial;
+
+                        quoteOrderModel.GraphicNo = order.GraphicNo;
+
+                        quoteOrderModel.GuidanceId = order.GuidanceId;
+                        quoteOrderModel.InstallPositionDescription = order.InstallPositionDescription;
+                        quoteOrderModel.InstallPriceMaterialSupport = order.InstallPriceMaterialSupport;
+                        quoteOrderModel.InstallPricePOSScale = order.InstallPricePOSScale;
+                        quoteOrderModel.IsFromRegion = order.IsFromRegion;
+                        quoteOrderModel.IsInstall = order.IsInstall;
+                        quoteOrderModel.IsValid = order.IsValid;
+                        quoteOrderModel.LocationType = order.LocationType;
+                        quoteOrderModel.MachineFrame = order.MachineFrame;
+                        quoteOrderModel.MaterialSupport = order.MaterialSupport;
+                        quoteOrderModel.OrderGender = order.OrderGender;
+                        quoteOrderModel.OrderPrice = order.OrderPrice;
+                        quoteOrderModel.OrderType = order.OrderType;
+                        quoteOrderModel.PayOrderPrice = order.PayOrderPrice;
+                        quoteOrderModel.POPAddress = order.POPAddress;
+                        quoteOrderModel.POPName = order.POPName;
+                        quoteOrderModel.POPType = order.POPType;
+                        quoteOrderModel.PositionDescription = order.PositionDescription;
+                        quoteOrderModel.POSScale = order.POSScale;
+                        quoteOrderModel.PriceBlongRegion = order.PriceBlongRegion;
+                        quoteOrderModel.Province = order.Province;
+                        quoteOrderModel.Quantity = order.Quantity;
+                        quoteOrderModel.Region = order.Region;
+                        quoteOrderModel.RegionSupplementId = order.RegionSupplementId;
+                        quoteOrderModel.Remark = order.Remark;
+                        quoteOrderModel.RightSideStick = order.RightSideStick;
+                        quoteOrderModel.Sheet = order.Sheet;
+                        quoteOrderModel.ShopId = order.ShopId;
+                        quoteOrderModel.ShopName = order.ShopName;
+                        quoteOrderModel.ShopNo = order.ShopNo;
+                        quoteOrderModel.ShopStatus = order.ShopStatus;
+                        quoteOrderModel.SmallMaterialId = order.SmallMaterialId;
+                        quoteOrderModel.SubjectId = order.SubjectId;
+                        quoteOrderModel.Tel = order.Tel;
+
+                        //原始尺寸
+                        quoteOrderModel.GraphicWidth = order.GraphicWidth;
+                        quoteOrderModel.GraphicLength = order.GraphicLength;
+                        quoteOrderModel.TotalGraphicWidth = order.GraphicWidth;
+                        quoteOrderModel.TotalGraphicLength = order.GraphicLength;
+                        quoteOrderModel.Area = order.Area;
+                        quoteOrderModel.DefaultTotalPrice = order.TotalPrice;
+                        quoteOrderModel.AutoAddTotalPrice = order.TotalPrice;
+                        //增加的尺寸
+                        //quoteOrderModel.AutoAddGraphicWidth = widthAdd;
+                        //quoteOrderModel.AutoAddGraphicLength = lengthAdd;
+                        //quoteOrderModel.AutoAddArea = areaAdd;
+                        //quoteOrderModel.AutoAddTotalPrice = addTotalPrice;
+
+                        //增加后尺寸
+
+                        //quoteOrderModel.TotalPrice = totalPriceAfterAdd;
+                        //quoteOrderModel.TotalArea = totalAreaAfterAdd;
+
+                        quoteOrderModel.UnitPrice = order.UnitPrice;
+                        quoteOrderModel.UnitName = order.UnitName;
+                        quoteOrderModel.WindowDeep = order.WindowDeep;
+                        quoteOrderModel.WindowHigh = order.WindowHigh;
+                        quoteOrderModel.WindowSize = order.WindowSize;
+                        quoteOrderModel.WindowStick = order.WindowStick;
+                        quoteOrderModel.WindowWide = order.WindowWide;
+
+
+                        if (!string.IsNullOrWhiteSpace(order.GraphicMaterial))
                         {
-                            isTaiKa = true;
-                        }
-                        else
-                        {
-                            
-                            foreach (var size in taiKaSizeList)
+                            decimal width = order.GraphicWidth ?? 0;
+                            decimal length = order.GraphicLength ?? 0;
+                            string GraphicMaterial = order.GraphicMaterial;
+                            bool isTaiKa = false;
+                            if ((order.Sheet != null && order.Sheet.Contains("台卡")) || (order.GraphicNo != null && order.GraphicNo.Contains("台卡")) || (order.Remark != null && order.Remark.Contains("台卡")) || (order.PositionDescription != null && order.PositionDescription.Contains("台卡")))
                             {
-                                if (length == size.Height && width == size.Width)
+                                isTaiKa = true;
+                            }
+                            else
+                            {
+
+                                foreach (var size in taiKaSizeList)
                                 {
-                                    isTaiKa = true;
-                                    break;
+                                    if (length == size.Height && width == size.Width)
+                                    {
+                                        isTaiKa = true;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if (isTaiKa)
-                        {
-                            GraphicMaterial = "背胶PP+3mm雪弗板+蝴蝶支架";
-                            POP pop = new POP();
-                            pop.Quantity = order.Quantity;
-                            pop.PriceItemId = priceItemId;
-                            pop.GraphicMaterial = GraphicMaterial;
-                            pop.GraphicLength = length;
-                            pop.GraphicWidth = width;
-                            decimal totalPrice = 0;
-                            string unitName = string.Empty;
-                            decimal newunitPrice = new BasePage().GetMaterialUnitPrice(pop, out totalPrice, out unitName);
-                            quoteOrderModel.UnitPrice = newunitPrice;
-                            quoteOrderModel.UnitName = unitName;
-                            quoteOrderModel.TotalPrice = totalPrice;
-                            quoteOrderModel.AutoAddTotalPrice = totalPrice;
+                            if (isTaiKa)
+                            {
+                                GraphicMaterial = "背胶PP+3mm雪弗板+蝴蝶支架";
+                                POP pop = new POP();
+                                pop.Quantity = order.Quantity;
+                                pop.PriceItemId = priceItemId;
+                                pop.GraphicMaterial = GraphicMaterial;
+                                pop.GraphicLength = length;
+                                pop.GraphicWidth = width;
+                                decimal totalPrice = 0;
+                                string unitName = string.Empty;
+                                decimal newunitPrice = new BasePage().GetMaterialUnitPrice(pop, out totalPrice, out unitName);
+                                quoteOrderModel.UnitPrice = newunitPrice;
+                                quoteOrderModel.UnitName = unitName;
+                                quoteOrderModel.TotalPrice = totalPrice;
+                                quoteOrderModel.AutoAddTotalPrice = totalPrice;
+                            }
+
+                            string QuoteGraphicMaterial = this.GetQuoteMaterial(GraphicMaterial);
+                            if (!string.IsNullOrWhiteSpace(QuoteGraphicMaterial))
+                                quoteOrderModel.QuoteGraphicMaterial = QuoteGraphicMaterial;
+                            else
+                                quoteOrderModel.QuoteGraphicMaterial = GraphicMaterial;
+
                         }
 
-                        string QuoteGraphicMaterial = this.GetQuoteMaterial(GraphicMaterial);
-                        if (!string.IsNullOrWhiteSpace(QuoteGraphicMaterial))
-                           quoteOrderModel.QuoteGraphicMaterial = QuoteGraphicMaterial;
-                        else
-                           quoteOrderModel.QuoteGraphicMaterial = GraphicMaterial;
-                       
-                    }
-
-                    quoteOrderBll.Add(quoteOrderModel);
-                });
+                        quoteOrderBll.Add(quoteOrderModel);
+                    });
+                }
             }
         }
 
@@ -7438,7 +7464,7 @@ namespace WebApp
         public void SaveQuotationOrder123(FinalOrderDetailTemp order, bool? orderSetting = true)
         { }
 
-       
+
 
         Dictionary<string, string> materialDic = new Dictionary<string, string>();
         QuoteMaterialBLL quoteMaterialBll = new QuoteMaterialBLL();
@@ -7483,7 +7509,7 @@ namespace WebApp
         /// <param name="quoteModelList"></param>
         /// <param name="sheet"></param>
         /// <param name="positionDes"></param>
-        protected void StatisticMaterial(List<QuoteOrderDetail> orderList, ref List<QuoteModel> quoteModelList,string sheet=null,string positionDes=null)
+        protected void StatisticMaterial(List<QuoteOrderDetail> orderList, ref List<QuoteModel> quoteModelList, string sheet = null, string positionDes = null)
         {
             if (orderList.Any())
             {
@@ -7509,16 +7535,17 @@ namespace WebApp
                             mc.Area = Quantity;
                         }
                         mc.MaterialName = s.QuoteGraphicMaterial;
-                        mc.UnitPrice = s.UnitPrice??0;
+                        mc.UnitPrice = s.UnitPrice ?? 0;
                         mc.UnitName = s.UnitName;
                         materialList.Add(mc);
                     }
                 });
                 var list0 = (from material in materialList
-                             group material by new {
-                                material.MaterialName,
-                                material.UnitPrice,
-                                material.UnitName
+                             group material by new
+                             {
+                                 material.MaterialName,
+                                 material.UnitPrice,
+                                 material.UnitName
                              }
                                  into g
                                  select new
@@ -7526,7 +7553,7 @@ namespace WebApp
                                      GraphicMaterial = g.Key.MaterialName,
                                      Area = g.Sum(s => s.Area > 0 ? s.Area : 0),
                                      UnitPrice = g.Key.UnitPrice,
-                                     UnitName=g.Key.UnitName
+                                     UnitName = g.Key.UnitName
                                  }).ToList();
                 if (list0.Any())
                 {
@@ -7607,7 +7634,7 @@ namespace WebApp
                                      GraphicMaterial = g.Key.MaterialName,
                                      Area = g.Sum(s => s.Area > 0 ? s.Area : 0),
                                      UnitPrice = g.Key.UnitPrice,
-                                     UnitName =g.Key.UnitName
+                                     UnitName = g.Key.UnitName
                                  }).ToList();
                 if (list0.Any())
                 {
@@ -7638,7 +7665,7 @@ namespace WebApp
 
 
         //合并单元格
-        protected void CombineCell(Repeater repeater, List<string> combineTDNameList) 
+        protected void CombineCell(Repeater repeater, List<string> combineTDNameList)
         {
             for (int i = repeater.Items.Count - 1; i > 0; i--)
             {
@@ -7654,9 +7681,9 @@ namespace WebApp
                         cell1.RowSpan += cell2.RowSpan;
                     }
 
-                   
+
                 });
-                
+
             }
         }
 
@@ -7717,8 +7744,8 @@ namespace WebApp
                                 foreach (KeyValuePair<Dictionary<HtmlTableCell, HtmlTableCell>, bool> cellItem in otherCellDic)
                                 {
                                     Dictionary<HtmlTableCell, HtmlTableCell> currCellDic = cellItem.Key;
-                                    HtmlTableCell cell1=new HtmlTableCell();
-                                    HtmlTableCell cell2=new HtmlTableCell();
+                                    HtmlTableCell cell1 = new HtmlTableCell();
+                                    HtmlTableCell cell2 = new HtmlTableCell();
                                     foreach (KeyValuePair<HtmlTableCell, HtmlTableCell> subCellItem in currCellDic)
                                     {
                                         cell1 = subCellItem.Key;
@@ -7729,8 +7756,8 @@ namespace WebApp
                                         string price1Str = string.Empty;
                                         string price2Str = string.Empty;
 
-                                        Label lab1=new Label();
-                                        
+                                        Label lab1 = new Label();
+
                                         foreach (Control con in cell1.Controls)
                                         {
                                             if (con.GetType().Name == "Label")
@@ -7758,7 +7785,7 @@ namespace WebApp
                             }
                         }
 
-                        
+
                     }
                 }
             }
@@ -7870,7 +7897,7 @@ namespace WebApp
                 List<InstallPriceShopInfo> installPriceShopInfoList = installPriceShopInfoBll.GetList(s => s.GuidanceId == guidanceId);
 
 
-                
+
                 List<FinalOrderDetailTemp> orderList0 = new List<FinalOrderDetailTemp>();
                 FinalOrderDetailTempBLL OrderDetailTempBll = new FinalOrderDetailTempBLL();
                 OutsourceOrderDetailBLL outsourceOrderDetailBll = new OutsourceOrderDetailBLL();
@@ -7971,6 +7998,10 @@ namespace WebApp
                                         select order).ToList();
                     shopList.ForEach(shop =>
                     {
+                        //主外协
+                        int mainOutsourceId = shop.OutsourceId ?? 0;
+                        //生产外协
+                        int produceOutsourceId = shop.ProductOutsourceId ?? 0;
 
                         bool isInstallShop = shop.IsInstall == "Y";
                         bool isBCSInstallShop = shop.BCSIsInstall == "Y";//三叶草是否安装
@@ -8123,8 +8154,46 @@ namespace WebApp
                                         OutsourceOrderPlaceConfigBLL placeConfigBll = new OutsourceOrderPlaceConfigBLL();
                                         if (!string.IsNullOrWhiteSpace(config.MaterialName))
                                         {
-                                            var orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && ((config.IsFullMatch ?? false) ? (order.order.GraphicMaterial.ToLower() == config.MaterialName.ToLower()) : (order.order.GraphicMaterial.ToLower().Contains(config.MaterialName.ToLower()))) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                            List<string> MaterialNameList = StringHelper.ToStringList(config.MaterialName,',', LowerUpperEnum.ToLower);
+                                            var orderList=oneShopOrderListNew.Select(s=>s).ToList();
 
+                                            for (int index = 0; index < MaterialNameList.Count; index++)
+                                            {
+                                                //完全匹配
+                                                if (config.IsFullMatch ?? false)
+                                                {
+                                                    string materialName = MaterialNameList[index];
+                                                    if (index == 0)
+                                                    {
+                                                        orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && (order.order.GraphicMaterial.ToLower() == materialName) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                                    
+                                                    }
+                                                    else
+                                                    {
+                                                        var list1 = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && (order.order.GraphicMaterial.ToLower() == materialName) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                                        orderList.AddRange(list1);
+                                                    }
+
+                                                }
+                                                else
+                                                { 
+                                                    //orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && (order.order.GraphicMaterial.ToLower().Contains(config.MaterialName.ToLower()))&& (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                                    string materialName = MaterialNameList[index];
+                                                    if (index == 0)
+                                                    {
+                                                        orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && (order.order.GraphicMaterial.ToLower().Contains(materialName)) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+
+                                                    }
+                                                    else
+                                                    {
+                                                        var list1 = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && (order.order.GraphicMaterial.ToLower().Contains(materialName)) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                                        orderList.AddRange(list1);
+                                                    }
+                                                }
+                                            }
+                                            
+                                            
+                                            
                                             List<int> cityIdList = new List<int>();
 
                                             List<string> cityNameList = new List<string>();
@@ -8179,7 +8248,7 @@ namespace WebApp
                                                     }
                                                     outsourceOrderDetailModel = new OutsourceOrderDetail();
                                                     outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                                    outsourceOrderDetailModel.AddUserId = CurrentUser.UserId; ;
+                                                    outsourceOrderDetailModel.AddUserId = order.order.AddUserId;
                                                     outsourceOrderDetailModel.AgentCode = order.order.AgentCode;
                                                     outsourceOrderDetailModel.AgentName = order.order.AgentName;
                                                     outsourceOrderDetailModel.Area = order.order.Area;
@@ -8281,13 +8350,15 @@ namespace WebApp
                                 {
                                     orderList1.ForEach(s =>
                                     {
-
+                                        //if ((s.order.ProduceOutsourceId ?? 0) > 0)
+                                        //    produceOutsourceId = s.order.ProduceOutsourceId ?? 0;
                                         int Quantity = s.order.Quantity ?? 1;
                                         if (!string.IsNullOrWhiteSpace(s.order.Sheet) && ChangePOPCountSheetList.Any() && ChangePOPCountSheetList.Contains(s.order.Sheet.ToUpper()))
                                         {
                                             Quantity = Quantity > 0 ? 1 : 0;
                                         }
                                         string material0 = s.order.GraphicMaterial ?? "";
+                                        #region 天津
                                         if (s.order.Province == "天津")
                                         {
                                             if (guidanceType == (int)GuidanceTypeEnum.Promotion || guidanceType == (int)GuidanceTypeEnum.Delivery)//促销或发货
@@ -8296,7 +8367,7 @@ namespace WebApp
 
                                                 outsourceOrderDetailModel = new OutsourceOrderDetail();
                                                 outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                                outsourceOrderDetailModel.AddUserId = CurrentUser.UserId; ;
+                                                outsourceOrderDetailModel.AddUserId = s.order.AddUserId;
                                                 outsourceOrderDetailModel.AgentCode = s.order.AgentCode;
                                                 outsourceOrderDetailModel.AgentName = s.order.AgentName;
                                                 outsourceOrderDetailModel.Area = s.order.Area;
@@ -8384,7 +8455,7 @@ namespace WebApp
                                                 outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
 
                                             }
-                                            else
+                                            else//安装活动
                                             {
 
                                                 string material = string.Empty;
@@ -8401,7 +8472,7 @@ namespace WebApp
 
                                                     outsourceOrderDetailModel = new OutsourceOrderDetail();
                                                     outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                                    outsourceOrderDetailModel.AddUserId = CurrentUser.UserId; ;
+                                                    outsourceOrderDetailModel.AddUserId = s.order.AddUserId;
                                                     outsourceOrderDetailModel.AgentCode = s.order.AgentCode;
                                                     outsourceOrderDetailModel.AgentName = s.order.AgentName;
                                                     outsourceOrderDetailModel.Area = s.order.Area;
@@ -8462,6 +8533,7 @@ namespace WebApp
                                                         pop.Quantity = Quantity;
                                                         pop.CustomerId = subjectModel.subject.CustomerId;
                                                         pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+
                                                         new BasePage().GetOutsourceOrderMaterialPrice(pop, out unitPrice, out totalPrice);
                                                         outsourceOrderDetailModel.UnitPrice = unitPrice;
                                                         outsourceOrderDetailModel.TotalPrice = totalPrice;
@@ -8477,11 +8549,9 @@ namespace WebApp
 
 
                                                     material1 = "3mmPVC";
-
-
                                                     outsourceOrderDetailModel = new OutsourceOrderDetail();
                                                     outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                                    outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
+                                                    outsourceOrderDetailModel.AddUserId = s.order.AddUserId;
                                                     outsourceOrderDetailModel.AgentCode = s.order.AgentCode;
                                                     outsourceOrderDetailModel.AgentName = s.order.AgentName;
                                                     outsourceOrderDetailModel.Area = s.order.Area;
@@ -8541,7 +8611,8 @@ namespace WebApp
                                                         pop.GraphicWidth = s.order.GraphicWidth;
                                                         pop.Quantity = Quantity;
                                                         pop.CustomerId = subjectModel.subject.CustomerId;
-                                                        pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                                        //pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                                        pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
                                                         new BasePage().GetOutsourceOrderMaterialPrice(pop, out unitPrice1, out totalPrice1);
                                                         outsourceOrderDetailModel.UnitPrice = unitPrice1;
                                                         outsourceOrderDetailModel.TotalPrice = totalPrice1;
@@ -8553,7 +8624,7 @@ namespace WebApp
                                                     outsourceOrderDetailModel.ReceiveTotalPrice = 0;
                                                     outsourceOrderDetailModel.RegionSupplementId = s.order.RegionSupplementId;
                                                     outsourceOrderDetailModel.CSUserId = s.order.CSUserId;
-                                                    outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
+                                                    outsourceOrderDetailModel.OutsourceId = mainOutsourceId;
                                                     outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                                                     outsourceOrderDetailModel.FinalOrderId = s.order.Id;
                                                     outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
@@ -8563,11 +8634,11 @@ namespace WebApp
                                                 else
                                                 {
 
-
+                                                    //pp背胶以外的材质
 
                                                     outsourceOrderDetailModel = new OutsourceOrderDetail();
                                                     outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                                    outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
+                                                    outsourceOrderDetailModel.AddUserId = s.order.AddUserId;
                                                     outsourceOrderDetailModel.AgentCode = s.order.AgentCode;
                                                     outsourceOrderDetailModel.AgentName = s.order.AgentName;
                                                     outsourceOrderDetailModel.Area = s.order.Area;
@@ -8633,6 +8704,16 @@ namespace WebApp
                                                         pop.Quantity = Quantity;
                                                         pop.CustomerId = subjectModel.subject.CustomerId;
                                                         pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                                        if ((s.order.ProduceOutsourceId ?? 0) > 0)
+                                                        {
+                                                            if (s.order.ProduceOutsourceId == mainOutsourceId)
+                                                                pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                        }
+                                                        else if (produceOutsourceId > 0)
+                                                        {
+                                                            if (produceOutsourceId == mainOutsourceId)
+                                                                pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                        }
                                                         new BasePage().GetOutsourceOrderMaterialPrice(pop, out unitPrice, out totalPrice);
                                                         outsourceOrderDetailModel.UnitPrice = unitPrice;
                                                         outsourceOrderDetailModel.TotalPrice = totalPrice;
@@ -8641,8 +8722,27 @@ namespace WebApp
                                                     outsourceOrderDetailModel.ReceiveTotalPrice = s.order.TotalPrice;
                                                     outsourceOrderDetailModel.RegionSupplementId = s.order.RegionSupplementId;
                                                     outsourceOrderDetailModel.CSUserId = s.order.CSUserId;
-                                                    outsourceOrderDetailModel.OutsourceId = calerOutsourceId;
-                                                    outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                                    if ((s.order.ProduceOutsourceId ?? 0) > 0)
+                                                    {
+                                                        outsourceOrderDetailModel.OutsourceId = s.order.ProduceOutsourceId;
+                                                        if (s.order.ProduceOutsourceId == mainOutsourceId)
+                                                            outsourceOrderDetailModel.AssignType = assignType;
+                                                        else
+                                                            outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                                    }
+                                                    else if (produceOutsourceId > 0)
+                                                    {
+                                                        outsourceOrderDetailModel.OutsourceId = produceOutsourceId;
+                                                        if (produceOutsourceId == mainOutsourceId)
+                                                            outsourceOrderDetailModel.AssignType = assignType;
+                                                        else
+                                                            outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                                    }
+                                                    else
+                                                    {
+                                                        outsourceOrderDetailModel.OutsourceId = calerOutsourceId;//如果没指定生产外协，默认给北京卡乐
+                                                        outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                                    }
                                                     if (s.order.OrderType == (int)OrderTypeEnum.安装费 || s.order.OrderType == (int)OrderTypeEnum.测量费 || s.order.OrderType == (int)OrderTypeEnum.其他费用)
                                                     {
                                                         outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
@@ -8657,13 +8757,15 @@ namespace WebApp
                                                 }
                                             }
                                         }
+                                        #endregion
+                                        #region 非天津
                                         else
                                         {
                                             //非天津
 
                                             outsourceOrderDetailModel = new OutsourceOrderDetail();
                                             outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                            outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
+                                            outsourceOrderDetailModel.AddUserId = s.order.AddUserId;
                                             outsourceOrderDetailModel.AgentCode = s.order.AgentCode;
                                             outsourceOrderDetailModel.AgentName = s.order.AgentName;
                                             outsourceOrderDetailModel.Area = s.order.Area;
@@ -8736,6 +8838,24 @@ namespace WebApp
                                                 }
                                                 else if (guidanceType == (int)GuidanceTypeEnum.Delivery)
                                                     pop.OutsourceType = (int)OutsourceOrderTypeEnum.Send;
+                                                else if (assignType == (int)OutsourceOrderTypeEnum.Install)
+                                                {
+                                                    if ((s.order.ProduceOutsourceId ?? 0) > 0)
+                                                    {
+                                                        if (s.order.ProduceOutsourceId == mainOutsourceId)
+                                                            pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                        else
+                                                            pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                                    }
+                                                    else if (produceOutsourceId > 0)
+                                                    {
+                                                        if (produceOutsourceId == mainOutsourceId)
+                                                            pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                        else
+                                                            pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                                    }
+
+                                                }
                                                 new BasePage().GetOutsourceOrderMaterialPrice(pop, out unitPrice1, out totalPrice1);
                                                 outsourceOrderDetailModel.UnitPrice = unitPrice1;
                                                 outsourceOrderDetailModel.TotalPrice = totalPrice1;
@@ -8744,33 +8864,60 @@ namespace WebApp
                                             outsourceOrderDetailModel.ReceiveTotalPrice = s.order.TotalPrice;
                                             outsourceOrderDetailModel.RegionSupplementId = s.order.RegionSupplementId;
                                             outsourceOrderDetailModel.CSUserId = s.order.CSUserId;
-                                            if ((shop.BCSOutsourceId ?? 0) > 0 && s.subject.CornerType == "三叶草")
+                                            //if ((s.order.ProduceOutsourceId ?? 0) > 0)
+                                            //    outsourceOrderDetailModel.OutsourceId = s.order.ProduceOutsourceId ?? 0;
+                                            //else if ((shop.BCSOutsourceId ?? 0) > 0 && s.subject.CornerType == "三叶草")
+                                            //{
+                                            //    outsourceOrderDetailModel.OutsourceId = shop.BCSOutsourceId ?? 0;
+                                            //}
+                                            //else if (produceOutsourceId > 0)
+                                            //    outsourceOrderDetailModel.OutsourceId = produceOutsourceId;
+                                            //else
+                                            //    outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
+                                            outsourceOrderDetailModel.OutsourceId = mainOutsourceId;
+                                            outsourceOrderDetailModel.AssignType = assignType;
+                                            if (s.order.OrderType == (int)OrderTypeEnum.POP || s.order.OrderType == (int)OrderTypeEnum.道具)
                                             {
-                                                outsourceOrderDetailModel.OutsourceId = shop.BCSOutsourceId ?? 0;
+                                                if ((s.order.ProduceOutsourceId ?? 0) > 0)
+                                                {
+                                                    outsourceOrderDetailModel.OutsourceId = s.order.ProduceOutsourceId;
+                                                    if (s.order.ProduceOutsourceId != mainOutsourceId)
+                                                        outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                                }
+                                                else if (produceOutsourceId > 0 || ((shop.BCSOutsourceId ?? 0) > 0 && s.subject.CornerType == "三叶草"))
+                                                {
+                                                    int pOutsourceId = 0;
+                                                    if (produceOutsourceId > 0)
+                                                        pOutsourceId = produceOutsourceId;
+                                                    else
+                                                        pOutsourceId = shop.BCSOutsourceId ?? 0;
+                                                    outsourceOrderDetailModel.OutsourceId = pOutsourceId;
+                                                    if (pOutsourceId != mainOutsourceId)
+                                                        outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                                }
                                             }
                                             else
-                                                outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
-
-                                            outsourceOrderDetailModel.AssignType = assignType;
-                                            if (s.order.OrderType == (int)OrderTypeEnum.安装费 || s.order.OrderType == (int)OrderTypeEnum.测量费 || s.order.OrderType == (int)OrderTypeEnum.其他费用)
                                             {
-                                                //if (s.order.OrderType == (int)OrderTypeEnum.安装费 && subjectModel.subject.SubjectType != (int)SubjectTypeEnum.费用订单)
-                                                //hasInstallPrice = true;
-                                                if (!string.IsNullOrWhiteSpace(s.order.Region) && (s.order.Region.ToLower() == "east" || s.order.Region.ToLower() == "south"))
+                                                if (s.order.OrderType == (int)OrderTypeEnum.安装费 || s.order.OrderType == (int)OrderTypeEnum.测量费 || s.order.OrderType == (int)OrderTypeEnum.其他费用)
+                                                {
+                                                    //if (s.order.OrderType == (int)OrderTypeEnum.安装费 && subjectModel.subject.SubjectType != (int)SubjectTypeEnum.费用订单)
+                                                    //hasInstallPrice = true;
+                                                    if (!string.IsNullOrWhiteSpace(s.order.Region) && (s.order.Region.ToLower() == "east" || s.order.Region.ToLower() == "south"))
+                                                    {
+                                                        outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                                        outsourceOrderDetailModel.PayOrderPrice = 0;
+                                                    }
+                                                    else
+                                                    {
+                                                        outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
+                                                    }
+                                                }
+                                                if (s.order.OrderType == (int)OrderTypeEnum.发货费)
                                                 {
                                                     outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
-                                                    outsourceOrderDetailModel.PayOrderPrice = 0;
+                                                    if (s.order.Province == "内蒙古" && !s.order.City.Contains("通辽"))
+                                                        outsourceOrderDetailModel.PayOrderPrice = 0;
                                                 }
-                                                else
-                                                {
-                                                    outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
-                                                }
-                                            }
-                                            if (s.order.OrderType == (int)OrderTypeEnum.发货费)
-                                            {
-                                                outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
-                                                if (s.order.Province == "内蒙古" && !s.order.City.Contains("通辽"))
-                                                    outsourceOrderDetailModel.PayOrderPrice = 0;
                                             }
                                             if (guidanceType == (int)GuidanceTypeEnum.Promotion || guidanceType == (int)GuidanceTypeEnum.Delivery)
                                             {
@@ -8781,11 +8928,7 @@ namespace WebApp
                                                     promotionInstallPrice = 150;
                                                 }
                                             }
-                                            if ((shop.ProductOutsourceId ?? 0) > 0)
-                                            {
-                                                outsourceOrderDetailModel.OutsourceId = shop.ProductOutsourceId;
-                                                outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
-                                            }
+
                                             if (isProductInNorth && shop.RegionName != null && shop.RegionName.ToLower() != subjectModel.subject.PriceBlongRegion.ToLower())
                                             {
                                                 outsourceOrderDetailModel.OutsourceId = calerOutsourceId;
@@ -8795,7 +8938,8 @@ namespace WebApp
                                             outsourceOrderDetailModel.FinalOrderId = s.order.Id;
                                             outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
                                         }
-                                        //assignOrderCount++;
+                                        #endregion
+
                                     });
                                 }
                                 #endregion
@@ -8814,7 +8958,7 @@ namespace WebApp
                                     }
                                     outsourceOrderDetailModel = new OutsourceOrderDetail();
                                     outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                    outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
+                                    outsourceOrderDetailModel.AddUserId = s.AddUserId;
                                     outsourceOrderDetailModel.AgentCode = s.AgentCode;
                                     outsourceOrderDetailModel.AgentName = s.AgentName;
                                     outsourceOrderDetailModel.Area = s.Area;
@@ -8882,6 +9026,25 @@ namespace WebApp
                                         pop.OutsourceType = assignType;
                                         if (guidanceType == (int)GuidanceTypeEnum.Promotion || guidanceType == (int)GuidanceTypeEnum.Delivery)
                                             pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                        else if (assignType == (int)OutsourceOrderTypeEnum.Install)
+                                        {
+                                            if ((s.ProduceOutsourceId ?? 0) > 0)
+                                            {
+                                                if (s.ProduceOutsourceId == mainOutsourceId)
+                                                    pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                else
+                                                    pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                            }
+                                            else if (produceOutsourceId > 0)
+                                            {
+                                                if (produceOutsourceId == mainOutsourceId)
+                                                    pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                else
+                                                    pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                            }
+                                            else
+                                                pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                        }
                                         new BasePage().GetOutsourceOrderMaterialPrice(pop, out unitPrice1, out totalPrice1);
                                         outsourceOrderDetailModel.UnitPrice = unitPrice1;
                                         outsourceOrderDetailModel.TotalPrice = totalPrice1;
@@ -8890,18 +9053,36 @@ namespace WebApp
                                     outsourceOrderDetailModel.ReceiveTotalPrice = s.TotalPrice;
                                     outsourceOrderDetailModel.RegionSupplementId = s.RegionSupplementId;
                                     outsourceOrderDetailModel.CSUserId = s.CSUserId;
-                                    outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
+                                    outsourceOrderDetailModel.OutsourceId = mainOutsourceId;
                                     outsourceOrderDetailModel.AssignType = assignType;
-                                    if (s.OrderType == (int)OrderTypeEnum.安装费 || s.OrderType == (int)OrderTypeEnum.测量费 || s.OrderType == (int)OrderTypeEnum.其他费用)
+                                    if (s.OrderType == (int)OrderTypeEnum.POP || s.OrderType == (int)OrderTypeEnum.道具)
                                     {
-                                        outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
-                                        //if (s.OrderType == (int)OrderTypeEnum.安装费 && subjectModel.subject.SubjectType != (int)SubjectTypeEnum.费用订单)
-                                        //hasInstallPrice = true;
-
+                                        if ((s.ProduceOutsourceId ?? 0) > 0)
+                                        {
+                                            outsourceOrderDetailModel.OutsourceId = s.ProduceOutsourceId;
+                                            if (s.ProduceOutsourceId != mainOutsourceId)
+                                                outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                        }
+                                        else if (produceOutsourceId > 0)
+                                        {
+                                            outsourceOrderDetailModel.OutsourceId = produceOutsourceId;
+                                            if (produceOutsourceId != mainOutsourceId)
+                                                outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                        }
                                     }
-                                    if (s.OrderType == (int)OrderTypeEnum.发货费)
+                                    else
                                     {
-                                        outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                        if (s.OrderType == (int)OrderTypeEnum.安装费 || s.OrderType == (int)OrderTypeEnum.测量费 || s.OrderType == (int)OrderTypeEnum.其他费用)
+                                        {
+                                            outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
+                                            //if (s.OrderType == (int)OrderTypeEnum.安装费 && subjectModel.subject.SubjectType != (int)SubjectTypeEnum.费用订单)
+                                            //hasInstallPrice = true;
+
+                                        }
+                                        if (s.OrderType == (int)OrderTypeEnum.发货费)
+                                        {
+                                            outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                        }
                                     }
                                     if (guidanceType == (int)GuidanceTypeEnum.Promotion || guidanceType == (int)GuidanceTypeEnum.Delivery)
                                     {
@@ -9040,7 +9221,7 @@ namespace WebApp
 
                                     installPrice = oohInstallPrice + basicInstallPrice;
                                 }
-                                if (isGeneric && ((shop.RegionName!=null && shop.RegionName.ToLower().Contains("west") && shop.IsInstall=="Y") || (shop.RegionName==null || (shop.RegionName!=null && !shop.RegionName.ToLower().Contains("west") && BCSCityTierList.Contains(shop.CityTier.ToUpper()) && shop.IsInstall=="Y"))))
+                                if (isGeneric && ((shop.RegionName != null && shop.RegionName.ToLower().Contains("west") && shop.IsInstall == "Y") || (shop.RegionName == null || (shop.RegionName != null && !shop.RegionName.ToLower().Contains("west") && BCSCityTierList.Contains(shop.CityTier.ToUpper()) && shop.IsInstall == "Y"))))
                                 {
 
                                     if (shop.CityName == "包头市" && (shop.OutsourceInstallPrice ?? 0) > 0)
@@ -9061,7 +9242,7 @@ namespace WebApp
                                         outsourceOrderDetailModel = new OutsourceOrderDetail();
                                         outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                                         outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                        outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
+                                        outsourceOrderDetailModel.AddUserId = oneShopOrderList[0].AddUserId;
                                         outsourceOrderDetailModel.AgentCode = oneShopOrderList[0].AgentCode;
                                         outsourceOrderDetailModel.AgentName = oneShopOrderList[0].AgentName;
                                         outsourceOrderDetailModel.BusinessModel = oneShopOrderList[0].BusinessModel;
@@ -9120,7 +9301,7 @@ namespace WebApp
                                     outsourceOrderDetailModel = new OutsourceOrderDetail();
                                     outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                                     outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                    outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
+                                    outsourceOrderDetailModel.AddUserId = oneShopOrderList[0].AddUserId;
                                     outsourceOrderDetailModel.AgentCode = oneShopOrderList[0].AgentCode;
                                     outsourceOrderDetailModel.AgentName = oneShopOrderList[0].AgentName;
                                     outsourceOrderDetailModel.BusinessModel = oneShopOrderList[0].BusinessModel;
@@ -9193,7 +9374,7 @@ namespace WebApp
                                     outsourceOrderDetailModel = new OutsourceOrderDetail();
                                     outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                                     outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                    outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
+                                    outsourceOrderDetailModel.AddUserId = oneShopOrderList[0].AddUserId;
                                     outsourceOrderDetailModel.AgentCode = oneShopOrderList[0].AgentCode;
                                     outsourceOrderDetailModel.AgentName = oneShopOrderList[0].AgentName;
                                     outsourceOrderDetailModel.BusinessModel = oneShopOrderList[0].BusinessModel;
@@ -9281,7 +9462,7 @@ namespace WebApp
                                 outsourceOrderDetailModel = new OutsourceOrderDetail();
                                 outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
                                 outsourceOrderDetailModel.AddDate = DateTime.Now;
-                                outsourceOrderDetailModel.AddUserId = CurrentUser.UserId;
+                                outsourceOrderDetailModel.AddUserId = oneShopOrderList[0].AddUserId;
                                 outsourceOrderDetailModel.AgentCode = oneShopOrderList[0].AgentCode;
                                 outsourceOrderDetailModel.AgentName = oneShopOrderList[0].AgentName;
                                 outsourceOrderDetailModel.BusinessModel = oneShopOrderList[0].BusinessModel;
@@ -9332,6 +9513,7 @@ namespace WebApp
                                 outsourceOrderDetailModel.ReceiveUnitPrice = 0;
                                 outsourceOrderDetailModel.ReceiveTotalPrice = 0;
                                 outsourceOrderDetailModel.CSUserId = oneShopOrderList[0].CSUserId;
+                                outsourceOrderDetailModel.InstallPriceAddType = 1;
                                 //outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
 
                                 if (shop.ProvinceName == "天津")

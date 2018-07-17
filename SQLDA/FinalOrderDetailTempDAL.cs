@@ -35,5 +35,17 @@ namespace SQLDAL
             DataSet ds = SQLHelper.RunProcedure("pro_ExportOutsourceOrder", paras, "orders");
             return ds;
         }
+
+       public void UpdateAddDate(int subjectId, string addDate, int type)
+        {
+            SqlParameter[] paras = new SqlParameter[] { 
+              
+               new SqlParameter("@subjectId",subjectId),
+               new SqlParameter("@addDate",addDate),
+               new SqlParameter("@type",type)
+              
+            };
+            SQLHelper.RunProcedure("prop_UpdateOrderAddDate", paras, "orders");
+        }
     }
 }

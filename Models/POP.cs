@@ -68,5 +68,6 @@ namespace Models
         public Nullable<bool> IsValid { get; set; }
         public Nullable<decimal> OOHInstallPrice { get; set; }
         public Nullable<decimal> OSOOHInstallPrice { get; set; }
+        public Nullable<int> ProduceOutsourceId { get; set; }
     }
 }

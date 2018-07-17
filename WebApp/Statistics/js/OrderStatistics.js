@@ -390,8 +390,7 @@ $(function () {
     $("#btnExport").click(function () {
         var guidanceIds = ""; //pop活动
         var subjectIds = ""; //pop项目
-        //var propGuidanceIds = "";//道具活动
-        //var propSubjectIds = ""; //道具项目
+       
         var regions = "";
         var provinces = "";
         var citys = "";
@@ -399,6 +398,8 @@ $(function () {
         var shopType = "";
         var customerServiceIds = "";
         var subjectCategory = "";
+        var beginDate = "";
+        var endDate = "";
         $("input[name^='cblGuidanceList']:checked").each(function () {
             guidanceIds += $(this).val() + ",";
         })
@@ -447,11 +448,14 @@ $(function () {
         $("input[name^='cblSubjectCategory']:checked").each(function () {
             subjectCategory += $(this).val() + ",";
         })
+        if ($("#txtSubjectBegin").val() != "")
+            beginDate = $("#txtSubjectBegin").val();
+        if ($("#txtSubjectEnd").val() != "")
+            endDate = $("#txtSubjectEnd").val();
         if (guidanceIds == "") {
             alert("请选择活动");
             return false;
         }
-
         var isExportInstall = 0;
         var installPrice = "";
         var freight = "";
@@ -462,7 +466,7 @@ $(function () {
         freight = $("#labExpressPrice").html();
         $("#exportWaiting").show();
         checkExport();
-        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&subjectIds=" + subjectIds + "&regions=" + regions + "&provinces=" + provinces + "&citys=" + citys + "&isExportInstall=" + isExportInstall + "&installPrice=" + installPrice + "&freight=" + freight + "&subjectChannel=" + subjectChannel + "&shopType=" + shopType + "&customerServiceIds=" + customerServiceIds + "&subjectCategory=" + subjectCategory;
+        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&subjectIds=" + subjectIds + "&regions=" + regions + "&provinces=" + provinces + "&citys=" + citys + "&isExportInstall=" + isExportInstall + "&installPrice=" + installPrice + "&freight=" + freight + "&subjectChannel=" + subjectChannel + "&shopType=" + shopType + "&customerServiceIds=" + customerServiceIds + "&subjectCategory=" + subjectCategory+"&beginDate=" + beginDate + "&endDate=" + endDate;
         $("#exportFrame").attr("src", url);
     })
 
@@ -477,6 +481,8 @@ $(function () {
         var shopType = "";
         var customerServiceIds = "";
         var subjectCategory = "";
+        var beginDate = "";
+        var endDate = "";
         $("input[name^='cblGuidanceList']:checked").each(function () {
             guidanceIds += $(this).val() + ",";
         })
@@ -516,6 +522,10 @@ $(function () {
         $("input[name^='cblSubjectCategory']:checked").each(function () {
             subjectCategory += $(this).val() + ",";
         })
+        if ($("#txtSubjectBegin").val() != "")
+            beginDate = $("#txtSubjectBegin").val();
+        if ($("#txtSubjectEnd").val() != "")
+            endDate = $("#txtSubjectEnd").val();
         if (guidanceIds == "") {
             alert("请选择活动");
             return false;
@@ -523,7 +533,7 @@ $(function () {
 
         $("#exportWaitingByShop").show();
         checkExportByShop();
-        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&subjectIds=" + subjectIds + "&regions=" + regions + "&provinces=" + provinces + "&citys=" + citys + "&subjectChannel=" + subjectChannel + "&shopType=" + shopType + "&customerServiceIds=" + customerServiceIds + "&subjectCategory=" + subjectCategory + "&exportType=byShop";
+        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&subjectIds=" + subjectIds + "&regions=" + regions + "&provinces=" + provinces + "&citys=" + citys + "&subjectChannel=" + subjectChannel + "&shopType=" + shopType + "&customerServiceIds=" + customerServiceIds + "&subjectCategory=" + subjectCategory + "&beginDate=" + beginDate + "&endDate=" + endDate + "&exportType=byShop";
         $("#exportFrame").attr("src", url);
     })
     //导出关闭店铺订单明细

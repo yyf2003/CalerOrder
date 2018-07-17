@@ -112,5 +112,6 @@ namespace Models
         public Nullable<bool> IsValidFromAssign { get; set; }
         public Nullable<int> CSUserId { get; set; }
         public Nullable<int> InstallPriceAddType { get; set; }
+        public Nullable<int> ProduceOutsourceId { get; set; }
     }
 }

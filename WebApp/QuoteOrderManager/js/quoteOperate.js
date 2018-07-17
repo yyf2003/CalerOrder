@@ -79,8 +79,12 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             layer.msg("请选择项目");
             return false;
         }
+        var region = "";
+        $("input[name^='cblRegion']:checked").each(function () {
+            region += $(this).val() + ',';
+        })
         $("#hfIsChange").val("");
-        var url = "AddQuotation.aspx?customerId=" + customerId + "&month=" + month + "&guidanceId=" + guidanceId + "&subjectCategory=" + subjectCategory + "&subjectId=" + subjectId;
+        var url = "AddQuotation.aspx?customerId=" + customerId + "&month=" + month + "&guidanceId=" + guidanceId + "&subjectCategory=" + subjectCategory + "&subjectId=" + subjectId + "&region=" + region;
         layer.open({
             type: 2,
             time: 0,
@@ -92,7 +96,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             cancel: function (index) {
                 layer.closeAll();
                 $("#btnRefreshGuidance").click();
-                
+
             }
 
         });

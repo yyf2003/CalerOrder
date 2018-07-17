@@ -64,6 +64,7 @@ namespace WebApp.OutsourcingOrder.handler
                     string jsonString = context.Request["jsonStr"];
                     if (!string.IsNullOrWhiteSpace(jsonString))
                     {
+                        jsonString = jsonString.Replace("+", "%2B");
                         jsonString = HttpUtility.UrlDecode(jsonString);
                     }
                     result = Edit(jsonString);
@@ -82,6 +83,9 @@ namespace WebApp.OutsourcingOrder.handler
                 case "delete":
                     string ids = context.Request["ids"];
                     result = Delete(ids);
+                    break;
+                case "getMaterial":
+                    result = GetMaterialList();
                     break;
             }
             context.Response.Write(result);
@@ -397,6 +401,26 @@ namespace WebApp.OutsourcingOrder.handler
                 }
                 else
                     return "";
+            }
+            else
+                return "";
+        }
+
+        string GetMaterialList()
+        {
+           
+            var materialList = new BasicMaterialBLL().GetList(s=>s.IsDelete==null || s.IsDelete==false);
+            if (materialList.Any())
+            {
+                materialList = materialList.OrderBy(s => s.MaterialName).ToList();
+                StringBuilder json = new StringBuilder();
+                materialList.ForEach(s => {
+                    if (!string.IsNullOrWhiteSpace(s.MaterialName))
+                    {
+                        json.Append("{\"MaterialName\":\"" + s.MaterialName + "\"},");
+                    }
+                });
+                return "[" + json.ToString().TrimEnd(',') + "]";
             }
             else
                 return "";

@@ -316,6 +316,8 @@ namespace Common
         Install = 1,
         [Description("发货")]
         Send,
+        [Description("生产+安装")]
+        InstallAndProduce,
     }
 
     public enum QuoteOrderSettingTypeEnum

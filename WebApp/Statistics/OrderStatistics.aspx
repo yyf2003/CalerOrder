@@ -63,7 +63,7 @@
                                 Checked="true" AutoPostBack="true" OnCheckedChanged="rbOnGuidanceSearch_CheckedChanged" />
                         </td>
                         <td style="text-align: left;">
-                            <div style="margin-left: 5px;">
+                            <%--<div style="margin-left: 5px;">
                                 <asp:TextBox ID="txtGuidanceBegin" runat="server" onclick="WdatePicker()" autocomplete="off"
                                     CssClass="Wdate"></asp:TextBox>
                                 —
@@ -72,7 +72,7 @@
                                 &nbsp;&nbsp;
                                 <asp:Button ID="btnGetGuidance" runat="server" Text="获取活动" class="easyui-linkbutton"
                                     Style="width: 65px; height: 26px;" OnClick="btnGetGuidance_Click" OnClientClick="return CheckGuidanceDate()" />
-                            </div>
+                            </div>--%>
                             <div>
                                 <table style="width: 100%;">
                                     <tr>
@@ -104,7 +104,7 @@
                     </tr>
                     <tr class="tr_bai">
                         <td>
-                            按下单时间查询
+                            按时间查询
                             <asp:RadioButton ID="rbOnOrderSubjectSearch" GroupName="rbSearchType" AutoPostBack="true"
                                 runat="server" OnCheckedChanged="rbOnOrderSubjectSearch_CheckedChanged" />
                         </td>
@@ -112,6 +112,11 @@
                             <asp:TextBox ID="txtSubjectBegin" runat="server" onclick="WdatePicker()" autocomplete="off"></asp:TextBox>
                             —
                             <asp:TextBox ID="txtSubjectEnd" runat="server" onclick="WdatePicker()" autocomplete="off"></asp:TextBox>
+                            &nbsp;&nbsp;
+                            <asp:RadioButtonList ID="rblDateType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                              <asp:ListItem Value="1" Selected="True">按项目时间&nbsp;&nbsp;</asp:ListItem>
+                              <asp:ListItem Value="2">按下单时间</asp:ListItem>
+                            </asp:RadioButtonList>
                             &nbsp;&nbsp;
                             <asp:Button ID="btnGetProject" runat="server" Text="查 询" class="easyui-linkbutton"
                                 Style="width: 65px; height: 26px;" OnClick="btnGetProject_Click" OnClientClick="return CheckProjectDate()" />

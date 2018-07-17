@@ -68,13 +68,14 @@ namespace WebApp.Subjects.SecondInstallFee
             {
                 RegionOrderDetailBLL orderBll = new RegionOrderDetailBLL();
                 RegionOrderDetail orderModel;
-                var orderList = orderBll.GetList(s => s.SubjectId == SubjectId && (s.IsSubmit == null || s.IsSubmit == 0));
+                var orderList = orderBll.GetList(s => s.SubjectId == SubjectId);
                 if (orderList.Any())
                 {
                     orderList.ForEach(s =>
                     {
                         orderModel = s;
                         orderModel.IsSubmit = 1;
+                        orderModel.ApproveState = 0;
                         orderBll.Update(orderModel);
                     });
 
@@ -82,21 +83,21 @@ namespace WebApp.Subjects.SecondInstallFee
                     model.ApproveState = 0;
                     subjectBll.Update(model);
                 }
-                else
-                {
+                //else
+                //{
 
-                    var orderList0 = orderBll.GetList(s => s.SubjectId == SubjectId && s.IsSubmit == 1);
-                    if (orderList0.Any())
-                    {
-                        orderList0 = orderList0.Where(s => s.ApproveState == null || s.ApproveState == 0).ToList();
-                        if (!orderList0.Any())
-                        {
-                            model.ApproveState = 1;
-                            subjectBll.Update(model);
-                        }
-                    }
+                //    var orderList0 = orderBll.GetList(s => s.SubjectId == SubjectId && s.IsSubmit == 1);
+                //    if (orderList0.Any())
+                //    {
+                //        orderList0 = orderList0.Where(s => s.ApproveState == null || s.ApproveState == 0).ToList();
+                //        if (!orderList0.Any())
+                //        {
+                //            model.ApproveState = 1;
+                //            subjectBll.Update(model);
+                //        }
+                //    }
 
-                }
+                //}
                 string url = "/Subjects/SubjectList.aspx";
                 if (!string.IsNullOrWhiteSpace(model.SupplementRegion))
                 {

@@ -23,7 +23,10 @@ namespace WebApp.Statistics
 
             if (!IsPostBack)
             {
-
+                Session["orderDetailStatistics"] = null;
+                Session["shopStatistics"] = null;
+                Session["subjectStatistics"] = null;
+                Session["guidanceStatistics"] = null;
                 BindCustomerList(ddlCustomer);
                 DateTime now = DateTime.Now;
                 txtGuidanceMonth.Text = now.Year + "-" + now.Month;
@@ -86,10 +89,6 @@ namespace WebApp.Statistics
         List<SubjectGuidance> guidanceList = new List<SubjectGuidance>();
 
 
-        //IQueryable<FinalOrderDetailTemp> finalOrderDetailTempList1 = null;
-        //IQueryable<Shop> shopList1 = null;
-        //IQueryable<Subject> subjectList1 = null;
-        //IQueryable<SubjectGuidance> guidanceList1 = null;
 
 
         void LoadSessionData1()
@@ -261,7 +260,7 @@ namespace WebApp.Statistics
             cblCustomerService.Items.Clear();
 
             List<int> guidanceIdList = GetGuidanceSelected();
-
+            guidanceIdList = guidanceIdList.Distinct().ToList();
             var subjectListTemp = (from subject in CurrentContext.DbContext.Subject
                                    join guidance in CurrentContext.DbContext.SubjectGuidance
                                    on subject.GuidanceId equals guidance.ItemId
@@ -270,12 +269,23 @@ namespace WebApp.Statistics
                                    && subject.ApproveState == 1
                                    select new { subject, guidance }
                               ).ToList();
+            //string begin = txtSubjectBegin.Text.Trim();
+            //string end = txtSubjectEnd.Text.Trim();
+            //if (!string.IsNullOrWhiteSpace(begin) && StringHelper.IsDateTime(begin) && !string.IsNullOrWhiteSpace(end) && StringHelper.IsDateTime(end))
+            //{
+            //    DateTime beginDate = DateTime.Parse(begin);
+            //    DateTime endDate = DateTime.Parse(end).AddDays(1);
+            //    subjectListTemp = subjectListTemp.Where(s => s.subject.AddDate >= beginDate && s.subject.AddDate < endDate).ToList();
+            //}
+            List<int> subjectIdList = subjectListTemp.Select(s => s.subject.Id).Distinct().ToList();
+            //var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+            //                 join sid in subjectIdList
+            //                 on order.SubjectId equals sid
+            //                 where (order.IsDelete==null || order.IsDelete==false)
+            //                 select order).ToList();
 
-            List<int> subjectIdList = subjectListTemp.Select(s => s.subject.Id).ToList();
-            var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
-                             from sid in subjectIdList
-                             where order.SubjectId == sid
-                             select order).ToList();
+            var orderList = new FinalOrderDetailTempBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0) && (s.IsDelete == null || s.IsDelete == false));
+
             if (orderList.Any())
             {
 
@@ -291,7 +301,6 @@ namespace WebApp.Statistics
 
                 subjectList = subjectListTemp.Select(s => s.subject).ToList();
                 Session["subjectStatistics"] = subjectList;
-
 
 
                 bool isNull = false;
@@ -319,7 +328,6 @@ namespace WebApp.Statistics
                 {
                     cblShopType.Items.Add(new ListItem("空", "空"));
                 }
-
                 List<int> addUserIdList = subjectList.Select(s => s.AddUserId ?? 0).Distinct().ToList();
 
                 var userList = new UserBLL().GetList(s => addUserIdList.Contains(s.UserId));
@@ -369,10 +377,6 @@ namespace WebApp.Statistics
                 {
                     cblSubjectCategory.Items.Add(new ListItem("空", "0"));
                 }
-
-
-
-
             }
             else
             {
@@ -468,15 +472,15 @@ namespace WebApp.Statistics
 
             if (onDateSearch != null)
             {
-                string begin = txtGuidanceBegin.Text;
-                string end = txtGuidanceEnd.Text;
-                if (!string.IsNullOrWhiteSpace(begin) && !string.IsNullOrWhiteSpace(end))
-                {
-                    DateTime beginDate = DateTime.Parse(begin);
-                    DateTime endDate = DateTime.Parse(end).AddDays(1);
+                //string begin = txtGuidanceBegin.Text;
+                //string end = txtGuidanceEnd.Text;
+                //if (!string.IsNullOrWhiteSpace(begin) && !string.IsNullOrWhiteSpace(end))
+                //{
+                //    DateTime beginDate = DateTime.Parse(begin);
+                //    DateTime endDate = DateTime.Parse(end).AddDays(1);
 
-                    list = list.Where(s => s.guidance.BeginDate >= beginDate && s.guidance.BeginDate < endDate).ToList();
-                }
+                //    list = list.Where(s => s.guidance.BeginDate >= beginDate && s.guidance.BeginDate < endDate).ToList();
+                //}
             }
             else
             {
@@ -716,7 +720,8 @@ namespace WebApp.Statistics
                 cblSubjectCategory.Items.Clear();
                 DateTime beginDate = DateTime.Parse(begin);
                 DateTime endDate = DateTime.Parse(end).AddDays(1);
-
+                
+                List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
                 var subjectListTemp = (from subject in CurrentContext.DbContext.Subject
                                        join guidance in CurrentContext.DbContext.SubjectGuidance
                                        on subject.GuidanceId equals guidance.ItemId
@@ -727,13 +732,21 @@ namespace WebApp.Statistics
                                        && (guidance.IsDelete == null || guidance.IsDelete == false)
                                        select new { subject, guidance }
                               ).ToList();
-
                 List<int> subjectIdList = subjectListTemp.Select(s => s.subject.Id).ToList();
-                var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
-                                 from sid in subjectIdList
-                                 where order.SubjectId == sid
-                                 select order).ToList();
-
+                int dateSearchType = 1;
+                foreach (ListItem li in rblDateType.Items)
+                {
+                    if (li.Selected)
+                        dateSearchType = int.Parse(li.Value);
+                }
+                if (dateSearchType == 1)
+                {
+                    orderList = new FinalOrderDetailTempBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0) && (s.IsDelete == null || s.IsDelete == false)).ToList();
+                }
+                else//按下单时间
+                {
+                    orderList = new FinalOrderDetailTempBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && s.AddDate >= beginDate && s.AddDate < endDate).ToList();
+                }
                 if (orderList.Any())
                 {
 
@@ -747,7 +760,11 @@ namespace WebApp.Statistics
                     Session["guidanceStatistics"] = guidanceList;
                     guidanceIdList = guidanceList.Select(s => s.ItemId).ToList();
 
-                    subjectList = subjectListTemp.Select(s => s.subject).ToList();
+                    List<int> hmSubjectIdList = subjectListTemp.Select(s => s.subject.HandMakeSubjectId ?? 0).Distinct().ToList();
+                    subjectIdList = subjectIdList.Union(hmSubjectIdList).ToList();
+
+                    subjectList = new SubjectBLL().GetList(s => subjectIdList.Contains(s.Id));
+
                     Session["subjectStatistics"] = subjectList;
 
                     guidanceList.ForEach(s =>
@@ -1364,6 +1381,7 @@ namespace WebApp.Statistics
             Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
             if (subjectList.Any())
             {
+                //获取所有百丽项目
                 var bailiSubjectList = subjectList.Where(s => (s.HandMakeSubjectId ?? 0) > 0).ToList();
                 bailiSubjectList.ForEach(s =>
                 {
@@ -1394,6 +1412,44 @@ namespace WebApp.Statistics
             if (guidanceIdList.Any())
             {
                 orderList = orderList.Where(s => guidanceIdList.Contains(s.order.GuidanceId ?? 0)).ToList();
+            }
+            if ((subjectIdList.Any() || priceSubjectIdList.Any()) == false)
+            {
+                foreach (ListItem li in cblSubjects.Items)
+                    subjectIdList.Add(int.Parse(li.Value));
+
+                foreach (ListItem li in cblPriceSubjects.Items)
+                    priceSubjectIdList.Add(int.Parse(li.Value));
+
+
+            }
+            subjectIdList.AddRange(priceSubjectIdList);
+
+            if (subjectIdList.Any())
+            {
+                List<int> hMSubjectIdList = subjectList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).Distinct().ToList();
+                subjectIdList.AddRange(hMSubjectIdList);
+            }
+            subjectIdList = subjectIdList.Distinct().ToList();
+            orderList = orderList.Where(s => subjectIdList.Contains(s.order.SubjectId ?? 0)).ToList();
+
+            string begin = txtSubjectBegin.Text.Trim();
+            string end = txtSubjectEnd.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(begin))
+            {
+                DateTime beginDate = DateTime.Parse(begin);
+                orderList = orderList.Where(s => s.subject.AddDate >= beginDate).ToList();
+                if (!string.IsNullOrWhiteSpace(end))
+                {
+                    DateTime endDate = DateTime.Parse(end).AddDays(1);
+                    orderList = orderList.Where(s => s.subject.AddDate < endDate).ToList();
+                }
+                //int dateSearchType = 1;
+                //foreach (ListItem li in rblDateType.Items)
+                //{
+                //    if (li.Selected)
+                //        dateSearchType = int.Parse(li.Value);
+                //}
             }
             if (subjectCategoryList.Any())
             {
@@ -1451,30 +1507,7 @@ namespace WebApp.Statistics
                     orderList = orderList.Where(s => cityList.Contains(s.order.City.Trim())).ToList();
             }
 
-            if ((subjectIdList.Any() || priceSubjectIdList.Any()) == false)
-            {
-                foreach (ListItem li in cblSubjects.Items)
-                    subjectIdList.Add(int.Parse(li.Value));
 
-                foreach (ListItem li in cblPriceSubjects.Items)
-                {
-                    priceSubjectIdList.Add(int.Parse(li.Value));
-                }
-
-            }
-            subjectIdList.AddRange(priceSubjectIdList);
-            string begin = txtSubjectBegin.Text.Trim();
-            string end = txtSubjectEnd.Text.Trim();
-            if (!string.IsNullOrWhiteSpace(begin))
-            {
-                DateTime beginDate = DateTime.Parse(begin);
-                orderList = orderList.Where(s => s.subject.AddDate >= beginDate).ToList();
-                if (!string.IsNullOrWhiteSpace(end))
-                {
-                    DateTime endDate = DateTime.Parse(end).AddDays(1);
-                    orderList = orderList.Where(s => s.subject.AddDate < endDate).ToList();
-                }
-            }
 
             if (customerServiceIds.Any())
             {
@@ -1498,12 +1531,7 @@ namespace WebApp.Statistics
 
                 }
             }
-            if (subjectIdList.Any())
-            {
-                List<int> hMSubjectIdList = subjectList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).Distinct().ToList();
-                subjectIdList.AddRange(hMSubjectIdList);
-            }
-            orderList = orderList.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
+
             decimal installPrice = 0;//安装费
             decimal secondInstallPrice = 0;//二次安装费
             decimal secondExperssPrice = 0;//二次安装费
@@ -1581,15 +1609,16 @@ namespace WebApp.Statistics
 
                     systemOrderListPrice1.ForEach(s =>
                     {
-                        area += (s.Area ?? 0);
+                        decimal area1 = (s.Area ?? 0);
+                        area += area1;
                         popPrice += (s.TotalPrice ?? 0);
                         if (!areaDic_s.Keys.Contains(s.SubjectId ?? 0))
                         {
-                            areaDic_s.Add(s.SubjectId ?? 0, s.Area ?? 0);
+                            areaDic_s.Add(s.SubjectId ?? 0, area1);
                         }
                         else
                         {
-                            areaDic_s[s.SubjectId ?? 0] = areaDic_s[s.SubjectId ?? 0] + (s.Area ?? 0);
+                            areaDic_s[s.SubjectId ?? 0] = areaDic_s[s.SubjectId ?? 0] + area1;
                         }
                         if (!popPriceDic_s.Keys.Contains(s.SubjectId ?? 0))
                         {
@@ -1607,7 +1636,8 @@ namespace WebApp.Statistics
                 {
                     regionOrderListPrice1.ForEach(s =>
                     {
-                        area += (s.Area ?? 0);
+                        decimal area1 = (s.Area ?? 0);
+                        area += area1;
                         popPrice += (s.TotalPrice ?? 0);
                         if (!areaDic_r.Keys.Contains(s.SubjectId ?? 0))
                         {
@@ -1617,19 +1647,19 @@ namespace WebApp.Statistics
                                 int sid = handMakeSubjectIdDic[(s.SubjectId ?? 0)];
                                 if (!areaDic_r.Keys.Contains(sid))
                                 {
-                                    areaDic_r.Add(sid, s.Area ?? 0);
+                                    areaDic_r.Add(sid, area1);
                                 }
                                 else
                                 {
-                                    areaDic_r[sid] = areaDic_r[sid] + (s.Area ?? 0);
+                                    areaDic_r[sid] = areaDic_r[sid] + area1;
                                 }
                             }
                             else
-                                areaDic_r.Add(s.SubjectId ?? 0, s.Area ?? 0);
+                                areaDic_r.Add(s.SubjectId ?? 0, area1);
                         }
                         else
                         {
-                            areaDic_r[s.SubjectId ?? 0] = areaDic_r[s.SubjectId ?? 0] + (s.Area ?? 0);
+                            areaDic_r[s.SubjectId ?? 0] = areaDic_r[s.SubjectId ?? 0] + area1;
                         }
                         if (!popPriceDic_r.Keys.Contains(s.SubjectId ?? 0))
                         {
@@ -1673,19 +1703,6 @@ namespace WebApp.Statistics
             //var saleGuidanceList=new SubjectGuidanceBLL().GetList(s=>)
             guidanceIdList.ForEach(gid =>
             {
-                //var freightOrderShopList = orderList.Where(s => s.order.GuidanceId == gid && (((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Promotion && (s.guidance.HasExperssFees ?? false) == true) || ((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Delivery))).ToList();
-                //if (freightOrderShopList.Any())
-                //{
-
-                //    List<int> expressShopIdList = freightOrderShopList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
-                //    var expressPriceList = new ExpressPriceDetailBLL().GetList(s => s.GuidanceId == gid && expressShopIdList.Contains(s.ShopId ?? 0)).ToList();
-                //    if (expressPriceList.Any())
-                //    {
-                //        expressPrice += expressPriceList.Sum(s => s.ExpressPrice ?? 0);
-                //    }
-
-
-                //}
 
                 List<int> expressShopIdList_s = new List<int>();
                 var freightOrderShopList_s = systemOrderList.Where(s => s.order.GuidanceId == gid && (((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Promotion && (s.guidance.HasExperssFees ?? false) == true) || ((s.guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Delivery))).ToList();
@@ -1783,10 +1800,10 @@ namespace WebApp.Statistics
 
                 if (installPriceDetailList_s.Any())
                 {
-                    decimal installPrice0 = 0;
+                   // decimal installPrice0 = 0;
                     installPriceDetailList_s.ForEach(s =>
                     {
-                        installPrice0 = (s.installShop.BasicPrice ?? 0) + (s.installShop.WindowPrice ?? 0) + (s.installShop.OOHPrice ?? 0);
+                        decimal installPrice0 = (s.installShop.BasicPrice ?? 0) + (s.installShop.WindowPrice ?? 0) + (s.installShop.OOHPrice ?? 0);
                         if (!subjectInstallPriceDic_s.Keys.Contains(s.installShop.SubjectId ?? 0))
                         {
                             subjectInstallPriceDic_s.Add(s.installShop.SubjectId ?? 0, installPrice0);
@@ -1822,10 +1839,10 @@ namespace WebApp.Statistics
 
                 if (installPriceDetailList_r.Any())
                 {
-                    decimal installPrice0 = 0;
+                    //decimal installPrice0 = 0;
                     installPriceDetailList_r.ForEach(s =>
                     {
-                        installPrice0 = (s.installShop.BasicPrice ?? 0) + (s.installShop.WindowPrice ?? 0) + (s.installShop.OOHPrice ?? 0);
+                        decimal installPrice0 = (s.installShop.BasicPrice ?? 0) + (s.installShop.WindowPrice ?? 0) + (s.installShop.OOHPrice ?? 0);
                         if (!subjectInstallPriceDic_r.Keys.Contains(s.installShop.SubjectId ?? 0))
                         {
                             subjectInstallPriceDic_r.Add(s.installShop.SubjectId ?? 0, installPrice0);
@@ -1839,51 +1856,6 @@ namespace WebApp.Statistics
             });
 
 
-
-
-            //var orderInstallList = orderList.Where(s => (s.guidance.ActivityTypeId ?? 1) != (int)GuidanceTypeEnum.Others && s.subject.SubjectType != (int)SubjectTypeEnum.二次安装 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单 && s.order.OrderType > (int)OrderTypeEnum.道具).ToList();
-            //if (orderInstallList.Any())
-            //{
-            //    subjectIdList.ForEach(s =>
-            //    {
-            //        decimal installPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.安装费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
-            //        if (!subjectInstallPriceDic.Keys.Contains(s))
-            //        {
-            //            subjectInstallPriceDic.Add(s, installPrice0);
-            //        }
-            //        else
-            //        {
-            //            subjectInstallPriceDic[s] = subjectInstallPriceDic[s] + installPrice0;
-            //        }
-
-            //        decimal otherPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.其他费用 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
-            //        otherPrice += otherPrice0;
-            //        if (!otherPriceDic.Keys.Contains(s))
-            //        {
-            //            otherPriceDic.Add(s, otherPrice0);
-            //        }
-            //        else
-            //        {
-            //            otherPriceDic[s] += otherPrice0;
-            //        }
-
-            //        decimal regionExpressPrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.发货费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
-
-            //        expressPrice += regionExpressPrice0;
-
-            //        decimal measurePrice0 = orderInstallList.Where(r => r.order.OrderType == (int)OrderTypeEnum.测量费 && r.subject.Id == s).Sum(r => r.order.OrderPrice ?? 0);
-            //        if (measurePriceDic.Keys.Contains(s))
-            //        {
-            //            measurePriceDic[s] = measurePriceDic[s] + measurePrice0;
-            //        }
-            //        else
-            //        {
-            //            measurePriceDic.Add(s, measurePrice0);
-            //        }
-            //        measurePrice += measurePrice0;
-
-            //    });
-            //}
 
             //上海
             var orderInstallList_s = systemOrderList.Where(s => (s.guidance.ActivityTypeId ?? 1) != (int)GuidanceTypeEnum.Others && s.subject.SubjectType != (int)SubjectTypeEnum.二次安装 && s.subject.SubjectType != (int)SubjectTypeEnum.费用订单 && s.order.OrderType > (int)OrderTypeEnum.道具).ToList();
@@ -2249,58 +2221,7 @@ namespace WebApp.Statistics
 
             #endregion
             #region 费用订单
-            //var priceOrderList = orderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.费用订单).ToList();
-            //if (priceOrderList.Any())
-            //{
-            //    priceOrderList.ForEach(s =>
-            //    {
-            //        decimal price0 = s.order.OrderPrice ?? 0;
-            //        if (s.order.OrderType == (int)OrderTypeEnum.安装费)
-            //        {
 
-            //            if (!subjectInstallPriceDic.Keys.Contains(s.order.SubjectId ?? 0))
-            //            {
-            //                subjectInstallPriceDic.Add(s.order.SubjectId ?? 0, price0);
-            //            }
-            //            else
-            //            {
-            //                subjectInstallPriceDic[s.order.SubjectId ?? 0] = subjectInstallPriceDic[s.order.SubjectId ?? 0] + price0;
-            //            }
-            //        }
-            //        else if (s.order.OrderType == (int)OrderTypeEnum.发货费)
-            //        {
-            //            expressPrice += price0;
-
-            //        }
-            //        else if (s.order.OrderType == (int)OrderTypeEnum.其他费用)
-            //        {
-            //            otherPrice += price0;
-            //            if (!otherPriceDic.Keys.Contains((s.order.SubjectId ?? 0)))
-            //            {
-            //                otherPriceDic.Add((s.order.SubjectId ?? 0), price0);
-            //            }
-            //            else
-            //            {
-            //                otherPriceDic[(s.order.SubjectId ?? 0)] += price0;
-            //            }
-            //        }
-            //        else if (s.order.OrderType == (int)OrderTypeEnum.运费)
-            //        {
-            //            //运费和新开的费用放一起
-            //            newShopInstallPrice += price0;
-            //            if (!newShopInstallPriceDic.Keys.Contains((s.order.SubjectId ?? 0)))
-            //            {
-            //                newShopInstallPriceDic.Add((s.order.SubjectId ?? 0), price0);
-            //            }
-            //            else
-            //            {
-            //                newShopInstallPriceDic[(s.order.SubjectId ?? 0)] += price0;
-            //            }
-
-            //        }
-            //    });
-            //}
-            //Session["otherPriceDicStatistics"] = otherPriceDic;
             //上海
             var priceOrderList_s = systemOrderList.Where(s => s.subject.SubjectType == (int)SubjectTypeEnum.费用订单).ToList();
             if (priceOrderList_s.Any())
@@ -2337,20 +2258,7 @@ namespace WebApp.Statistics
                             otherPriceDic_s[(s.order.SubjectId ?? 0)] += price0;
                         }
                     }
-                    //else if (s.order.OrderType == (int)OrderTypeEnum.运费)
-                    //{
-                    //    //运费和新开的费用放一起
-                    //    newShopInstallPrice_s += price0;
-                    //    if (!newShopInstallPriceDic_s.Keys.Contains((s.order.SubjectId ?? 0)))
-                    //    {
-                    //        newShopInstallPriceDic_s.Add((s.order.SubjectId ?? 0), price0);
-                    //    }
-                    //    else
-                    //    {
-                    //        newShopInstallPriceDic_s[(s.order.SubjectId ?? 0)] += price0;
-                    //    }
 
-                    //}
                 });
             }
 
@@ -2390,20 +2298,7 @@ namespace WebApp.Statistics
                             otherPriceDic_r[(s.order.SubjectId ?? 0)] += price0;
                         }
                     }
-                    //else if (s.order.OrderType == (int)OrderTypeEnum.运费)
-                    //{
-                    //    //运费和新开的费用放一起
-                    //    newShopInstallPrice_r += price0;
-                    //    if (!newShopInstallPriceDic_r.Keys.Contains((s.order.SubjectId ?? 0)))
-                    //    {
-                    //        newShopInstallPriceDic_r.Add((s.order.SubjectId ?? 0), price0);
-                    //    }
-                    //    else
-                    //    {
-                    //        newShopInstallPriceDic_r[(s.order.SubjectId ?? 0)] += price0;
-                    //    }
 
-                    //}
                 });
             }
             #endregion
@@ -2425,19 +2320,20 @@ namespace WebApp.Statistics
             {
                 propOrderList = Session["propOrderDetailStatistics"] as List<PropOrderDetail>;
             }
-            propOrderList = propOrderList.Where(s => propGuidanceIdList.Contains(s.GuidanceId ?? 0) && propSubjectIdList.Contains(s.SubjectId??0)).ToList();
+            propOrderList = propOrderList.Where(s => propGuidanceIdList.Contains(s.GuidanceId ?? 0) && propSubjectIdList.Contains(s.SubjectId ?? 0)).ToList();
             if (propOrderList.Any())
             {
-                
+
                 var propList = (from order in propOrderList
                                 group order by order.SubjectId
                                     into g
                                     select new
                                     {
-                                        SubjectId=g.Key??0,
+                                        SubjectId = g.Key ?? 0,
                                         OrderPrice = g.Sum(s => (s.Quantity ?? 1) * (s.UnitPrice ?? 0))
                                     }).ToList();
-                propList.ForEach(s => {
+                propList.ForEach(s =>
+                {
                     propOrderPrice += s.OrderPrice;
                     if (!propPriceDic.Keys.Contains(s.SubjectId))
                     {
@@ -2762,7 +2658,6 @@ namespace WebApp.Statistics
             }
         }
 
-
         void ClearSeesion()
         {
             Session["area_s"] = null;
@@ -2783,7 +2678,6 @@ namespace WebApp.Statistics
             Session["measurePrice_r"] = null;
             Session["propOrderPrice"] = null;
         }
-
 
         /// <summary>
         /// 获取已选择的活动
@@ -3413,7 +3307,7 @@ namespace WebApp.Statistics
                             lab.Text = Math.Round(newDic[subjectId], 2).ToString();
                         }
                     }
-                    
+
                 }
             }
         }
@@ -4105,28 +3999,28 @@ namespace WebApp.Statistics
         /// <param name="e"></param>
         protected void btnGetGuidance_Click(object sender, EventArgs e)
         {
-            string begin = txtGuidanceBegin.Text.Trim();
-            string end = txtGuidanceEnd.Text.Trim();
-            if (!string.IsNullOrWhiteSpace(begin) && !string.IsNullOrWhiteSpace(end))
-            {
-                labBeginDate.Text = begin;
-                labEndDate.Text = end;
-                labSeparator.Visible = true;
-                BindGuidance(1);
-                BindShopType();
-                BindAddUser();
-                BindSubjectCategory();
-                BindProvince();
-                BindPriceSubjects();
-                BindSubjects();
-                BindSecondInstallSubjects();
-            }
-            else
-            {
-                labBeginDate.Text = "";
-                labEndDate.Text = "";
-                labSeparator.Visible = false;
-            }
+            //string begin = txtGuidanceBegin.Text.Trim();
+            //string end = txtGuidanceEnd.Text.Trim();
+            //if (!string.IsNullOrWhiteSpace(begin) && !string.IsNullOrWhiteSpace(end))
+            //{
+            //    labBeginDate.Text = begin;
+            //    labEndDate.Text = end;
+            //    labSeparator.Visible = true;
+            //    BindGuidance(1);
+            //    BindShopType();
+            //    BindAddUser();
+            //    BindSubjectCategory();
+            //    BindProvince();
+            //    BindPriceSubjects();
+            //    BindSubjects();
+            //    BindSecondInstallSubjects();
+            //}
+            //else
+            //{
+            //    labBeginDate.Text = "";
+            //    labEndDate.Text = "";
+            //    labSeparator.Visible = false;
+            //}
 
         }
 
@@ -4137,9 +4031,7 @@ namespace WebApp.Statistics
         /// <param name="e"></param>
         protected void cblGuidanceList_SelectedIndexChanged(object sender, EventArgs e)
         {
-
             GuidanceSelectChange();
-
         }
 
         protected void cblPropGuidanceList_SelectedIndexChanged(object sender, EventArgs e)
@@ -4344,7 +4236,7 @@ namespace WebApp.Statistics
         void GuidanceSelectChange()
         {
 
-            if (!string.IsNullOrWhiteSpace(txtSubjectBegin.Text))
+            if (!string.IsNullOrWhiteSpace(txtSubjectBegin.Text) && !string.IsNullOrWhiteSpace(txtSubjectEnd.Text))
             {
 
                 BindShopType();
@@ -4362,6 +4254,7 @@ namespace WebApp.Statistics
 
 
             }
+
             BindSubjectNameList();
 
         }
@@ -4467,7 +4360,7 @@ namespace WebApp.Statistics
                 shopList = Session["shopStatistics"] as List<Shop>;
             if (Session["subjectStatistics"] != null)
                 subjectList = Session["subjectStatistics"] as List<Subject>;
-            
+
 
             var orderList0 = (from order in finalOrderDetailTempList
                               join shop in shopList
@@ -4615,7 +4508,7 @@ namespace WebApp.Statistics
                             ).ToList();
             gvList.DataSource = list;
             gvList.DataBind();
-            
+
         }
 
         void ShowSubjectList()
@@ -5010,8 +4903,9 @@ namespace WebApp.Statistics
                                  on order.SubjectId equals subject.Id
                                  join user in CurrentContext.DbContext.UserInfo
                                  on subject.AddUserId equals user.UserId
-                                 where (subject.HandMakeSubjectId ?? 0) == 0
-                                 && guidanceIdList.Contains(order.GuidanceId ?? 0)
+                                 where
+                                     //(subject.HandMakeSubjectId ?? 0) == 0
+                                 guidanceIdList.Contains(order.GuidanceId ?? 0)
                                  select new
                                  {
                                      order,
@@ -5090,9 +4984,22 @@ namespace WebApp.Statistics
                     }
                 }
 
+
+
+
                 var subjectList1 = orderList.Where(s => s.subject.SubjectType != (int)SubjectTypeEnum.费用订单).Select(s => s.subject).Distinct().OrderBy(s => s.GuidanceId).ThenBy(s => s.SubjectName).ToList();
 
-                if (subjectList1.Any())
+
+                List<int> subjectIdList1 = (from s1 in subjectList1
+                                             where (s1.HandMakeSubjectId ?? 0) == 0
+                                             select s1.Id).Union(
+                                            from s2 in subjectList1
+                                            where (s2.HandMakeSubjectId ?? 0) > 0
+                                            select s2.HandMakeSubjectId ?? 0
+                                            ).ToList();
+                List<Subject> allSubjectList = subjectList.Where(s => subjectIdList1.Contains(s.Id) && (s.HandMakeSubjectId??0)==0).ToList();
+
+                if (allSubjectList.Any())
                 {
                     cbAllDiv.Style.Add("display", "block");
                 }
@@ -5106,7 +5013,7 @@ namespace WebApp.Statistics
                     selectedList = Session["subjectSelected"] as List<int>;
                 }
 
-                subjectList1.OrderBy(s => s.SubjectName).ToList().ForEach(s =>
+                allSubjectList.OrderBy(s => s.SubjectName).ToList().ForEach(s =>
                 {
                     ListItem li = new ListItem();
                     string subjectName = s.SubjectName;
@@ -5126,10 +5033,20 @@ namespace WebApp.Statistics
                 });
 
                 //空的项目
-                List<int> subjectIdAllList = subjectList1.Select(s => s.Id).ToList();
+                List<int> subjectIdAllList = allSubjectList.Select(s => s.Id).ToList();
                 List<Subject> emptyPOPSubjectList = subjectList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && !subjectIdAllList.Contains(s.Id) && s.Region != null && s.Region != "").ToList();
                 if (emptyPOPSubjectList.Any())
                 {
+                    if (!string.IsNullOrWhiteSpace(begin))
+                    {
+                        DateTime beginDate = DateTime.Parse(begin);
+                        emptyPOPSubjectList = emptyPOPSubjectList.Where(s => s.AddDate >= beginDate).ToList();
+                        if (!string.IsNullOrWhiteSpace(end))
+                        {
+                            DateTime endDate = DateTime.Parse(end).AddDays(1);
+                            emptyPOPSubjectList = emptyPOPSubjectList.Where(s => s.AddDate < endDate).ToList();
+                        }
+                    }
                     if (addUsers.Any())
                     {
                         emptyPOPSubjectList = emptyPOPSubjectList.Where(s => addUsers.Contains(s.AddUserId ?? 0)).ToList();
@@ -5226,13 +5143,23 @@ namespace WebApp.Statistics
                                 materialSubjectList = materialSubjectList.Where(s => citys.Contains(s.shop.CityName)).ToList();
                         }
                     }
-                    string begin0 = txtGuidanceBegin.Text.Trim();
-                    string end0 = txtGuidanceEnd.Text.Trim();
-                    if (!string.IsNullOrWhiteSpace(begin0) && !string.IsNullOrWhiteSpace(end0))
+                    //string begin0 = txtGuidanceBegin.Text.Trim();
+                    //string end0 = txtGuidanceEnd.Text.Trim();
+                    //if (!string.IsNullOrWhiteSpace(begin0) && !string.IsNullOrWhiteSpace(end0))
+                    //{
+                    //    DateTime beginDate = DateTime.Parse(begin0);
+                    //    DateTime endDate = DateTime.Parse(end0).AddDays(1);
+                    //    materialSubjectList = materialSubjectList.Where(s => s.subject.AddDate >= beginDate && s.subject.AddDate < endDate).ToList();
+                    //}
+                    if (!string.IsNullOrWhiteSpace(begin))
                     {
-                        DateTime beginDate = DateTime.Parse(begin0);
-                        DateTime endDate = DateTime.Parse(end0).AddDays(1);
-                        materialSubjectList = materialSubjectList.Where(s => s.subject.AddDate >= beginDate && s.subject.AddDate < endDate).ToList();
+                        DateTime beginDate = DateTime.Parse(begin);
+                        materialSubjectList = materialSubjectList.Where(s => s.subject.AddDate >= beginDate).ToList();
+                        if (!string.IsNullOrWhiteSpace(end))
+                        {
+                            DateTime endDate = DateTime.Parse(end).AddDays(1);
+                            materialSubjectList = materialSubjectList.Where(s => s.subject.AddDate < endDate).ToList();
+                        }
                     }
                     var subjectList0 = materialSubjectList.Select(s => s.subject).Distinct().OrderBy(s => s.GuidanceId).ToList();
                     subjectList0.OrderBy(s => s.Id).ToList().ForEach(s =>
@@ -5284,6 +5211,18 @@ namespace WebApp.Statistics
             //subjectList = subjectList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0)).ToList();
             if (subjectList.Any())
             {
+                string begin = txtSubjectBegin.Text.Trim();
+                string end = txtSubjectEnd.Text.Trim();
+                if (!string.IsNullOrWhiteSpace(begin))
+                {
+                    DateTime beginDate = DateTime.Parse(begin);
+                    subjectList = subjectList.Where(s => s.AddDate >= beginDate).ToList();
+                    if (!string.IsNullOrWhiteSpace(end))
+                    {
+                        DateTime endDate = DateTime.Parse(end).AddDays(1);
+                        subjectList = subjectList.Where(s => s.AddDate < endDate).ToList();
+                    }
+                }
                 subjectList.OrderBy(s => s.SubjectName).ToList().ForEach(s =>
                 {
                     ListItem li = new ListItem();
@@ -5461,14 +5400,14 @@ namespace WebApp.Statistics
                 btnGetProject.Enabled = false;
                 lbUp.Enabled = true;
                 lbDown.Enabled = true;
-                btnGetGuidance.Enabled = true;
+                //btnGetGuidance.Enabled = true;
             }
             else if (rbOnOrderSubjectSearch.Checked)
             {
                 btnGetProject.Enabled = true;
                 lbUp.Enabled = false;
                 lbDown.Enabled = false;
-                btnGetGuidance.Enabled = false;
+                //btnGetGuidance.Enabled = false;
             }
 
         }

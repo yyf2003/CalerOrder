@@ -231,7 +231,7 @@ namespace WebApp.Subjects.HandMadeOrder
                                     else
                                     {
                                         orderModel = new FinalOrderDetailTemp();
-                                        //orderModel.Area = s.order.Area;
+                                        orderModel.AddDate = s.order.AddDate;
                                         orderModel.ChooseImg = s.order.ChooseImg;
                                         orderModel.Gender = s.order.Gender;
                                         orderModel.GraphicLength = s.order.GraphicLength;

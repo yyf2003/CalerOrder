@@ -214,7 +214,6 @@ var Order = {
 
 
     },
-
     model: function () {
         this.Id = 0;
         this.OrderType = 0;

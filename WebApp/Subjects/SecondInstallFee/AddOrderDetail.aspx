@@ -210,7 +210,7 @@
                     </thead>
                     <tbody id="tbodyOrderEmpty">
                         <tr>
-                            <td colspan="18" style="text-align: center;">
+                            <td colspan="19" style="text-align: center;">
                                 --暂无数据--
                             </td>
                         </tr>

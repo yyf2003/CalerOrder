@@ -25,5 +25,6 @@ namespace Models
         public Nullable<bool> IsDelete { get; set; }
         public Nullable<int> AddUserId { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
+        public Nullable<decimal> InstallAndProductPrice { get; set; }
     }
 }

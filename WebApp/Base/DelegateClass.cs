@@ -44,7 +44,7 @@ namespace WebApp.Base
             Subject subjectModel = new SubjectBLL().GetModel(subjectId);
             if (subjectModel != null)
             {
-                if (subjectModel.IsSecondInstall ?? false)
+                if ((subjectModel.IsSecondInstall ?? false) || subjectModel.SubjectType==(int)SubjectTypeEnum.二次安装)
                 {
                     //二次安装
                     SaveHandler2(guidanceId, subjectId, subjectModel.SubjectType ?? 1);
@@ -73,20 +73,13 @@ namespace WebApp.Base
                 try
                 {
 
-                    if ((subjectType != (int)SubjectTypeEnum.二次安装 && subjectType != (int)SubjectTypeEnum.费用订单))
+                    if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
                     {
-                        if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
-                        {
-                            new BasePage().SaveSecondInstallPrice(subjectId, subjectType);
-                        }
-                        //else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
-                        //{
-                        //    new BasePage().SaveExpressPrice(guidanceId, subjectId, subjectType);
-                        //}
-                        //else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
-                        //{
-                        //    new BasePage().SaveExpressPriceForDelivery(guidanceId, subjectId, subjectType, guidanceModel.ExperssPrice);
-                        //}
+                        new BasePage().SaveExpressPrice(guidanceId, subjectId, subjectType);
+                    }
+                    else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Delivery)
+                    {
+                        new BasePage().SaveExpressPriceForDelivery(guidanceId, subjectId, subjectType, guidanceModel.ExperssPrice);
                     }
                     //保存报价单
                     new BasePage().SaveQuotationOrder(guidanceId, subjectId, subjectType);
@@ -344,8 +337,44 @@ namespace WebApp.Base
                                                 if (!string.IsNullOrWhiteSpace(config.MaterialName))
                                                 {
                                                     //var orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && order.order.GraphicMaterial.ToLower().Contains(config.MaterialName.ToLower()) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
-                                                    var orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && ((config.IsFullMatch ?? false) ? (order.order.GraphicMaterial.ToLower() == config.MaterialName.ToLower()) : (order.order.GraphicMaterial.ToLower().Contains(config.MaterialName.ToLower()))) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                                    //var orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && ((config.IsFullMatch ?? false) ? (order.order.GraphicMaterial.ToLower() == config.MaterialName.ToLower()) : (order.order.GraphicMaterial.ToLower().Contains(config.MaterialName.ToLower()))) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                                    List<string> MaterialNameList = StringHelper.ToStringList(config.MaterialName, ',', LowerUpperEnum.ToLower);
+                                                    var orderList = oneShopOrderListNew.Select(s => s).ToList();
 
+                                                    for (int index = 0; index < MaterialNameList.Count; index++)
+                                                    {
+                                                        //完全匹配
+                                                        if (config.IsFullMatch ?? false)
+                                                        {
+                                                            string materialName = MaterialNameList[index];
+                                                            if (index == 0)
+                                                            {
+                                                                orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && (order.order.GraphicMaterial.ToLower() == materialName) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+
+                                                            }
+                                                            else
+                                                            {
+                                                                var list1 = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && (order.order.GraphicMaterial.ToLower() == materialName) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                                                orderList.AddRange(list1);
+                                                            }
+
+                                                        }
+                                                        else
+                                                        {
+                                                            //orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && (order.order.GraphicMaterial.ToLower().Contains(config.MaterialName.ToLower()))&& (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                                            string materialName = MaterialNameList[index];
+                                                            if (index == 0)
+                                                            {
+                                                                orderList = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && (order.order.GraphicMaterial.ToLower().Contains(materialName)) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+
+                                                            }
+                                                            else
+                                                            {
+                                                                var list1 = oneShopOrderListNew.Where(order => !assignedOrderIdList.Contains(order.order.Id) && order.order.GraphicMaterial != null && (order.order.GraphicMaterial.ToLower().Contains(materialName)) && (order.order.OrderType == (int)OrderTypeEnum.POP || order.order.OrderType == (int)OrderTypeEnum.道具)).ToList();
+                                                                orderList.AddRange(list1);
+                                                            }
+                                                        }
+                                                    }
                                                     List<int> cityIdList = new List<int>();
 
                                                     List<string> cityNameList = new List<string>();
@@ -1461,6 +1490,7 @@ namespace WebApp.Base
                                         outsourceOrderDetailModel.ReceiveTotalPrice = 0;
                                         outsourceOrderDetailModel.CSUserId = oneShopOrderList[0].CSUserId;
                                         outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
+                                        outsourceOrderDetailModel.InstallPriceAddType = 2;
                                         if (shop.ProvinceName == "天津")
                                             outsourceOrderDetailModel.OutsourceId = calerOutsourceId;
                                         outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
@@ -1515,7 +1545,7 @@ namespace WebApp.Base
                         if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
                         {
                             new BasePage().SaveInstallPrice(guidanceId, subjectId, subjectType);
-                            UpdateInstallOrderRedisDataHandler(subjectId);
+                            //UpdateInstallOrderRedisDataHandler(subjectId);
 
                         }
                         else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
@@ -3075,7 +3105,7 @@ namespace WebApp.Base
                        if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guidanceModel.HasInstallFees ?? true))
                        {
                            new BasePage().SaveInstallPrice(guidanceId, subjectId, subjectType);
-                           UpdateInstallOrderRedisDataHandler(subjectId);
+                           UpdateInstallOrderRedisDataHandler(subjectId, subjectType);
 
                        }
                        else if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion && (guidanceModel.HasExperssFees ?? true))
@@ -3155,24 +3185,33 @@ namespace WebApp.Base
         #endregion
 
         #region 更新Redis缓存（安装活动订单的缓存）
-        public delegate void DeleUpdateInstallOrderRedisData(int subjectId);
+        public delegate void DeleUpdateInstallOrderRedisData(int subjectId, int subjectType);
         void CallBackMethod3(IAsyncResult ia)
         {
             DeleUpdateInstallOrderRedisData dele = ia.AsyncState as DeleUpdateInstallOrderRedisData;
             dele.EndInvoke(ia);
         }
 
-        public void UpdateInstallOrderRedisData(int subjectId)
+        public void UpdateInstallOrderRedisData(int subjectId,int subjectType)
         {
             DeleUpdateInstallOrderRedisData dele = new DeleUpdateInstallOrderRedisData(UpdateInstallOrderRedisDataHandler);
             AsyncCallback callback = new AsyncCallback(CallBackMethod3);
-            dele.BeginInvoke(subjectId, callback, dele);
+            dele.BeginInvoke(subjectId,subjectType, callback, dele);
         }
 
-        void UpdateInstallOrderRedisDataHandler(int subjectId)
+        void UpdateInstallOrderRedisDataHandler(int subjectId, int subjectType)
         {
             
-            List<FinalOrderDetailTemp> orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId);
+            //List<FinalOrderDetailTemp> orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId);
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            if (subjectType == (int)SubjectTypeEnum.HC订单 || subjectType == (int)SubjectTypeEnum.分区补单 || subjectType == (int)SubjectTypeEnum.分区增补 || subjectType == (int)SubjectTypeEnum.新开店订单)
+            {
+                orderList = new FinalOrderDetailTempBLL().GetList(s => s.RegionSupplementId == subjectId && (s.IsDelete == null || s.IsDelete == false));
+            }
+            else
+            {
+                orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0 && (s.IsDelete == null || s.IsDelete == false));
+            }
             if (orderList.Any())
             {
                 int currGuidanceId = orderList[0].GuidanceId ?? 0;
@@ -3197,10 +3236,55 @@ namespace WebApp.Base
                 }
                 else
                 {
-                    orderListSave.RemoveAll(s => s.SubjectId == subjectId);
+                    //orderListSave.RemoveAll(s => s.SubjectId == subjectId);
+                    if (subjectType == (int)SubjectTypeEnum.HC订单 || subjectType == (int)SubjectTypeEnum.分区补单 || subjectType == (int)SubjectTypeEnum.分区增补 || subjectType == (int)SubjectTypeEnum.新开店订单)
+                    {
+                        orderListSave.RemoveAll(s => s.RegionSupplementId == subjectId);
+                    }
+                    else
+                    {
+                        orderListSave.RemoveAll(s => s.SubjectId == subjectId);
+                    }
                     orderListSave.AddRange(orderList);
                     RedisHelper.Set(redisOrderKey, orderListSave);
                 }
+            }
+        }
+
+
+
+
+        public delegate void DeleUpdateInstallOrderByGuidanceIdRedisDataByGuidanceId(int guidanceId);
+        void CallBackMethod4(IAsyncResult ia)
+        {
+            DeleUpdateInstallOrderByGuidanceIdRedisDataByGuidanceId dele = ia.AsyncState as DeleUpdateInstallOrderByGuidanceIdRedisDataByGuidanceId;
+            dele.EndInvoke(ia);
+        }
+        public void UpdateInstallOrderRedisDataByGuidanceId(int guidanceId)
+        {
+            DeleUpdateInstallOrderByGuidanceIdRedisDataByGuidanceId dele = new DeleUpdateInstallOrderByGuidanceIdRedisDataByGuidanceId(UpdateInstallOrderRedisDataByGuidanceIdHandler);
+            AsyncCallback callback = new AsyncCallback(CallBackMethod4);
+            dele.BeginInvoke(guidanceId, callback, dele);
+        }
+        void UpdateInstallOrderRedisDataByGuidanceIdHandler(int guidanceId)
+        {
+
+            //List<FinalOrderDetailTemp> orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId);
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                         join subject in CurrentContext.DbContext.Subject
+                         on order.SubjectId equals subject.Id
+                         where (subject.IsDelete == null || subject.IsDelete == false)
+
+                         //&& (order.IsDelete == null || order.IsDelete == false)
+                         && order.GuidanceId == guidanceId
+                         && order.OrderType == (int)OrderTypeEnum.POP
+                         select order).ToList();
+            if (orderList.Any())
+            {
+               
+                string redisOrderKey = "InstallPriceOrderList" + guidanceId;
+                RedisHelper.Set(redisOrderKey, orderList);
             }
         }
 

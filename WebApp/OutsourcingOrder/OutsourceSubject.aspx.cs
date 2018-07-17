@@ -20,7 +20,15 @@ namespace WebApp.OutsourcingOrder
                 BindCustomerList(ddlCustomer);
                 DateTime now = DateTime.Now;
                 txtMonth.Text = now.Year + "-" + now.Month;
-               
+
+                var orderTypeList = CommonMethod.GetEnumList<OrderTypeEnum>().ToList();
+                orderTypeList.ForEach(s =>
+                {
+                    ListItem li = new ListItem();
+                    li.Text = s.Name + "&nbsp;";
+                    li.Value = s.Value.ToString();
+                    rblOrderType.Items.Add(li);
+                });
             }
         }
 

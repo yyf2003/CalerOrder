@@ -224,6 +224,14 @@ namespace WebApp.Customer.Handler
                         }
                         if (canGo)
                         {
+                            if ((model.ProductOutsourceId ?? 0) > 0 && (model.OutsourceId ?? 0) > 0 && model.ProductOutsourceId == model.OutsourceId)
+                            {
+                                canGo = false;
+                                result = "生产外协与主外协不能相同";
+                            }
+                        }
+                        if (canGo)
+                        {
 
                             if (newModel != null)
                             {
@@ -231,6 +239,7 @@ namespace WebApp.Customer.Handler
                                 model.AddUserId = newModel.AddUserId;
                                 model.CustomerId = newModel.CustomerId;
                                 model.IsDelete = newModel.IsDelete;
+                                
                                 shopBll.Update(model);
 
                                 BaseDataChangeLog logModel = new BaseDataChangeLog();
@@ -351,6 +360,11 @@ namespace WebApp.Customer.Handler
                             {
                                 canGo = false;
                                 result = "exist";
+                            }
+                            else if ((model.ProductOutsourceId ?? 0) > 0 && (model.OutsourceId ?? 0) > 0 && model.ProductOutsourceId == model.OutsourceId)
+                            {
+                                canGo = false;
+                                result = "生产外协与主外协不能相同";
                             }
                         }
                         else
@@ -559,7 +573,9 @@ namespace WebApp.Customer.Handler
 
         string GetOutsourceList()
         {
-            var list = new CompanyBLL().GetList(s => s.TypeId == (int)CompanyTypeEnum.Outsource && (s.IsDelete == null || s.IsDelete == false));
+            //var list = new CompanyBLL().GetList(s => s.TypeId == (int)CompanyTypeEnum.Outsource && (s.IsDelete == null || s.IsDelete == false));
+            var list = new CompanyBLL().GetList(s =>s.ParentId>0 && (s.IsDelete == null || s.IsDelete == false));
+            
             if (list.Any())
             {
                 StringBuilder json = new StringBuilder();

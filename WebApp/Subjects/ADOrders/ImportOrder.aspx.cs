@@ -3204,6 +3204,7 @@ namespace WebApp.Subjects.ADOrders
                                 finalOrderTempModel.TotalPrice = totalPrice;
                                 finalOrderTempModel.Remark = o.pop.Remark;
                                 finalOrderTempModel.IsValid = o.pop.IsValid;
+                                finalOrderTempModel.ProduceOutsourceId = o.pop.ProduceOutsourceId;
                             }
                             if (o.SubjectType == (int)SubjectTypeEnum.正常单)
                             {
@@ -3213,6 +3214,7 @@ namespace WebApp.Subjects.ADOrders
                             finalOrderTempModel.GuidanceId = o.GuidanceId;
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                             finalOrderTempModel.UnitName = unitName;
+                            finalOrderTempModel.AddDate = DateTime.Now;
                             finalOrderTempBll.Add(finalOrderTempModel);
                             //保存报价单
                             
@@ -3293,7 +3295,7 @@ namespace WebApp.Subjects.ADOrders
                                 finalOrderTempModel.PayOrderPrice = (o.material.PayPrice ?? 0) * (o.material.MaterialCount ?? 0);
                             }
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
-
+                            finalOrderTempModel.AddDate = DateTime.Now;
                             finalOrderTempBll.Add(finalOrderTempModel);
                             //保存报价单
                             //new BasePage().SaveQuotationOrder(finalOrderTempModel,false);

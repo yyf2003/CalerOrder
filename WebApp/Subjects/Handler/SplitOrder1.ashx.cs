@@ -2164,6 +2164,8 @@ namespace WebApp.Subjects.Handler
                                                         finalOrderTempModel.GuidanceId = shop1.subject.GuidanceId;
                                                         finalOrderTempModel.CSUserId = shop1.shop.CSUserId;
                                                         finalOrderTempModel.UnitName = unitName;
+                                                        finalOrderTempModel.ProduceOutsourceId =pop.ProduceOutsourceId;
+                                                        finalOrderTempModel.AddDate = DateTime.Now;
                                                         finalOrderTempBll.Add(finalOrderTempModel);
                                                         
                                                     });
@@ -2303,6 +2305,7 @@ namespace WebApp.Subjects.Handler
                                                                 finalOrderTempModel.TotalPrice = totalPrice;
                                                                 finalOrderTempModel.Remark = o.pop.Remark;
                                                                 finalOrderTempModel.IsValid = o.pop.IsValid;
+                                                                finalOrderTempModel.ProduceOutsourceId = o.pop.ProduceOutsourceId;
                                                             }
                                                             if ((finalOrderTempModel.IsValid ?? true) && !frameIsValid)
                                                             {
@@ -2317,6 +2320,7 @@ namespace WebApp.Subjects.Handler
                                                             finalOrderTempModel.GuidanceId = o.subject.GuidanceId;
                                                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                             finalOrderTempModel.UnitName = unitName;
+                                                            finalOrderTempModel.AddDate = DateTime.Now;
                                                             finalOrderTempBll.Add(finalOrderTempModel);
                                                            
                                                         }
@@ -2398,6 +2402,7 @@ namespace WebApp.Subjects.Handler
                                                                         finalOrderTempModel.IsElectricity = o.pop.IsElectricity;
                                                                         finalOrderTempModel.Remark = o.pop.Remark;
                                                                         finalOrderTempModel.IsValid = o.pop.IsValid;
+                                                                        finalOrderTempModel.ProduceOutsourceId = o.pop.ProduceOutsourceId;
                                                                     }
                                                                     if ((finalOrderTempModel.IsValid ?? true) && !frameIsValid)
                                                                     {
@@ -2424,6 +2429,7 @@ namespace WebApp.Subjects.Handler
                                                                     finalOrderTempModel.GuidanceId = o.subject.GuidanceId;
                                                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                                     finalOrderTempModel.UnitName = unitName;
+                                                                    finalOrderTempModel.AddDate = DateTime.Now;
                                                                     finalOrderTempBll.Add(finalOrderTempModel);
                                                                    
                                                                 }
@@ -2571,6 +2577,7 @@ namespace WebApp.Subjects.Handler
                                                                     finalOrderTempModel.WindowWide = o.pop.WindowWide;
                                                                     finalOrderTempModel.IsElectricity = o.pop.IsElectricity;
                                                                     finalOrderTempModel.IsValid = o.pop.IsValid;
+                                                                    finalOrderTempModel.ProduceOutsourceId = o.pop.ProduceOutsourceId;
                                                                 }
                                                                 if ((finalOrderTempModel.IsValid ?? true) && !frameIsValid)
                                                                 {
@@ -2597,6 +2604,7 @@ namespace WebApp.Subjects.Handler
                                                                 finalOrderTempModel.GuidanceId = o.subject.GuidanceId;
                                                                 finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                                 finalOrderTempModel.UnitName = unitName;
+                                                                finalOrderTempModel.AddDate = DateTime.Now;
                                                                 bool isOk = true;
                                                                 
                                                                 if (isOk)
@@ -2702,6 +2710,7 @@ namespace WebApp.Subjects.Handler
                                                 finalOrderTempModel.IsPOPMaterial = 1;
                                                 finalOrderTempModel.Remark = o.pop.Remark;
                                                 finalOrderTempModel.IsValid = o.pop.IsValid;
+                                                finalOrderTempModel.ProduceOutsourceId = o.pop.ProduceOutsourceId;
                                             }
 
                                             finalOrderTempModel.IsSplit = false;
@@ -2713,6 +2722,7 @@ namespace WebApp.Subjects.Handler
                                             finalOrderTempModel.GuidanceId = o.subject.GuidanceId;
                                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                             finalOrderTempModel.UnitName = unitName;
+                                            finalOrderTempModel.AddDate = DateTime.Now;
                                             finalOrderTempBll.Add(finalOrderTempModel);
 
                                            
@@ -2797,6 +2807,7 @@ namespace WebApp.Subjects.Handler
                                                         finalOrderTempModel.IsElectricity = o.pop.IsElectricity;
                                                         finalOrderTempModel.Remark = o.pop.Remark;
                                                         finalOrderTempModel.IsValid = o.pop.IsValid;
+                                                        finalOrderTempModel.ProduceOutsourceId = o.pop.ProduceOutsourceId;
                                                     }
 
 
@@ -2819,6 +2830,7 @@ namespace WebApp.Subjects.Handler
                                                     finalOrderTempModel.GuidanceId = o.subject.GuidanceId;
                                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                     finalOrderTempModel.UnitName = unitName;
+                                                    finalOrderTempModel.AddDate = DateTime.Now;
                                                     finalOrderTempBll.Add(finalOrderTempModel);
                                                    
                                                 }
@@ -2974,7 +2986,7 @@ namespace WebApp.Subjects.Handler
                                                     finalOrderTempModel.WindowWide = o.pop.WindowWide;
                                                     finalOrderTempModel.IsElectricity = o.pop.IsElectricity;
                                                     finalOrderTempModel.IsValid = o.pop.IsValid;
-
+                                                    finalOrderTempModel.ProduceOutsourceId = o.pop.ProduceOutsourceId;
                                                 }
 
                                                 decimal totalPrice = 0;
@@ -2997,6 +3009,7 @@ namespace WebApp.Subjects.Handler
                                                 finalOrderTempModel.ShopStatus = o.shop.Status;
                                                 finalOrderTempModel.GuidanceId = o.subject.GuidanceId;
                                                 finalOrderTempModel.CSUserId = o.shop.CSUserId;
+                                                finalOrderTempModel.AddDate = DateTime.Now;
                                                 finalOrderTempModel.UnitName = unitName;
                                                 bool isOk = true;
                                                
@@ -3102,12 +3115,13 @@ namespace WebApp.Subjects.Handler
                                 finalOrderTempModel.Remark = o.pop.Remark;
                                 finalOrderTempModel.IsSplit = false;
                                 finalOrderTempModel.IsValid = o.pop.IsValid;
-                                
+                                finalOrderTempModel.ProduceOutsourceId = o.pop.ProduceOutsourceId;
                             }
                             finalOrderTempModel.ShopStatus = o.shop.Status;
                             finalOrderTempModel.GuidanceId = o.subject.GuidanceId;
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                             finalOrderTempModel.UnitName = unitName;
+                            finalOrderTempModel.AddDate = DateTime.Now;
                             if (o.subject.SubjectType == (int)SubjectTypeEnum.正常单)
                             {
                                 finalOrderTempModel.IsFromRegion = true;
@@ -3199,6 +3213,7 @@ namespace WebApp.Subjects.Handler
                             }
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                             finalOrderTempModel.UnitName = unitName;
+                            finalOrderTempModel.AddDate = DateTime.Now;
                             finalOrderTempBll.Add(finalOrderTempModel);
                             
                         });

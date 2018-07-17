@@ -8,6 +8,7 @@ using BLL;
 using DAL;
 using Models;
 using System.Transactions;
+using Common;
 
 namespace WebApp.Subjects.SecondInstallFee
 {
@@ -88,6 +89,8 @@ namespace WebApp.Subjects.SecondInstallFee
             string remark = txtRemark.Text.Trim();
             SubjectBLL subjectBll = new SubjectBLL();
             bool isApproveOk = false;
+            int subjectType=1;
+            int guidanceId = 0;
             string msg = string.Empty;
             using (TransactionScope tran = new TransactionScope())
             {
@@ -96,7 +99,8 @@ namespace WebApp.Subjects.SecondInstallFee
                     Models.Subject model = subjectBll.GetModel(subjectId);
                     if (model != null)
                     {
-
+                        guidanceId = model.GuidanceId ?? 0;
+                        subjectType = model.SubjectType ?? 1;
                         model.ApproveState = result;
                         model.ApproveUserId = CurrentUser.UserId;
                         subjectBll.Update(model);
@@ -114,7 +118,10 @@ namespace WebApp.Subjects.SecondInstallFee
             }
             if (isApproveOk)
             {
-
+                if (result == 1 && subjectType != (int)SubjectTypeEnum.新开店安装费 && subjectType != (int)SubjectTypeEnum.运费)
+                {
+                    new WebApp.Base.DelegateClass().SaveOutsourceOrder(guidanceId, subjectId);
+                }
                 Alert("审批成功！", "/Subjects/ApproveList.aspx");
             }
             else

@@ -123,7 +123,7 @@ namespace WebApp.Subjects.PriceOrder
 
                                     
                                     finalOrderTempModel = new FinalOrderDetailTemp();
-                                    
+                                    finalOrderTempModel.AddDate = o.order.AddDate;
                                     finalOrderTempModel.AgentCode = o.shop.AgentCode;
                                     finalOrderTempModel.AgentName = o.shop.AgentName;
                                     finalOrderTempModel.BusinessModel = o.shop.BusinessModel;

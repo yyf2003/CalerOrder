@@ -14,7 +14,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
 
     if (eleId.indexOf("cblPropGuidanceList") != -1) {
         $("#loadPropSubject").show();
-
+        $("#loadPropOutsource").show();
 
     }
 
@@ -50,19 +50,20 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
     }
     if (eleId.indexOf("cbAllPropGuidance") != -1) {
         $("#loadPropSubject").show();
+        $("#loadPropOutsource").show();
     }
 })
 
 
 Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
-    $("#loadGuidance").hide();
-    $("#loadPropGuidance").hide();
-    $("#loadCategory").hide();
-    $("#loadProvince").hide();
-    $("#loadCity").hide();
-    $("#loadSubject").hide();
-    $("#loadPropSubject").hide();
-    $("#loadMaterial").hide();
+//    $("#loadGuidance").hide();
+//    $("#loadPropGuidance").hide();
+//    $("#loadCategory").hide();
+//    $("#loadProvince").hide();
+//    $("#loadCity").hide();
+//    $("#loadSubject").hide();
+//    $("#loadPropSubject").hide();
+//    $("#loadMaterial").hide();
     //$("#loadOutsource").hide();
     $("span[name='checkPOPOrderPrice']").click(function () {
 
@@ -141,9 +142,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             $("#cbAllGuidance").prop("checked", checked);
         }
     })
-    //var a = '<a id="btnExportDetail" style="float: left;" class="easyui-linkbutton l-btn l-btn-small l-btn-plain"  plain="true"  icon="icon-print">导出明细</a>';
-    //$("#toolbar").html(a);
-
+   
     $("#btnExportDetail").click(function () {
         var guidanceId0 = "";
         $("input[name^='cblGuidanceList']:checked").each(function () {

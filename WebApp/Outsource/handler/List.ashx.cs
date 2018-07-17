@@ -105,7 +105,7 @@ namespace WebApp.Outsource.handler
             //    return "[" + json.ToString().TrimEnd(',') + "]";
             //}
             #endregion
-            int typeId=(int)CompanyTypeEnum.Outsource;
+            //int typeId=(int)CompanyTypeEnum.Outsource;
             var list = (from company in CurrentContext.DbContext.Company
                         join province1 in CurrentContext.DbContext.Place
                         on company.ProvinceId equals province1.ID into provinceTemp
@@ -116,7 +116,8 @@ namespace WebApp.Outsource.handler
                         join user1 in CurrentContext.DbContext.UserInfo
                         on company.CustomerServiceId equals user1.UserId into userTemp
                         from user in userTemp.DefaultIfEmpty()
-                        where company.TypeId == typeId
+                        //where company.TypeId == typeId
+                        where company.ParentId>0
                         select new
                         {
                             company,

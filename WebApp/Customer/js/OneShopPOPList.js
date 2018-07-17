@@ -1,5 +1,7 @@
 ﻿
 
+
+
 $(function () {
     CheckPrimission(url, null, $("#btnAdd"), $("#btnEdit"), $("#btnDelete"), null, $("#separator"), $("#btnCheckEditLog"), $("#toolbar"));
 //    if ($("#hfPromission").val() != "") {

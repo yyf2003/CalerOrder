@@ -55,7 +55,7 @@ namespace WebApp.Subjects.InstallPrice
                         on item.CustomerId equals customer.Id
                         where (curstomerList.Any() ? (curstomerList.Contains(item.CustomerId ?? 0)) : 1 == 1)
                         && ((item.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Install)
-                        && (item.HasInstallFees??true)
+                        && (item.HasInstallFees ?? true)
                         && (item.IsDelete == null || item.IsDelete == false)
                         select new
                         {
@@ -114,7 +114,7 @@ namespace WebApp.Subjects.InstallPrice
             //                       && subject.SubjectType != (int)SubjectTypeEnum.费用订单
             //                       && (subject.IsSecondInstall??false)==false
             //                       && ((order.IsInstall == "Y" && (subject.CornerType == null || subject.CornerType == "" || subject.CornerType != "三叶草")) || (subject.CornerType == "三叶草" && order.BCSIsInstall == "Y"))
-                                  
+
             //                       && (subject.IsSecondInstall??false)==false
             //                        select order).ToList();
             //installPriceShopList = InstallPriceShopInfoBll.GetList(s => currPageGuidanceIdList.Contains(s.GuidanceId ?? 0));
@@ -132,7 +132,7 @@ namespace WebApp.Subjects.InstallPrice
                 if (!curstomerList.Contains(id))
                     curstomerList.Add(id);
             }
-            
+
             var list = (from guidance in CurrentContext.DbContext.SubjectGuidance
                         join customer in CurrentContext.DbContext.Customer
                         on guidance.CustomerId equals customer.Id
@@ -183,9 +183,9 @@ namespace WebApp.Subjects.InstallPrice
             }
             AspNetPager1.RecordCount = list.Count;
             this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
-            
+
             var guidanceList = list.OrderByDescending(s => s.ItemId).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
-            currPageGuidanceIdList = guidanceList.Select(s=>s.ItemId).ToList();
+            currPageGuidanceIdList = guidanceList.Select(s => s.ItemId).ToList();
             subjectList = new SubjectBLL().GetList(s => currPageGuidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && s.SubjectType != (int)SubjectTypeEnum.二次安装 && s.SubjectType != (int)SubjectTypeEnum.费用订单 && (s.IsSecondInstall ?? false) == false);
 
             gv.DataSource = guidanceList;
@@ -234,12 +234,21 @@ namespace WebApp.Subjects.InstallPrice
 
                     List<int> myInstallShopIdList = new List<int>();
 
-                    string redisOrderKey = "InstallPriceOrderList"+Id;
+                    string redisOrderKey = "InstallPriceOrderList" + Id;
                     List<FinalOrderDetailTemp> orderListSave = null;
                     bool isError = false;
                     try
                     {
                         orderListSave = RedisHelper.Get<List<FinalOrderDetailTemp>>(redisOrderKey);
+                        //orderListSave = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                        //                 join subject in CurrentContext.DbContext.Subject
+                        //                 on order.SubjectId equals subject.Id
+                        //                 where (order.IsDelete == null || order.IsDelete == false)
+                        //                 && (subject.IsDelete == null || subject.IsDelete == false)
+                        //                 && subject.ApproveState == 1
+                        //                 && order.GuidanceId == Id
+                        //                 && order.OrderType == (int)OrderTypeEnum.POP
+                        //                 select order).ToList();
                     }
                     catch (Exception ex)
                     {
@@ -247,27 +256,23 @@ namespace WebApp.Subjects.InstallPrice
                     }
                     if (!isError && orderListSave == null)
                     {
-                        Subject sModel = new SubjectBLL().GetList(s => s.GuidanceId == Id).FirstOrDefault();
-                        if (sModel != null)
-                        {
-                            new DelegateClass().UpdateInstallOrderRedisData(sModel.Id);
-                        }
+                        new DelegateClass().UpdateInstallOrderRedisDataByGuidanceId(Id);
                     }
                     if (orderListSave != null)
                     {
                         var installShopOrderList = (from order in orderListSave
-                                                join subject in subjectList
-                                                on order.SubjectId equals subject.Id
-                                                join subjectCategory1 in CurrentContext.DbContext.ADSubjectCategory
-                                                on subject.SubjectCategoryId equals subjectCategory1.Id into subjectCategoryTemp
-                                                from subjectCategory in subjectCategoryTemp.DefaultIfEmpty()
-                                                //from subject in subjectList
-                                                where
-                                                order.OrderType == (int)OrderTypeEnum.POP
-                                                && (order.IsDelete == null || order.IsDelete == false)
-                                                //&& ((order.IsInstall == "Y" && (subject.CornerType == null || subject.CornerType == "" || subject.CornerType != "三叶草") && (subjectCategory == null || (subjectCategory != null && !subjectCategory.CategoryName.Contains("常规-非活动")))) || (subject.CornerType == "三叶草" && order.BCSIsInstall == "Y") || (subjectCategory != null && subjectCategory.CategoryName.Contains("常规-非活动") && order.GenericIsInstall == "Y"))
+                                                    join subject in subjectList
+                                                    on order.SubjectId equals subject.Id
+                                                    join subjectCategory1 in CurrentContext.DbContext.ADSubjectCategory
+                                                    on subject.SubjectCategoryId equals subjectCategory1.Id into subjectCategoryTemp
+                                                    from subjectCategory in subjectCategoryTemp.DefaultIfEmpty()
+                                                    //from subject in subjectList
+                                                    where
+                                                    order.OrderType == (int)OrderTypeEnum.POP
+                                                    && (order.IsDelete == null || order.IsDelete == false)
+                                                    //&& ((order.IsInstall == "Y" && (subject.CornerType == null || subject.CornerType == "" || subject.CornerType != "三叶草") && (subjectCategory == null || (subjectCategory != null && !subjectCategory.CategoryName.Contains("常规-非活动")))) || (subject.CornerType == "三叶草" && order.BCSIsInstall == "Y") || (subjectCategory != null && subjectCategory.CategoryName.Contains("常规-非活动") && order.GenericIsInstall == "Y"))
 
-                                                select new { order, subjectCategory }).ToList();
+                                                    select new { order, subjectCategory }).ToList();
 
 
                         //东区的户外店不自动算安装费，手动下安装费
@@ -306,15 +311,15 @@ namespace WebApp.Subjects.InstallPrice
                             activityAssginShopIdList = installPriceShopInfoList.Where(s => s.SubjectType == null || s.SubjectType == (int)InstallPriceSubjectTypeEnum.活动安装费).Select(s => s.ShopId ?? 0).Distinct().ToList();
 
                             genericAssginShopIdList = installPriceShopInfoList.Where(s => s.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费).Select(s => s.ShopId ?? 0).Distinct().ToList();
-                            
+
                         }
 
                         labFinishCount.Text = activityAssginShopIdList.Concat(genericAssginShopIdList).Count().ToString();
                     }
 
                     //List<FinalOrderDetailTemp> orderList = installShopOrderList.Where(s => s.GuidanceId == Id && (s.InstallPriceAddType ?? 1) == 1).ToList();
-                    
-                    
+
+
                     if (!myInstallShopIdList.Any())
                     {
                         LinkButton lbCheck = (LinkButton)e.Row.FindControl("lbCheck");

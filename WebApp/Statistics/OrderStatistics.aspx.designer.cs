@@ -76,33 +76,6 @@ namespace WebApp.Statistics {
         protected global::System.Web.UI.WebControls.RadioButton rbOnGuidanceSearch;
         
         /// <summary>
-        /// txtGuidanceBegin 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtGuidanceBegin;
-        
-        /// <summary>
-        /// txtGuidanceEnd 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtGuidanceEnd;
-        
-        /// <summary>
-        /// btnGetGuidance 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnGetGuidance;
-        
-        /// <summary>
         /// labBeginDate 控件。
         /// </summary>
         /// <remarks>
@@ -182,6 +155,15 @@ namespace WebApp.Statistics {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtSubjectEnd;
+        
+        /// <summary>
+        /// rblDateType 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButtonList rblDateType;
         
         /// <summary>
         /// btnGetProject 控件。

@@ -101,41 +101,47 @@ namespace WebApp.QuoteOrderManager
                     guidanceIdList.Add(int.Parse(li.Value));
                 }
             }
-            var orderList = (from order in CurrentContext.DbContext.QuoteOrderDetail
-                             join subject in CurrentContext.DbContext.Subject
-                             on order.SubjectId equals subject.Id
-                             join category1 in CurrentContext.DbContext.ADSubjectCategory
-                             on subject.SubjectCategoryId equals category1.Id into categoryTemp
-                             from category in categoryTemp.DefaultIfEmpty()
-                             where guidanceIdList.Contains(order.GuidanceId??0)
-                             && (order.QuoteItemId??0)==0
-                             select new
-                             {
-                                 order,
-                                 category
-                             }).ToList();
-
-            if (orderList.Any())
+            try
             {
-                var categoryList = orderList.Select(s => s.category).Distinct().OrderBy(s=>s.CategoryName).ToList();
+                List<QuoteOrderDetail> orderList0 = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.QuoteItemId ?? 0) == 0);
+                var orderList = (from order in orderList0
+                                 join subject in CurrentContext.DbContext.Subject
+                                 on order.SubjectId equals subject.Id
+                                 join category1 in CurrentContext.DbContext.ADSubjectCategory
+                                 on subject.SubjectCategoryId equals category1.Id into categoryTemp
+                                 from category in categoryTemp.DefaultIfEmpty()
+                                 select new
+                                 {
+                                     order,
+                                     category
+                                 }).ToList();
 
-                bool isNull = false;
-                categoryList.ForEach(s =>
+                if (orderList.Any())
                 {
-                    if (s != null)
+                    var categoryList = orderList.Select(s => s.category).Distinct().ToList();
+
+                    bool isNull = false;
+                    categoryList.ForEach(s =>
                     {
-                        ListItem li = new ListItem();
-                        li.Text = s.CategoryName + "&nbsp;&nbsp;";
-                        li.Value = s.Id.ToString();
-                        cblSubjectCategory.Items.Add(li);
+                        if (s != null)
+                        {
+                            ListItem li = new ListItem();
+                            li.Text = s.CategoryName + "&nbsp;&nbsp;";
+                            li.Value = s.Id.ToString();
+                            cblSubjectCategory.Items.Add(li);
+                        }
+                        else
+                            isNull = true;
+                    });
+                    if (isNull)
+                    {
+                        cblSubjectCategory.Items.Add(new ListItem("空", "0"));
                     }
-                    else
-                        isNull = true;
-                });
-                if (isNull)
-                {
-                    cblSubjectCategory.Items.Add(new ListItem("空", "0"));
                 }
+            }
+            catch (Exception ex)
+            { 
+            
             }
         }
 
@@ -159,41 +165,46 @@ namespace WebApp.QuoteOrderManager
                     subjectCategoryList.Add(int.Parse(li.Value));
                 }
             }
-            //获取已提交报价的订单
-            List<int> quoteSubjectIdList = new List<int>();
-            var quoteOrderList = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId??0) && (s.QuoteItemId??0)>0);
-            if (quoteOrderList.Any())
+            try
             {
-                quoteSubjectIdList = quoteOrderList.Select(s => s.SubjectId ?? 0).Distinct().ToList();
-            }
-            var subjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false) && ((s.HandMakeSubjectId ?? 0) == 0 && (s.SupplementRegion ?? "") == "") && !quoteSubjectIdList.Contains(s.Id));
-            if (subjectCategoryList.Any())
-            {
-                if (subjectCategoryList.Contains(0))
+                //获取已提交报价的订单
+                List<int> quoteSubjectIdList = new List<int>();
+                var quoteOrderList = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.QuoteItemId ?? 0) > 0);
+                if (quoteOrderList.Any())
                 {
-                    subjectCategoryList.Remove(0);
-                    if (subjectCategoryList.Any())
+                    quoteSubjectIdList = quoteOrderList.Select(s => s.SubjectId ?? 0).Distinct().ToList();
+                }
+                var subjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false) && ((s.HandMakeSubjectId ?? 0) == 0 && (s.SupplementRegion ?? "") == "") && !quoteSubjectIdList.Contains(s.Id));
+                if (subjectCategoryList.Any())
+                {
+                    if (subjectCategoryList.Contains(0))
                     {
-                        subjectList = subjectList.Where(s => subjectCategoryList.Contains(s.SubjectCategoryId ?? 0) || (s.SubjectCategoryId == null || s.SubjectCategoryId == 0)).ToList();
+                        subjectCategoryList.Remove(0);
+                        if (subjectCategoryList.Any())
+                        {
+                            subjectList = subjectList.Where(s => subjectCategoryList.Contains(s.SubjectCategoryId ?? 0) || (s.SubjectCategoryId == null || s.SubjectCategoryId == 0)).ToList();
+                        }
+                        else
+                            subjectList = subjectList.Where(s => s.SubjectCategoryId == null || s.SubjectCategoryId == 0).ToList();
                     }
                     else
-                        subjectList = subjectList.Where(s => s.SubjectCategoryId == null || s.SubjectCategoryId == 0).ToList();
+                        subjectList = subjectList.Where(s => subjectCategoryList.Contains(s.SubjectCategoryId ?? 0)).ToList();
                 }
-                else
-                    subjectList = subjectList.Where(s => subjectCategoryList.Contains(s.SubjectCategoryId ?? 0)).ToList();
-            }
 
-            if (subjectList.Any())
-            {
-                //var subjectList = orderList.Select(s => s.subject).Distinct().ToList();
-                subjectList.OrderBy(s=>s.SubjectName).ToList().ForEach(s => {
-                    ListItem li = new ListItem();
-                    li.Text = s.SubjectName + "&nbsp;&nbsp;&nbsp;";
-                    li.Value = s.Id.ToString();
-                    cblSubjectName.Items.Add(li);
-                });
+                if (subjectList.Any())
+                {
+                    //var subjectList = orderList.Select(s => s.subject).Distinct().ToList();
+                    subjectList.OrderBy(s => s.SubjectName).ToList().ForEach(s =>
+                    {
+                        ListItem li = new ListItem();
+                        li.Text = s.SubjectName + "&nbsp;&nbsp;&nbsp;";
+                        li.Value = s.Id.ToString();
+                        cblSubjectName.Items.Add(li);
+                    });
+                }
             }
-
+            catch (Exception ex)
+            { }
         }
 
 

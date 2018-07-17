@@ -33,6 +33,7 @@ namespace WebApp.QuoteOrderManager
         public string subjectCategory = string.Empty;
         public string subjectIdSelected = string.Empty;//不含百丽项目
         public string subjectId = string.Empty;//包含百丽项目
+        string region = string.Empty;
         public int customerId;
         public int itemId;
         protected void Page_Load(object sender, EventArgs e)
@@ -64,6 +65,10 @@ namespace WebApp.QuoteOrderManager
             if (Request.QueryString["customerId"] != null)
             {
                 customerId = int.Parse(Request.QueryString["customerId"]);
+            }
+            if (Request.QueryString["region"] != null)
+            {
+                region = Request.QueryString["region"];
             }
             //else
             //{
@@ -110,6 +115,7 @@ namespace WebApp.QuoteOrderManager
         List<int> guidanceIdList = new List<int>();
         List<int> categoryIdList = new List<int>();
         List<int> subjectIdList = new List<int>();
+        List<string> regionList = new List<string>();
         QuotationItemBLL quotationBll = new QuotationItemBLL();
         List<SpecialPriceQuoteDetail> specialPriceQuoteDetailList = new List<SpecialPriceQuoteDetail>();
         //decimal addRate = 0;
@@ -145,6 +151,10 @@ namespace WebApp.QuoteOrderManager
 
         void BindGuidanceName()
         {
+            if (!string.IsNullOrWhiteSpace(region))
+            {
+                regionList = StringHelper.ToStringList(region, ',', LowerUpperEnum.ToLower);
+            }
             labGuidanceMonth.Text = month;
             if (!string.IsNullOrWhiteSpace(guidanceId))
             {
@@ -1181,7 +1191,10 @@ namespace WebApp.QuoteOrderManager
                                  order,
                                  subject
                              }).ToList();
-
+            if (regionList.Any())
+            {
+                orderList = orderList.Where(s => s.order.Region != null && regionList.Contains(s.order.Region.ToLower())).ToList();
+            }
             if (subjectIdList.Any())
             {
                 orderList = orderList.Where(s => subjectIdList.Contains(s.order.SubjectId ?? 0)).ToList();
@@ -3009,6 +3022,7 @@ namespace WebApp.QuoteOrderManager
                         model.QuoteSubjectCategoryId = subjectModel.SubjectCategoryId;
                     }
                     model.QuoteSubjectId = quoteSubjectId;
+                    
                     if (itemId > 0)
                     {
 
@@ -3538,6 +3552,11 @@ namespace WebApp.QuoteOrderManager
             {
                 subjectIdList = StringHelper.ToIntList(subjectId, ',');
             }
+            if (!string.IsNullOrWhiteSpace(region))
+            {
+                regionList = StringHelper.ToStringList(region, ',', LowerUpperEnum.ToLower);
+            }
+
             var orderList = (from order in CurrentContext.DbContext.QuoteOrderDetail
                              join subject in CurrentContext.DbContext.Subject
                              on order.SubjectId equals subject.Id
@@ -3552,6 +3571,10 @@ namespace WebApp.QuoteOrderManager
                                  order,
                                  subject
                              }).ToList();
+            if (regionList.Any())
+            {
+                orderList = orderList.Where(s => s.order.Region != null && regionList.Contains(s.order.Region.ToLower())).ToList();
+            }
             if (itemId == 0)
             {
                 orderList = orderList.Where(s => (s.order.QuoteItemId ?? 0) == 0).ToList();

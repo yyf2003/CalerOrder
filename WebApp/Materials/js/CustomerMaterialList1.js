@@ -26,8 +26,8 @@ $(function () {
         Material.bindUnit();
         $("#editMaterialDiv").show().dialog({
             modal: true,
-            width: 480,
-            height: 300,
+            width: 520,
+            height: 350,
             iconCls: 'icon-add',
             resizable: false,
             buttons: [
@@ -67,12 +67,13 @@ $(function () {
             Material.bindBasicCategory(row.BasicCategoryId);
             $("#txtPrice").val(row.Price);
             $("#txtPayPriceInstall").val(row.PayPriceInstall);
+            $("#txtPayPriceInstallAndProduct").val(row.PayPriceInstallAndProduct);
             $("#txtPayPriceSend").val(row.PayPriceSend);
             Material.bindUnit(row.UnitId);
             $("#editMaterialDiv").show().dialog({
                 modal: true,
-                width: 480,
-                height: 300,
+                width: 520,
+                height: 350,
                 iconCls: 'icon-add',
                 resizable: false,
                 buttons: [
@@ -290,6 +291,7 @@ var Material = {
         this.UnitId = 0;
         this.PriceItemId = 0;
         this.PayPriceInstall = 0;
+        this.PayPriceInstallAndProduct = 0;
         this.PayPriceSend = 0;
     },
     getCustomer: function () {
@@ -374,7 +376,7 @@ var Material = {
                         $("#selCustomer").append(option);
                         $("#selOtherCustomer").append(option);
                     }
-                    if(isSelected)
+                    if (isSelected)
                         Material.bindPriceItem();
                 }
             }
@@ -412,7 +414,7 @@ var Material = {
         document.getElementById("selBasicMaterial").length = 1;
         $.ajax({
             type: "get",
-            url: "./Handler/CustomerMaterialList1.ashx?type=getBasicMaterial&categoryId=" + categoryId + "&customerId="+currCustomerId,
+            url: "./Handler/CustomerMaterialList1.ashx?type=getBasicMaterial&categoryId=" + categoryId + "&customerId=" + currCustomerId,
             success: function (data) {
 
                 if (data != "") {
@@ -460,7 +462,8 @@ var Material = {
                         { field: 'CustomerName', title: '客户名称' },
                         { field: 'MaterialName', title: '客户材料名称' },
                         { field: 'Price', title: '应收单价' },
-                        { field: 'PayPriceInstall', title: '应付单价(安装)',width:200 },
+                        { field: 'PayPriceInstall', title: '应付单价(安装)', width: 200 },
+                        { field: 'PayPriceInstallAndProduct', title: '应付单价(生产+安装)', width: 250 },
                         { field: 'PayPriceSend', title: '应付单价(发货)', width: 200 },
                         { field: 'Unit', title: '单位' },
 
@@ -505,8 +508,8 @@ var Material = {
 
         if (CheckVal()) {
             //var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"MaterialName":"' + this.model.MaterialName + '","UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + '}';
-            var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + ',"PayPriceInstall":' + this.model.PayPriceInstall + ',"PayPriceSend":' + this.model.PayPriceSend + ',"OutsourceMaterialId":'+currOutsourceMaterialId+'}';
-
+            var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + ',"PayPriceInstall":' + this.model.PayPriceInstall + ',"PayPriceInstallAndProduct":' + this.model.PayPriceInstallAndProduct + ',"PayPriceSend":' + this.model.PayPriceSend + ',"OutsourceMaterialId":' + currOutsourceMaterialId + '}';
+            
             $.ajax({
                 type: "get",
                 url: "./Handler/CustomerMaterialList1.ashx",
@@ -652,7 +655,8 @@ function CheckVal() {
     var basicCategoryId = $("#selCategory").val();
     var basicMaterialId = $("#selBasicMaterial").val();
     var price = $.trim($("#txtPrice").val());
-    var payPriceInstall = $.trim($("#txtPayPriceInstall").val())||0;
+    var payPriceInstall = $.trim($("#txtPayPriceInstall").val()) || 0;
+    var payPriceInstallAndProduct = $.trim($("#txtPayPriceInstallAndProduct").val()) || 0;
     var payPriceSend = $.trim($("#txtPayPriceSend").val())||0;
     var unitId = $("#selUnit").val();
     if (customerId == "0") {
@@ -675,6 +679,11 @@ function CheckVal() {
         alert("应付单价（安装）必须为数字");
         return false;
     }
+    if (payPriceInstallAndProduct != "" && isNaN(payPriceInstallAndProduct)) {
+        alert("应付单价（生产+安装）必须为数字");
+        return false;
+    }
+
     if (payPriceSend != "" && isNaN(payPriceSend)) {
         alert("应付单价（发货）必须为数字");
         return false;
@@ -689,6 +698,7 @@ function CheckVal() {
     Material.model.BasicMaterialId = basicMaterialId;
     Material.model.Price = price;
     Material.model.PayPriceInstall = payPriceInstall;
+    Material.model.PayPriceInstallAndProduct = payPriceInstallAndProduct;
     Material.model.PayPriceSend = payPriceSend;
     Material.model.UnitId = unitId;
 

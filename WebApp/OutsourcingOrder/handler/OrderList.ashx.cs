@@ -38,6 +38,9 @@ namespace WebApp.OutsourcingOrder.handler
                 case "getOutsource":
                     result = GetOutsourceList();
                     break;
+                case "getOrderOutsource":
+                    result = GetOutsourceFromOrder();
+                    break;
                 case "getGuidanceList":
                     result = GetGuidanceList();
                     break;
@@ -83,8 +86,42 @@ namespace WebApp.OutsourcingOrder.handler
             context.Response.Write(result);
         }
 
+        List<int> guidanceIdList = new List<int>();
+        void ReLoadSession()
+        {
+
+            if (context1.Session["ChangeOutsourceGuidanceIdList="] != null)
+            {
+                guidanceIdList = context1.Session["ChangeOutsourceGuidanceIdList="] as List<int>;
+            }
+            
+            List<OutsourceOrderDetail> orderList0 = (from order in CurrentContext.DbContext.OutsourceOrderDetail
+                                                     from gid in guidanceIdList
+                                                     where order.GuidanceId == gid
+                                                     select order).ToList();
+            if (orderList0.Any())
+            {
+                List<Subject> subjectList = (from order in orderList0
+                                             join subject in CurrentContext.DbContext.Subject
+                                             on order.SubjectId equals subject.Id
+                                             where subject.IsDelete == null || subject.IsDelete == false
+                                             select subject).Distinct().ToList();
+                context1.Session["ChangeOutsourceOrderList="] = orderList0;
+                context1.Session["ChangeOutsourceSubjectList="] = subjectList;
+            }
+            else
+            {
+                context1.Session["ChangeOutsourceOrderList="] = null;
+                context1.Session["ChangeOutsourceSubjectList="] = null;
+            }
+        }
+
+
         string GetGuidanceList()
         {
+            context1.Session["ChangeOutsourceOrderList="] = null;
+            context1.Session["ChangeOutsourceSubjectList="] = null;
+            context1.Session["ChangeOutsourceGuidanceIdList="] = null;
             string result = string.Empty;
             string outsourceId = string.Empty;
             int customerId = 0;
@@ -142,6 +179,7 @@ namespace WebApp.OutsourcingOrder.handler
 
         string GetRegion()
         {
+
             context1.Session["ChangeOutsourceOrderList="] = null;
             context1.Session["ChangeOutsourceSubjectList="] = null;
             context1.Session["ChangeOutsourceGuidanceIdList="] = null;
@@ -298,6 +336,15 @@ namespace WebApp.OutsourcingOrder.handler
             List<string> regionList = new List<string>();
             List<int> categoryIdList = new List<int>();
             List<int> guidanceIdList = new List<int>();
+            if (context1.Request.QueryString["guidanceIds"] != null)
+            {
+                string guidanceIds = context1.Request.QueryString["guidanceIds"];
+                if (!string.IsNullOrWhiteSpace(guidanceIds))
+                {
+                    guidanceIdList = StringHelper.ToIntList(guidanceIds, ',');
+                    context1.Session["ChangeOutsourceGuidanceIdList="] = guidanceIdList;
+                }
+            }
             if (context1.Request.QueryString["outsourceId"] != null)
             {
                 string outsourceId = context1.Request.QueryString["outsourceId"];
@@ -324,10 +371,13 @@ namespace WebApp.OutsourcingOrder.handler
             }
             List<OutsourceOrderDetail> orderList = new List<OutsourceOrderDetail>();
             List<Subject> subjectList = new List<Subject>();
+            //if (context1.Session["ChangeOutsourceOrderList="]== null)
+            ReLoadSession();
             if (context1.Session["ChangeOutsourceOrderList="] != null)
             {
                 orderList = context1.Session["ChangeOutsourceOrderList="] as List<OutsourceOrderDetail>;
             }
+            
             if (context1.Session["ChangeOutsourceSubjectList="] != null)
             {
                 subjectList = context1.Session["ChangeOutsourceSubjectList="] as List<Subject>;
@@ -422,6 +472,122 @@ namespace WebApp.OutsourcingOrder.handler
                 return "[" + json.ToString().TrimEnd(',') + "]";
             }
             return "[]";
+        }
+
+        string GetOutsourceFromOrder()
+        {
+            string result = string.Empty;
+            List<int> subjectCategoryIdList = new List<int>();
+            if (context1.Request.QueryString["subjectCategoryIds"] != null)
+            {
+                string subjectCategoryIds = context1.Request.QueryString["subjectCategoryIds"];
+                if (!string.IsNullOrWhiteSpace(subjectCategoryIds))
+                {
+                    subjectCategoryIdList = StringHelper.ToIntList(subjectCategoryIds, ',');
+                }
+            }
+            List<int> subjectIdList = new List<int>();
+            if (context1.Request.QueryString["subjectIds"] != null)
+            {
+                string subjectIds = context1.Request.QueryString["subjectIds"];
+                if (!string.IsNullOrWhiteSpace(subjectIds))
+                {
+                    subjectIdList = StringHelper.ToIntList(subjectIds, ',');
+                }
+
+            }
+            List<string> regionList = new List<string>();
+            if (context1.Request.QueryString["region"] != null)
+            {
+                string region = context1.Request.QueryString["region"];
+                if (!string.IsNullOrWhiteSpace(region))
+                {
+                    regionList = StringHelper.ToStringList(region, ',');
+                }
+            }
+            List<string> provinceList = new List<string>();
+            if (context1.Request.QueryString["province"] != null)
+            {
+                string province = context1.Request.QueryString["province"];
+                if (!string.IsNullOrWhiteSpace(province))
+                {
+                    provinceList = StringHelper.ToStringList(province, ',');
+                }
+            }
+            List<string> cityList = new List<string>();
+            if (context1.Request.QueryString["city"] != null)
+            {
+                string city = context1.Request.QueryString["city"];
+                if (!string.IsNullOrWhiteSpace(city))
+                {
+                    cityList = StringHelper.ToStringList(city, ',');
+                }
+            }
+            List<OutsourceOrderDetail> orderList = new List<OutsourceOrderDetail>();
+            List<Subject> subjectList = new List<Subject>();
+            List<int> guidanceIdList = new List<int>();
+            if (context1.Session["ChangeOutsourceOrderList="] != null)
+            {
+                orderList = context1.Session["ChangeOutsourceOrderList="] as List<OutsourceOrderDetail>;
+            }
+            if (context1.Session["ChangeOutsourceSubjectList="] != null)
+            {
+                subjectList = context1.Session["ChangeOutsourceSubjectList="] as List<Subject>;
+            }
+            if (context1.Session["ChangeOutsourceGuidanceIdList="] != null)
+            {
+                guidanceIdList = context1.Session["ChangeOutsourceGuidanceIdList="] as List<int>;
+            }
+            if (subjectIdList.Any())
+            {
+                //orderList = orderList.Where(s => subjectList.Contains(s.SubjectId ?? 0) || s.SubjectId == 0).ToList();
+                //百丽订单项目
+                Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
+                List<int> hMSubjectIdList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
+                subjectIdList.AddRange(hMSubjectIdList);
+            }
+            var sList = (from order in orderList
+                         join subject1 in subjectList
+                         on order.SubjectId equals subject1.Id into subjectTemp
+                         join outsource in CurrentContext.DbContext.Company
+                         on order.OutsourceId equals outsource.Id
+                         from subject in subjectTemp.DefaultIfEmpty()
+                         where (subjectCategoryIdList.Any() ? (subjectCategoryIdList.Contains(subject.SubjectCategoryId ?? 0)) : 1 == 1)
+                         && (subjectIdList.Any() ? (subjectIdList.Contains(order.SubjectId ?? 0) || subjectIdList.Contains(order.BelongSubjectId ?? 0)) : 1 == 1)
+                         && (provinceList.Any() ? provinceList.Contains(order.Province) : 1 == 1)
+                         && (cityList.Any() ? cityList.Contains(order.City) : 1 == 1)
+                         select new { order, outsource }).ToList();
+            if (regionList.Any())
+            {
+                if (regionList.Contains("空"))
+                {
+                    regionList.Remove("空");
+                    if (regionList.Any())
+                    {
+                        sList = sList.Where(s => (regionList.Contains(s.order.Region)) || s.order.Region == null || s.order.Region == "").ToList();
+                    }
+                    else
+                    {
+                        sList = sList.Where(s => s.order.Region == null || s.order.Region == "").ToList();
+                    }
+                }
+                else
+                    sList = sList.Where(s => (regionList.Contains(s.order.Region))).ToList();
+            }
+            if (sList.Any())
+            {
+                var outsourceList = sList.Select(s => s.outsource).Distinct().OrderBy(s => s.CompanyName).ToList();
+                StringBuilder json = new StringBuilder();
+                outsourceList.ForEach(s =>
+                {
+                    json.Append("{\"OutsourceId\":\"" + s.Id + "\",\"OutsourceName\":\"" + s.CompanyName + "\"},");
+                });
+                if (json.Length > 0)
+                {
+                    result = "[" + json.ToString().TrimEnd(',') + "]";
+                }
+            }
+            return result;
         }
 
         string GetOrderList_old()
@@ -726,6 +892,9 @@ namespace WebApp.OutsourcingOrder.handler
             List<OutsourceOrderDetail> orderList = new List<OutsourceOrderDetail>();
             List<Subject> subjectList = new List<Subject>();
             List<int> guidanceIdList = new List<int>();
+
+
+
             if (context1.Session["ChangeOutsourceOrderList="] != null)
             {
                 orderList = context1.Session["ChangeOutsourceOrderList="] as List<OutsourceOrderDetail>;
@@ -749,10 +918,11 @@ namespace WebApp.OutsourcingOrder.handler
             }
 
             var sList = (from order in orderList
-                         join subject in subjectList
-                         on order.SubjectId equals subject.Id
+                         join subject1 in subjectList
+                         on order.SubjectId equals subject1.Id into subjectTemp
                          join outsource in CurrentContext.DbContext.Company
                          on order.OutsourceId equals outsource.Id
+                         from subject in subjectTemp.DefaultIfEmpty()
                          where (outsourceIdList.Any() ? (outsourceIdList.Contains(order.OutsourceId ?? 0)) : 1 == 1)
                          && (subjectCategoryIdList.Any() ? (subjectCategoryIdList.Contains(subject.SubjectCategoryId ?? 0)) : 1 == 1)
                          && (subjectIdList.Any() ? (subjectIdList.Contains(order.SubjectId ?? 0) || subjectIdList.Contains(order.BelongSubjectId ?? 0)) : 1 == 1)
@@ -848,6 +1018,7 @@ namespace WebApp.OutsourcingOrder.handler
                     string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
                     string orderPrice = string.Empty;
                     string receiveOrderPrice = string.Empty;
+                    string assignType = CommonMethod.GetEnumDescription<OutsourceOrderTypeEnum>((s.order.AssignType??1).ToString());
                     int Quantity = s.order.Quantity ?? 1;
                     if ((s.order.PayOrderPrice ?? 0) > 0)
                     {
@@ -855,7 +1026,7 @@ namespace WebApp.OutsourcingOrder.handler
                         receiveOrderPrice = ((s.order.ReceiveOrderPrice ?? 0) * Quantity).ToString();
                         //Quantity = 1;
                     }
-                    json.Append("{\"rowIndex\":\"" + index + "\",\"OutsourceName\":\"" + s.outsource.CompanyName + "\",\"OrderType\":\"" + orderType + "\",\"Id\":\"" + s.order.Id + "\",\"ShopNo\":\"" + s.order.ShopNo + "\",\"ShopName\":\"" + s.order.ShopName + "\",\"Region\":\"" + s.order.Region + "\",\"Province\":\"" + s.order.Province + "\",\"City\":\"" + s.order.City + "\",\"CityTier\":\"" + s.order.CityTier + "\",\"Channel\":\"" + s.order.Channel + "\",\"Format\":\"" + s.order.Format + "\",\"Sheet\":\"" + s.order.Sheet + "\",\"Gender\":\"" + gender + "\",\"Quantity\":\"" + Quantity + "\",\"PositionDescription\":\"" + s.order.PositionDescription + "\",\"GraphicLength\":\"" + s.order.GraphicLength + "\",\"GraphicWidth\":\"" + s.order.GraphicWidth + "\",\"GraphicMaterial\":\"" + s.order.OrderGraphicMaterial + "\",\"ChooseImg\":\"" + s.order.ChooseImg + "\",\"OrderPrice\":\"" + orderPrice + "\",\"ReceiveOrderPrice\":\"" + receiveOrderPrice + "\",\"IsDelete\":\"" + ((s.order.IsDelete ?? false) ? 1 : 0) + "\"},");
+                    json.Append("{\"rowIndex\":\"" + index + "\",\"AssignType\":\"" + assignType + "\",\"OutsourceName\":\"" + s.outsource.CompanyName + "\",\"OrderType\":\"" + orderType + "\",\"Id\":\"" + s.order.Id + "\",\"ShopNo\":\"" + s.order.ShopNo + "\",\"ShopName\":\"" + s.order.ShopName + "\",\"Region\":\"" + s.order.Region + "\",\"Province\":\"" + s.order.Province + "\",\"City\":\"" + s.order.City + "\",\"CityTier\":\"" + s.order.CityTier + "\",\"IsInstall\":\"" + s.order.IsInstall + "\",\"Channel\":\"" + s.order.Channel + "\",\"Format\":\"" + s.order.Format + "\",\"Sheet\":\"" + s.order.Sheet + "\",\"Gender\":\"" + gender + "\",\"Quantity\":\"" + Quantity + "\",\"PositionDescription\":\"" + s.order.PositionDescription + "\",\"GraphicLength\":\"" + s.order.GraphicLength + "\",\"GraphicWidth\":\"" + s.order.GraphicWidth + "\",\"GraphicMaterial\":\"" + s.order.GraphicMaterial + "\",\"ChooseImg\":\"" + s.order.ChooseImg + "\",\"OrderPrice\":\"" + orderPrice + "\",\"ReceiveOrderPrice\":\"" + receiveOrderPrice + "\",\"IsDelete\":\"" + ((s.order.IsDelete ?? false) ? 1 : 0) + "\",\"UnitPrice\":\"" + s.order.UnitPrice + "\"},");
                     index++;
                 });
                 if (json.Length > 0)
@@ -1027,7 +1198,7 @@ namespace WebApp.OutsourcingOrder.handler
                          where (outsourceIdList.Any() ? (outsourceIdList.Contains(order.OutsourceId ?? 0)) : 1 == 1)
                              //&& (order.Region != null && (regionList.Contains(order.Region.ToLower())))
                          && (categoryIdList.Any() ? (categoryIdList.Contains(subject.SubjectCategoryId ?? 0)) : 1 == 1)
-                         //&& (subjectIdList.Any() ? subjectIdList.Contains(order.SubjectId ?? 0) : 1 == 1)
+                             //&& (subjectIdList.Any() ? subjectIdList.Contains(order.SubjectId ?? 0) : 1 == 1)
                          && (subjectIdList.Any() ? (subjectIdList.Contains(order.SubjectId ?? 0) || subjectIdList.Contains(order.BelongSubjectId ?? 0)) : 1 == 1)
                          select new { order, subject }).ToList();
             if (regionList.Any())
@@ -1217,7 +1388,7 @@ namespace WebApp.OutsourcingOrder.handler
                          where
                          (outsourceIdList.Any() ? (outsourceIdList.Contains(order.OutsourceId ?? 0)) : 1 == 1)
                          && (subjectIdList.Any() ? (subjectIdList.Contains(order.SubjectId ?? 0) || subjectIdList.Contains(order.BelongSubjectId ?? 0)) : 1 == 1)
-                         //&& (subjectIdList.Any() ? subjectIdList.Contains(order.SubjectId ?? 0) : 1 == 1)
+                             //&& (subjectIdList.Any() ? subjectIdList.Contains(order.SubjectId ?? 0) : 1 == 1)
                              //&& order.Region != null && (regionList.Contains(order.Region.ToLower()))
                          && (categoryIdList.Any() ? (categoryIdList.Contains(subject.SubjectCategoryId ?? 0)) : 1 == 1)
                          && provinceList.Contains(order.Province)
@@ -1550,7 +1721,7 @@ namespace WebApp.OutsourcingOrder.handler
 
                         }
                     }
-
+                    ReLoadSession();
                 }
                 catch (Exception ex)
                 {
@@ -1593,6 +1764,7 @@ namespace WebApp.OutsourcingOrder.handler
                             model.ModifyDate = DateTime.Now;
                             bll.Update(s);
                         });
+                        ReLoadSession();
                     }
 
                 }
@@ -1632,6 +1804,7 @@ namespace WebApp.OutsourcingOrder.handler
                             model.ModifyDate = DateTime.Now;
                             bll.Update(s);
                         });
+                        ReLoadSession();
                     }
 
                 }
@@ -1643,12 +1816,18 @@ namespace WebApp.OutsourcingOrder.handler
             return result;
         }
 
+        OutsourceOrderDetailBLL outsourceOrderBll = new OutsourceOrderDetailBLL();
         string ChangeOutsource()
         {
             string result = "ok";
+            string subjectId = string.Empty;
             string orderId = string.Empty;
             int newOutsourceId = 0;
             int changeType = 1;
+            if (context1.Request.QueryString["subjectId"] != null)
+            {
+                subjectId = context1.Request.QueryString["subjectId"];
+            }
             if (context1.Request.QueryString["orderId"] != null)
             {
                 orderId = context1.Request.QueryString["orderId"];
@@ -1663,48 +1842,185 @@ namespace WebApp.OutsourcingOrder.handler
             }
             try
             {
-                if (!string.IsNullOrWhiteSpace(orderId) && newOutsourceId > 0)
+                if (newOutsourceId > 0)
                 {
-                    List<int> idList = StringHelper.ToIntList(orderId, ',');
-                    OutsourceOrderDetailBLL bll = new OutsourceOrderDetailBLL();
-                    var list = bll.GetList(s => idList.Contains(s.Id));
-                    if (list.Any())
+                    
+                    if (changeType == 1 && !string.IsNullOrWhiteSpace(subjectId))//按项目更改
                     {
-
-                        if (changeType == 1)//整店更新
+                        List<int> subjectIdList = StringHelper.ToIntList(subjectId, ',');
+                        if (subjectIdList.Any())
                         {
-                            int guidanceId = list[0].GuidanceId ?? 0;
-                            List<int> shopId = list.Select(s => s.ShopId ?? 0).Distinct().ToList();
-                            var newList = bll.GetList(s => s.GuidanceId == guidanceId && shopId.Contains(s.ShopId ?? 0));
-                            if (newList.Any())
+                            List<OutsourceOrderDetail> outsourceOrderList = new OutsourceOrderDetailBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0) || subjectIdList.Contains(s.BelongSubjectId ?? 0));
+                            if (outsourceOrderList.Any())
                             {
-                                newList.ForEach(s =>
-                                {
-                                    //model = new OutsourceOrderDetail();
-                                    //model = s;
-                                    //model.OutsourceId = newOutsourceId;
-                                    s.OutsourceId = newOutsourceId;
-                                    bll.Update(s);
+                                List<int> guidanceIdList = outsourceOrderList.Select(s=>s.GuidanceId??0).Distinct().ToList();
+                                guidanceIdList.ForEach(gid => {
+                                    SubjectGuidance guidanceModel = guidanceBll.GetModel(gid);
+                                    if (guidanceModel != null)
+                                    {
+                                        if (!guidanceDic.Keys.Contains(gid))
+                                        {
+                                            guidanceDic.Add(gid, guidanceModel);
+                                        }
+                                        var orderList = outsourceOrderList.Where(s=>s.GuidanceId==gid).ToList();
+                                        var popOrderList = orderList.Where(s =>(s.SubjectId??0)>0).ToList();
+                                        List<int> shopIdList = popOrderList.Select(s => s.ShopId ?? 0).Distinct().ToList();
+                                        //更新pop
+                                        popOrderList.ForEach(order => {
+                                            UpdatePOPOrder(order, newOutsourceId);
+                                        });
+                                        if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion)
+                                        {
+                                            //快递费
+                                            var expressPriceOrderList = orderList.Where(s => (s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.快递费) && (s.SubjectId ?? 0) == 0 && shopIdList.Contains(s.ShopId ?? 0)).ToList();
+                                            expressPriceOrderList.ForEach(order =>
+                                            {
+                                                UpdatePOPOrder(order, newOutsourceId);
+                                            });
+                                        }
+                                    }
                                 });
                             }
                         }
-                        else//只更新选择的pop
-                        {
-                            list.ForEach(s =>
-                            {
-                                s.OutsourceId = newOutsourceId;
-                                bll.Update(s);
-                            });
-                        }
                     }
+                    else if (changeType == 2 && !string.IsNullOrWhiteSpace(orderId))//只更新选择的pop
+                    {
+                        List<int> idList = StringHelper.ToIntList(orderId, ',');
 
+                        var list = outsourceOrderBll.GetList(s => idList.Contains(s.Id));
+
+                        list.ForEach(order =>
+                        {
+                            UpdatePOPOrder(order, newOutsourceId);
+                        });
+                    }
                 }
+                ReLoadSession();
             }
             catch (Exception ex)
             {
                 result = "更新失败：" + ex.Message;
             }
             return result;
+        }
+
+        Dictionary<int, int> customerIdDic = new Dictionary<int, int>();
+        SubjectBLL subjectBll = new SubjectBLL();
+        SubjectGuidanceBLL guidanceBll = new SubjectGuidanceBLL();
+        Dictionary<int, SubjectGuidance> guidanceDic = new Dictionary<int, SubjectGuidance>();
+        void UpdatePOPOrder(OutsourceOrderDetail order, int newOutsourceId)
+        {
+            int oldOutsourceId = order.OutsourceId ?? 0;
+            order.OutsourceId = newOutsourceId;
+            SubjectGuidance guidanceModel = new SubjectGuidance();
+            if (guidanceDic.Keys.Contains(order.GuidanceId ?? 0))
+            {
+                guidanceModel = guidanceDic[order.GuidanceId ?? 0];
+            }
+            else
+            {
+                guidanceModel = guidanceBll.GetModel(order.GuidanceId ?? 0);
+                if (guidanceModel != null)
+                {
+                    guidanceDic.Add(order.GuidanceId ?? 0, guidanceModel);
+                }
+            }
+            if (order.OrderType == ((int)OrderTypeEnum.POP) && guidanceModel.ActivityTypeId==(int)GuidanceTypeEnum.Install && order.IsInstall == "Y")
+            {
+
+                if (oldOutsourceId != newOutsourceId)
+                {
+                    int customerId = 0;
+                    if (customerIdDic.Keys.Contains(order.SubjectId ?? 0))
+                    {
+                        customerId = customerIdDic[order.SubjectId ?? 0];
+                    }
+                    else
+                    {
+                        Subject sModel = subjectBll.GetModel(order.SubjectId ?? 0);
+                        if (sModel != null)
+                        {
+                            customerId = sModel.CustomerId ?? 0;
+                            customerIdDic.Add(order.SubjectId ?? 0, customerId);
+                        }
+                    }
+                    //判断新外协是否和主外协一样，如果一样使用 生产+安装 价格，如果不一样，使用 安装价格
+                    int shopOutsourceId = GetShopOutsourceId(order.ShopId ?? 0);
+                    if (shopOutsourceId == newOutsourceId)
+                    {
+                        POP pop = new POP();
+                        pop.GraphicLength = order.GraphicLength;
+                        pop.GraphicWidth = order.GraphicWidth;
+                        string material = string.Empty;
+                        if (!string.IsNullOrWhiteSpace(order.OrderGraphicMaterial))
+                            material = new BasePage().GetBasicMaterial(order.OrderGraphicMaterial);
+                        if (string.IsNullOrWhiteSpace(material))
+                            material = order.OrderGraphicMaterial;
+                        pop.GraphicMaterial = material;
+                        pop.Quantity = order.Quantity;
+                        pop.CustomerId = customerId;
+                        pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                        
+                        decimal unitPrice = 0;
+                        decimal totalPrice = 0;
+                        new BasePage().GetOutsourceOrderMaterialPrice(pop, out unitPrice, out totalPrice);
+                        order.UnitPrice = unitPrice;
+                        order.TotalPrice = totalPrice;
+                        order.AssignType = (int)OutsourceOrderTypeEnum.Install;
+                        outsourceOrderBll.Update(order);
+                    }
+                    else
+                    {
+                        POP pop = new POP();
+                        pop.GraphicLength = order.GraphicLength;
+                        pop.GraphicWidth = order.GraphicWidth;
+                        string material = string.Empty;
+                        if (!string.IsNullOrWhiteSpace(order.OrderGraphicMaterial))
+                            material = new BasePage().GetBasicMaterial(order.OrderGraphicMaterial);
+                        if (string.IsNullOrWhiteSpace(material))
+                            material = order.OrderGraphicMaterial;
+                        pop.GraphicMaterial = material;
+                        pop.Quantity = order.Quantity;
+                        pop.CustomerId = customerId;
+                        pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                        decimal unitPrice = 0;
+                        decimal totalPrice = 0;
+                        new BasePage().GetOutsourceOrderMaterialPrice(pop, out unitPrice, out totalPrice);
+                        order.UnitPrice = unitPrice;
+                        order.TotalPrice = totalPrice;
+                        order.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                        outsourceOrderBll.Update(order);
+                    }
+                }
+            }
+            else
+            {
+                outsourceOrderBll.Update(order);
+            }
+        }
+
+        /// <summary>
+        /// 获取店铺主外协
+        /// </summary>
+        Dictionary<int, int> shopOutsourceIdDic = new Dictionary<int, int>();
+        ShopBLL shopBll = new ShopBLL();
+        int GetShopOutsourceId(int shopId)
+        {
+            if (shopOutsourceIdDic.Keys.Contains(shopId))
+            {
+                return shopOutsourceIdDic[shopId];
+            }
+            else
+            {
+                Shop model = shopBll.GetModel(shopId);
+                int osId = 0;
+                if (model != null)
+                {
+                    osId = model.OutsourceId ?? 0;
+                    shopOutsourceIdDic.Add(shopId, osId);
+                }
+                return osId;
+            }
         }
 
         public bool IsReusable

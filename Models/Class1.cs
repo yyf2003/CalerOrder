@@ -45,6 +45,8 @@ namespace Models
         public int PriceItemId { get; set; }
         public int? OutsourceType { get; set; }
         public int? CustomerId { get; set; }
+        
+        
     }
 
     public partial class ADOrderErrorCorrection
@@ -90,7 +92,9 @@ namespace Models
         public string Remark { get; set; }
         public string GuidanceName { get; set; }
         public string OutsourceName { get; set; }
-        
+        public string Channel { get; set; }
+        public string Format { get; set; }
+        public string CustomServiceName { get; set; }
     }
 
     public partial class Shop {
@@ -113,6 +117,7 @@ namespace Models
         public decimal MaterialPrice { get; set; }
         //其他费
         public decimal OtherPrice { get; set; }
+        public string CSUserName { get; set; }
     }
 
     public partial class NewMaterialSupport {
@@ -178,6 +183,10 @@ namespace Models
         /// 应付安装单价
         /// </summary>
         public decimal? PayPriceInstall { get; set; }
+        /// <summary>
+        /// 应付生产+安装单价
+        /// </summary>
+        public decimal? PayPriceInstallAndProduct { get; set; }
         /// <summary>
         /// 应付发货单价
         /// </summary>

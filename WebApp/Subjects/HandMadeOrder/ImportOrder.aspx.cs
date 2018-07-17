@@ -555,7 +555,7 @@ namespace WebApp.Subjects.HandMadeOrder
                     {
 
                         handOrderModel = new HandMadeOrderDetail();
-                        
+                        handOrderModel.AddDate = DateTime.Now;
                         handOrderModel.Area = area;
                         handOrderModel.ChooseImg = chooseImg;
                         handOrderModel.Gender = gender;
@@ -923,7 +923,7 @@ namespace WebApp.Subjects.HandMadeOrder
                     {
 
                         hcOrderModel = new HCOrderDetail();
-                        
+                        hcOrderModel.AddDate = DateTime.Now;
                         hcOrderModel.Area = area;
                         hcOrderModel.ChooseImg = chooseImg;
                         hcOrderModel.Gender = gender;

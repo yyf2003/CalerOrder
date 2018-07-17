@@ -75,12 +75,16 @@ namespace WebApp.Customer
             var list = (from pop in CurrentContext.DbContext.POP
                        join shop in CurrentContext.DbContext.Shop
                        on pop.ShopId equals shop.Id
+                       join company1 in CurrentContext.DbContext.Company
+                       on pop.ProduceOutsourceId equals company1.Id into temp
+                       from company in temp.DefaultIfEmpty()
                        where pop.ShopId == shopId
                        select new {
                           pop.Id,
                           pop.IsValid,
                           pop,
-                          shop
+                          shop,
+                          ProduceOutsourceName = company!=null?company.CompanyName:""
                        }).ToList();
             popList = list.Select(s=>s.pop).ToList();
             if (!string.IsNullOrWhiteSpace(txtPOPNo.Text))

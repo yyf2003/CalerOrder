@@ -66,6 +66,7 @@ namespace WebApp.Subjects.ChangeMaterialPrice
             }
             try
             {
+                #region 正常订单
                 var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                                  join subject in CurrentContext.DbContext.Subject
                                  on order.SubjectId equals subject.Id
@@ -85,16 +86,7 @@ namespace WebApp.Subjects.ChangeMaterialPrice
                 {
                     int finishOrderCount = 0;
                     int totalOrderCount = orderList.Count;
-                    //HttpCookie cookie = context1.Request.Cookies["updateIncomePriceTotal"];
-                    //if (cookie == null)
-                    //{
-                    //    cookie = new HttpCookie("updateIncomePriceTotal");
-                    //}
-                    //cookie.Value = totalOrderCount.ToString();
-                    //cookie.Expires = DateTime.Now.AddMinutes(60);
-                    //context1.Response.Cookies.Add(cookie);
-                    //context1.Session["updateIncomePriceTotal"] = totalOrderCount.ToString();
-
+                    
 
                     POP popModel;
                     string unitName = string.Empty;
@@ -124,19 +116,18 @@ namespace WebApp.Subjects.ChangeMaterialPrice
                             outsourceOrderBll.Update(outsourceOrder);
                         }
                         finishOrderCount++;
-                        //HttpCookie cookie1 = context1.Request.Cookies["updateIncomePriceFinish"];
-                        //if (cookie1 == null)
-                        //{
-                        //    cookie1 = new HttpCookie("updateIncomePriceFinish");
-                        //}
-                        //cookie1.Value = finishOrderCount.ToString();
-                        //cookie1.Expires = DateTime.Now.AddMinutes(60);
-                        //context1.Response.Cookies.Add(cookie1);
-                        //context1.Session["updateIncomePriceFinish"] = finishOrderCount.ToString();
+                       
                     });
-                    
-                }
 
+                }
+                #endregion
+ 
+                #region 报价订单
+                guidanceIdList.ForEach(gid => {
+                    new BasePage().SaveQuotationOrder(gid, 0, 0, orderMaterialList);
+                });
+                
+                #endregion
             }
             catch (Exception ex)
             {

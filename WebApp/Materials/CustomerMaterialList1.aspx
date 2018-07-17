@@ -79,9 +79,9 @@
         </div>
     </div>
     <div id="editMaterialDiv" title="添加客户材质" style="display: none;">
-        <table style="width: 450px; text-align: center; margin-top: 10px;">
+        <table style="width: 500px; text-align: center; margin-top: 10px;">
             <tr class="tr_bai">
-                <td style="width: 120px; height: 25px;">
+                <td style="width: 150px; height: 25px;">
                     客户名称：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
@@ -93,7 +93,7 @@
             </tr>
             
             <tr class="tr_bai">
-                <td style="width: 100px; height: 25px;">
+                <td style=" height: 25px;">
                     基础材质：
                 </td>
                 <td colspan="3" style="text-align: left; padding-left: 5px;">
@@ -107,7 +107,7 @@
                 </td>
             </tr>
              <tr class="tr_bai">
-                <td style="width: 100px; height: 25px;">
+                <td style=" height: 25px;">
                     单位：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
@@ -118,7 +118,7 @@
                 </td>
             </tr>
             <tr class="tr_bai">
-                <td style="width: 100px; height: 25px;">
+                <td style=" height: 25px;">
                     应收单价：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
@@ -127,7 +127,7 @@
                 </td>
             </tr>
             <tr class="tr_bai">
-                <td style="width: 100px; height: 25px;">
+                <td style="height: 25px;">
                     应付单价（安装）：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
@@ -135,8 +135,17 @@
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
+            <tr class="tr_bai">
+                <td style=" height: 25px;">
+                    应付单价（生产+安装）：
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <input type="text" id="txtPayPriceInstallAndProduct" maxlength="20" style="width: 100px;" />
+                    <span style="color: Red;">*</span>
+                </td>
+            </tr>
              <tr class="tr_bai">
-                <td style="width: 100px; height: 25px;">
+                <td style=" height: 25px;">
                     应付单价（发货）：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">

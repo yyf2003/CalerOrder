@@ -171,7 +171,7 @@ namespace WebApp.Outsource.MaterialInfo
                     list.ForEach(s =>
                     {
                         string state = s.om.IsDelete != null && s.om.IsDelete == true ? "已删除" : "正常";
-                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.om.Id + "\",\"MaterialName\":\"" + s.MaterialName + "\",\"CustomerId\":\"" + s.om.CustomerId + "\",\"CustomerName\":\"" + s.CustomerName + "\",\"UnitId\":\"" + s.om.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"State\":\"" + state + "\",\"InstallPrice\":\"" + s.om.InstallPrice + "\",\"SendPrice\":\"" + s.om.SendPrice + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"BasicMaterialId\":\"" + s.om.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.om.BasicCategoryId + "\"},");
+                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.om.Id + "\",\"MaterialName\":\"" + s.MaterialName + "\",\"CustomerId\":\"" + s.om.CustomerId + "\",\"CustomerName\":\"" + s.CustomerName + "\",\"UnitId\":\"" + s.om.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"State\":\"" + state + "\",\"InstallPrice\":\"" + s.om.InstallPrice + "\",\"InstallAndProductPrice\":\"" + s.om.InstallAndProductPrice + "\",\"SendPrice\":\"" + s.om.SendPrice + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"BasicMaterialId\":\"" + s.om.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.om.BasicCategoryId + "\"},");
                         index++;
                     });
                     if (json.Length > 0)
@@ -214,6 +214,7 @@ namespace WebApp.Outsource.MaterialInfo
                                 newModel.CustomerId = model.CustomerId;
                                 newModel.PriceItemId = model.PriceItemId;
                                 newModel.InstallPrice = model.InstallPrice;
+                                newModel.InstallAndProductPrice = model.InstallAndProductPrice;
                                 newModel.SendPrice = model.SendPrice;
                                 newModel.UnitId = model.UnitId;
                                 bll.Update(newModel);

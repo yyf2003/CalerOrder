@@ -67,6 +67,7 @@ $(function () {
 
             Material.bindBasicCategory(row.BasicCategoryId);
             $("#txtInstallPrice").val(row.InstallPrice);
+            $("#txtInstallAndProductPrice").val(row.InstallAndProductPrice);
             $("#txtSendPrice").val(row.SendPrice);
             Material.bindUnit(row.UnitId);
             $("#editMaterialDiv").show().dialog({
@@ -216,6 +217,7 @@ var Material = {
         this.BasicCategoryId = 0;
         this.BasicMaterialId = 0;
         this.InstallPrice = 0;
+        this.InstallAndProductPrice = 0;
         this.SendPrice = 0;
         this.UnitId = 0;
 
@@ -388,6 +390,7 @@ var Material = {
                         { field: 'CustomerName', title: '客户名称' },
                         { field: 'MaterialName', title: '客户材料名称' },
                         { field: 'InstallPrice', title: '安装单价' },
+                        { field: 'InstallAndProductPrice', title: '生产+安装单价' },
                         { field: 'SendPrice', title: '发货单价' },
                         { field: 'Unit', title: '单位' },
                         { field: 'State', title: '状态', formatter: function (value, row) {
@@ -431,8 +434,8 @@ var Material = {
 
         if (CheckVal()) {
             //var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"MaterialName":"' + this.model.MaterialName + '","UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + '}';
-            var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"InstallPrice":' + this.model.InstallPrice + ',"SendPrice":' + this.model.SendPrice + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + '}';
-
+            var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"InstallPrice":' + this.model.InstallPrice + ',"InstallAndProductPrice":' + this.model.InstallAndProductPrice + ',"SendPrice":' + this.model.SendPrice + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + '}';
+           
             $.ajax({
                 type: "get",
                 url: "ListHandler.ashx",
@@ -529,7 +532,7 @@ var Material = {
         $.ajax({
             type: "post",
             url: 'ListHandler.ashx',
-            data: {type:"addPriceItem", jsonStr: escape(jsonStr) },
+            data: { type: "addPriceItem", jsonStr: escape(jsonStr) },
             success: function (data) {
                 if (data == "ok") {
                     $("#editPriceTypeDiv").dialog('close');
@@ -592,6 +595,7 @@ function CheckVal() {
     var basicCategoryId = $("#selCategory").val();
     var basicMaterialId = $("#selBasicMaterial").val();
     var installPrice = $.trim($("#txtInstallPrice").val());
+    var installAndProductPrice = $.trim($("#txtInstallAndProductPrice").val());
     var sendPrice = $.trim($("#txtSendPrice").val());
     var unitId = $("#selUnit").val();
     if (customerId == "0") {
@@ -610,6 +614,14 @@ function CheckVal() {
         alert("安装单价必须为数字");
         return false;
     }
+    if (installAndProductPrice == "") {
+        alert("请填写生产+安装单价");
+        return false;
+    }
+    else if (isNaN(installAndProductPrice)) {
+        alert("生产+安装单价必须为数字");
+        return false;
+    }
     if (sendPrice == "") {
         alert("请填写发货单价");
         return false;
@@ -622,6 +634,7 @@ function CheckVal() {
     Material.model.BasicCategoryId = basicCategoryId;
     Material.model.BasicMaterialId = basicMaterialId;
     Material.model.InstallPrice = installPrice;
+    Material.model.InstallAndProductPrice = installAndProductPrice;
     Material.model.SendPrice = sendPrice;
     Material.model.UnitId = unitId;
 

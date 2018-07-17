@@ -7,10 +7,10 @@
 // </自动生成>
 //------------------------------------------------------------------------------
 
-namespace WebApp.OutsourcingOrder {
+namespace WebApp.Subjects.ADOrders {
     
     
-    public partial class OutsourceSubject {
+    public partial class ImportOrder1 {
         
         /// <summary>
         /// form1 控件。
@@ -22,210 +22,192 @@ namespace WebApp.OutsourcingOrder {
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
         
         /// <summary>
-        /// ddlCustomer 控件。
+        /// labSubjectNo 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlCustomer;
+        protected global::System.Web.UI.WebControls.Label labSubjectNo;
         
         /// <summary>
-        /// txtMonth 控件。
+        /// labSubjectName 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtMonth;
+        protected global::System.Web.UI.WebControls.Label labSubjectName;
         
         /// <summary>
-        /// cblMaterial 控件。
+        /// labCustomer 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList cblMaterial;
+        protected global::System.Web.UI.WebControls.Label labCustomer;
         
         /// <summary>
-        /// cblExportType 控件。
+        /// labSubjectType 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList cblExportType;
+        protected global::System.Web.UI.WebControls.Label labSubjectType;
         
         /// <summary>
-        /// cblOutsourceType 控件。
+        /// FileUpload1 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList cblOutsourceType;
+        protected global::System.Web.UI.WebControls.FileUpload FileUpload1;
         
         /// <summary>
-        /// rblOrderType 控件。
+        /// cbAdd 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList rblOrderType;
+        protected global::System.Web.UI.WebControls.CheckBox cbAdd;
         
         /// <summary>
-        /// txtShopNo 控件。
+        /// lbDownLoad 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtShopNo;
+        protected global::System.Web.UI.WebControls.LinkButton lbDownLoad;
         
         /// <summary>
-        /// txtPOSScale 控件。
+        /// btnImport 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPOSScale;
+        protected global::System.Web.UI.WebControls.Button btnImport;
         
         /// <summary>
-        /// ddlMaterialSupport 控件。
+        /// Panel1 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlMaterialSupport;
+        protected global::System.Web.UI.WebControls.Panel Panel1;
         
         /// <summary>
-        /// ddlMachineFrame 控件。
+        /// labState 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlMachineFrame;
+        protected global::System.Web.UI.WebControls.Label labState;
         
         /// <summary>
-        /// txtPositionDescription 控件。
+        /// labTips 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPositionDescription;
+        protected global::System.Web.UI.WebControls.Label labTips;
         
         /// <summary>
-        /// txtQuantity 控件。
+        /// ExportFailMsg 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtQuantity;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ExportFailMsg;
         
         /// <summary>
-        /// txtGraphicWidth 控件。
+        /// lbExportError 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtGraphicWidth;
+        protected global::System.Web.UI.WebControls.LinkButton lbExportError;
         
         /// <summary>
-        /// txtGraphicLength 控件。
+        /// ExportEmptyFrame 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtGraphicLength;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ExportEmptyFrame;
         
         /// <summary>
-        /// ddlMaterialCategory 控件。
+        /// lbExportEmptyFrame 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlMaterialCategory;
+        protected global::System.Web.UI.WebControls.LinkButton lbExportEmptyFrame;
         
         /// <summary>
-        /// ddlMaterial 控件。
+        /// ExportPOPEmptyFrame 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlMaterial;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ExportPOPEmptyFrame;
         
         /// <summary>
-        /// txtChooseImg 控件。
+        /// lbExportPOPEmptyFrame 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtChooseImg;
+        protected global::System.Web.UI.WebControls.LinkButton lbExportPOPEmptyFrame;
         
         /// <summary>
-        /// txtRemark 控件。
+        /// ExportPOPPlaceWarning 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtRemark;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ExportPOPPlaceWarning;
         
         /// <summary>
-        /// txtPayPrice 控件。
+        /// lbExportPOPPlaceWarning 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPayPrice;
+        protected global::System.Web.UI.WebControls.LinkButton lbExportPOPPlaceWarning;
         
         /// <summary>
-        /// txtReceivePrice 控件。
+        /// ErrorMaterialSupportWarning 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtReceivePrice;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ErrorMaterialSupportWarning;
         
         /// <summary>
-        /// txtPriceQuantity 控件。
+        /// lbExportErrorMaterialSupport 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPriceQuantity;
-        
-        /// <summary>
-        /// txtPriceRemark 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPriceRemark;
-        
-        /// <summary>
-        /// rblChangeType 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList rblChangeType;
+        protected global::System.Web.UI.WebControls.LinkButton lbExportErrorMaterialSupport;
     }
 }

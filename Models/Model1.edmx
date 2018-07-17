@@ -789,6 +789,7 @@
           <Property Name="IsValidFromAssign" Type="bit" />
           <Property Name="CSUserId" Type="int" />
           <Property Name="InstallPriceAddType" Type="int" />
+          <Property Name="ProduceOutsourceId" Type="int" />
         </EntityType>
         <EntityType Name="HandMadeOrderDetail">
           <Key>
@@ -1559,6 +1560,7 @@
           <Property Name="PriceItemId" Type="int" />
           <Property Name="UnitId" Type="int" />
           <Property Name="InstallPrice" Type="decimal" Scale="2" />
+          <Property Name="InstallAndProductPrice" Type="decimal" Scale="2" />
           <Property Name="SendPrice" Type="decimal" Scale="2" />
           <Property Name="BasicCategoryId" Type="int" />
           <Property Name="BasicMaterialId" Type="int" />
@@ -1588,6 +1590,7 @@
           <Property Name="BasicCategoryId" Type="int" />
           <Property Name="BasicMaterialId" Type="int" />
           <Property Name="InstallPrice" Type="decimal" Scale="2" />
+          <Property Name="InstallAndProductPrice" Type="decimal" Scale="2" />
           <Property Name="SendPrice" Type="decimal" Scale="2" />
           <Property Name="AddUserId" Type="int" />
           <Property Name="AddDate" Type="datetime" />
@@ -1937,6 +1940,7 @@
           <Property Name="IsValid" Type="bit" />
           <Property Name="OOHInstallPrice" Type="decimal" Scale="2" />
           <Property Name="OSOOHInstallPrice" Type="decimal" Scale="2" />
+          <Property Name="ProduceOutsourceId" Type="int" />
         </EntityType>
         <EntityType Name="POPBlackList">
           <Key>
@@ -2099,11 +2103,11 @@
           <Property Name="GuidanceId" Type="int" />
           <Property Name="SubjectId" Type="int" />
           <Property Name="MaterialName" Type="nvarchar" MaxLength="50" />
-          <Property Name="Packaging" Type="nvarchar" MaxLength="50" />
           <Property Name="OutsourceName" Type="nvarchar" MaxLength="50" />
+          <Property Name="Packaging" Type="nvarchar" MaxLength="50" />
+          <Property Name="UnitName" Type="nvarchar" MaxLength="50" />
           <Property Name="Quantity" Type="int" />
           <Property Name="UnitPrice" Type="decimal" Scale="2" />
-          <Property Name="UnitName" Type="nvarchar" MaxLength="50" />
           <Property Name="Remark" Type="nvarchar" MaxLength="100" />
           <Property Name="AddUserId" Type="int" />
           <Property Name="AddDate" Type="datetime" />
@@ -3775,6 +3779,7 @@
           <Property Type="Boolean" Name="IsValidFromAssign" />
           <Property Type="Int32" Name="CSUserId" />
           <Property Type="Int32" Name="InstallPriceAddType" />
+          <Property Type="Int32" Name="ProduceOutsourceId" />
         </EntityType>
         <EntityType Name="HandMadeOrderDetail">
           <Key>
@@ -4548,6 +4553,7 @@
           <Property Type="Boolean" Name="IsDelete" />
           <Property Type="Int32" Name="AddUserId" />
           <Property Type="DateTime" Name="AddDate" />
+          <Property Type="Decimal" Name="InstallAndProductPrice" Precision="18" Scale="2" />
         </EntityType>
         <EntityType Name="OutsourceMaterialOrderDetail">
           <Key>
@@ -4574,6 +4580,7 @@
           <Property Type="Decimal" Name="SendPrice" Precision="18" Scale="2" />
           <Property Type="Int32" Name="AddUserId" />
           <Property Type="DateTime" Name="AddDate" />
+          <Property Type="Decimal" Name="InstallAndProductPrice" Precision="18" Scale="2" />
         </EntityType>
         <EntityType Name="OutsourceMaterialPriceItem">
           <Key>
@@ -4917,6 +4924,7 @@
           <Property Type="Boolean" Name="IsValid" />
           <Property Type="Decimal" Name="OOHInstallPrice" Precision="18" Scale="2" />
           <Property Type="Decimal" Name="OSOOHInstallPrice" Precision="18" Scale="2" />
+          <Property Type="Int32" Name="ProduceOutsourceId" />
         </EntityType>
         <EntityType Name="POPBlackList">
           <Key>
@@ -6536,6 +6544,7 @@
           <EntitySetMapping Name="FinalOrderDetailTemp">
             <EntityTypeMapping TypeName="KalerOrderDBModel.FinalOrderDetailTemp">
               <MappingFragment StoreEntitySet="FinalOrderDetailTemp">
+                <ScalarProperty Name="ProduceOutsourceId" ColumnName="ProduceOutsourceId" />
                 <ScalarProperty Name="InstallPriceAddType" ColumnName="InstallPriceAddType" />
                 <ScalarProperty Name="CSUserId" ColumnName="CSUserId" />
                 <ScalarProperty Name="IsValidFromAssign" ColumnName="IsValidFromAssign" />
@@ -7435,6 +7444,7 @@
           <EntitySetMapping Name="OutsourceMaterialInfo">
             <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourceMaterialInfo">
               <MappingFragment StoreEntitySet="OutsourceMaterialInfo">
+                <ScalarProperty Name="InstallAndProductPrice" ColumnName="InstallAndProductPrice" />
                 <ScalarProperty Name="AddDate" ColumnName="AddDate" />
                 <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
                 <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
@@ -7466,6 +7476,7 @@
           <EntitySetMapping Name="OutsourceMaterialPrice">
             <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourceMaterialPrice">
               <MappingFragment StoreEntitySet="OutsourceMaterialPrice">
+                <ScalarProperty Name="InstallAndProductPrice" ColumnName="InstallAndProductPrice" />
                 <ScalarProperty Name="AddDate" ColumnName="AddDate" />
                 <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
                 <ScalarProperty Name="SendPrice" ColumnName="SendPrice" />
@@ -7776,6 +7787,7 @@
           <EntitySetMapping Name="POP">
             <EntityTypeMapping TypeName="KalerOrderDBModel.POP">
               <MappingFragment StoreEntitySet="POP">
+                <ScalarProperty Name="ProduceOutsourceId" ColumnName="ProduceOutsourceId" />
                 <ScalarProperty Name="OSOOHInstallPrice" ColumnName="OSOOHInstallPrice" />
                 <ScalarProperty Name="OOHInstallPrice" ColumnName="OOHInstallPrice" />
                 <ScalarProperty Name="IsValid" ColumnName="IsValid" />

@@ -23,5 +23,10 @@ namespace BLL
         {
             return dal.ExportOutsourceOrderList(whereSql);
         }
+
+        public void UpdateAddDate(int subjectId, string addDate, int type)
+        {
+            dal.UpdateAddDate(subjectId, addDate, type);
+        }
     }
 }

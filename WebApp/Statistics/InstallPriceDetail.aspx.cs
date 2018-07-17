@@ -73,6 +73,7 @@ namespace WebApp.Statistics
             if (!string.IsNullOrWhiteSpace(subjectIds))
             {
                 subjectIdList = StringHelper.ToIntList(subjectIds, ',');
+
             }
             List<int> customerServiceIdList = new List<int>();
             if (!string.IsNullOrWhiteSpace(customerServiceIds))
@@ -101,21 +102,35 @@ namespace WebApp.Statistics
             List<int> installShopIdList = new List<int>();
             decimal totalPrice = 0;
             shopList = new List<Shop>();
-            guidanceIdList.ForEach(gid => {
-                var orderDetailList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
-                                       join subject in CurrentContext.DbContext.Subject
+            List<FinalOrderDetailTemp> fOrderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                                     from gid in guidanceIdList
+                                                     where order.GuidanceId == gid
+                                                     && (order.IsDelete == null || order.IsDelete == false)
+                                                     select order).ToList();
+            List<Subject> subjectList = (from subject in CurrentContext.DbContext.Subject
+                                         from gid in guidanceIdList
+                                         where subject.GuidanceId == gid
+                                         && subject.ApproveState == 1
+                                         && (subject.IsDelete == null || subject.IsDelete == false)
+                                         select subject).ToList();
+            List<SubjectGuidance> guidanceList = new SubjectGuidanceBLL().GetList(s => guidanceIdList.Contains(s.ItemId));
+            guidanceIdList.ForEach(gid =>
+            {
+                List<int> currSubjectIdList = subjectIdList;
+                var orderDetailList = (from order in fOrderList
+                                       join subject in subjectList
                                        on order.SubjectId equals subject.Id
-                                       join guidance in CurrentContext.DbContext.SubjectGuidance
+                                       join guidance in guidanceList
                                        on order.GuidanceId equals guidance.ItemId
                                        where order.GuidanceId == gid
                                        && order.OrderType != (int)OrderTypeEnum.物料
-                                       && (order.IsDelete==null || order.IsDelete==false)
-                                       && (subject.IsDelete==null || subject.IsDelete==false)
-                                       && subject.ApproveState==1
-                                       //&& subject.SubjectType!=(int)SubjectTypeEnum.费用订单
-                                       //&& (regionList1.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList1.Contains(subject.PriceBlongRegion.ToLower()) : regionList1.Contains(order.Region.ToLower())) : 1 == 1)
+                                           //&& (order.IsDelete==null || order.IsDelete==false)
+                                           //&& (subject.IsDelete==null || subject.IsDelete==false)
+                                           //&& subject.ApproveState==1
+                                           //&& subject.SubjectType!=(int)SubjectTypeEnum.费用订单
+                                           //&& (regionList1.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList1.Contains(subject.PriceBlongRegion.ToLower()) : regionList1.Contains(order.Region.ToLower())) : 1 == 1)
                                        && (regionList1.Any() ? regionList1.Contains(order.Region.ToLower()) : 1 == 1)
-                                       
+
                                        select new
                                        {
                                            order,
@@ -139,11 +154,11 @@ namespace WebApp.Statistics
                 }
                 if (subjectIdList.Any())
                 {
-                    orderDetailList = orderDetailList.Where(s => subjectIdList.Contains(s.subject.Id) || subjectIdList.Contains(s.subject.HandMakeSubjectId??0)).ToList();
+                    orderDetailList = orderDetailList.Where(s => subjectIdList.Contains(s.subject.Id) || subjectIdList.Contains(s.subject.HandMakeSubjectId ?? 0)).ToList();
                 }
                 else
                 {
-                    subjectIdList = orderDetailList.Select(s=>s.subject.Id).Distinct().ToList();
+                    currSubjectIdList = orderDetailList.Select(s => s.subject.Id).Distinct().ToList();
                 }
                 if (subjectChannel == 1)
                 {
@@ -178,12 +193,12 @@ namespace WebApp.Statistics
 
                     }
                 }
-                
+
                 if (regionList1.Any())
                 {
 
                     //orderDetailList = orderDetailList.Where(s => (s.subject.PriceBlongRegion != null && s.subject.PriceBlongRegion != "") ? regionList1.Contains(s.subject.PriceBlongRegion.ToLower()) : regionList1.Contains(s.order.Region.ToLower())).ToList();
-                   
+
                 }
                 if (!string.IsNullOrWhiteSpace(province))
                 {
@@ -201,106 +216,112 @@ namespace WebApp.Statistics
                     orderDetailList = orderDetailList.Where(s => s.order.ShopNo.ToLower().Contains(shopNo.ToLower())).ToList();
                 }
                 List<int> shopIdList = orderDetailList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
-                
 
-                var orderList = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
-                                 join shop in CurrentContext.DbContext.Shop
-                                 on installShop.ShopId equals shop.Id
-                                 join subject in CurrentContext.DbContext.Subject
-                                 on installShop.SubjectId equals subject.Id
-                                 join guidance in CurrentContext.DbContext.SubjectGuidance
-                                 on installShop.GuidanceId equals guidance.ItemId
-                                 where installShop.GuidanceId == gid
-                                 && (guidance.ActivityTypeId != (int)GuidanceTypeEnum.Others)//不统计分区增补的安装费
-                                 && (installShop.BasicPrice ?? 0) > 0
-                                 && shopIdList.Contains(installShop.ShopId??0)
-                                 && subjectIdList.Contains(installShop.SubjectId??0)
-                                 select new
-                                 {
-                                     installShop,
-                                     shop,
-                                     subject,
-                                     guidance.ItemName
-                                 }).ToList();
-
-
-
-                bool isWindow = false;
-                bool isOOH = false;
-                foreach (ListItem li in cblFeeType.Items)
+                try
                 {
-                    if (li.Selected)
+                    var orderList = (from installShop in CurrentContext.DbContext.InstallPriceShopInfo
+                                     join shop in CurrentContext.DbContext.Shop
+                                     on installShop.ShopId equals shop.Id
+                                     join subject in CurrentContext.DbContext.Subject
+                                     on installShop.SubjectId equals subject.Id
+                                     join guidance in CurrentContext.DbContext.SubjectGuidance
+                                     on installShop.GuidanceId equals guidance.ItemId
+                                     where installShop.GuidanceId == gid
+                                     && (guidance.ActivityTypeId != (int)GuidanceTypeEnum.Others)//不统计分区增补的安装费
+                                     && (installShop.BasicPrice ?? 0) > 0
+                                     && shopIdList.Contains(installShop.ShopId ?? 0)
+                                     && currSubjectIdList.Contains(installShop.SubjectId ?? 0)
+                                     select new
+                                     {
+                                         installShop,
+                                         shop,
+                                         subject,
+                                         guidance.ItemName
+                                     }).ToList();
+
+
+
+                    bool isWindow = false;
+                    bool isOOH = false;
+                    foreach (ListItem li in cblFeeType.Items)
                     {
-                        if (li.Value == "window")
-                            isWindow = true;
-                        if (li.Value == "ooh")
-                            isOOH = true;
+                        if (li.Selected)
+                        {
+                            if (li.Value == "window")
+                                isWindow = true;
+                            if (li.Value == "ooh")
+                                isOOH = true;
+                        }
+                    }
+                    if (isWindow)
+                    {
+                        orderList = orderList.Where(s => (s.installShop.WindowPrice ?? 0) > 0).ToList();
+
+                    }
+                    if (isOOH)
+                    {
+                        orderList = orderList.Where(s => (s.installShop.OOHPrice ?? 0) > 0).ToList();
+                    }
+
+
+                    if (orderList.Any())
+                    {
+                        orderList.ForEach(s =>
+                        {
+
+                            Shop shopModel = new Shop();
+                            shopModel.ShopNo = s.shop.ShopNo;
+                            shopModel.ShopName = s.shop.ShopName;
+                            shopModel.RegionName = s.shop.RegionName;
+                            shopModel.ProvinceName = s.shop.ProvinceName;
+                            shopModel.CityName = s.shop.CityName;
+                            shopModel.CityTier = s.shop.CityTier;
+                            shopModel.IsInstall = s.shop.IsInstall;
+                            shopModel.BasicInstallPrice = s.installShop.BasicPrice ?? 0;
+                            shopModel.WindowInstallPrice = s.installShop.WindowPrice ?? 0;
+                            shopModel.OOHInstallPrice = s.installShop.OOHPrice ?? 0;
+                            shopModel.POSScale = s.installShop.POSScale;
+                            shopModel.MaterialSupport = s.installShop.MaterialSupport;
+                            shopModel.GuidanceName = s.ItemName;
+                            shopModel.SubjectName = s.subject.SubjectName;
+                            shopList.Add(shopModel);
+                            totalPrice += ((s.installShop.BasicPrice ?? 0) + (s.installShop.WindowPrice ?? 0) + (s.installShop.OOHPrice ?? 0));
+                            installShopIdList.Add(s.installShop.ShopId ?? 0);
+                        });
+                    }
+                    // var priceOrderList = orderDetailList.Where(s => s.order.OrderType == (int)OrderTypeEnum.安装费 &&  && (s.order.OrderPrice ?? 0) > 0).ToList();
+                    var priceOrderList = orderDetailList.Where(s => (s.guidance.ActivityTypeId ?? 1) != (int)GuidanceTypeEnum.Others && s.subject.SubjectType != (int)SubjectTypeEnum.二次安装 && s.order.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                    if (priceOrderList.Any())
+                    {
+                        priceOrderList.ForEach(s =>
+                        {
+                            Shop shopModel = new Shop();
+                            shopModel.ShopNo = s.order.ShopNo;
+                            shopModel.ShopName = s.order.ShopName;
+                            shopModel.RegionName = s.order.Region;
+                            shopModel.ProvinceName = s.order.Province;
+                            shopModel.CityName = s.order.City;
+                            shopModel.CityTier = s.order.CityTier;
+                            shopModel.IsInstall = s.order.IsInstall;
+                            shopModel.BasicInstallPrice = s.order.OrderPrice ?? 0;
+                            shopModel.WindowInstallPrice = 0;
+                            shopModel.OOHInstallPrice = 0;
+                            shopModel.POSScale = s.order.POSScale;
+                            shopModel.MaterialSupport = s.order.MaterialSupport;
+                            shopModel.GuidanceName = s.guidance.ItemName; ;
+                            shopModel.SubjectName = s.subject.SubjectName;
+                            shopList.Add(shopModel);
+                            totalPrice += (s.order.OrderPrice ?? 0);
+                            installShopIdList.Add(s.order.ShopId ?? 0);
+                        });
                     }
                 }
-                if (isWindow)
+                catch (Exception ex)
                 {
-                    orderList = orderList.Where(s => (s.installShop.WindowPrice ?? 0) > 0).ToList();
 
-                }
-                if (isOOH)
-                {
-                    orderList = orderList.Where(s => (s.installShop.OOHPrice ?? 0) > 0).ToList();
-                }
-                
-                
-                if (orderList.Any())
-                {
-                    orderList.ForEach(s =>
-                    {
-
-                        Shop shopModel = new Shop();
-                        shopModel.ShopNo = s.shop.ShopNo;
-                        shopModel.ShopName = s.shop.ShopName;
-                        shopModel.RegionName = s.shop.RegionName;
-                        shopModel.ProvinceName = s.shop.ProvinceName;
-                        shopModel.CityName = s.shop.CityName;
-                        shopModel.CityTier = s.shop.CityTier;
-                        shopModel.IsInstall = s.shop.IsInstall;
-                        shopModel.BasicInstallPrice = s.installShop.BasicPrice ?? 0;
-                        shopModel.WindowInstallPrice = s.installShop.WindowPrice ?? 0;
-                        shopModel.OOHInstallPrice = s.installShop.OOHPrice ?? 0;
-                        shopModel.POSScale = s.installShop.POSScale;
-                        shopModel.MaterialSupport = s.installShop.MaterialSupport;
-                        shopModel.GuidanceName = s.ItemName;
-                        shopModel.SubjectName = s.subject.SubjectName;
-                        shopList.Add(shopModel);
-                        totalPrice += ((s.installShop.BasicPrice ?? 0) + (s.installShop.WindowPrice ?? 0) + (s.installShop.OOHPrice ?? 0));
-                        installShopIdList.Add(s.installShop.ShopId ?? 0);
-                    });
-                }
-               // var priceOrderList = orderDetailList.Where(s => s.order.OrderType == (int)OrderTypeEnum.安装费 &&  && (s.order.OrderPrice ?? 0) > 0).ToList();
-                var priceOrderList = orderDetailList.Where(s => (s.guidance.ActivityTypeId ?? 1) != (int)GuidanceTypeEnum.Others && s.subject.SubjectType != (int)SubjectTypeEnum.二次安装 && s.order.OrderType == (int)OrderTypeEnum.安装费).ToList();
-                if (priceOrderList.Any())
-                {
-                    priceOrderList.ForEach(s =>
-                    {
-                        Shop shopModel = new Shop();
-                        shopModel.ShopNo = s.order.ShopNo;
-                        shopModel.ShopName = s.order.ShopName;
-                        shopModel.RegionName = s.order.Region;
-                        shopModel.ProvinceName = s.order.Province;
-                        shopModel.CityName = s.order.City;
-                        shopModel.CityTier = s.order.CityTier;
-                        shopModel.IsInstall = s.order.IsInstall;
-                        shopModel.BasicInstallPrice = s.order.OrderPrice ?? 0;
-                        shopModel.WindowInstallPrice = 0;
-                        shopModel.OOHInstallPrice = 0;
-                        shopModel.POSScale = s.order.POSScale;
-                        shopModel.MaterialSupport = s.order.MaterialSupport;
-                        shopModel.GuidanceName = s.guidance.ItemName; ;
-                        shopModel.SubjectName = s.subject.SubjectName;
-                        shopList.Add(shopModel);
-                        totalPrice += (s.order.OrderPrice ?? 0);
-                        installShopIdList.Add(s.order.ShopId ?? 0);
-                    });
                 }
             });
-            
+
 
 
 

@@ -189,6 +189,7 @@ namespace WebApp.Materials.Handler
                     list.ForEach(s =>
                     {
                         decimal PayPriceInstall = 0;
+                        decimal PayPriceInstallAndProduct = 0;
                         decimal PayPriceSend = 0;
                         int materialId = s.cm.BasicMaterialId ?? 0;
                         int outsourceMaterialId = 0;
@@ -196,11 +197,12 @@ namespace WebApp.Materials.Handler
                         if (omModel != null)
                         {
                             PayPriceInstall = omModel.InstallPrice ?? 0;
+                            PayPriceInstallAndProduct = omModel.InstallAndProductPrice ?? 0;
                             PayPriceSend = omModel.SendPrice ?? 0;
                             outsourceMaterialId = omModel.Id;
                         }
                         string state = s.cm.IsDelete != null && s.cm.IsDelete == true ? "已删除" : "正常";
-                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.cm.Id + "\",\"MaterialName\":\"" + s.MaterialName + "\",\"CustomerId\":\"" + s.cm.CustomerId + "\",\"CustomerName\":\"" + s.CustomerName + "\",\"UnitId\":\"" + s.cm.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"State\":\"" + state + "\",\"Price\":\"" + s.cm.Price + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"BasicMaterialId\":\"" + s.cm.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.cm.BasicCategoryId + "\",\"PayPriceInstall\":\"" + PayPriceInstall + "\",\"PayPriceSend\":\"" + PayPriceSend + "\",\"OutsourceMaterialId\":\"" + outsourceMaterialId + "\"},");
+                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.cm.Id + "\",\"MaterialName\":\"" + s.MaterialName + "\",\"CustomerId\":\"" + s.cm.CustomerId + "\",\"CustomerName\":\"" + s.CustomerName + "\",\"UnitId\":\"" + s.cm.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"State\":\"" + state + "\",\"Price\":\"" + s.cm.Price + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"BasicMaterialId\":\"" + s.cm.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.cm.BasicCategoryId + "\",\"PayPriceInstall\":\"" + PayPriceInstall + "\",\"PayPriceInstallAndProduct\":\"" + PayPriceInstallAndProduct + "\",\"PayPriceSend\":\"" + PayPriceSend + "\",\"OutsourceMaterialId\":\"" + outsourceMaterialId + "\"},");
                         index++;
                     });
                     if (json.Length > 0)
@@ -328,9 +330,10 @@ namespace WebApp.Materials.Handler
                                 outsourceMaterialInfoModel = outMaterialBll.GetModel(model.OutsourceMaterialId ?? 0);
                                 if (outsourceMaterialInfoModel != null)
                                 {
-                                    if (outsourceMaterialInfoModel.InstallPrice != model.PayPriceInstall || outsourceMaterialInfoModel.SendPrice != model.PayPriceSend)
+                                    if (outsourceMaterialInfoModel.InstallPrice != model.PayPriceInstall || outsourceMaterialInfoModel.SendPrice != model.PayPriceSend || outsourceMaterialInfoModel.InstallAndProductPrice!=model.PayPriceInstallAndProduct)
                                     {
                                         outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                                        outsourceMaterialInfoModel.InstallAndProductPrice = model.PayPriceInstallAndProduct;
                                         outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
                                         outMaterialBll.Update(outsourceMaterialInfoModel);
                                     }
@@ -349,6 +352,7 @@ namespace WebApp.Materials.Handler
                                     outsourceMaterialInfoModel.BasicMaterialId = model.BasicMaterialId;
                                     outsourceMaterialInfoModel.CustomerId = model.CustomerId;
                                     outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                                    outsourceMaterialInfoModel.InstallAndProductPrice = model.PayPriceInstallAndProduct;
                                     outsourceMaterialInfoModel.IsDelete = false;
                                     outsourceMaterialInfoModel.PriceItemId = itemModel.Id;
                                     outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
@@ -405,9 +409,10 @@ namespace WebApp.Materials.Handler
                                         outsourceMaterialInfoModel = outMaterialBll.GetModel(model.OutsourceMaterialId ?? 0);
                                         if (outsourceMaterialInfoModel != null)
                                         {
-                                            if (outsourceMaterialInfoModel.InstallPrice != model.PayPriceInstall || outsourceMaterialInfoModel.SendPrice != model.PayPriceSend)
+                                            if (outsourceMaterialInfoModel.InstallPrice != model.PayPriceInstall || outsourceMaterialInfoModel.SendPrice != model.PayPriceSend || outsourceMaterialInfoModel.InstallAndProductPrice != model.PayPriceInstallAndProduct)
                                             {
                                                 outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                                                outsourceMaterialInfoModel.InstallAndProductPrice = model.PayPriceInstallAndProduct;
                                                 outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;
                                                 outMaterialBll.Update(outsourceMaterialInfoModel);
                                             }
@@ -426,6 +431,7 @@ namespace WebApp.Materials.Handler
                                             outsourceMaterialInfoModel.BasicMaterialId = model.BasicMaterialId;
                                             outsourceMaterialInfoModel.CustomerId = model.CustomerId;
                                             outsourceMaterialInfoModel.InstallPrice = model.PayPriceInstall;
+                                            outsourceMaterialInfoModel.InstallAndProductPrice = model.PayPriceInstallAndProduct;
                                             outsourceMaterialInfoModel.IsDelete = false;
                                             outsourceMaterialInfoModel.PriceItemId = itemModel.Id;
                                             outsourceMaterialInfoModel.SendPrice = model.PayPriceSend;

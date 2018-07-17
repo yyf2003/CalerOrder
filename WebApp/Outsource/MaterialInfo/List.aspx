@@ -118,6 +118,15 @@
             </tr>
             <tr class="tr_bai">
                 <td style="width: 100px; height: 25px;">
+                    生产+安装单价：
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <input type="text" id="txtInstallAndProductPrice" maxlength="20" style="width: 100px;" />
+                    <span style="color: Red;">*</span>
+                </td>
+            </tr>
+            <tr class="tr_bai">
+                <td style="width: 100px; height: 25px;">
                     发货单价：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
