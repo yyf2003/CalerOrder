@@ -256,7 +256,7 @@ namespace WebApp.Statistics.handler
                     {
                         allSubjectIdList = orderList.Select(s => s.order.SubjectId??0).Distinct().ToList();
                     }
-
+                    orderList = orderList.Where(s => allSubjectIdList.Contains(s.order.SubjectId??0)).ToList();
                     if (!string.IsNullOrWhiteSpace(provinces))
                     {
                         provinceList = StringHelper.ToStringList(provinces, ',');

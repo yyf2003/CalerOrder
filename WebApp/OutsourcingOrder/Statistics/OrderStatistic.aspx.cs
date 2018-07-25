@@ -1566,7 +1566,11 @@ namespace WebApp.OutsourcingOrder.Statistics
                                     }
                                     popPrice += (s.order.TotalPrice ?? 0);
                                     receivePOPPrice += (s.order.ReceiveTotalPrice ?? 0);
-
+                                    if (s.order.OrderType == (int)OrderTypeEnum.安装费)
+                                    {
+                                        installPrice += (s.order.PayOrderPrice ?? 0);
+                                        receiveinstallPrice += (s.order.ReceiveOrderPrice ?? 0);
+                                    }
                                     if (s.order.OrderType == (int)OrderTypeEnum.测量费)
                                     {
                                         measurePrice += (s.order.PayOrderPrice ?? 0);
@@ -2459,12 +2463,12 @@ namespace WebApp.OutsourcingOrder.Statistics
                                 if ((s.order.PayOrderPrice ?? 0) > 0)
                                 {
                                     //orderPrice = (s.order.OrderPrice ?? 0).ToString();
-                                    orderModel.TotalPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
+                                    orderModel.TotalPrice = double.Parse(((s.order.PayOrderPrice ?? 0) * (s.order.Quantity ?? 1)).ToString());
                                     orderModel.UnitPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
                                     orderModel.Gender = string.Empty;
                                     orderModel.Sheet = string.Empty;
                                     orderModel.ReceiveUnitPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
-                                    orderModel.ReceiveTotalPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
+                                    orderModel.ReceiveTotalPrice = double.Parse(((s.order.ReceiveOrderPrice ?? 0) * (s.order.Quantity ?? 1)).ToString());
                                 }
                                 else
                                 {
@@ -2573,10 +2577,10 @@ namespace WebApp.OutsourcingOrder.Statistics
                                     orderModel.SubjectNo = string.Empty;
                                     
                                     orderModel.PriceType = "安装费";
-                                    orderModel.TotalPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
+                                    orderModel.TotalPrice = double.Parse(((s.order.PayOrderPrice ?? 0)*(s.order.Quantity??1)).ToString());
                                     orderModel.UnitPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
                                     orderModel.ReceiveUnitPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
-                                    orderModel.ReceiveTotalPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
+                                    orderModel.ReceiveTotalPrice = double.Parse(((s.order.ReceiveOrderPrice ?? 0) * (s.order.Quantity ?? 1)).ToString());
                                     orderModel.GuidanceName = s.guidance.ItemName;
                                     orderModel.OutsourceName = s.outsource.CompanyName;
                                     newOrderList.Add(orderModel);
@@ -2608,10 +2612,10 @@ namespace WebApp.OutsourcingOrder.Statistics
                                     orderModel.SubjectNo = string.Empty;
                                     
                                     orderModel.PriceType = "发货费";
-                                    orderModel.TotalPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
+                                    orderModel.TotalPrice = double.Parse(((s.order.PayOrderPrice ?? 0) * (s.order.Quantity ?? 1)).ToString());
                                     orderModel.UnitPrice = double.Parse((s.order.PayOrderPrice ?? 0).ToString());
                                     orderModel.ReceiveUnitPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
-                                    orderModel.ReceiveTotalPrice = double.Parse((s.order.ReceiveOrderPrice ?? 0).ToString());
+                                    orderModel.ReceiveTotalPrice = double.Parse(((s.order.ReceiveOrderPrice ?? 0) * (s.order.Quantity ?? 1)).ToString());
                                     orderModel.GuidanceName = s.guidance.ItemName;
                                     orderModel.OutsourceName = s.outsource.CompanyName;
                                     newOrderList.Add(orderModel);

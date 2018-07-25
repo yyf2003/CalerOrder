@@ -15,16 +15,18 @@
         var subjectId = '<%=subjectId %>';
         var customerId = '<%=customerId %>';
         var quoteItemId = '<%=itemId %>';
+        var region = '<%=region %>';
         function finish(msg) {
             if (msg == "ok") {
                 window.parent.Finish();
             }
             else {
                 layer.msg("提交失败!");
-                
             }
         }
-        
+        function Changed() {
+            window.parent.Changed();
+        }
     </script>
     <style type="text/css">
         #popTable li
@@ -155,6 +157,10 @@
               <td colspan="5" style="text-align: left; padding-left: 5px; height:40px;">
                  <asp:Button ID="btnExport" runat="server" Text="导出报价单模板" class="layui-btn layui-btn-small"
                         OnClick="btnExport_Click" />
+
+                 &nbsp;&nbsp;&nbsp;&nbsp;
+                 <asp:Button ID="btnExportOrder" runat="server" Text="导出订单" class="layui-btn layui-btn-small"
+                        OnClick="btnExportOrder_Click" />
               </td>
             </tr>
         </table>
@@ -383,9 +389,9 @@
     <div class="tr" style="margin-top: 20px;">
         》T1-T3安装费统计
     </div>
-    <table class="table">
+    <table class="table" id="basicInstallPriceTB">
         <tr class="tr_hui">
-            <td rowspan="2" style="width: 180px;">
+            <td rowspan="2" style="width: 180px; ">
                 费用名称
             </td>
             <td rowspan="2">
@@ -1271,8 +1277,4 @@
 </body>
 </html>
 <script src="js/addQuotation.js" type="text/javascript"></script>
-<script type="text/javascript">
-    $(function () {
-        //$().siblings
-    })
-</script>
+

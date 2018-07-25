@@ -1,0 +1,1 @@
+[{"PermissionType":"Export","PermissionContent":[{"UserId":10,"Channel":"BB","Format":""},{"UserId":2,"Channel":"Homecourt","Format":""},{"UserId":2,"Channel":"Kids","Format":""},{"UserId":2,"Channel":"KIDS","Format":""}]},{"PermissionType":"Approve","PermissionContent":[]}]

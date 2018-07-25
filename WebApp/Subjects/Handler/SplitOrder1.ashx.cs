@@ -1586,9 +1586,10 @@ namespace WebApp.Subjects.Handler
                         ProvinceName = GetProvinceNames(s.Id);
                         CityName = GetCityNames(s.Id);
                         string keeppopsize = s.KeepPOPSize != null && bool.Parse(s.KeepPOPSize.ToString()) ? "是" : "";
+                        string noMainKV = s.NoMainKV != null && bool.Parse(s.NoMainKV.ToString()) ? "是" : "";
                         int isExcept = s.IsExcept == true ? 1 : 0;
 
-                        json.Append("{\"Id\":\"" + s.Id + "\",\"RegionNames\":\"" + s.RegionNames + "\",\"ProvinceId\":\"" + s.ProvinceId + "\",\"CityId\":\"" + s.CityId + "\",\"ProvinceName\":\"" + ProvinceName + "\",\"CityName\":\"" + CityName + "\",\"CityTier\":\"" + s.CityTier + "\",\"IsInstall\":\"" + s.IsInstall + "\",\"Format\":\"" + s.Format + "\",\"MaterialSupport\":\"" + s.MaterialSupport + "\",\"POSScale\":\"" + s.POSScale + "\",\"Gender\":\"" + s.Gender + "\",\"ShopNos\":\"" + s.ShopNos + "\",\"PositionId\":\"" + s.PositionId + "\",\"PositionName\":\"" + s.PositionName + "\",\"MachineFrameIds\":\"" + s.MachineFrameIds + "\",\"MachineFrameNames\":\"" + s.MachineFrameNames + "\",\"Quantity\":\"" + s.Quantity + "\",\"GraphicMaterial\":\"" + s.GraphicMaterial + "\",\"POPSize\":\"" + s.POPSize + "\",\"WindowSize\":\"" + s.WindowSize + "\",\"ChooseImg\":\"" + s.ChooseImg + "\",\"CornerType\":\"" + s.CornerType + "\",\"KeepPOPSize\":\"" + keeppopsize + "\",\"IsElectricity\":\"" + s.IsElectricity + "\",\"NotInvolveShopNos\":\"" + s.NotInvolveShopNos + "\"},");
+                        json.Append("{\"Id\":\"" + s.Id + "\",\"RegionNames\":\"" + s.RegionNames + "\",\"ProvinceId\":\"" + s.ProvinceId + "\",\"CityId\":\"" + s.CityId + "\",\"ProvinceName\":\"" + ProvinceName + "\",\"CityName\":\"" + CityName + "\",\"CityTier\":\"" + s.CityTier + "\",\"IsInstall\":\"" + s.IsInstall + "\",\"Format\":\"" + s.Format + "\",\"MaterialSupport\":\"" + s.MaterialSupport + "\",\"POSScale\":\"" + s.POSScale + "\",\"Gender\":\"" + s.Gender + "\",\"ShopNos\":\"" + s.ShopNos + "\",\"PositionId\":\"" + s.PositionId + "\",\"PositionName\":\"" + s.PositionName + "\",\"MachineFrameIds\":\"" + s.MachineFrameIds + "\",\"MachineFrameNames\":\"" + s.MachineFrameNames + "\",\"Quantity\":\"" + s.Quantity + "\",\"GraphicMaterial\":\"" + s.GraphicMaterial + "\",\"POPSize\":\"" + s.POPSize + "\",\"WindowSize\":\"" + s.WindowSize + "\",\"ChooseImg\":\"" + s.ChooseImg + "\",\"CornerType\":\"" + s.CornerType + "\",\"KeepPOPSize\":\"" + keeppopsize + "\",\"IsElectricity\":\"" + s.IsElectricity + "\",\"NotInvolveShopNos\":\"" + s.NotInvolveShopNos + "\",\"NoMainKV\":\"" + noMainKV + "\"},");
 
                     });
                     return "[" + json.ToString().TrimEnd(',') + "]";
@@ -1761,6 +1762,9 @@ namespace WebApp.Subjects.Handler
                     #region 按方案拆单
                     if (listOrder.Any() && planList.Any())
                     {
+                        //户外店鞋墙主kv
+                        List<HCSmallGraphicSize> terrexMainKvList = new HCSmallGraphicSizeBLL().GetList(s=>s.Format.ToLower()=="terrex");
+
                         if (!string.IsNullOrWhiteSpace(listOrder[0].subject.CornerType))
                             subjectCornerTypeList.Add(listOrder[0].subject.CornerType);
                         List<string> InSetList = new List<string>();
@@ -1884,12 +1888,12 @@ namespace WebApp.Subjects.Handler
                                     shopList = shopList.Where(l => scaleList.Contains(l.order.POSScale)).ToList();
                                 }
                             }
-
+                            List<string> PlanGenderlist = new List<string>();
                             //性别
                             if (!string.IsNullOrWhiteSpace(s.Gender))
                             {
-                                List<string> list = StringHelper.ToStringList(s.Gender, ',');
-                                shopList = shopList.Where(l => list.Contains(l.order.OrderGender) || (l.order.OrderGender.Contains("男") && l.order.OrderGender.Contains("女"))).ToList();
+                                PlanGenderlist = StringHelper.ToStringList(s.Gender, ',');
+                                shopList = shopList.Where(l => PlanGenderlist.Contains(l.order.OrderGender) || (l.order.OrderGender.Contains("男") && l.order.OrderGender.Contains("女"))).ToList();
                             }
                             //数量
                             if (!string.IsNullOrWhiteSpace(s.Quantity))
@@ -2069,7 +2073,20 @@ namespace WebApp.Subjects.Handler
                                 {
                                     
                                     if (subjectCategoryName == "户外")
-                                    { 
+                                    {
+                                        #region 判断是否去掉主KV（主KV延续）
+                                        List<HCSmallGraphicSize> mainKvList = terrexMainKvList.Where(kv => kv.Sheet == s.PositionName).ToList();
+                                        List<HCSmallGraphicSize> noMainKvList = new List<HCSmallGraphicSize>();
+                                        List<decimal> GraphicWidthList = new List<decimal>();
+                                        if (s.NoMainKV ?? false)
+                                        {
+                                            frames.ForEach(f => {
+                                                noMainKvList.AddRange(mainKvList.Where(kv => f.Contains(kv.Remark)).ToList());
+                                            });
+
+                                            GraphicWidthList = noMainKvList.Select(kv => kv.BigGraphicWidth ?? 0).ToList();
+                                        }
+                                        #endregion
                                         POPBLL popBll=new POPBLL();
                                         //如果是户外项目，先取出对应该器架的POP作为拆单结果
                                         shopList.ForEach(shop1 => {
@@ -2078,6 +2095,12 @@ namespace WebApp.Subjects.Handler
                                             {
                                                 bool frameIsValid = frame.IsValid ?? true;
                                                 var shopPOPList = popBll.GetList(pop => pop.ShopId == shop1.shop.Id && pop.Sheet.ToUpper() == s.PositionName.ToUpper() && pop.MachineFrameName != null && pop.MachineFrameName.ToUpper() == frame.MachineFrame.ToUpper() && (pop.Gender == shop1.order.Gender || (pop.Gender.Contains("男") && pop.Gender.Contains("女")) || (shop1.order.Gender.Contains("男") && shop1.order.Gender.Contains("女"))));
+                                                //如果是主KV延续，去掉符合条件的主KV
+                                                if (GraphicWidthList.Any())
+                                                {
+                                                    var mainKVPOPIdList = shopPOPList.Where(pop => PlanGenderlist.Contains(pop.Gender) && GraphicWidthList.Contains(pop.GraphicWidth ?? 0)).Select(pop => pop.Id).ToList();
+                                                    shopPOPList = shopPOPList.Where(pop => !mainKVPOPIdList.Contains(pop.Id)).ToList();
+                                                }
                                                 if (shopPOPList.Any())
                                                 {
                                                     shopPOPList.ForEach(pop => {

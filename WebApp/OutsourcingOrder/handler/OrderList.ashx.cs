@@ -10,6 +10,8 @@ using Common;
 using Newtonsoft.Json;
 using System.Configuration;
 using System.Web.SessionState;
+using System.Data.OleDb;
+using System.Data;
 
 namespace WebApp.OutsourcingOrder.handler
 {
@@ -80,6 +82,9 @@ namespace WebApp.OutsourcingOrder.handler
                 case "changeOutsource":
                     result = ChangeOutsource();
                     break;
+                case "changeOutsourceBatch":
+                    result = ChangeOutsourceBatch();
+                    break;
                 default:
                     break;
             }
@@ -94,7 +99,7 @@ namespace WebApp.OutsourcingOrder.handler
             {
                 guidanceIdList = context1.Session["ChangeOutsourceGuidanceIdList="] as List<int>;
             }
-            
+
             List<OutsourceOrderDetail> orderList0 = (from order in CurrentContext.DbContext.OutsourceOrderDetail
                                                      from gid in guidanceIdList
                                                      where order.GuidanceId == gid
@@ -377,7 +382,7 @@ namespace WebApp.OutsourcingOrder.handler
             {
                 orderList = context1.Session["ChangeOutsourceOrderList="] as List<OutsourceOrderDetail>;
             }
-            
+
             if (context1.Session["ChangeOutsourceSubjectList="] != null)
             {
                 subjectList = context1.Session["ChangeOutsourceSubjectList="] as List<Subject>;
@@ -1018,7 +1023,7 @@ namespace WebApp.OutsourcingOrder.handler
                     string orderType = CommonMethod.GeEnumName<OrderTypeEnum>((s.order.OrderType ?? 1).ToString());
                     string orderPrice = string.Empty;
                     string receiveOrderPrice = string.Empty;
-                    string assignType = CommonMethod.GetEnumDescription<OutsourceOrderTypeEnum>((s.order.AssignType??1).ToString());
+                    string assignType = CommonMethod.GetEnumDescription<OutsourceOrderTypeEnum>((s.order.AssignType ?? 1).ToString());
                     int Quantity = s.order.Quantity ?? 1;
                     if ((s.order.PayOrderPrice ?? 0) > 0)
                     {
@@ -1844,7 +1849,7 @@ namespace WebApp.OutsourcingOrder.handler
             {
                 if (newOutsourceId > 0)
                 {
-                    
+
                     if (changeType == 1 && !string.IsNullOrWhiteSpace(subjectId))//按项目更改
                     {
                         List<int> subjectIdList = StringHelper.ToIntList(subjectId, ',');
@@ -1853,8 +1858,9 @@ namespace WebApp.OutsourcingOrder.handler
                             List<OutsourceOrderDetail> outsourceOrderList = new OutsourceOrderDetailBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0) || subjectIdList.Contains(s.BelongSubjectId ?? 0));
                             if (outsourceOrderList.Any())
                             {
-                                List<int> guidanceIdList = outsourceOrderList.Select(s=>s.GuidanceId??0).Distinct().ToList();
-                                guidanceIdList.ForEach(gid => {
+                                List<int> guidanceIdList = outsourceOrderList.Select(s => s.GuidanceId ?? 0).Distinct().ToList();
+                                guidanceIdList.ForEach(gid =>
+                                {
                                     SubjectGuidance guidanceModel = guidanceBll.GetModel(gid);
                                     if (guidanceModel != null)
                                     {
@@ -1862,11 +1868,12 @@ namespace WebApp.OutsourcingOrder.handler
                                         {
                                             guidanceDic.Add(gid, guidanceModel);
                                         }
-                                        var orderList = outsourceOrderList.Where(s=>s.GuidanceId==gid).ToList();
-                                        var popOrderList = orderList.Where(s =>(s.SubjectId??0)>0).ToList();
+                                        var orderList = outsourceOrderList.Where(s => s.GuidanceId == gid).ToList();
+                                        var popOrderList = orderList.Where(s => (s.SubjectId ?? 0) > 0).ToList();
                                         List<int> shopIdList = popOrderList.Select(s => s.ShopId ?? 0).Distinct().ToList();
                                         //更新pop
-                                        popOrderList.ForEach(order => {
+                                        popOrderList.ForEach(order =>
+                                        {
                                             UpdatePOPOrder(order, newOutsourceId);
                                         });
                                         if (guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion)
@@ -1925,7 +1932,7 @@ namespace WebApp.OutsourcingOrder.handler
                     guidanceDic.Add(order.GuidanceId ?? 0, guidanceModel);
                 }
             }
-            if (order.OrderType == ((int)OrderTypeEnum.POP) && guidanceModel.ActivityTypeId==(int)GuidanceTypeEnum.Install && order.IsInstall == "Y")
+            if (order.OrderType == ((int)OrderTypeEnum.POP) && guidanceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && order.IsInstall == "Y")
             {
 
                 if (oldOutsourceId != newOutsourceId)
@@ -1960,7 +1967,7 @@ namespace WebApp.OutsourcingOrder.handler
                         pop.Quantity = order.Quantity;
                         pop.CustomerId = customerId;
                         pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
-                        
+
                         decimal unitPrice = 0;
                         decimal totalPrice = 0;
                         new BasePage().GetOutsourceOrderMaterialPrice(pop, out unitPrice, out totalPrice);
@@ -2023,6 +2030,247 @@ namespace WebApp.OutsourcingOrder.handler
             }
         }
 
+        /// <summary>
+        /// 批量更新订单外协，
+        /// </summary>
+        string ChangeOutsourceBatch()
+        {
+            string result = "ok";
+            bool isOk = true;
+            int guidanceYear = 0;
+            int guidanceMonth = 0;
+            string guidanceMonthStr = string.Empty;
+            if (context1.Request.QueryString["guidanceMonth"] != null)
+            {
+                guidanceMonthStr = context1.Request.QueryString["guidanceMonth"];
+            }
+            int newOutsourceId = 0;
+            if (context1.Request.QueryString["newOutsourceId"] != null)
+            {
+                newOutsourceId = int.Parse(context1.Request.QueryString["newOutsourceId"]);
+            }
+            if (string.IsNullOrWhiteSpace(guidanceMonthStr))
+            {
+                result = "请选择活动月份或者活动名称";
+                isOk = false;
+            }
+            else if (!StringHelper.IsDateTime(guidanceMonthStr))
+            {
+                result = "活动月份填写不正确";
+                isOk = false;
+            }
+            else if (newOutsourceId == 0)
+            {
+                result = "请选择新外协";
+                isOk = false;
+            }
+            if (isOk)
+            {
+                HttpFileCollection files = context1.Request.Files;
+                if (files.Count > 0)
+                {
+                    HttpPostedFile file = files[0];
+                    string path = OperateFile.UpLoadFile(file, "TempFiles");
+                    if (path != "")
+                    {
+                        OleDbConnection conn;
+                        OleDbDataAdapter da;
+                        DataSet ds = null;
+                        path = context1.Server.MapPath(path);
+                        string ExcelConnStr = ConfigurationManager.ConnectionStrings["ExcelFilePath"].ToString();
+                        ExcelConnStr = ExcelConnStr.Replace("ExcelPath", path);
+                        conn = new OleDbConnection(ExcelConnStr);
+                        conn.Open();
+                        string sql = "select * from [Sheet1$]";
+                        da = new OleDbDataAdapter(sql, conn);
+                        ds = new DataSet();
+                        da.Fill(ds);
+                        da.Dispose();
+                        if (ds != null && ds.Tables[0].Rows.Count > 0)
+                        {
+                            DateTime guidanceDate = DateTime.Parse(guidanceMonthStr);
+                            guidanceYear = guidanceDate.Year;
+                            guidanceMonth = guidanceDate.Month;
+                            List<int> guidanceIdList = new List<int>();
+                            guidanceIdList = (from guidance in CurrentContext.DbContext.SubjectGuidance
+                                              join subject in CurrentContext.DbContext.Subject
+                                              on guidance.ItemId equals subject.GuidanceId
+                                              where (guidance.IsDelete == null || guidance.IsDelete == false)
+                                              && (subject.IsDelete == null || subject.IsDelete == false)
+                                              && subject.ApproveState == 1
+                                              && guidance.GuidanceYear == guidanceYear
+                                              && guidance.GuidanceMonth == guidanceMonth
+                                              select guidance.ItemId).Distinct().ToList();
+                            List<ChangeOutsourceBatchClass> changeOrderList = new List<ChangeOutsourceBatchClass>();
+                            string shopNo = string.Empty;
+                            string outsourceName = string.Empty;
+                            string orderTypeName = string.Empty;
+                            string newPriceStr = string.Empty;
+                            int shopId = 0;
+                            int outsourceId = 0;
+                            decimal newPrice = 0;
+                            int orderType = 0;
+                            DataColumnCollection cols = ds.Tables[0].Columns;
+                            #region 获取文件内容
+                            foreach (DataRow dr in ds.Tables[0].Rows)
+                            {
+                                shopNo = string.Empty;
+                                outsourceName = string.Empty;
+                                orderTypeName = string.Empty;
+                                newPriceStr = string.Empty;
+                                shopId = 0;
+                                outsourceId = 0;
+                                newPrice = 0;
+                                orderType = 0;
+                                if (cols.Contains("店铺编号"))
+                                {
+                                    shopNo = StringHelper.ReplaceSpecialChar(dr["店铺编号"].ToString().Trim());
+                                }
+                                if (cols.Contains("新外协"))
+                                {
+                                    outsourceName = StringHelper.ReplaceSpecialChar(dr["新外协"].ToString().Trim().ToLower());
+                                }
+                                else if (cols.Contains("新外协名称"))
+                                {
+                                    outsourceName = StringHelper.ReplaceSpecialChar(dr["新外协名称"].ToString().Trim().ToLower());
+                                }
+                                if (cols.Contains("订单类型"))
+                                {
+                                    orderTypeName = dr["订单类型"].ToString().Trim();
+                                }
+                                if (cols.Contains("新费用"))
+                                {
+                                    newPriceStr = dr["新费用"].ToString().Trim();
+                                }
+                                if (!string.IsNullOrWhiteSpace(shopNo))
+                                {
+                                    shopId = GetShopId(shopNo);
+                                }
+                                if (!string.IsNullOrWhiteSpace(orderTypeName))
+                                {
+                                    if (orderTypeName == "快递费")
+                                        orderTypeName = "发货费";
+                                    OrderTypeEnum otEnum = (OrderTypeEnum)Enum.Parse(typeof(OrderTypeEnum), orderTypeName, true);
+                                    orderType = (int)otEnum;
+                                }
+                                if (!string.IsNullOrWhiteSpace(newPriceStr))
+                                {
+                                    newPrice = StringHelper.IsDecimal(newPriceStr);
+                                }
+                                if (shopId > 0)
+                                {
+                                    ChangeOutsourceBatchClass cbc = new ChangeOutsourceBatchClass();
+                                    cbc.NewOrderPrice = newPrice;
+                                    cbc.NewOutsourceId = newOutsourceId;
+                                    cbc.OrderTypeName = orderTypeName;
+                                    cbc.ShopId = shopId;
+                                    cbc.OrderType = orderType;
+                                    changeOrderList.Add(cbc);
+                                }
+                            }
+                            #endregion
+
+                            if (changeOrderList.Any())
+                            {
+                                List<int> shopIdList = changeOrderList.Select(s=>s.ShopId).Distinct().ToList();
+                                List<int> orderTypeList = changeOrderList.Select(s => s.OrderType).Distinct().ToList();
+                                orderTypeList.Add((int)OrderTypeEnum.测量费);
+                                OutsourceOrderDetailBLL outsourceOrderDetailBll = new OutsourceOrderDetailBLL();
+                                var outsourceOrderList = outsourceOrderDetailBll.GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && shopIdList.Contains(s.ShopId ?? 0) && orderTypeList.Contains(s.OrderType ?? 0));
+                                if (outsourceOrderList.Any())
+                                {
+                                    changeOrderList.ForEach(change => {
+                                        if (change.OrderTypeName == "全部")
+                                        {
+
+                                        }
+                                        else if (change.OrderType == (int)OrderTypeEnum.POP)
+                                        { 
+                                        
+                                        }
+                                        else if (change.OrderType == (int)OrderTypeEnum.安装费)
+                                        {
+                                            var oldOrderList = outsourceOrderList.Where(s => s.ShopId == change.ShopId && s.OutsourceId != newOutsourceId && (s.OrderType == (int)OrderTypeEnum.安装费 || s.OrderType == (int)OrderTypeEnum.测量费) && !s.Remark.Contains("户外安装费")).ToList();
+                                            if (oldOrderList.Any())
+                                            {
+                                                oldOrderList.ForEach(s => {
+                                                    s.OutsourceId = newOutsourceId;
+                                                    if (newPrice > 0)
+                                                    {
+                                                        s.PayOrderPrice = newPrice;
+                                                    }
+                                                    outsourceOrderDetailBll.Update(s);
+                                                });
+                                            }
+                                        }
+                                        else
+                                        { 
+                                            
+                                        }
+                                        
+                                    });
+                                    ReLoadSession();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            result = "上传文件没有内容";
+                        }
+                    }
+
+                }
+                else
+                {
+                    result = "上传文件为空";
+                }
+            }
+            return result;
+        }
+
+
+        int GetShopId(string shopNo)
+        {
+            int shopId = 0;
+            Shop model = shopBll.GetList(s => s.ShopNo.ToUpper() == shopNo.ToUpper() && (s.IsDelete==null ||s.IsDelete==false)).FirstOrDefault();
+            if (model != null)
+            {
+                shopId = model.Id;
+            }
+            else
+            {
+                model = shopBll.GetList(s => s.ShopNo.ToUpper() == shopNo.ToUpper()).FirstOrDefault();
+                if (model != null)
+                {
+                    shopId = model.Id;
+                }
+            }
+            return shopId;
+        }
+
+
+        Dictionary<string, int> outsourceDic = new Dictionary<string, int>();
+        CompanyBLL companyBll = new CompanyBLL();
+        int GetOutsourceId(string outsourceName)
+        {
+            int oid = 0;
+            if (outsourceDic.Keys.Contains(outsourceName))
+            {
+                oid = outsourceDic[outsourceName];
+            }
+            else
+            {
+                var model = companyBll.GetList(s => s.CompanyName.ToLower() == outsourceName || (s.ShortName != null && s.ShortName.ToLower() == outsourceName)).FirstOrDefault();
+                if (model != null)
+                {
+                    oid = model.Id;
+                    outsourceDic.Add(outsourceName, oid);
+                }
+            }
+            return oid;
+        }
+
+
         public bool IsReusable
         {
             get
@@ -2030,5 +2278,15 @@ namespace WebApp.OutsourcingOrder.handler
                 return false;
             }
         }
+    }
+
+
+    public class ChangeOutsourceBatchClass
+    {
+        public int ShopId { get; set; }
+        public int NewOutsourceId { get; set; }
+        public string OrderTypeName { get; set; }
+        public int OrderType { get; set; }
+        public decimal NewOrderPrice { get; set; }
     }
 }

@@ -57,5 +57,6 @@ namespace Models
         public string POPSize { get; set; }
         public string WindowSize { get; set; }
         public string IsElectricity { get; set; }
+        public Nullable<bool> NoMainKV { get; set; }
     }
 }

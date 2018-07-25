@@ -336,6 +336,10 @@ namespace Models
         public decimal TotalPrice { get; set; }
     }
 
-    
+    public class ExportPermissionContent {
+        public int UserId { get; set; }
+        public string Channel { get; set; }
+        public string Format { get; set; }
+    }
 
 }

@@ -4300,6 +4300,7 @@ var Plan = {
                             { field: 'IsElectricity', title: '通电否' },
                             { field: 'ChooseImg', title: '选图' },
                             { field: 'KeepPOPSize', title: '是否保留POP原尺寸' },
+                            { field: 'NoMainKV', title: '去掉主KV(延续)' },
                             { field: 'NotInvolveShopNos', title: '不参与店铺' }
                 ]],
             singleSelect: true,
@@ -4637,6 +4638,10 @@ function CheckSubmitPlanVal() {
     if ($("#cbKeepSize").attr("checked") == "checked") {
         KeepPOPSize = true;
     }
+    var NoMainKV = "";
+    if ($("#cbNoMainKV").attr("checked") == "checked") {
+        NoMainKV = true;
+    }
 
     var NotInvolveShopNos = $.trim($("#txtNoInvolveShopNos").val());
 
@@ -4709,7 +4714,7 @@ function CheckSubmitPlanVal() {
     }
     PlanJsonStr = '{"Id":' + CurrPlanId + ',"CustomerId":' + customerId + ',"SubjectId":' + subjectId + ',"ProvinceId":"' + province + '","CityId":"' + city + '","RegionNames":"' + region + '","CityTier":"' + cityTier + '","ShopNos":"' + ShopNos + '","IsInstall":"' + Install + '","Format":"' + Format + '","MaterialSupport":"' + MaterialSupport + '","POSScale":"' + POSScale + '","PositionName":"' + sheet + '","CornerType":"' + CornerTypes + '","MachineFrameNames":"' + MachineFrameNames + '","Quantity":"' + Quantity + '","Gender":"' + Gender + '",';
 
-    PlanJsonStr += '"POPSize":"' + POPSize + '","ChooseImg":"' + ChooseImg + '","KeepPOPSize":"' + KeepPOPSize + '","IsElectricity":"' + IsElectricity + '","NotInvolveShopNos":"' + NotInvolveShopNos + '"';
+    PlanJsonStr += '"POPSize":"' + POPSize + '","ChooseImg":"' + ChooseImg + '","KeepPOPSize":"' + KeepPOPSize + '","IsElectricity":"' + IsElectricity + '","NotInvolveShopNos":"' + NotInvolveShopNos + '","NoMainKV":"' + NoMainKV + '"';
 
 
     PlanJsonStr += ',"SplitOrderPlanDetail":[' + planDetailJson + ']}';
@@ -4764,7 +4769,9 @@ function LoadCondition(row) {
        var KeepPOPSize = row.KeepPOPSize;
        if (KeepPOPSize == "是")
            $("#cbKeepSize").attr("checked", "checked");
-
+       var noMainKV = row.NoMainKV;
+       if (noMainKV == "是")
+           $("#cbNoMainKV").attr("checked", "checked");
        if (row.NotInvolveShopNos != "") {
            $("#txtNoInvolveShopNos").val(row.NotInvolveShopNos);
        }

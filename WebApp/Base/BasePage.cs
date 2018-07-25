@@ -19,6 +19,12 @@ namespace WebApp
 {
     public class BasePage : System.Web.UI.Page
     {
+        public string UserExportShopChannelPath {
+            get {
+                return "/ConfigFile/Config.txt";//配置文件路径
+            }
+        }
+
         public LoginUser CurrentUser
         {
             get
@@ -7219,6 +7225,7 @@ namespace WebApp
                         //quoteOrderModel.TotalArea = totalAreaAfterAdd;
 
                         quoteOrderModel.UnitPrice = order.UnitPrice;
+                        quoteOrderModel.DefaultUnitPrice = order.UnitPrice;
                         quoteOrderModel.UnitName = order.UnitName;
                         quoteOrderModel.WindowDeep = order.WindowDeep;
                         quoteOrderModel.WindowHigh = order.WindowHigh;

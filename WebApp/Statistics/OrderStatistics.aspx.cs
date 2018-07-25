@@ -269,20 +269,11 @@ namespace WebApp.Statistics
                                    && subject.ApproveState == 1
                                    select new { subject, guidance }
                               ).ToList();
-            //string begin = txtSubjectBegin.Text.Trim();
-            //string end = txtSubjectEnd.Text.Trim();
-            //if (!string.IsNullOrWhiteSpace(begin) && StringHelper.IsDateTime(begin) && !string.IsNullOrWhiteSpace(end) && StringHelper.IsDateTime(end))
-            //{
-            //    DateTime beginDate = DateTime.Parse(begin);
-            //    DateTime endDate = DateTime.Parse(end).AddDays(1);
-            //    subjectListTemp = subjectListTemp.Where(s => s.subject.AddDate >= beginDate && s.subject.AddDate < endDate).ToList();
-            //}
+           
             List<int> subjectIdList = subjectListTemp.Select(s => s.subject.Id).Distinct().ToList();
-            //var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
-            //                 join sid in subjectIdList
-            //                 on order.SubjectId equals sid
-            //                 where (order.IsDelete==null || order.IsDelete==false)
-            //                 select order).ToList();
+            List<Subject> bailiSubjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && !subjectIdList.Contains(s.Id) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0) && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false));
+            if (bailiSubjectList.Any())
+                subjectIdList.AddRange(bailiSubjectList.Select(s => s.Id).ToList());
 
             var orderList = new FinalOrderDetailTempBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0) && (s.IsDelete == null || s.IsDelete == false));
 
@@ -299,7 +290,8 @@ namespace WebApp.Statistics
                 Session["guidanceStatistics"] = guidanceList;
                 guidanceIdList = guidanceList.Select(s => s.ItemId).ToList();
 
-                subjectList = subjectListTemp.Select(s => s.subject).ToList();
+                //subjectList = subjectListTemp.Select(s => s.subject).ToList();
+                subjectList = new SubjectBLL().GetList(s => subjectIdList.Contains(s.Id));
                 Session["subjectStatistics"] = subjectList;
 
 
@@ -706,6 +698,9 @@ namespace WebApp.Statistics
             }
         }
 
+        /// <summary>
+        /// 按时间查询
+        /// </summary>
         void BindaGuidanceByOrderDate()
         {
 
@@ -732,7 +727,15 @@ namespace WebApp.Statistics
                                        && (guidance.IsDelete == null || guidance.IsDelete == false)
                                        select new { subject, guidance }
                               ).ToList();
+                guidanceList = subjectListTemp.Select(s => s.guidance).Distinct().OrderBy(s => s.ItemId).ThenBy(s => s.ItemName).ToList(); 
+                guidanceIdList = guidanceList.Select(s => s.ItemId).ToList();
+
+
+
                 List<int> subjectIdList = subjectListTemp.Select(s => s.subject.Id).ToList();
+                List<Subject> bailiSubjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && !subjectIdList.Contains(s.Id) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0) && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false));
+                if (bailiSubjectList.Any())
+                   subjectIdList.AddRange(bailiSubjectList.Select(s=>s.Id).ToList());
                 int dateSearchType = 1;
                 foreach (ListItem li in rblDateType.Items)
                 {
@@ -741,6 +744,9 @@ namespace WebApp.Statistics
                 }
                 if (dateSearchType == 1)
                 {
+                    //subjectListTemp = subjectListTemp.Where(s => s.subject.AddDate >= beginDate && s.subject.AddDate < endDate).ToList();
+                    //subjectIdList = subjectListTemp.Select(s => s.subject.Id).ToList();
+
                     orderList = new FinalOrderDetailTempBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0) && (s.IsDelete == null || s.IsDelete == false)).ToList();
                 }
                 else//按下单时间
@@ -756,12 +762,10 @@ namespace WebApp.Statistics
                     Session["shopStatistics"] = shopList;
 
 
-                    guidanceList = subjectListTemp.Select(s => s.guidance).Distinct().OrderBy(s => s.ItemId).ThenBy(s => s.ItemName).ToList();
                     Session["guidanceStatistics"] = guidanceList;
-                    guidanceIdList = guidanceList.Select(s => s.ItemId).ToList();
 
-                    List<int> hmSubjectIdList = subjectListTemp.Select(s => s.subject.HandMakeSubjectId ?? 0).Distinct().ToList();
-                    subjectIdList = subjectIdList.Union(hmSubjectIdList).ToList();
+                    //List<int> hmSubjectIdList = subjectListTemp.Select(s => s.subject.HandMakeSubjectId ?? 0).Distinct().ToList();
+                    //subjectIdList = subjectIdList.Union(hmSubjectIdList).ToList();
 
                     subjectList = new SubjectBLL().GetList(s => subjectIdList.Contains(s.Id));
 
@@ -1433,24 +1437,7 @@ namespace WebApp.Statistics
             subjectIdList = subjectIdList.Distinct().ToList();
             orderList = orderList.Where(s => subjectIdList.Contains(s.order.SubjectId ?? 0)).ToList();
 
-            string begin = txtSubjectBegin.Text.Trim();
-            string end = txtSubjectEnd.Text.Trim();
-            if (!string.IsNullOrWhiteSpace(begin))
-            {
-                DateTime beginDate = DateTime.Parse(begin);
-                orderList = orderList.Where(s => s.subject.AddDate >= beginDate).ToList();
-                if (!string.IsNullOrWhiteSpace(end))
-                {
-                    DateTime endDate = DateTime.Parse(end).AddDays(1);
-                    orderList = orderList.Where(s => s.subject.AddDate < endDate).ToList();
-                }
-                //int dateSearchType = 1;
-                //foreach (ListItem li in rblDateType.Items)
-                //{
-                //    if (li.Selected)
-                //        dateSearchType = int.Parse(li.Value);
-                //}
-            }
+            
             if (subjectCategoryList.Any())
             {
                 if (subjectCategoryList.Contains(0))

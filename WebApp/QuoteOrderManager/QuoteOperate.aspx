@@ -10,11 +10,15 @@
     <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
     <script src="/My97DatePicker/WdatePicker.js" type="text/javascript"></script>
     <script type="text/javascript">
-       
+
         function Finish() {
             layer.closeAll();
             layer.msg("提交成功!");
             $("#btnRefreshOrder").click();
+        }
+
+        function Changed() {
+            $("#hfIsChanged").val("1");
         }
     </script>
 </head>
@@ -80,6 +84,17 @@
                     </tr>
                     <tr class="tr_bai">
                         <td>
+                            区域
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <asp:CheckBoxList ID="cblRegion" runat="server" CssClass="cbl" CellSpacing="20" RepeatDirection="Horizontal"
+                                RepeatLayout="Flow" RepeatColumns="5"  AutoPostBack="true"
+                                onselectedindexchanged="cblRegion_SelectedIndexChanged">
+                            </asp:CheckBoxList>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
                             项目类型
                         </td>
                         <td style="text-align: left; padding-left: 5px;">
@@ -104,20 +119,12 @@
                                 <asp:CheckBox ID="cbAllSubject" runat="server" /><span style="color: Blue;">全选</span>
                             </div>
                             <asp:CheckBoxList ID="cblSubjectName" runat="server" CssClass="cbl" CellSpacing="20"
-                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="10">
+                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="10" AutoPostBack="true" 
+                                onselectedindexchanged="cblSubjectName_SelectedIndexChanged">
                             </asp:CheckBoxList>
                         </td>
                     </tr>
-                    <tr class="tr_bai">
-                        <td>
-                            区域
-                        </td>
-                        <td style="text-align: left; padding-left: 5px;">
-                            <asp:CheckBoxList ID="cblRegion" runat="server" CssClass="cbl" CellSpacing="20" RepeatDirection="Horizontal"
-                                RepeatLayout="Flow" RepeatColumns="5">
-                            </asp:CheckBoxList>
-                        </td>
-                    </tr>
+                    
                     <tr class="tr_bai">
                         <td>
                         </td>
@@ -220,7 +227,7 @@
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>
-    
+    <asp:HiddenField ID="hfIsChanged" runat="server" Value=""/>
     </form>
 </body>
 </html>

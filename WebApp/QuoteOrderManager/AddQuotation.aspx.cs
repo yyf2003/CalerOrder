@@ -15,11 +15,8 @@ using DAL;
 using Models;
 using Newtonsoft.Json;
 using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using NPOI.HSSF.UserModel;
-using NPOI.POIFS.FileSystem;
-using NPOI;
-using NPOI.OpenXml4Net.OPC;
+using NPOI.SS.Util;
 //using NPOI.HSSF.UserModel;
 //using OfficeOpenXml;
 
@@ -33,7 +30,7 @@ namespace WebApp.QuoteOrderManager
         public string subjectCategory = string.Empty;
         public string subjectIdSelected = string.Empty;//不含百丽项目
         public string subjectId = string.Empty;//包含百丽项目
-        string region = string.Empty;
+        public string region = string.Empty;
         public int customerId;
         public int itemId;
         protected void Page_Load(object sender, EventArgs e)
@@ -1202,10 +1199,11 @@ namespace WebApp.QuoteOrderManager
             List<QuoteModel> quoteOrderList = new List<QuoteModel>();
             List<QuoteOrderDetail> popOrderList = new List<QuoteOrderDetail>();
             //保存每个位置区域的订单
-
+            Session["AddQuoteOrderList"] = null;
             if (orderList.Any())
             {
                 popOrderList = orderList.Where(s => s.order.OrderType == (int)OrderTypeEnum.POP || s.order.OrderType == (int)OrderTypeEnum.道具).Select(s => s.order).ToList();
+                Session["AddQuoteOrderList"] = popOrderList;
                 //VVIP店铺
                 var vvipList = orderList.Where(s => s.order.MaterialSupport != null && s.order.MaterialSupport.ToLower() == "vvip").ToList();
                 List<int> vvipShopList = vvipList.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
@@ -1969,43 +1967,91 @@ namespace WebApp.QuoteOrderManager
             #region 赋值
             labInstallShop.Text = installShopList.Distinct().Count().ToString();
 
-            labOOHLevel1Count.Text = oohLevelOneCount.ToString();
+            string OOHLevel1 = "0";
+            if (oohLevelOneCount > 0)
+            {
+                OOHLevel1 = string.Format("<span name='checkQuoteInstallPriceSpan' data-leveltype='ooh' data-price='{0}' style='color:blue;cursor:pointer;text-decoration:underline;'>{1}</span>", 5000, oohLevelOneCount);
+            }
+            labOOHLevel1Count.Text = OOHLevel1;
             labOOHLevel1.Text = oohLevelOnePrice.ToString();
 
 
-            labOOHLevel2Count.Text = oohLevelTwoCount.ToString();
+            string OOHLevel2 = "0";
+            if (oohLevelTwoCount > 0)
+            {
+                OOHLevel2 = string.Format("<span name='checkQuoteInstallPriceSpan' data-leveltype='ooh' data-price='{0}' style='color:blue;cursor:pointer;text-decoration:underline;'>{1}</span>", 2700, oohLevelTwoCount);
+            }
+            labOOHLevel2Count.Text = OOHLevel2;
             labOOHLevel2.Text = oohLevelTwoPrice.ToString();
 
-            labOOHLevel3Count.Text = oohLevelThreeCount.ToString();
+
+            string OOHLevel3 = "0";
+            if (oohLevelThreeCount > 0)
+            {
+                OOHLevel3 = string.Format("<span name='checkQuoteInstallPriceSpan' data-leveltype='ooh' data-price='{0}' style='color:blue;cursor:pointer;text-decoration:underline;'>{1}</span>", 1800, oohLevelThreeCount);
+            }
+            labOOHLevel3Count.Text = OOHLevel3;
             labOOHLevel3.Text = oohLevelThreePrice.ToString();
 
 
-            labOOHLevel4Count.Text = oohLevelFourCount.ToString();
+            string OOHLevel4 = "0";
+            if (oohLevelFourCount > 0)
+            {
+                OOHLevel4 = string.Format("<span name='checkQuoteInstallPriceSpan' data-leveltype='ooh' data-price='{0}' style='color:blue;cursor:pointer;text-decoration:underline;'>{1}</span>", 600, oohLevelFourCount);
+            }
+            labOOHLevel4Count.Text = OOHLevel4;
             labOOHLevel4.Text = oohLevelFourPrice.ToString();
 
 
-            labWindowLevel1Count.Text = windowLevelOneCount.ToString();
+            string WindowLevel1 = "0";
+            if (windowLevelOneCount > 0)
+            {
+                WindowLevel1 = string.Format("<span name='checkQuoteInstallPriceSpan' data-leveltype='window' data-price='{0}' style='color:blue;cursor:pointer;text-decoration:underline;'>{1}</span>", 1000, windowLevelOneCount);
+            }
+            labWindowLevel1Count.Text = WindowLevel1;
             labWindowLevel1.Text = windowLevelOnePrice.ToString();
 
 
-            labBasicLevel1Count.Text = basicLevelOneCount.ToString();
+            string BasicLevel1 = "0";
+            if (basicLevelOneCount > 0)
+            {
+                BasicLevel1 = string.Format("<span name='checkQuoteInstallPriceSpan' data-leveltype='basic' data-price='{0}' style='color:blue;cursor:pointer;text-decoration:underline;'>{1}</span>", 800, basicLevelOneCount);
+            }
+            labBasicLevel1Count.Text = BasicLevel1;
             labBasicLevel1.Text = basicLevelOnePrice.ToString();
 
 
-
-            labWindowLevel2Count.Text = windowLevelTwoCount.ToString();
+            string WindowLevel2 = "0";
+            if (windowLevelTwoCount > 0)
+            {
+                WindowLevel2 = string.Format("<span name='checkQuoteInstallPriceSpan' data-leveltype='window' data-price='{0}' style='color:blue;cursor:pointer;text-decoration:underline;'>{1}</span>", 500, windowLevelTwoCount);
+            }
+            labWindowLevel2Count.Text = WindowLevel2;
             labWindowLevel2.Text = windowLevelTwoPrice.ToString();
 
 
-            labBasicLevel2Count.Text = basicLevelTwoCount.ToString();
+            string BasicLevel2 = "0";
+            if (basicLevelTwoCount > 0)
+            {
+                BasicLevel2 = string.Format("<span name='checkQuoteInstallPriceSpan' data-leveltype='basic' data-price='{0}' style='color:blue;cursor:pointer;text-decoration:underline;'>{1}</span>", 400, basicLevelTwoCount);
+            }
+            labBasicLevel2Count.Text = BasicLevel2;
             labBasicLevel2.Text = basicLevelTwoPrice.ToString();
 
-
-            labWindowLevel3Count.Text = windowLevelThreeCount.ToString();
+            string WindowLevel3 = "0";
+            if (windowLevelThreeCount > 0)
+            {
+                WindowLevel3 = string.Format("<span name='checkQuoteInstallPriceSpan' data-leveltype='window' data-price='{0}' style='color:blue;cursor:pointer;text-decoration:underline;'>{1}</span>", 200, windowLevelThreeCount);
+            }
+            labWindowLevel3Count.Text = WindowLevel3;
             labWindowLevel3.Text = windowLevelThreePrice.ToString();
 
-
-            labBasicLevel3Count.Text = basicLevelThreeCount.ToString();
+            string BasicLevel3 = "0";
+            if (basicLevelThreeCount > 0)
+            {
+                BasicLevel3 = string.Format("<span name='checkQuoteInstallPriceSpan' data-leveltype='basic' data-price='{0}' style='color:blue;cursor:pointer;text-decoration:underline;'>{1}</span>", 150, basicLevelThreeCount);
+            }
+            labBasicLevel3Count.Text = BasicLevel3;
             labBasicLevel3.Text = basicLevelThreePrice.ToString();
 
 
@@ -2523,6 +2569,7 @@ namespace WebApp.QuoteOrderManager
                         model.PriceType = CommonMethod.GeEnumName<OrderTypeEnum>((s.PriceType ?? 0).ToString());
                         model.TotalPrice = s.TotalPrice;
                         otherOrderlist.Add(model);
+                        installPriceTotal += s.TotalPrice;
                     });
                 }
             }
@@ -3190,7 +3237,7 @@ namespace WebApp.QuoteOrderManager
             if (msg == "ok" && !isUpdate)
             {
                 new QuoteOrderDetailBLL().UpdateQuoteItemId(model.GuidanceId.TrimEnd(','), subjectId.TrimEnd(','), model.Id, "edit");
-                //ExcuteJs("beChanged");
+                
             }
             return msg;
         }
@@ -3265,6 +3312,7 @@ namespace WebApp.QuoteOrderManager
                             quoteModel.QuoteFileUrl = path;
                             quotationBll.Update(quoteModel);
                         }
+                        ExcuteJs("Changed");
                         Response.Redirect("AddQuotation.aspx?itemId=" + itemId, false);
 
                         //BindGuidanceName();
@@ -4057,19 +4105,32 @@ namespace WebApp.QuoteOrderManager
             ExportQuotePOP();
             if (exportQuoteOrderList.Any())
             {
-                string templateFileName = "报价模板";
-                string path = ConfigurationManager.AppSettings["ExportTemplate"];
+                string templateFileName = "项目报价模板";
+                string path = ConfigurationManager.AppSettings["ExportTemplate2003"];
                 path = path.Replace("fileName", templateFileName);
                 FileStream outFile = new FileStream(Server.MapPath(path), FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
 
                 IWorkbook workBook = WorkbookFactory.Create(outFile, ImportOption.All);
                 ISheet sheet = workBook.GetSheetAt(0);
-
+                
                 int startRow = 12;
                 int oneSheetRowCount = 0;
                 int insertRowTotalCount = 0;
                 string currSheet = string.Empty;
                 string lastSheet = string.Empty;
+
+                string subjectName = ddlQuoteSubject.SelectedItem.Text;
+
+                string vvipShopCount = labVVIPShop.Text;
+                string normalShopCount = labNormalShop.Text;
+
+                IRow dataRowSubjectName0 = sheet.GetRow(5);
+                dataRowSubjectName0.GetCell(5).SetCellValue(vvipShopCount);
+
+                IRow dataRowSubjectName1 = sheet.GetRow(7);
+                dataRowSubjectName1.GetCell(1).SetCellValue(subjectName);
+                dataRowSubjectName1.GetCell(5).SetCellValue(normalShopCount);
+                
 
                 #region 导出POP
                 exportQuoteOrderList.ToList().ForEach(s =>
@@ -4172,16 +4233,7 @@ namespace WebApp.QuoteOrderManager
                                 cell = dataRow.CreateCell(i);
 
                         }
-                        //if (startRow == 12)
-                        //{
-                        //    dataRow.GetCell(0).SetCellValue(currSheet);
-                        //    lastSheet = currSheet;
-                        //}
-                        //else if (currSheet != lastSheet)
-                        //{
-                        //    dataRow.GetCell(0).SetCellValue(currSheet);
-                        //    lastSheet = currSheet;
-                        //}
+                       
                         dataRow.GetCell(1).SetCellValue(s.PositionDescription);
                         dataRow.GetCell(2).SetCellValue(s.QuoteGraphicMaterial);
                         dataRow.GetCell(4).SetCellValue(double.Parse(s.Amount.ToString()));
@@ -4189,13 +4241,29 @@ namespace WebApp.QuoteOrderManager
                     }
                    
                 });
+                int formulaBeginRow = 34 + insertRowTotalCount;
+                int formulaEndRow = 59 + insertRowTotalCount;
+                int totalRow = 33 + insertRowTotalCount;
+                //for (int i = 12; i < totalRow; i++)
+                //{
+                //    IRow dataRow = sheet.GetRow(i);
+                //    ICell cell = dataRow.GetCell(2, MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                //    //cell.SetCellFormula(string.Format("$X${0}:$X${1}", formulaBeginRow, formulaEndRow));
+
+                //}
+                
+
                 #endregion
 
-                #region 安装费
-                if (Session["InstallPriceQuoteModel"] != null)
-                {
-                    InstallPriceQuoteModelList = Session["InstallPriceQuoteModel"] as List<InstallPriceQuoteModel>;
-                }
+
+
+
+
+                    #region 安装费
+                    if (Session["InstallPriceQuoteModel"] != null)
+                    {
+                        InstallPriceQuoteModelList = Session["InstallPriceQuoteModel"] as List<InstallPriceQuoteModel>;
+                    }
                 if (InstallPriceQuoteModelList.Any())
                 {
                     //startRow += insertRowTotalCount;
@@ -4342,8 +4410,12 @@ namespace WebApp.QuoteOrderManager
                     }
                 }
                 #endregion
+                HSSFDataValidation validate = SetValidata(12,
+                    totalRow, 2, 2, formulaBeginRow, formulaEndRow);
+                // 设定规则  
+                sheet.AddValidationData(validate);  
                 sheet.ForceFormulaRecalculation = true;
-
+                
                 #region 导出快递费
 
                 List<ExpressPriceClass> expressPriceList = new List<ExpressPriceClass>();
@@ -4376,15 +4448,117 @@ namespace WebApp.QuoteOrderManager
                     expressSheet = null;
                 }
                 #endregion
-
+                
                 using (MemoryStream ms = new MemoryStream())
                 {
                     workBook.Write(ms);
                     ms.Flush();
                     sheet = null;
                     workBook = null;
-                    OperateFile.DownLoadFile(ms, "活动报价模板");
+                    OperateFile.DownLoadFile(ms, "活动报价模板",".xls");
 
+                }
+            }
+        }
+
+        /// <summary>
+        /// 导出订单
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void btnExportOrder_Click(object sender, EventArgs e)
+        {
+            List<QuoteOrderDetail> orderList0 = new List<QuoteOrderDetail>();
+            if (Session["AddQuoteOrderList"] != null)
+            {
+                orderList0 = Session["AddQuoteOrderList"] as List<QuoteOrderDetail>;
+            }
+            if (orderList0.Any())
+            {
+                var orderList = (from order in orderList0
+                                 join subject in CurrentContext.DbContext.Subject
+                                 on order.SubjectId equals subject.Id
+                                 join guidance in CurrentContext.DbContext.SubjectGuidance
+                                 on order.GuidanceId equals guidance.ItemId
+                                 select new
+                                 {
+                                     order,
+                                     subject,
+                                     guidance
+                                 }).ToList();
+                string templateFileName = "350Template";
+                string path = ConfigurationManager.AppSettings["ExportTemplate"];
+                path = path.Replace("fileName", templateFileName);
+                FileStream outFile = new FileStream(Server.MapPath(path), FileMode.Open, FileAccess.Read, FileShare.Read);
+                IWorkbook workBook = WorkbookFactory.Create(outFile, ImportOption.All);
+
+                ISheet tableSheet = workBook.GetSheetAt(0);
+
+                int startRow = 1;
+                string shopno = string.Empty;
+                foreach (var item in orderList)
+                {
+
+                    IRow dataRow = tableSheet.GetRow(startRow);
+                    if (dataRow == null)
+                        dataRow = tableSheet.CreateRow(startRow);
+                    for (int i = 0; i < 30; i++)
+                    {
+                        ICell cell = dataRow.GetCell(i);
+                        if (cell == null)
+                            cell = dataRow.CreateCell(i);
+
+                    }
+
+                    dataRow.GetCell(0).SetCellValue("POP");
+                    if (item.order.AddDate != null)
+                        dataRow.GetCell(1).SetCellValue(DateTime.Parse(item.order.AddDate.ToString()).ToShortDateString());
+                    dataRow.GetCell(2).SetCellValue(item.order.ShopNo);
+                    dataRow.GetCell(3).SetCellValue(item.order.ShopName);
+                    dataRow.GetCell(4).SetCellValue(item.order.Province);
+                    dataRow.GetCell(5).SetCellValue(item.order.City);
+                    dataRow.GetCell(6).SetCellValue(item.order.CityTier);
+                    dataRow.GetCell(7).SetCellValue(item.order.Channel);
+                    dataRow.GetCell(8).SetCellValue(item.order.Format);
+                    dataRow.GetCell(9).SetCellValue(item.order.POPAddress);
+                    dataRow.GetCell(10).SetCellValue(item.order.Contact);
+                    dataRow.GetCell(11).SetCellValue(item.order.Tel);
+
+                    dataRow.GetCell(12).SetCellValue(item.order.POSScale);
+                    dataRow.GetCell(13).SetCellValue(item.order.MaterialSupport);
+                    dataRow.GetCell(14).SetCellValue(item.subject.SubjectName);
+                    dataRow.GetCell(15).SetCellValue(item.order.Gender);
+                    dataRow.GetCell(16).SetCellValue(item.order.ChooseImg);
+
+
+                    //dataRow.GetCell(12).SetCellValue(item.Category);
+                    dataRow.GetCell(17).SetCellValue(item.order.Sheet);
+                    dataRow.GetCell(18).SetCellValue(item.order.MachineFrame);
+                    dataRow.GetCell(19).SetCellValue(item.order.PositionDescription);
+                    dataRow.GetCell(20).SetCellValue(item.order.Quantity ?? 0);
+                    dataRow.GetCell(21).SetCellValue(item.order.GraphicMaterial);
+                    dataRow.GetCell(22).SetCellValue(item.order.QuoteGraphicMaterial);
+                    dataRow.GetCell(23).SetCellValue(double.Parse((item.order.UnitPrice ?? 0).ToString()));
+                    dataRow.GetCell(24).SetCellValue(double.Parse((item.order.TotalGraphicWidth ?? 0).ToString()));
+                    dataRow.GetCell(25).SetCellValue(double.Parse((item.order.TotalGraphicLength ?? 0).ToString()));
+                    decimal area = ((item.order.TotalGraphicWidth ?? 0) * (item.order.TotalGraphicLength ?? 0)) / 1000000;
+                    dataRow.GetCell(26).SetCellValue(double.Parse(area.ToString()));
+                    dataRow.GetCell(27).SetCellValue(double.Parse((item.order.AutoAddTotalPrice ?? 0).ToString()));
+                    //其他备注
+                    dataRow.GetCell(28).SetCellValue(item.order.Remark);
+                    dataRow.GetCell(29).SetCellValue(item.order.IsInstall);
+                    //dataRow.GetCell(27).SetCellValue(item.NewFormat);
+                    startRow++;
+
+                }
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    workBook.Write(ms);
+                    ms.Flush();
+                    tableSheet = null;
+                    workBook = null;
+                    OperateFile.DownLoadFile(ms,"报价订单明细");
                 }
             }
         }
@@ -4486,6 +4660,29 @@ namespace WebApp.QuoteOrderManager
 
 
 
+        }
+
+        /// <summary>
+        /// 设置单元格有效性(下拉)
+        /// </summary>
+        /// <param name="firstRow"></param>
+        /// <param name="lastRow"></param>
+        /// <param name="firstCell"></param>
+        /// <param name="lastCell"></param>
+        /// <param name="formulaBeginRow"></param>
+        /// <param name="formulaEndRow"></param>
+        /// <returns></returns>
+        HSSFDataValidation SetValidata(int firstRow, int lastRow, int firstCell, int lastCell, int formulaBeginRow,int formulaEndRow)
+        {
+
+            //DVConstraint constraint = DVConstraint.CreateExplicitListConstraint(new String[] { "aa", "bb", "cc" });
+            DVConstraint constraint = DVConstraint.CreateFormulaListConstraint(string.Format("$X${0}:$X${1}", formulaBeginRow, formulaEndRow));
+            // 设定在哪个单元格生效  
+            CellRangeAddressList regions = new CellRangeAddressList(firstRow, lastRow,
+                    firstCell, lastCell);
+            // 创建规则对象  
+            HSSFDataValidation ret = new HSSFDataValidation(regions, constraint);
+            return ret;
         }
     }
 

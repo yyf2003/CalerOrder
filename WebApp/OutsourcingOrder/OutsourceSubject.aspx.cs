@@ -8,6 +8,7 @@ using BLL;
 using DAL;
 using Models;
 using Common;
+using System.Configuration;
 
 namespace WebApp.OutsourcingOrder
 {
@@ -31,6 +32,16 @@ namespace WebApp.OutsourcingOrder
                 });
             }
         }
+
+        protected void lbDownLoadTemplate_Click(object sender, EventArgs e)
+        {
+            string path = ConfigurationManager.AppSettings["ImportTemplate"].ToString();
+            string fileName = "批量更改外协模板";
+            path = path.Replace("fileName", fileName);
+            OperateFile.DownLoadFile(path);
+        }
+
+
 
        
     }

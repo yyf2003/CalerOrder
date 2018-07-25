@@ -94,9 +94,13 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             content: url,
             id: 'layer1',
             cancel: function (index) {
+                var val = $("#hfIsChanged").val();
+                
+                if (val == 1) {
+                    $("#hfIsChanged").val("");
+                    $("#btnRefreshGuidance").click();
+                }
                 layer.closeAll();
-                $("#btnRefreshGuidance").click();
-
             }
 
         });

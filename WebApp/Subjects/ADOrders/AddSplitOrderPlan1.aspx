@@ -338,7 +338,14 @@
                <input type="checkbox" name="KeepSizecb" id="cbKeepSize"/>是(使用数据库尺寸)
             </td>
         </tr>
-       
+        <tr class="tr_bai">
+            <td>
+                主KV延续(去掉主KV)
+            </td>
+            <td style="text-align: left; padding-left: 5px;"> 
+               <input type="checkbox" name="NoMainKVcb" id="cbNoMainKV"/>主KV延续
+            </td>
+        </tr>
         <tr class="tr_bai">
             <td>
                 橱窗

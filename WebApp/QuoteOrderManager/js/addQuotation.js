@@ -371,6 +371,27 @@ $(function () {
     })
 
     ChangeTextColor();
+
+
+    $("#basicInstallPriceTB").delegate("span[name='checkQuoteInstallPriceSpan']", "click", function () {
+        var levelType = $(this).data("leveltype");
+        var price = $(this).data("price");
+        var url = "CheckQuoteInstallPrice.aspx?itemId=" + quoteItemId + "&month=" + month + "&guidanceId=" + guidanceId + "&subjectCategory=" + subjectCategory + "&subjectId=" + subjectId + "&region=" + region + "&levelType=" + levelType + "&price=" + price;
+        layer.open({
+            type: 2,
+            time: 0,
+            title: '查看安装费信息',
+            skin: 'layui-layer-rim', //加上边框
+            area: ['95%', '90%'],
+            content: url,
+            id: 'layer1',
+            cancel: function (index) {
+                layer.closeAll();
+            }
+
+        });
+    })
+
 })
 
 function LoadPOPQuoteJson() {

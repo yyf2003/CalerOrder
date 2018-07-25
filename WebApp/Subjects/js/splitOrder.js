@@ -141,6 +141,7 @@ var Plan = {
                             { field: 'IsElectricity', title: '通电否' },
                             { field: 'ChooseImg', title: '选图' },
                             { field: 'KeepPOPSize', title: '是否保留POP原尺寸' },
+                            { field: 'NoMainKV', title: '去掉主KV(延续)' },
                             { field: 'NotInvolveShopNos', title: '不参与店铺' }
                 ]],
 

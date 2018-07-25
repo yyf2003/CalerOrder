@@ -1480,6 +1480,7 @@
           <Property Name="POPSize" Type="varchar" MaxLength="1000" />
           <Property Name="WindowSize" Type="varchar" MaxLength="1000" />
           <Property Name="IsElectricity" Type="varchar" MaxLength="50" />
+          <Property Name="NoMainKV" Type="bit" />
         </EntityType>
         <EntityType Name="OrderType">
           <Key>
@@ -1629,7 +1630,7 @@
           <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="CustomerId" Type="int" />
           <Property Name="ConfigTypeId" Type="int" />
-          <Property Name="MaterialName" Type="nvarchar" MaxLength="50" />
+          <Property Name="MaterialName" Type="nvarchar" MaxLength="500" />
           <Property Name="ProductOutsourctId" Type="int" />
           <Property Name="AssignType" Type="int" />
           <Property Name="Channel" Type="nvarchar" MaxLength="500" />
@@ -2306,6 +2307,7 @@
           <Property Name="GraphicMaterial" Type="varchar" MaxLength="500" />
           <Property Name="QuoteGraphicMaterial" Type="varchar" MaxLength="500" />
           <Property Name="UnitName" Type="varchar" MaxLength="50" />
+          <Property Name="DefaultUnitPrice" Type="decimal" Scale="2" />
           <Property Name="UnitPrice" Type="decimal" Scale="2" />
           <Property Name="DefaultTotalPrice" Type="decimal" Scale="6" />
           <Property Name="AutoAddTotalPrice" Type="decimal" Scale="6" />
@@ -4467,6 +4469,7 @@
           <Property Type="String" Name="POPSize" MaxLength="1000" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="WindowSize" MaxLength="1000" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="IsElectricity" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Boolean" Name="NoMainKV" />
         </EntityType>
         <EntityType Name="OrderType">
           <Key>
@@ -5326,6 +5329,7 @@
           <Property Type="Int32" Name="FinalOrderId" />
           <Property Type="Int32" Name="QuoteItemId" />
           <Property Type="Decimal" Name="AddSizeRate" Precision="18" Scale="2" />
+          <Property Type="Decimal" Name="DefaultUnitPrice" Precision="18" Scale="2" />
         </EntityType>
         <EntityType Name="QuoteOrderSetting">
           <Key>
@@ -7320,6 +7324,7 @@
           <EntitySetMapping Name="OrderPlan">
             <EntityTypeMapping TypeName="KalerOrderDBModel.OrderPlan">
               <MappingFragment StoreEntitySet="OrderPlan">
+                <ScalarProperty Name="NoMainKV" ColumnName="NoMainKV" />
                 <ScalarProperty Name="IsElectricity" ColumnName="IsElectricity" />
                 <ScalarProperty Name="WindowSize" ColumnName="WindowSize" />
                 <ScalarProperty Name="POPSize" ColumnName="POPSize" />
@@ -8179,6 +8184,7 @@
           <EntitySetMapping Name="QuoteOrderDetail">
             <EntityTypeMapping TypeName="KalerOrderDBModel.QuoteOrderDetail">
               <MappingFragment StoreEntitySet="QuoteOrderDetail">
+                <ScalarProperty Name="DefaultUnitPrice" ColumnName="DefaultUnitPrice" />
                 <ScalarProperty Name="AddSizeRate" ColumnName="AddSizeRate" />
                 <ScalarProperty Name="QuoteItemId" ColumnName="QuoteItemId" />
                 <ScalarProperty Name="FinalOrderId" ColumnName="FinalOrderId" />

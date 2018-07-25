@@ -383,7 +383,7 @@ var User = {
                                     url: "/Users/Handler/Handler1.ashx?type=edit&optype=" + optype + "&jsonString=" + escape(UserJsonStr),
                                     success: function (data) {
                                         if (data == "exist") {
-                                            alert("该登陆账号已存在！");
+                                            layer.msg("该登陆账号已存在！");
 
                                         }
                                         else if (data == "ok") {
@@ -392,7 +392,7 @@ var User = {
                                             //window.location.href = "List.aspx";
                                         }
                                         else
-                                            alert(data);
+                                            layer.msg(data);
                                     }
                                 })
                             }
@@ -417,7 +417,7 @@ var User = {
             type: "get",
             url: "/Users/Handler/Handler1.ashx",
             data: { type: "getUserRole", userId: CurrUserId },
-            
+
             success: function (data) {
 
                 if (data != "") {
@@ -489,13 +489,13 @@ var User = {
 
             ]],
             onLoadSuccess: function (row, data) {
-                
+
                 if ($("#cbExpand").attr("checked") == "checked")
                     gridId.treegrid("expandAll");
                 else if (expandId.length > 0) {
-                  
-                    $.each(expandId,function (key, val) {
-                        
+
+                    $.each(expandId, function (key, val) {
+
                         gridId.treegrid("expand", val);
                     })
                 }
@@ -531,7 +531,6 @@ var User = {
     submitUserPermission: function () {
         var rows = gridId.treegrid('getRoots');
         $(".datagrid-wrap").find("div.divPermission").each(function () {
-
             var moduleId = $(this).data("moduleid");
             var operateStr = "";
             $(this).find("input.cbPermission:checked").each(function () {
@@ -547,28 +546,112 @@ var User = {
         else {
             for (key in moduleHash) {
                 jsonStr += '{"UserId":"' + CurrUserId + '","RoleId":"' + roleId + '","ModuleId":"' + key + '","OperatePermission":"' + moduleHash[key] + '"},';
-
             }
         }
         if (jsonStr.length > 0)
             jsonStr = "[" + jsonStr.substring(0, jsonStr.length - 1) + "]";
+        var exportChannelJson = "";
+        $("input[name='channelPermission']:checked").each(function () {
+            var channel = $(this).val();
+            var format = "";
+            $(this).parent().next().find("input[name='formatPermission']:checked").each(function () {
+                format += $(this).val() + ",";
+            })
+            if (format != "") {
+                format = format.substring(0, format.length - 1);
+            }
+            exportChannelJson += '{"UserId":' + CurrUserId + ',"Channel":"' + channel + '","Format":"' + format + '"},';
+        })
+        if (exportChannelJson.length > 0) {
+            exportChannelJson = "[" + exportChannelJson.substring(0, exportChannelJson.length - 1) + "]";
+            //exportChannelJson = exportChannelJson.substring(0, exportChannelJson.length - 1);
+        }
 
+        //alert(exportChannelJson);
+        //return false;
         $.ajax({
             type: "post",
             url: "/Users/Handler/Handler1.ashx",
-            data: { type: "updatePermission", jsonStr: jsonStr },
+            data: { type: "updatePermission", jsonStr: jsonStr, exportChannelJsonStr: exportChannelJson },
             cache: false,
             success: function (data) {
+
                 if (data == "ok") {
                     moduleHash = [];
                     $("#editUserPrimissionDiv").dialog('close');
                     expandId = [];
+                    layer.msg("提交成功");
                 }
                 else
-                    alert(data);
+                    layer.msg(data);
+            }
+        })
+    },
+    getShopChannels: function () {
+        $("#editPermissionChannelTable").html("");
+        $.ajax({
+            type: "get",
+            url: "/Users/Handler/Handler1.ashx",
+            data: { type: "GetChannel", userId: CurrUserId },
+            beforeSend: function () {
+                $("#loadExportChannelImg").show();
+            },
+            complete: function () {
+                $("#loadExportChannelImg").hide();
+            },
+            cache: false,
+            success: function (data) {
+                var data1 = data;
+                if (data != "") {
+
+                    var shopChannelJsonData = "";
+                    var exportPermissionJson = [];
+                    if (data.indexOf('|') != -1) {
+                        shopChannelJsonData = data.split('|')[0];
+                        var exportPermissionJsonData = data.split('|')[1];
+
+                        exportPermissionJson = JSON.parse(exportPermissionJsonData);
+                    }
+                    else {
+                        shopChannelJsonData = data;
+                    }
+
+                    var shopChannelJson = JSON.parse(shopChannelJsonData);
+
+                    if (shopChannelJson.length > 0) {
+
+                        for (var i = 0; i < shopChannelJson.length; i++) {
+                            var channel = shopChannelJson[i].Channel;
+                            var checked = "";
+                            var disabled = "disabled='disabled'";
+                            if (exportPermissionJson.length > 0) {
+                                for (var ii = 0; ii < exportPermissionJson.length; ii++) {
+                                    if (exportPermissionJson[ii].Channel == channel) {
+                                        checked = "checked='checked'";
+                                        disabled = "";
+                                    }
+                                }
+                            }
+                            var tr = "<tr class='tr_bai'>";
+                            tr += "<td style='text-align:left;padding-left:20px;'><input type='checkbox' name='channelPermission' value='" + channel + "' " + checked + "/>" + channel + "</td>";
+                            tr += "<td style='text-align:left; padding-left:5px;'>";
+                            var formats = shopChannelJson[i].Formats;
+                            for (var j = 0; j < formats.length; j++) {
+                                var divFormat = "<div style='width:120px;'>";
+                                divFormat += "<input type='checkbox' name='formatPermission'  value='" + formats[j].Format + "' " + disabled + "/>" + formats[j].Format;
+                                divFormat += "</div>";
+                                tr += divFormat;
+                            }
+                            tr += "</td>";
+                            tr += "</tr>";
+                            $("#editPermissionChannelTable").append(tr);
+                        }
+                    }
+                }
             }
         })
     }
+
 }
 
 var Outsource = {
@@ -680,13 +763,7 @@ $(function () {
         User.addUser("add");
     })
 
-    //负责客户只能单选
-    //    $("#customerContainer").delegate("input[name='cbCustomer']", "change", function () {
-    //        if (this.checked) {
-    //            $("#customerContainer").find("input[name='cbCustomer']").not($(this)).attr("checked", false);
-    //        }
 
-    //    })
     $("#selUserLevel").on("change", function () {
         DisplayRegion();
     })
@@ -721,6 +798,20 @@ $(function () {
             gridId.treegrid("collapseAll");
         }
         expandId = [];
+    })
+
+    $("#editPermissionChannelTable").delegate("input[name='channelPermission']", "change", function () {
+        var checked = this.checked;
+        if (checked) {
+            $(this).parent().next().find("input[name='formatPermission']").each(function () {
+                $(this).prop("disabled",false);
+            })
+        }
+        else {
+            $(this).parent().next().find("input[name='formatPermission']").each(function () {
+                $(this).prop("checked", false).prop("disabled", true);
+            })
+        }
     })
 
 })
@@ -889,11 +980,7 @@ function ClearVal() {
 
 function DisplayRegion() {
     var flag = false;
-    //    $("#showRoles").find("input[name='cbRole']:checked").each(function () {
-    //        if ($(this).val() == "5" || $(this).val() == "6") {
-    //            flag = true;
-    //        }
-    //    })
+   
     var levelId = $("#selUserLevel").val();
     var customerId = 0;
     $("input[name='cbCustomer']:checked").each(function () {
@@ -940,7 +1027,10 @@ function editOutsource(obj) {
 function editPermission(obj) {
     expandId = [];
     CurrUserId = $(obj).data("userid");
+    var userName = $(obj).data("username");
+    $("#editPrimissionUserName").html(userName);
     User.getUserRole();
+    User.getShopChannels();
     $("#editUserPrimissionDiv").show().dialog({
         modal: true,
         width: '90%',
@@ -965,7 +1055,8 @@ function editPermission(obj) {
                         }
                     }
                 ]
-    });
+                });
+    
 }
 
 function SaveIntoHash(moduleid, operate) {

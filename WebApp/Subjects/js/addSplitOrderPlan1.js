@@ -801,6 +801,7 @@ var Plan = {
                             { field: 'IsElectricity', title: '通电否' },
                             { field: 'ChooseImg', title: '选图' },
                             { field: 'KeepPOPSize', title: '是否保留POP原尺寸' },
+                            { field: 'NoMainKV', title: '不含主KV' },
                             { field: 'NotInvolveShopNos', title: '不参与店铺' }
                 ]],
             singleSelect: true,
@@ -1122,6 +1123,11 @@ function CheckSubmitVal() {
         KeepPOPSize = true;
     }
 
+    var NoMainKV = "";
+    if ($("#cbNoMainKV").attr("checked") == "checked") {
+        NoMainKV = true;
+    }
+
     var NotInvolveShopNos = $.trim($("#txtNoInvolveShopNos").val());
 
     if (region.length > 0)
@@ -1134,8 +1140,6 @@ function CheckSubmitVal() {
         cityTier = cityTier.substring(0, cityTier.length - 1);
     if (Format.length > 0)
         Format = Format.substring(0, Format.length - 1);
-//    if (ShopLevel.length > 0)
-//        ShopLevel = ShopLevel.substring(0, ShopLevel.length - 1);
     if (MaterialSupport.length > 0)
         MaterialSupport = MaterialSupport.substring(0, MaterialSupport.length - 1);
     if (Install.length > 0)
@@ -1217,7 +1221,7 @@ function CheckSubmitVal() {
     }
     PlanJsonStr = '{"Id":' + CurrPlanId + ',"CustomerId":' + customerId + ',"SubjectId":' + subjectId + ',"ProvinceId":"' + province + '","CityId":"' + city + '","RegionNames":"' + region + '","CityTier":"' + cityTier + '","ShopNos":"' + ShopNos + '","IsInstall":"' + Install + '","Format":"' + Format + '","MaterialSupport":"' + MaterialSupport + '","POSScale":"' + Scale + '","PositionName":"' + PositionName + '","CornerType":"' + CornerTypes + '","MachineFrameNames":"' + MachineFrameNames + '","Quantity":"' + Quantity + '","Gender":"' + Gender + '",';
 
-    PlanJsonStr += '"GraphicMaterial":"' + GraphicMaterial + '","POPSize":"' + POPSize + '","WindowSize":"' + WindowSize + '","ChooseImg":"' + ChooseImg + '","KeepPOPSize":"' + KeepPOPSize + '","IsElectricity":"' + IsElectricity + '","NotInvolveShopNos":"' + NotInvolveShopNos + '"';
+    PlanJsonStr += '"GraphicMaterial":"' + GraphicMaterial + '","POPSize":"' + POPSize + '","WindowSize":"' + WindowSize + '","ChooseImg":"' + ChooseImg + '","KeepPOPSize":"' + KeepPOPSize + '","IsElectricity":"' + IsElectricity + '","NotInvolveShopNos":"' + NotInvolveShopNos + '","NoMainKV":"' + NoMainKV + '"';
 
 
     PlanJsonStr += ',"SplitOrderPlanDetail":[' + planDetailJson + ']}';

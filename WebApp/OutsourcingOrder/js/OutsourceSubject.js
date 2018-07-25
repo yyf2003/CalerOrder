@@ -108,8 +108,29 @@ $(function () {
         recoverOrder();
     })
 
+    //修改外协
     $("#btnChangeOS").click(function () {
+        var newOutsourceId = $("#seleOutsource").val() || 0;
+        var changeType = $("input[name$='rblChangeType']:checked").val() || 0;
+        if (newOutsourceId == 0) {
+            layer.msg("请选择外协");
+            return false;
+        }
+        if (changeType == 0) {
+            layer.msg("请选择更新类型");
+            return false;
+        }
         changeOutsource();
+    })
+
+    //批量修改外协
+    $("#btnBatchChangeOS").click(function () {
+        var guidanceMonth = $("#txtMonth").val();
+        if (guidanceMonth == "") {
+            layer.msg("请选择活动月份");
+            return false;
+        }
+        changeOutsourceBatch();
     })
 
     $("#txtSheet").on("click", function () {
@@ -500,6 +521,7 @@ function doSearch() {
 
 
 var pageIndex = 1, pageSize = 15;
+var Loadingindex;
 var Order = {
     model: function () {
         this.Id = 0;
@@ -565,7 +587,7 @@ var Order = {
         var materialName = $("input[name^='cblMaterial']:checked").val() || "";
 
         var shopNo = $.trim($("#txtSearchShopNo").val());
-        alert(shopNo);
+
         $("#tbOrderList").datagrid({
             queryParams: { type: "getOrderList", region: region, subjectCategoryIds: category, subjectIds: subjectId, province: province, city: city, outsourceId: outsourceId, materialCategoryId: materialCategoryId, outsourceType: oType, shopNo: shopNo, exportType: exportType, materialName: materialName, currpage: pageIndex, pagesize: pageSize },
             method: 'get',
@@ -770,38 +792,64 @@ var Order = {
     updateOutsource: function () {
         var newOutsourceId = $("#seleOutsource").val() || 0;
         var changeType = $("input[name$='rblChangeType']:checked").val() || 0;
-        if (newOutsourceId == 0) {
-            layer.msg("请选择外协");
-            return false;
-        }
-        if (changeType == 0) {
-            layer.msg("请选择更新类型");
-            return false;
-        }
+        $.ajax({
+            type: "get",
+            url: "handler/OrderList.ashx",
+            data: { type: 'changeOutsource', subjectId: subjectId, orderId: changeIds, newOutsourceId: newOutsourceId, changeType: changeType },
+            complete: function () {
+                layer.close(Loadingindex);
+            },
+            success: function (data) {
 
-        if (newOutsourceId > 0) {
-            $.ajax({
-                type: "get",
-                url: "handler/OrderList.ashx",
-                data: { type: 'changeOutsource', subjectId: subjectId, orderId: changeIds, newOutsourceId: newOutsourceId, changeType: changeType },
-                success: function (data) {
-
-                    if (data == "ok") {
-                        Order.getOrderList(pageIndex, pageSize);
-                        changeIds = "";
-                        subjectId = "";
-                        newOutsourceId = 0;
-                        $("#divOutsource").hide();
-                        layer.closeAll();
-                        $("#seleOutsource").val("0");
-                        //document.getElementById("seleOutsource").length = 1;
-                    }
-                    else {
-                        layer.msg(data);
-                    }
+                if (data == "ok") {
+                    Order.getOrderList(pageIndex, pageSize);
+                    changeIds = "";
+                    subjectId = "";
+                    newOutsourceId = 0;
+                    $("#divOutsource").hide();
+                    layer.closeAll();
+                    $("#seleOutsource").val("0");
+                    //document.getElementById("seleOutsource").length = 1;
                 }
-            });
-        }
+                else {
+                    layer.msg(data);
+                }
+            }
+        });
+    },
+    updateOutsourceBatch: function () {
+        //var formData = new FormData($("#form1"));  //重点：要用这种方法接收表单的参数
+
+        var formData = new FormData();
+        formData.append('file', $('#changeFile')[0].files[0]);
+        var guidanceMonth = $("#txtMonth").val();
+        var newOutsourceId = $("#seleOutsourceBatch").val();
+        
+        $.ajax({
+            url: "handler/OrderList.ashx?type=changeOutsourceBatch&guidanceMonth=" + guidanceMonth + "&newOutsourceId=" + newOutsourceId,
+            type: 'POST',
+            data: formData,
+            // 告诉jQuery不要去处理发送的数据
+            processData: false,
+            // 告诉jQuery不要去设置Content-Type请求头
+            contentType: false,
+            async: false,
+            complete: function () {
+                layer.close(Loadingindex);
+            },
+            success: function (data) {
+                if (data == "ok") {
+                    layer.closeAll();
+                    $("#divOutsourceBatch").hide();
+                    layer.msg("更新成功！");
+                    Order.getOrderList(pageIndex, pageSize);
+                }
+                else {
+                    layer.msg(data);
+                }
+            }
+        });
+
     }
 };
 
@@ -1002,7 +1050,7 @@ function changeOutsource() {
     }
     var outsourceLen = $("#seleOutsource option").length;
     if (outsourceLen == 1) {
-        //document.getElementById("seleOutsource").length = 1;
+       
         $.ajax({
             type: "get",
             url: "handler/OrderList.ashx?type=getOutsource",
@@ -1032,10 +1080,14 @@ function changeOutsource() {
         btnAlign: 'c',
         yes: function () {
 
-            var index2=layer.confirm('确定修改外协吗？', {
-                btn: ['确定的', '取消'] //按钮
+            var index2 = layer.confirm('确定修改外协吗？', {
+                btn: ['确定', '取消'] //按钮
             }, function () {
-                Order.updateOutsource();
+                layer.close(index2);
+                Loadingindex = layer.load(1, { shade: [0.5, '#fff'] }); //0代表加载的风格，支持0-2
+                setTimeout(function () {
+                    Order.updateOutsource();
+                }, 1000);
             }, function () {
                 //$("#divOutsource").hide();
                 layer.close(index2);
@@ -1169,6 +1221,79 @@ function CheckVal() {
     Order.model.PayOrderPrice = PayPrice;
     Order.model.ReceiveOrderPrice = ReceivePrice;
     return true;
+}
+
+
+function changeOutsourceBatch() {
+    var outsourceLen = $("#seleOutsourceBatch option").length;
+    if (outsourceLen == 1) {
+
+        $.ajax({
+            type: "get",
+            url: "handler/OrderList.ashx?type=getOutsource",
+            success: function (data) {
+                if (data != "") {
+                    var json = eval(data);
+                    if (json.length > 0) {
+
+                        for (var i = 0; i < json.length; i++) {
+                            var option = "<option value='" + json[i].Id + "'>" + json[i].CompanyName + "</option>";
+                            $("#seleOutsourceBatch").append(option);
+                        }
+                    }
+                }
+            }
+        })
+    }
+    layer.open({
+        type: 1,
+        time: 0,
+        title: '批量修改外协',
+        skin: 'layui-layer-rim', //加上边框
+        area: ['700px', '300px'],
+        content: $("#divOutsourceBatch"),
+        id: 'outsourceLayer',
+        btn: ['提 交'],
+        btnAlign: 'c',
+        yes: function () {
+
+            var newOutsourceId = $("#seleOutsourceBatch").val();
+            if (newOutsourceId == "0") {
+                layer.msg("请选择新外协名称");
+                return false;
+            }
+            var val = $("#changeFile").val();
+            if (val != "") {
+                var extent = val.substring(val.lastIndexOf('.') + 1);
+                if (extent != "xls" && extent != "xlsx") {
+                    layer.msg("只能导入Excel文件");
+                    return false;
+                }
+            }
+            else {
+                layer.msg("请选择文件");
+                return false;
+            }
+            var index2 = layer.confirm('确定修改外协吗？', {
+                btn: ['确定', '取消'] //按钮
+            }, function () {
+                layer.close(index2);
+                Loadingindex = layer.load(1, { shade: [0.5, '#fff'] }); //0代表加载的风格，支持0-2
+                setTimeout(function () {
+                    Order.updateOutsourceBatch();
+                }, 1000);
+                
+            }, function () {
+                //$("#divOutsource").hide();
+                layer.close(index2);
+            });
+        },
+        cancel: function () {
+            $("#divOutsourceBatch").hide();
+            layer.closeAll();
+        }
+
+    });
 }
 
 

@@ -37,7 +37,7 @@
     </style>
 </head>
 <body>
-    <form id="form1" runat="server">
+    <form id="form1" runat="server" method="post" enctype="multipart/form-data" >
     <div class="nav_title">
         <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" /><p
             class="nav_table_p">
@@ -211,6 +211,8 @@
                         plain="true" icon="icon-remove">删除</a> <a id="btnRecover" style="float: left;" class="easyui-linkbutton"
                             plain="true" icon="icon-redo">恢复</a><a id="btnChangeOS" style="float: left;"
                                         class="easyui-linkbutton" plain="true" icon="icon-edit">更改外协</a>
+                             <a id="btnBatchChangeOS" style="float: left;"
+                                        class="easyui-linkbutton" plain="true" icon="icon-edit">批量更改外协</a>
             <div class='datagrid-btn-separator'>
             </div>
             <input type="text" id="txtSearchShopNo" />
@@ -423,6 +425,72 @@
            </tr>
        </table>
      </div>
+
+
+    <div id="divOutsourceBatch" style="display:none; width:700px; height:180px; margin:0px;">
+       <table class="table">
+           <tr>
+             <td style=" width:100px; height:35px;">
+               请选择新外协：
+             </td>
+             <td style=" text-align:left; padding-left:10px;">
+                <select id="seleOutsourceBatch">
+                   <option value="0">--请选择--</option>
+                </select>
+                <span style=" color:Blue;">(提示：如果不选，以模板填写的为准！)</span>
+             </td>
+           </tr>
+           <tr>
+             <td style="  height:35px;">
+                更新类型：
+             </td>
+             <td style=" text-align:left; padding-left:10px;">
+                 <asp:CheckBoxList ID="cblBatchChangeType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                    <asp:ListItem Value="1">POP&nbsp;&nbsp;</asp:ListItem>
+                    <asp:ListItem Value="2">安装费&nbsp;&nbsp;</asp:ListItem>
+                    <asp:ListItem Value="3">快递费&nbsp;&nbsp;</asp:ListItem>
+                    <asp:ListItem Value="4">印刷费&nbsp;&nbsp;</asp:ListItem>
+                    <asp:ListItem Value="5">其他费用&nbsp;&nbsp;</asp:ListItem>
+                    <asp:ListItem Value="6">全部&nbsp;&nbsp;</asp:ListItem>
+                    <asp:ListItem Value="0" Selected="True">以模板为准</asp:ListItem>
+                 </asp:CheckBoxList>
+             </td>
+           </tr>
+           <tr>
+             <td style="  height:35px;">
+                更新费用：
+             </td>
+             <td style=" text-align:left; padding-left:10px;">
+                 安装费：
+                 <asp:TextBox ID="TextBox1" runat="server" style=" width:60px;"></asp:TextBox>
+                 &nbsp;&nbsp;
+                 快递费：
+                 <asp:TextBox ID="TextBox2" runat="server" style=" width:60px;"></asp:TextBox>
+                 &nbsp;&nbsp;
+                 <span style=" color:Blue;">(提示：如果不填,以模板为准，默认原来数据)</span>
+             </td>
+           </tr>
+           <tr>
+             <td style="  height:35px;">
+                批量更新模板：
+             </td>
+             <td style=" text-align:left; padding-left:10px;">
+                 <asp:LinkButton ID="lbDownLoadTemplate" runat="server" 
+                     onclick="lbDownLoadTemplate_Click">下载模板</asp:LinkButton>
+             </td>
+           </tr>
+           <tr>
+             <td style="  height:35px;">
+                请选择文件：
+             </td>
+             <td style=" text-align:left; padding-left:10px;">
+                 <%--<asp:FileUpload ID="FileUpload1" runat="server" />--%>
+                 <input type="file" id="changeFile" />
+             </td>
+           </tr>
+       </table>
+     </div>
+
     </form>
 </body>
 </html>

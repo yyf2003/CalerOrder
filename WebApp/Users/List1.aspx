@@ -12,6 +12,8 @@
     <script src="../easyui1.4/jquery.min.js"></script>
     <script src="../easyui1.4/jquery.easyui.min.js"></script>
     <script src="../easyui1.4/plugins/jquery.treegrid.js"></script>
+    <link href="/layui/css/layui.css" rel="stylesheet" type="text/css" />
+    <script src="/layui/lay/dest/layui.all.js" type="text/javascript"></script>
     <style type="text/css">
         .ul
         {
@@ -24,6 +26,10 @@
             float: left;
             margin-right: 10px;
         }
+        #editPermissionChannelTable div
+        {
+         float:left;
+         }
     </style>
 </head>
 <body>
@@ -113,7 +119,7 @@
             </asp:TemplateField>
             <asp:TemplateField HeaderText="权限设置" Visible="false" HeaderStyle-Width="80px" HeaderStyle-BorderColor="#dce0e9">
                 <ItemTemplate>
-                    <span data-userid='<%#Eval("UserId") %>' onclick="editPermission(this)" style="color: blue;
+                    <span data-userid='<%#Eval("UserId") %>' data-username='<%#Eval("UserName") %>' onclick="editPermission(this)" style="color: blue;
                         cursor: pointer;">模块权限</span> | <span data-userid='<%#Eval("UserId") %>' onclick="editOrderApproveRight(this)"
                             style="color: blue; cursor: pointer;">订单审批权限</span>
                 </ItemTemplate>
@@ -290,24 +296,56 @@
     </div>
     <div id="editUserPrimissionDiv" title="设置权限" style="display: none;">
         <div style="padding-left: 8px; height: 30px; background: #e5e2e2; padding-top: 5px;">
+            用户：
+            <span id="editPrimissionUserName"></span>
+            &nbsp;&nbsp;&nbsp;&nbsp;
             角色：
-            <select id="seleRole" class="easyui-combobox"></select>
-            &nbsp;&nbsp;&nbsp;
-            <input type="checkbox" id="cbExpand" />展开
+            <select id="seleRole" class="easyui-combobox">
+            </select>
+           
         </div>
-        <img id="loadModuleImg" style=" display:none;" src="../image/WaitImg/loading1.gif" />
-        <table id="modulegrid">
-        </table>
+        <div class="layui-tab layui-tab-brief" lay-filter="order">
+            <ul class="layui-tab-title">
+                <li class="layui-this" lay-id="1">菜单权限</li>
+                <li lay-id="2">导出权限</li>
+            </ul>
+            <div class="layui-tab-content" style="overflow: auto;">
+                <div class="layui-tab-item layui-show" style=" padding-left:0px; padding-right:0px;">
+                   <div><input type="checkbox" id="cbExpand" />展开</div>
+                   <img id="loadModuleImg" style="display: none;" src="../image/WaitImg/loading1.gif" />
+                   <table id="modulegrid">
+                   </table>
+                </div>
+                <div class="layui-tab-item">
+                   <table class="table">
+                      <thead>
+                        <tr class="tr_hui" style=" font-weight:bold;">
+                          <td style=" width:150px;">Channel</td>
+                          <td style=" text-align:left; padding-left:5px;">Format(店铺类型)：<span style=" color:Blue;">默认全选</span></td>
+                        </tr>
+                      </thead>
+                      <tbody id="editPermissionChannelTable"></tbody>
+                   </table>
+                   <div id="loadExportChannelImg" style="display: none;">
+                     <img  src="../image/WaitImg/loading1.gif" />
+                   </div>
+                </div>
+            </div>
+        </div>
+        
     </div>
     <div id="editOrderApprovePermission" title="设置订单审批权限" style="display: none;">
-      <table class="table">
-        <tr class="tr_bai">
-           <td style=" width:120px;">请选择订单类型：</td>
-           <td>
-             <div id="orderTypeDiv"></div>
-           </td>
-        </tr>
-      </table>
+        <table class="table">
+            <tr class="tr_bai">
+                <td style="width: 120px;">
+                    请选择订单类型：
+                </td>
+                <td>
+                    <div id="orderTypeDiv">
+                    </div>
+                </td>
+            </tr>
+        </table>
     </div>
     <asp:HiddenField ID="hfRoles" runat="server" />
     </form>

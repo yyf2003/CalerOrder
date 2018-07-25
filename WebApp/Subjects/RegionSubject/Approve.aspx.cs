@@ -306,8 +306,8 @@ namespace WebApp.Subjects.RegionSubject
             int subjectType = 1;
             int guidanceId = 0;
             Models.Subject model = subjectBll.GetModel(subjectId);
-            using (TransactionScope tran = new TransactionScope())
-            {
+            //using (TransactionScope tran = new TransactionScope())
+            //{
                 try
                 {
                     
@@ -485,11 +485,6 @@ namespace WebApp.Subjects.RegionSubject
                             });
 
                         }
-
-
-                        
-
-                        
                         // && (model.SubjectType == (int)SubjectTypeEnum.HC订单 || model.SubjectType == (int)SubjectTypeEnum.分区补单 || model.SubjectType == (int)SubjectTypeEnum.正常单)
                         if (result == 1)
                         {
@@ -515,7 +510,7 @@ namespace WebApp.Subjects.RegionSubject
                         ApproveInfo approveModel = new ApproveInfo() { AddDate = DateTime.Now, AddUserId = CurrentUser.UserId, Remark = remark, Result = result, SubjectId = subjectId };
                         new ApproveInfoBLL().Add(approveModel);
 
-                        tran.Complete();
+                        //tran.Complete();
                         isApproveOk = true;
                     }
                 }
@@ -523,7 +518,7 @@ namespace WebApp.Subjects.RegionSubject
                 {
                     msg = ex.Message;
                 }
-            }
+            //}
             if (isApproveOk)
             {
 

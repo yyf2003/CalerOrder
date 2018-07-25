@@ -18,11 +18,12 @@ namespace WebApp.QuoteOrderManager
         {
             if (!IsPostBack)
             {
+                ClearSession();
                 BindCustomerList(ddlCustomer);
                 DateTime now = DateTime.Now;
                 txtGuidanceMonth.Text = now.Year + "-" + now.Month;
                 BindGuidance();
-                BindRegion();
+                //BindRegion();
                 GetQuoteList();
             }
         }
@@ -60,65 +61,222 @@ namespace WebApp.QuoteOrderManager
             if (list.Any())
             {
                 list = list.OrderBy(s => s.guidance.ItemId).ToList();
-
+                List<int> selectedList = new List<int>();
+                if (Session["QuoteOperateGuidanceSelected"] != null)
+                {
+                    selectedList = Session["QuoteOperateGuidanceSelected"] as List<int>;
+                }
                 list.ForEach(s =>
                 {
                     ListItem li = new ListItem();
                     string ActivityName = CommonMethod.GetEnumDescription<GuidanceTypeEnum>((s.guidance.ActivityTypeId ?? 1).ToString());
                     li.Value = s.guidance.ItemId.ToString();
                     li.Text = s.guidance.ItemName + "-" + ActivityName + "&nbsp;&nbsp;";
+                    if (selectedList.Contains(s.guidance.ItemId))
+                        li.Selected = true;
                     cblGuidanceList.Items.Add(li);
                 });
             }
             Panel_EmptyGuidance.Visible = !list.Any();
         }
 
-        void BindRegion()
+        void ClearSession()
         {
-            int customerId = int.Parse(ddlCustomer.SelectedValue);
-            List<string> myRegion = GetResponsibleRegion;
-            if (myRegion.Any())
-            {
-                myRegion.ForEach(s =>
-                {
-                    ListItem li = new ListItem();
-                    li.Value = s;
-                    li.Text = s + "&nbsp;&nbsp;";
-                    cblRegion.Items.Add(li);
-                });
-            }
-            else
-                BindRegionByCustomer1(customerId, ref cblRegion);
+            Session["QuoteOperateOrderListTotal"] = null;
+            Session["QuoteOperateSubjectListTotal"] = null;
+
+            Session["QuoteOperateOrderListSubmited"] = null;
+            Session["QuoteOperateSubjectListSubmited"] = null;
+
+            Session["QuoteOperateOrderListNotSubmit"] = null;
+            Session["QuoteOperateSubjectListNotSubmit"] = null;
+
+            Session["QuoteOperateGuidanceSelected"] = null;
+            Session["QuoteOperateRegionSelected"] = null;
+            Session["QuoteOperateSubjectCategorySelected"] = null;
         }
 
-        void BindSubjectCategory()
+        void LoadSession()
         {
-            cblSubjectCategory.Items.Clear();
+            
             List<int> guidanceIdList = new List<int>();
-            foreach (ListItem li in cblGuidanceList.Items) {
+            foreach (ListItem li in cblGuidanceList.Items)
+            {
                 if (li.Selected)
                 {
                     guidanceIdList.Add(int.Parse(li.Value));
                 }
             }
+            Session["QuoteOperateGuidanceSelected"] = guidanceIdList;
+            List<QuoteOrderDetail> orderList0 = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.IsDelete==null || s.IsDelete==false));
+            if (orderList0.Any())
+            {
+                List<int> totalSubjectIdList = orderList0.Select(s => s.SubjectId ?? 0).Distinct().ToList();
+                List<Subject> totalSubjectList = new SubjectBLL().GetList(s => totalSubjectIdList.Contains(s.Id) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1);
+
+
+                var notSubmitOrderList = orderList0.Where(s => (s.QuoteItemId ?? 0) == 0).ToList();
+                var submitedOrderList = orderList0.Where(s => (s.QuoteItemId ?? 0) > 0).ToList();
+                List<int> notSubmitSubjectIdList = notSubmitOrderList.Select(s => s.SubjectId ?? 0).Distinct().ToList();
+                List<Subject> notSubmitSubjectList = totalSubjectList.Where(s => notSubmitSubjectIdList.Contains(s.Id)).ToList();
+
+
+
+                List<int> submitSubjectIdList = submitedOrderList.Select(s => s.SubjectId ?? 0).Distinct().ToList();
+                List<Subject> submitSubjectList = totalSubjectList.Where(s => submitSubjectIdList.Contains(s.Id)).ToList();
+
+
+                Session["QuoteOperateOrderListTotal"] = orderList0;
+                Session["QuoteOperateSubjectListTotal"] = totalSubjectList;
+
+                Session["QuoteOperateOrderListSubmited"] = submitedOrderList;
+                Session["QuoteOperateSubjectListSubmited"] = submitSubjectList;
+
+                Session["QuoteOperateOrderListNotSubmit"] = notSubmitOrderList;
+                Session["QuoteOperateSubjectListNotSubmit"] = notSubmitSubjectList;
+            }
+            else
+            {
+                Session["QuoteOperateOrderListTotal"] = null;
+                Session["QuoteOperateSubjectListTotal"] = null;
+
+                Session["QuoteOperateOrderListSubmited"] = null;
+                Session["QuoteOperateSubjectListSubmited"] = null;
+
+                Session["QuoteOperateOrderListNotSubmit"] = null;
+                Session["QuoteOperateSubjectListNotSubmit"] = null;
+            }
+        }
+
+        void BindRegion()
+        {
+            cblRegion.Items.Clear();
+            //int customerId = int.Parse(ddlCustomer.SelectedValue);
+            //List<string> myRegion = GetResponsibleRegion;
+            //if (myRegion.Any())
+            //{
+            //    myRegion.ForEach(s =>
+            //    {
+            //        ListItem li = new ListItem();
+            //        li.Value = s;
+            //        li.Text = s + "&nbsp;&nbsp;";
+            //        cblRegion.Items.Add(li);
+            //    });
+            //}
+            //else
+            //    BindRegionByCustomer1(customerId, ref cblRegion);
+
+            List<QuoteOrderDetail> orderList = new List<QuoteOrderDetail>();
+            List<Subject> subjectList = new List<Subject>();
+            if (Session["QuoteOperateOrderListTotal"] != null)
+            {
+                orderList = Session["QuoteOperateOrderListTotal"] as List<QuoteOrderDetail>;
+            }
+            if (Session["QuoteOperateSubjectListTotal"] != null)
+            {
+                subjectList = Session["QuoteOperateSubjectListTotal"] as List<Subject>;
+            }
+            var orderList0 = (from order in orderList
+                              join subject in subjectList
+                              on order.SubjectId equals subject.Id
+                              select order).ToList();
+            if (orderList0.Any())
+            {
+                List<string> selectedList = new List<string>();
+                if (Session["QuoteOperateRegionSelected"] != null)
+                {
+                    selectedList = Session["QuoteOperateRegionSelected"] as List<string>;
+                }
+
+                List<string> regionList = orderList0.Select(s=>s.Region).Distinct().ToList();
+                bool isEmpty = false;
+                regionList.ForEach(s => {
+                    if (!string.IsNullOrWhiteSpace(s))
+                    {
+                        ListItem li = new ListItem();
+                        li.Value = s;
+                        li.Text = s + "&nbsp;&nbsp;";
+                        if (selectedList.Contains(s))
+                            li.Selected = true;
+                        cblRegion.Items.Add(li);
+                    }
+                    else
+                        isEmpty = true;
+                });
+                if (isEmpty)
+                {
+                    ListItem li = new ListItem();
+                    li.Value = "空";
+                    li.Text = "空";
+                    if (selectedList.Contains(li.Value))
+                        li.Selected = true;
+                    cblRegion.Items.Add(li);
+                }
+            }
+        }
+
+        void BindSubjectCategory()
+        {
+            cblSubjectCategory.Items.Clear();
             try
             {
-                List<QuoteOrderDetail> orderList0 = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.QuoteItemId ?? 0) == 0);
-                var orderList = (from order in orderList0
-                                 join subject in CurrentContext.DbContext.Subject
-                                 on order.SubjectId equals subject.Id
-                                 join category1 in CurrentContext.DbContext.ADSubjectCategory
-                                 on subject.SubjectCategoryId equals category1.Id into categoryTemp
-                                 from category in categoryTemp.DefaultIfEmpty()
-                                 select new
-                                 {
-                                     order,
-                                     category
-                                 }).ToList();
-
-                if (orderList.Any())
+                
+                List<QuoteOrderDetail> orderList = new List<QuoteOrderDetail>();
+                List<Subject> subjectList = new List<Subject>();
+                if (Session["QuoteOperateOrderListTotal"] != null)
                 {
-                    var categoryList = orderList.Select(s => s.category).Distinct().ToList();
+                    orderList = Session["QuoteOperateOrderListTotal"] as List<QuoteOrderDetail>;
+                }
+                if (Session["QuoteOperateSubjectListTotal"] != null)
+                {
+                    subjectList = Session["QuoteOperateSubjectListTotal"] as List<Subject>;
+                }
+                List<string> regionList = new List<string>();
+                foreach (ListItem li in cblRegion.Items)
+                {
+                    if (li.Selected && !regionList.Contains(li.Value))
+                    {
+                        regionList.Add(li.Value);
+                    }
+                }
+                Session["QuoteOperateRegionSelected"] = regionList;
+                var orderList0 = (from order in orderList
+                                  join subject in subjectList
+                                  on order.SubjectId equals subject.Id
+                                  join category1 in CurrentContext.DbContext.ADSubjectCategory
+                                  on subject.SubjectCategoryId equals category1.Id into categoryTemp
+                                  from category in categoryTemp.DefaultIfEmpty()
+                                  select new { order, category }).ToList();
+                if (regionList.Any())
+                {
+                    //orderList0 = orderList0.Where(s => regionList.Contains(s.order.Region)).ToList();
+                    if (regionList.Contains("空"))
+                    {
+                        regionList.Remove("空");
+                        if (regionList.Any())
+                        {
+                            orderList0 = orderList0.Where(s => regionList.Contains(s.order.Region) || (s.order.Region == null || s.order.Region == "")).ToList();
+                        }
+                        else
+                        {
+                            orderList0 = orderList0.Where(s => s.order.Region == null || s.order.Region == "").ToList();
+                        }
+                    }
+                    else
+                        orderList0 = orderList0.Where(s => regionList.Contains(s.order.Region)).ToList();
+                }
+                if (orderList0.Any())
+                {
+
+                    List<int> selectedList = new List<int>();
+                    if (Session["QuoteOperateSubjectCategorySelected"] != null)
+                    {
+                        selectedList = Session["QuoteOperateSubjectCategorySelected"] as List<int>;
+                    }
+
+
+
+                    var categoryList = orderList0.Select(s => s.category).Distinct().ToList();
 
                     bool isNull = false;
                     categoryList.ForEach(s =>
@@ -128,6 +286,8 @@ namespace WebApp.QuoteOrderManager
                             ListItem li = new ListItem();
                             li.Text = s.CategoryName + "&nbsp;&nbsp;";
                             li.Value = s.Id.ToString();
+                            if (selectedList.Contains(s.Id))
+                                li.Selected = true;
                             cblSubjectCategory.Items.Add(li);
                         }
                         else
@@ -135,7 +295,13 @@ namespace WebApp.QuoteOrderManager
                     });
                     if (isNull)
                     {
-                        cblSubjectCategory.Items.Add(new ListItem("空", "0"));
+                        ListItem li = new ListItem();
+                        li.Text = "空";
+                        li.Value = "0";
+                        if (selectedList.Contains(0))
+                            li.Selected = true;
+                        cblSubjectCategory.Items.Add(li);
+                        //cblSubjectCategory.Items.Add(new ListItem("空", "0"));
                     }
                 }
             }
@@ -149,32 +315,67 @@ namespace WebApp.QuoteOrderManager
         {
             cblSubjectName.Items.Clear();
             cbAllSubject.Checked = false;
-            List<int> guidanceIdList = new List<int>();
-            foreach (ListItem li in cblGuidanceList.Items)
+            
+            List<string> regionList = new List<string>();
+            foreach (ListItem li in cblRegion.Items)
             {
-                if (li.Selected)
+                if (li.Selected && !regionList.Contains(li.Value))
                 {
-                    guidanceIdList.Add(int.Parse(li.Value));
+                    regionList.Add(li.Value);
                 }
             }
             List<int> subjectCategoryList = new List<int>();
             foreach (ListItem li in cblSubjectCategory.Items)
             {
-                if (li.Selected)
+                if (li.Selected && !subjectCategoryList.Contains(int.Parse(li.Value)))
                 {
                     subjectCategoryList.Add(int.Parse(li.Value));
                 }
             }
+            Session["QuoteOperateSubjectCategorySelected"] = subjectCategoryList;
             try
             {
-                //获取已提交报价的订单
-                List<int> quoteSubjectIdList = new List<int>();
-                var quoteOrderList = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.QuoteItemId ?? 0) > 0);
-                if (quoteOrderList.Any())
+                List<QuoteOrderDetail> orderList = new List<QuoteOrderDetail>();
+                if (Session["QuoteOperateOrderListNotSubmit"] != null)
                 {
-                    quoteSubjectIdList = quoteOrderList.Select(s => s.SubjectId ?? 0).Distinct().ToList();
+                    orderList = Session["QuoteOperateOrderListNotSubmit"] as List<QuoteOrderDetail>;
                 }
-                var subjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false) && ((s.HandMakeSubjectId ?? 0) == 0 && (s.SupplementRegion ?? "") == "") && !quoteSubjectIdList.Contains(s.Id));
+                List<Subject> subjectList = new List<Subject>();
+                if (Session["QuoteOperateSubjectListNotSubmit"] != null)
+                {
+                    subjectList = Session["QuoteOperateSubjectListNotSubmit"] as List<Subject>;
+                }
+
+                var orderList0 = (from order in orderList
+                                  join subject in subjectList
+                                  on order.SubjectId equals subject.Id
+                                  select new { order, subject }).ToList();
+
+                //获取已提交报价的订单
+                //List<int> quoteSubjectIdList = new List<int>();
+                //var quoteOrderList = new QuoteOrderDetailBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && (s.QuoteItemId ?? 0) > 0);
+                //if (quoteOrderList.Any())
+                //{
+                //    quoteSubjectIdList = quoteOrderList.Select(s => s.SubjectId ?? 0).Distinct().ToList();
+                //}
+                //var subjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false) && ((s.HandMakeSubjectId ?? 0) == 0 && (s.SupplementRegion ?? "") == "") && !quoteSubjectIdList.Contains(s.Id));
+                if (regionList.Any())
+                {
+                    if (regionList.Contains("空"))
+                    {
+                        regionList.Remove("空");
+                        if (regionList.Any())
+                        {
+                            orderList0 = orderList0.Where(s => regionList.Contains(s.order.Region) || (s.order.Region==null || s.order.Region=="")).ToList();
+                        }
+                        else
+                        {
+                            orderList0 = orderList0.Where(s => s.order.Region == null || s.order.Region == "").ToList();
+                        }
+                    }
+                    else
+                       orderList0 = orderList0.Where(s => regionList.Contains(s.order.Region)).ToList();
+                }
                 if (subjectCategoryList.Any())
                 {
                     if (subjectCategoryList.Contains(0))
@@ -182,23 +383,31 @@ namespace WebApp.QuoteOrderManager
                         subjectCategoryList.Remove(0);
                         if (subjectCategoryList.Any())
                         {
-                            subjectList = subjectList.Where(s => subjectCategoryList.Contains(s.SubjectCategoryId ?? 0) || (s.SubjectCategoryId == null || s.SubjectCategoryId == 0)).ToList();
+                            orderList0 = orderList0.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0) || (s.subject.SubjectCategoryId == null || s.subject.SubjectCategoryId == 0)).ToList();
                         }
                         else
-                            subjectList = subjectList.Where(s => s.SubjectCategoryId == null || s.SubjectCategoryId == 0).ToList();
+                            orderList0 = orderList0.Where(s => s.subject.SubjectCategoryId == null || s.subject.SubjectCategoryId == 0).ToList();
                     }
                     else
-                        subjectList = subjectList.Where(s => subjectCategoryList.Contains(s.SubjectCategoryId ?? 0)).ToList();
+                        orderList0 = orderList0.Where(s => subjectCategoryList.Contains(s.subject.SubjectCategoryId ?? 0)).ToList();
                 }
 
-                if (subjectList.Any())
+                if (orderList0.Any())
                 {
-                    //var subjectList = orderList.Select(s => s.subject).Distinct().ToList();
-                    subjectList.OrderBy(s => s.SubjectName).ToList().ForEach(s =>
+                    List<int> selectedList = new List<int>();
+                    if (Session["QuoteOperateSubjectSelected"] != null)
+                    {
+                        selectedList = Session["QuoteOperateSubjectSelected"] as List<int>;
+                    }
+                    var subjectList0 = orderList0.Where(s => (s.subject.HandMakeSubjectId ?? 0) == 0).Select(s=>s.subject).Distinct().OrderBy(s=>s.GuidanceId).ThenBy(s => s.SubjectName).ToList();
+                    
+                    subjectList0.ForEach(s =>
                     {
                         ListItem li = new ListItem();
                         li.Text = s.SubjectName + "&nbsp;&nbsp;&nbsp;";
                         li.Value = s.Id.ToString();
+                        if (selectedList.Contains(s.Id))
+                            li.Selected = true;
                         cblSubjectName.Items.Add(li);
                     });
                 }
@@ -210,10 +419,21 @@ namespace WebApp.QuoteOrderManager
 
         protected void btnCheckAllGuidance_Click(object sender, EventArgs e)
         {
+            LoadSession();
+            BindRegion();
             BindSubjectCategory();
+            BindSubject();
         }
 
         protected void cblGuidanceList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadSession();
+            BindRegion();
+            BindSubjectCategory();
+            BindSubject();
+        }
+
+        protected void cblRegion_SelectedIndexChanged(object sender, EventArgs e)
         {
             BindSubjectCategory();
             BindSubject();
@@ -321,6 +541,8 @@ namespace WebApp.QuoteOrderManager
                 new QuotationItemBLL().Delete(s=>s.Id==id);
                 new QuoteOrderDetailBLL().UpdateQuoteItemId("", "", id, "delete");
                 new ImportQuoteOrderBLL().Delete(s => s.ItemId == id);
+                LoadSession();
+                BindRegion();
                 BindSubjectCategory();
                 BindSubject();
                 GetQuoteList();
@@ -401,7 +623,7 @@ namespace WebApp.QuoteOrderManager
                         ((Label)e.Item.FindControl("labTotalPrice")).Text = (popPrice + installPrice + expressPrice + materialPrice).ToString();
 
                     }
-                    if (addUserId == CurrentUser.UserId)
+                    if (addUserId == CurrentUser.UserId || CurrentUser.RoleId==1)
                     {
                         lbEdit.Enabled = true;
                         lbEdit.Style.Add("color", "blue");
@@ -415,7 +637,7 @@ namespace WebApp.QuoteOrderManager
                     else
                     {
                         lbDelete.CommandName = "";
-                        lbDelete.Enabled = false;
+                        lbDelete.Enabled = false; 
                         lbDelete.Style.Add("color", "#ccc");
 
                         lbEdit.Enabled = false;
@@ -428,7 +650,10 @@ namespace WebApp.QuoteOrderManager
 
         protected void btnRefreshOrder_Click(object sender, EventArgs e)
         {
-            
+            LoadSession();
+            BindRegion();
+            BindSubjectCategory();
+            BindSubject();
             GetQuoteList();
         }
 
@@ -445,6 +670,20 @@ namespace WebApp.QuoteOrderManager
         {
             BindSubject();
         }
+
+
+        protected void cblSubjectName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            List<int> subjectSelectList = new List<int>();
+            foreach (ListItem li in cblSubjectName.Items)
+            {
+                if (li.Selected)
+                    subjectSelectList.Add(int.Parse(li.Value));
+            }
+            Session["QuoteOperateSubjectelected"] = subjectSelectList;
+        }
+
+        
 
        
     }

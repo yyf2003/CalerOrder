@@ -99,5 +99,6 @@ namespace Models
         public Nullable<int> FinalOrderId { get; set; }
         public Nullable<int> QuoteItemId { get; set; }
         public Nullable<decimal> AddSizeRate { get; set; }
+        public Nullable<decimal> DefaultUnitPrice { get; set; }
     }
 }

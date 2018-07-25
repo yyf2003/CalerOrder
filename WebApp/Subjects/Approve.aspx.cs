@@ -114,8 +114,8 @@ namespace WebApp.Subjects
             int guidanceId = 0;
             int subjectType = 1;
             Models.Subject model = subjectBll.GetModel(subjectId);
-            using (TransactionScope tran = new TransactionScope())
-            {
+            //using (TransactionScope tran = new TransactionScope())
+            //{
 
                 try
                 {
@@ -150,6 +150,7 @@ namespace WebApp.Subjects
                                     list.ForEach(o =>
                                     {
                                         finalOrderTempModel = new FinalOrderDetailTemp();
+                                        finalOrderTempModel.AddDate = DateTime.Now;
                                         finalOrderTempModel.AgentCode = o.shop.AgentCode;
                                         finalOrderTempModel.AgentName = o.shop.AgentName;
                                         finalOrderTempModel.BusinessModel = o.shop.BusinessModel;
@@ -234,7 +235,7 @@ namespace WebApp.Subjects
                         approveModel.Result = result;
                         approveModel.SubjectId = subjectId;
                         new ApproveInfoBLL().Add(approveModel);
-                        tran.Complete();
+                        //tran.Complete();
                         isApproveOk = true;
                     }
                 }
@@ -242,7 +243,7 @@ namespace WebApp.Subjects
                 {
                     msg = ex.Message;
                 }
-            }
+           // }
             if (isApproveOk)
             {
                

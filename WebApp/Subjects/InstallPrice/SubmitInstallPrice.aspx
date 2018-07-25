@@ -33,7 +33,7 @@
     <div class="layui-tab layui-tab-brief" lay-filter="order">
         <ul class="layui-tab-title">
             <li class="layui-this" lay-id="1">正常归类</li>
-           <%-- <li lay-id="2">按项目提交</li>--%>
+            <li lay-id="2">单独安装</li>
         </ul>
         <div class="layui-tab-content" style="overflow: auto;">
             <div class="layui-tab-item layui-show">

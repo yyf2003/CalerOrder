@@ -4547,6 +4547,7 @@ namespace WebApp.Subjects.ADOrders
                         {
 
                             orderModel = new FinalOrderDetailTemp();
+                            orderModel.AddDate = DateTime.Now;
                             orderModel.ChooseImg = s.order.ChooseImg;
                             orderModel.Gender = s.order.Gender;
                             orderModel.GraphicLength = s.order.GraphicLength;
@@ -4733,6 +4734,7 @@ namespace WebApp.Subjects.ADOrders
                         {
 
                             orderModel = new FinalOrderDetailTemp();
+                            orderModel.AddDate = DateTime.Now;
                             orderModel.AgentCode = o.shop.AgentCode;
                             orderModel.AgentName = o.shop.AgentName;
                             orderModel.BusinessModel = o.shop.BusinessModel;

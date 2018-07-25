@@ -403,6 +403,11 @@ namespace Common
         [Description("上海增补")]
         Supplement=2,
     }
+
+    public enum ConfigPermissionTypeEnum { 
+       Export=1,
+       Approve
+    }
 }
 
 public class EnumEntity

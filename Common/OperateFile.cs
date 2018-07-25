@@ -301,19 +301,20 @@ namespace Common
         }
 
 
-        public static void DownLoadFile(MemoryStream ms, string fileName)
+        public static void DownLoadFile(MemoryStream ms, string fileName,string extent=null)
         {
             byte[] data = ms.ToArray();
 
             long fileSize = data.Length;
 
             //加上设置大小下载下来的.xlsx文件打开时才没有错误
-            
-
+            string ext = ".xlsx";
+            if (!string.IsNullOrWhiteSpace(extent))
+                ext = extent;
             HttpContext.Current.Response.Clear();
             //HttpContext.Current.Response.Buffer = true;
             HttpContext.Current.Response.Charset = "UTF-8";//GB2312  //设置了类型为中文防止乱码的出现  
-            HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment; filename=" + HttpUtility.UrlEncode(fileName, System.Text.Encoding.UTF8) + ".xlsx");
+            HttpContext.Current.Response.AddHeader("Content-Disposition", "attachment; filename=" + HttpUtility.UrlEncode(fileName, System.Text.Encoding.UTF8) + ext);
             HttpContext.Current.Response.AddHeader("Content-Length", fileSize.ToString());
             //HttpContext.Current.Response.ContentEncoding = System.Text.Encoding.GetEncoding("GB2312");
             HttpContext.Current.Response.ContentType = "application/ms-excel";

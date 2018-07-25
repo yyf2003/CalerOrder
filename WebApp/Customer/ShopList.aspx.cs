@@ -12,6 +12,8 @@ using Common;
 using System.Transactions;
 using System.Text;
 using System.Configuration;
+using LitJson;
+using System.IO;
 
 namespace WebApp.Customer
 {
@@ -40,36 +42,37 @@ namespace WebApp.Customer
                 }
                 BindOutsource();
                 BindData();
-                string userExportPermission = string.Empty;
-                try
-                {
-                    userExportPermission = ConfigurationManager.AppSettings["CanExportUser"];
-                }
-                catch
-                {
+                GetUserExportChannel();
+                //string userExportPermission = string.Empty;
+                //try
+                //{
+                //    userExportPermission = ConfigurationManager.AppSettings["CanExportUser"];
+                //}
+                //catch
+                //{
 
-                }
-                if (!string.IsNullOrWhiteSpace(userExportPermission))
-                {
-                    string[] permissions = userExportPermission.Split('#');
-                    foreach (string s in permissions)
-                    {
-                        int userId = int.Parse(s.Split('|')[0]);
-                        //string format = s.Split('|')[1];
+                //}
+                //if (!string.IsNullOrWhiteSpace(userExportPermission))
+                //{
+                //    string[] permissions = userExportPermission.Split('#');
+                //    foreach (string s in permissions)
+                //    {
+                //        int userId = int.Parse(s.Split('|')[0]);
+                //        //string format = s.Split('|')[1];
 
-                        string channel = s.Split('|')[1];
-                        if (CurrentUser.UserId == userId)
-                        {
-                            btnExportShop.Visible = true;
-                            btnExportShopAndPOP.Visible = true;
-                            btnExportShopAndFrame.Visible = true;
-                            ViewState["ExportChannel"] = channel;
-                            break;
-                        }
-                    }
+                //        string channel = s.Split('|')[1];
+                //        if (CurrentUser.UserId == userId)
+                //        {
+                //            btnExportShop.Visible = true;
+                //            btnExportShopAndPOP.Visible = true;
+                //            btnExportShopAndFrame.Visible = true;
+                //            ViewState["ExportChannel"] = channel;
+                //            break;
+                //        }
+                //    }
 
                     
-                }
+                //}
             }
         }
 
@@ -1522,18 +1525,7 @@ namespace WebApp.Customer
             {
                 list = list.Where(s => s.OutsourceId == outsoutceId).ToList();
             }
-            //string isInstall = rblIsInstall.SelectedValue;
-            //switch (isInstall)
-            //{
-            //    case "1":
-            //        list = list.Where(s=>s.IsInstall=="Y").ToList();
-            //        break;
-            //    case "0":
-            //        list = list.Where(s => s.IsInstall == "N" || s.IsInstall==null || s.IsInstall=="").ToList();
-            //        break;
-            //    default:
-            //        break;
-            //}
+            
             AspNetPager1.RecordCount = list.Count;
             this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
             gv.DataSource = list.OrderBy(s => s.Id).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
@@ -1592,14 +1584,6 @@ namespace WebApp.Customer
             BindShopType();
             BindCS();
         }
-
-        //protected void cblCity_SelectedIndexChanged(object sender, EventArgs e)
-        //{
-        //    BindCityTier();
-        //    BindChannel();
-        //    BindFormat();
-        //    BindShopLevel();
-        //}
 
         protected void cblCityTier_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1707,14 +1691,22 @@ namespace WebApp.Customer
         {
             bool isCanExportUser = false;
             List<string> exportChannelList = new List<string>();
-            if (ViewState["ExportChannel"] != null)
+            //if (ViewState["ExportChannel"] != null)
+            //{
+            //    string exportChannel = ViewState["ExportChannel"].ToString();
+            //    exportChannelList = StringHelper.ToStringList(exportChannel, ',');
+            //    isCanExportUser = true;
+            //}
+            if (Session["UserExportChannel"] != null)
             {
-                string exportChannel = ViewState["ExportChannel"].ToString();
-                exportChannelList = StringHelper.ToStringList(exportChannel, ',');
-                isCanExportUser = true;
+                List<ExportPermissionContent> contentList = Session["UserExportChannel"] as List<ExportPermissionContent>;
+                if (contentList.Any())
+                {
+                    contentList.ForEach(s => {
+                        exportChannelList.Add(s.Channel);
+                    });
+                }
             }
-
-
 
 
             System.Text.StringBuilder where = new System.Text.StringBuilder();
@@ -2202,8 +2194,48 @@ namespace WebApp.Customer
             }
         }
 
-       
+        /// <summary>
+        /// 获取当前用户的导出范围
+        /// </summary>
+        void GetUserExportChannel()
+        {
+            Session["UserExportChannel"] = null;
+            string filePath = UserExportShopChannelPath;
+            if (File.Exists(Server.MapPath(filePath)))
+            {
+                List<ExportPermissionContent> contentList = new List<ExportPermissionContent>();
+                JsonData jsonData = JsonMapper.ToObject(File.ReadAllText(Server.MapPath(filePath)));
+                foreach (JsonData item in jsonData)
+                {
+                    string PermissionType = item["PermissionType"].ToString();
+                    JsonData PermissionContents = item["PermissionContent"];
 
+                    if (PermissionType == ConfigPermissionTypeEnum.Export.ToString())
+                    {
+
+                        foreach (JsonData subItem in PermissionContents)
+                        {
+                            int userId = int.Parse(subItem["UserId"].ToString());
+                            if (userId == CurrentUser.UserId)
+                            {
+                                ExportPermissionContent permissionContent = new ExportPermissionContent();
+                                permissionContent.Channel = subItem["Channel"].ToString();
+                                permissionContent.Format = subItem["Format"].ToString();
+                                permissionContent.UserId = userId;
+                                contentList.Add(permissionContent);
+                            }
+                        }
+                    }
+                }
+                if (contentList.Any())
+                {
+                    btnExportShop.Visible = true;
+                    btnExportShopAndPOP.Visible = true;
+                    btnExportShopAndFrame.Visible = true;
+                    Session["UserExportChannel"] = contentList;
+                }
+            }
+        }
         
 
 
