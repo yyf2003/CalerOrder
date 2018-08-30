@@ -514,6 +514,15 @@ var Material = {
                     if (installPriceInput && sendPriceInput) {
                         var installPrice = $(installPriceInput).val() || 0;
                         var sendPrice = $(sendPriceInput).val() || 0;
+                        if (isNaN(installPrice)) {
+                            installPrice = 0;
+                        }
+                        //if (isNaN(installAndProducePrice)) {
+                            //installAndProducePrice = 0;
+                        //}
+                        if (isNaN(sendPrice)) {
+                            sendPrice = 0;
+                        }
                         var unitId = $(installPriceInput).data("unitid") || 0;
                         var basicCategoryId = $(installPriceInput).data("basiccategoryid") || 0;
                         var basicMaterialId = $(installPriceInput).data("basicmaterialid") || 0;

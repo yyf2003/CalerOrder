@@ -64,8 +64,9 @@ namespace WebApp.PropSubject
         {
             List<PropOrderDetail> orderList = new List<PropOrderDetail>();
             var list = (from iOrder in CurrentContext.DbContext.PropOrderDetail
-                        join oOrder in CurrentContext.DbContext.PropOutsourceOrderDetail
-                        on iOrder.Id equals oOrder.PropOrderId
+                        join oOrder1 in CurrentContext.DbContext.PropOutsourceOrderDetail
+                        on iOrder.Id equals oOrder1.PropOrderId into temp
+                        from oOrder in temp.DefaultIfEmpty()
                         where iOrder.SubjectId == subjectId
                         select new
                         {
@@ -127,15 +128,17 @@ namespace WebApp.PropSubject
                             model.UnitPrice = item.iOrder.UnitPrice;
                         }
                     }
-                    model.PropOrderId = item.oOrder.PropOrderId;
-                    model.OutsourceName = item.oOrder.OutsourceName;
-                    model.PayMaterialName = item.oOrder.MaterialName;
-                    model.PayPackaging = item.oOrder.Packaging;
-                    model.PayQuantity = item.oOrder.Quantity;
-                    model.PayRemark = item.oOrder.Remark;
-                    model.PayUnitName = item.oOrder.UnitName;
-                    model.PayUnitPrice = item.oOrder.UnitPrice;
-
+                    if (item.oOrder != null)
+                    {
+                        model.PropOrderId = item.oOrder.PropOrderId;
+                        model.OutsourceName = item.oOrder.OutsourceName;
+                        model.PayMaterialName = item.oOrder.MaterialName;
+                        model.PayPackaging = item.oOrder.Packaging;
+                        model.PayQuantity = item.oOrder.Quantity;
+                        model.PayRemark = item.oOrder.Remark;
+                        model.PayUnitName = item.oOrder.UnitName;
+                        model.PayUnitPrice = item.oOrder.UnitPrice;
+                    }
                     orderList.Add(model);
                     index++;
                 }

@@ -120,6 +120,7 @@ namespace WebApp.Subjects.PriceOrder
                         DataColumnCollection cols = ds.Tables[0].Columns;
                         errorTB = CommonMethod.CreateErrorTB(cols);
                         int shopId = 0;
+                        int outsourceId = 0;
                         string orderType = string.Empty;
                         //店铺编号
                         string shopNo = string.Empty;
@@ -130,10 +131,12 @@ namespace WebApp.Subjects.PriceOrder
                         string count = string.Empty;
                         string contents = string.Empty;
                         string remark = string.Empty;
-                        
+                        string outsourceName = string.Empty;
+
                         foreach (DataRow dr in ds.Tables[0].Rows)
                         {
                             shopId = 0;
+                            outsourceId = 0;
                             orderType = string.Empty;
                             //店铺编号
                             shopNo = string.Empty;
@@ -144,6 +147,7 @@ namespace WebApp.Subjects.PriceOrder
                             count = string.Empty;
                             contents = string.Empty;
                             remark = string.Empty;
+                            outsourceName = string.Empty;
                             StringBuilder msg = new StringBuilder();
                             int orderTypeIndex = 0;
                             bool canSave = true;
@@ -184,6 +188,12 @@ namespace WebApp.Subjects.PriceOrder
                                 contents = StringHelper.ReplaceSpecialChar(dr["费用内容"].ToString().Trim());
                             if (cols.Contains("备注"))
                                 remark = StringHelper.ReplaceSpecialChar(dr["备注"].ToString().Trim());
+
+                            if (cols.Contains("外协"))
+                                outsourceName = StringHelper.ReplaceSpecialChar(dr["外协"].ToString().Trim());
+                            else if (cols.Contains("外协名称"))
+                                outsourceName = StringHelper.ReplaceSpecialChar(dr["外协名称"].ToString().Trim());
+
                             if (string.IsNullOrWhiteSpace(orderType))
                             {
                                 canSave = false;
@@ -247,6 +257,15 @@ namespace WebApp.Subjects.PriceOrder
                                 canSave = false;
                                 msg.Append("数量填写不正确；");
                             }
+                            if (!string.IsNullOrWhiteSpace(outsourceName))
+                            {
+                                if (!GetOutsourceName(outsourceName, out outsourceId))
+                                {
+                                    canSave = false;
+                                    msg.Append("外协不存在；");
+                                }
+                            }
+
                             if (canSave)
                             {
                                 if (string.IsNullOrWhiteSpace(payPrice))
@@ -268,6 +287,7 @@ namespace WebApp.Subjects.PriceOrder
                                 priceModel.OrderType = orderTypeIndex;
                                 priceModel.GuidanceId = int.Parse(hfGuidanceId.Value);
                                 priceModel.ShopNo = shopFromDB.ShopNo;
+                                priceModel.OutsourceId = outsourceId;
                                 priceOrderBll.Add(priceModel);
                                 
                             }
@@ -406,6 +426,34 @@ namespace WebApp.Subjects.PriceOrder
         protected void btnBack_Click(object sender, EventArgs e)
         {
             Response.Redirect(string.Format("/Subjects/AddSubject.aspx?subjectId={0}", subjectId), false);
+        }
+
+        Dictionary<string, int> outsourceDic = new Dictionary<string, int>();
+        CompanyBLL companyBll = new CompanyBLL();
+        bool GetOutsourceName(string outsourceName, out int outsourceId)
+        {
+            bool flag = false;
+            outsourceId = 0;
+            if (!string.IsNullOrWhiteSpace(outsourceName))
+            {
+                outsourceName = outsourceName.ToLower();
+            }
+            if (outsourceDic.Keys.Contains(outsourceName))
+            {
+                outsourceId = outsourceDic[outsourceName];
+                flag = true;
+            }
+            else
+            {
+                Company model = companyBll.GetList(s => s.TypeId == (int)CompanyTypeEnum.Outsource && (s.CompanyName.ToLower() == outsourceName || (s.ShortName != null && s.ShortName.ToLower() == outsourceName)) && (s.IsDelete == null || s.IsDelete == false)).FirstOrDefault();
+                if (model != null)
+                {
+                    outsourceId = model.Id;
+                    outsourceDic.Add(outsourceName, outsourceId);
+                    flag = true;
+                }
+            }
+            return flag;
         }
     }
 }

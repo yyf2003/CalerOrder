@@ -587,16 +587,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                                 receiveExpressPrice += ((s.order.ReceiveOrderPrice ?? 0) * (s.order.Quantity ?? 1));
                             }
                         });
-                        //安装费单独算
-                        //var installOrderList = orderList.Where(s => installShopIdList.Contains(s.order.ShopId ?? 0)).ToList();
-                        //installOrderList.ForEach(s =>
-                        //{
-                        //    if (s.order.OrderType == (int)OrderTypeEnum.安装费)
-                        //    {
-                        //        installPrice1 += (s.order.PayOrderPrice ?? 0);
-                        //        receiveInstallPrice1 += (s.order.ReceiveOrderPrice ?? 0);
-                        //    }
-                        //});
+                       
 
                         if (!string.IsNullOrWhiteSpace(guidanceMonth) && StringHelper.IsDateTime(guidanceMonth))
                         {

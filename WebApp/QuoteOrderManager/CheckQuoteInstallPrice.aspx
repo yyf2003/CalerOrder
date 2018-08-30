@@ -119,40 +119,40 @@
                         <%#(AspNetPager1.CurrentPageIndex-1)*AspNetPager1.PageSize+ Container.ItemIndex + 1%>
                     </td>
                     <td>
-                       <%#Eval("guidance.ItemName")%>
+                       <%#Eval("GuidanceName")%>
                     </td>
                     <td>
-                        <%#Eval("shop.ShopNo")%>
+                        <%#Eval("ShopNo")%>
                     </td>
                     <td>
-                        <%#Eval("shop.ShopName")%>
+                        <%#Eval("ShopName")%>
                     </td>
                     <td>
-                        <%#Eval("shop.RegionName")%>
+                        <%#Eval("RegionName")%>
                     </td>
                     <td>
-                        <%#Eval("shop.ProvinceName")%>
+                        <%#Eval("ProvinceName")%>
                     </td>
                     <td>
-                        <%#Eval("shop.CityName")%>
+                        <%#Eval("CityName")%>
                     </td>
                     <td>
-                        <%#Eval("shop.CityTier")%>
+                        <%#Eval("CityTier")%>
                     </td>
                     <td>
-                        <%#Eval("shop.IsInstall")%>
+                        <%#Eval("IsInstall")%>
                     </td>
                     <td>
-                        <%#Eval("install.MaterialSupport")%>
+                        <%#Eval("MaterialSupport")%>
                     </td>
                     <td>
-                        <%#Eval("install.BasicPrice")%>
+                        <%#Eval("BasicInstallPrice")%>
                     </td>
                     <td>
-                        <%#Eval("install.WindowPrice")%>
+                        <%#Eval("WindowInstallPrice")%>
                     </td>
                     <td>
-                        <%#Eval("install.OOHPrice")%>
+                        <%#Eval("OOHInstallPrice")%>
                     </td>
                     <td>
                         <asp:Label ID="labTotal" runat="server" Text="0"></asp:Label>

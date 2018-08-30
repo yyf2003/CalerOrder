@@ -151,6 +151,7 @@ namespace WebApp.Outsource.MaterialInfo
                             from unit in unitTemp.DefaultIfEmpty()
                             where om.CustomerId == customerId
                             && om.PriceItemId == priceItemId
+                            && (om.OutsourctId??0)==0
                             select new
                             {
                                 om,

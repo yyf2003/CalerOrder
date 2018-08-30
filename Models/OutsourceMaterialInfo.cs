@@ -26,5 +26,7 @@ namespace Models
         public Nullable<int> AddUserId { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
         public Nullable<decimal> InstallAndProductPrice { get; set; }
+        public Nullable<int> OutsourctId { get; set; }
+        public Nullable<int> RegionId { get; set; }
     }
 }

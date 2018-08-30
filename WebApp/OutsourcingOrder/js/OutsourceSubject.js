@@ -110,16 +110,7 @@ $(function () {
 
     //修改外协
     $("#btnChangeOS").click(function () {
-        var newOutsourceId = $("#seleOutsource").val() || 0;
-        var changeType = $("input[name$='rblChangeType']:checked").val() || 0;
-        if (newOutsourceId == 0) {
-            layer.msg("请选择外协");
-            return false;
-        }
-        if (changeType == 0) {
-            layer.msg("请选择更新类型");
-            return false;
-        }
+
         changeOutsource();
     })
 
@@ -1079,7 +1070,16 @@ function changeOutsource() {
         btn: ['提 交'],
         btnAlign: 'c',
         yes: function () {
-
+            var newOutsourceId = $("#seleOutsource").val() || 0;
+            var changeType = $("input[name$='rblChangeType']:checked").val() || 0;
+            if (newOutsourceId == 0) {
+                layer.msg("请选择新外协");
+                return false;
+            }
+            if (changeType == 0) {
+                layer.msg("请选择更新类型");
+                return false;
+            }
             var index2 = layer.confirm('确定修改外协吗？', {
                 btn: ['确定', '取消'] //按钮
             }, function () {
@@ -1131,7 +1131,7 @@ function CheckVal() {
             layer.msg("请填写应付费用");
             return false;
         }
-        if (isNaN(PayPrice) || parseFloat(PayPrice) == 0) {
+        if (isNaN(PayPrice)) {
             layer.msg("应付费用填写不正确");
             return false;
         }
@@ -1147,7 +1147,7 @@ function CheckVal() {
             layer.msg("数量填写不正确");
             return false;
         }
-        if (isNaN(ReceivePrice) || parseFloat(ReceivePrice) == 0) {
+        if (isNaN(ReceivePrice)) {
             layer.msg("应收费用填写不正确");
             return false;
         }

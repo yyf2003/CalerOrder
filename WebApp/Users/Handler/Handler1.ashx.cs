@@ -9,6 +9,8 @@ using Models;
 using Newtonsoft.Json;
 using System.Transactions;
 using Common;
+using System.IO;
+using LitJson;
 
 namespace WebApp.Users.Handler
 {
@@ -20,8 +22,10 @@ namespace WebApp.Users.Handler
 
         UserBLL user = new UserBLL();
         string type = string.Empty;
+        HttpContext context1;
         public void ProcessRequest(HttpContext context)
         {
+            context1 = context;
             context.Response.ContentType = "text/plain";
             string result = string.Empty;
             if (context.Request.QueryString["type"] != null)
@@ -118,7 +122,20 @@ namespace WebApp.Users.Handler
                     break;
                 case "updatePermission":
                     string jsonStr0 = context.Request.Form["jsonStr"];
-                    result = UpdatePermission(jsonStr0);
+                    string exportChannelJsonStr0 = string.Empty;
+                    if (context.Request.Form["exportChannelJsonStr"] != null)
+                    {
+                        exportChannelJsonStr0 = context.Request.Form["exportChannelJsonStr"];
+                    }
+                    result = UpdatePermission(jsonStr0, exportChannelJsonStr0);
+                    break;
+                case "GetChannel":
+                    int userId2 = 0;
+                    if (context.Request.QueryString["userId"] != null)
+                    {
+                        userId2 = int.Parse(context.Request.QueryString["userId"]);
+                    }
+                    result = GetShopChannels(userId2);
                     break;
             }
             context.Response.Write(result);
@@ -738,11 +755,13 @@ namespace WebApp.Users.Handler
             }
         }
 
-        string UpdatePermission(string jsonStr)
+        string UpdatePermission(string jsonStr, string exportChannelJsonStr0=null)
         {
             string result = "ok";
+            int userId = 0;
             if (!string.IsNullOrWhiteSpace(jsonStr))
             {
+                
                 using (TransactionScope tran = new TransactionScope())
                 {
                     try
@@ -750,7 +769,7 @@ namespace WebApp.Users.Handler
                         List<UserInModule> moduleList = JsonConvert.DeserializeObject<List<UserInModule>>(jsonStr);
                         if (moduleList.Any())
                         {
-                            int userId = moduleList[0].UserId??0;
+                            userId = moduleList[0].UserId??0;
                             int roleId = moduleList[0].RoleId ?? 0;
                             userInModuleBll.Delete(s => s.RoleId == roleId && s.UserId == userId);
                             moduleList.ForEach(s => {
@@ -769,6 +788,162 @@ namespace WebApp.Users.Handler
             }
             else
                 result = "提交失败";
+            if (result == "ok")
+            {
+                //string filePath = "/ConfigFile/Config.txt";//配置文件路径
+                string filePath = new BasePage().UserExportShopChannelPath;
+                if (File.Exists(context1.Server.MapPath(filePath)))
+                {
+                    JsonData jsonData = JsonMapper.ToObject(File.ReadAllText(context1.Server.MapPath(filePath)));
+                    List<ExportPermissionContent> contentList = new List<ExportPermissionContent>();
+                    foreach (JsonData item in jsonData)
+                    {
+                        string PermissionType = item["PermissionType"].ToString();
+                        if (PermissionType == ConfigPermissionTypeEnum.Export.ToString())
+                        {
+                            JsonData PermissionContents = item["PermissionContent"];
+                            List<ExportPermissionContent> exportChannelList = JsonConvert.DeserializeObject<List<ExportPermissionContent>>(PermissionContents.ToJson());
+                            exportChannelList = exportChannelList.Where(s => s.UserId != userId).ToList();
+                            PermissionContents.Clear();
+                            if (exportChannelList.Any())
+                            {
+                                exportChannelList.ForEach(s =>
+                                {
+                                    JsonData jd = JsonMapper.ToObject(JsonMapper.ToJson(s));// new JsonData(JsonMapper.ToJson(s).Replace(@"\", ""));
+                                    PermissionContents.Add(jd);
+                                });
+
+                            }
+                            if (!string.IsNullOrWhiteSpace(exportChannelJsonStr0))
+                            {
+                                JsonData jsonDataAdd = JsonMapper.ToObject(exportChannelJsonStr0);
+                                foreach (JsonData jd in jsonDataAdd)
+                                {
+                                    PermissionContents.Add(jd);
+                                }
+                            }
+                        }
+
+                    }
+                    string jsond = jsonData.ToJson();
+                    StreamWriter sw = new StreamWriter(context1.Server.MapPath(filePath));
+                    sw.Write(jsond); //写入数据
+                    sw.Close();	//关闭流
+                    sw.Dispose();
+                }
+            }
+            return result;
+        }
+
+        string GetShopChannels(int userId)
+        {
+            string result = string.Empty;
+            var list = new ShopBLL().GetList(s => s.Channel != null && s.Channel != "");
+            if (list.Any())
+            {
+                var channelList = list.Select(s=>s.Channel).Distinct().OrderBy(s=>s).ToList();
+                StringBuilder json = new StringBuilder();
+                channelList.ForEach(channel => {
+                    StringBuilder formatJson = new StringBuilder();
+                    if (!string.IsNullOrWhiteSpace(channel))
+                    {
+                        json.Append("{\"Channel\":\"" + channel + "\",\"Formats\":");
+                        var formatList = list.Where(s => s.Channel == channel).Select(s=>s.Format).Distinct().OrderBy(s=>s).ToList();
+                        
+                        formatList.ForEach(format => {
+                            if (!string.IsNullOrWhiteSpace(format))
+                               formatJson.Append("{\"Format\":\"" + format + "\"},");
+                        });
+                        
+                    }
+                    json.Append("[" + formatJson.ToString().TrimEnd(',') + "]},");
+                });
+                result= "[" + json.ToString().TrimEnd(',') + "]";
+                string exportPersimisson= GetUserExportPermission(userId);
+                if (!string.IsNullOrWhiteSpace(exportPersimisson))
+                {
+                    result += "|" + exportPersimisson;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 获取用户导出权限
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        string GetUserExportPermission(int userId)
+        {
+            string result = string.Empty;
+            //string filePath = "/ConfigFile/Config.txt";
+            string filePath = new BasePage().UserExportShopChannelPath;
+
+            if (File.Exists(context1.Server.MapPath(filePath)))
+            {
+                List<ExportPermissionContent> contentList = new List<ExportPermissionContent>();
+                JsonData jsonData = JsonMapper.ToObject(File.ReadAllText(context1.Server.MapPath(filePath)));
+                foreach (JsonData item in jsonData)
+                {
+                    string PermissionType = item["PermissionType"].ToString();
+                    JsonData PermissionContents = item["PermissionContent"];
+
+                    if (PermissionType == ConfigPermissionTypeEnum.Export.ToString())
+                    {
+
+                        foreach (JsonData subItem in PermissionContents)
+                        {
+                            ExportPermissionContent permissionContent = new ExportPermissionContent();
+                            permissionContent.Channel = subItem["Channel"].ToString();
+                            permissionContent.Format = subItem["Format"].ToString();
+                            permissionContent.UserId = int.Parse(subItem["UserId"].ToString());
+                            contentList.Add(permissionContent);
+                        }
+                    }
+
+                }
+                if (contentList.Any())
+                {
+                    contentList = contentList.Where(s => s.UserId == userId).ToList();
+                    if (contentList.Any())
+                    {
+                        StringBuilder channelJson = new StringBuilder();
+                        contentList.ForEach(s =>
+                        {
+                            channelJson.Append("{\"Channel\":\"" + s.Channel + "\",\"Format\":\"" + s.Format + "\"},");
+                        });
+                        result = "[" + channelJson.ToString().TrimEnd(',') + "]";
+                    }
+                }
+            }
+            else
+            {
+                JsonData jsonData = new JsonData();
+                jsonData.SetJsonType(JsonType.Array);
+
+                JsonData PermissionContent = new JsonData();
+                PermissionContent.SetJsonType(JsonType.Array);
+                
+
+                JsonData jsonData1 = new JsonData();
+                jsonData1["PermissionType"] = "Export";
+                jsonData1["PermissionContent"] = PermissionContent;
+                jsonData.Add(jsonData1);
+
+                JsonData jsonData2 = new JsonData();
+                jsonData2["PermissionType"] = "Approve";
+                jsonData2["PermissionContent"] = PermissionContent;
+                jsonData.Add(jsonData2);
+
+                
+
+
+                string jsond = jsonData.ToJson();
+                StreamWriter sw = new StreamWriter(context1.Server.MapPath(filePath));
+                sw.Write(jsond); //写入数据
+                sw.Close();	//关闭流
+                sw.Dispose();	
+            }
             return result;
         }
 

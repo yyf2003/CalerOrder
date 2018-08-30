@@ -18,6 +18,8 @@ namespace WebApp.OutsourcingOrder.Statistics
         string province = string.Empty;
         string city = string.Empty;
         string assignType = string.Empty;
+        string beginDateStr = string.Empty;
+        string endDateStr = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["outsourceId"] != null)
@@ -43,6 +45,14 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (Request.QueryString["assignType"] != null)
             {
                 assignType = Request.QueryString["assignType"];
+            }
+            if (Request.QueryString["beginDate"] != null)
+            {
+                beginDateStr = Request.QueryString["beginDate"];
+            }
+            if (Request.QueryString["endDate"] != null)
+            {
+                endDateStr = Request.QueryString["endDate"];
             }
             if (!IsPostBack)
             {
@@ -93,6 +103,12 @@ namespace WebApp.OutsourcingOrder.Statistics
                                   select new { order,order.OrderType,order.Remark,order.PositionDescription, shop }).ToList();
 
             //var assignShopList = new OutsourceAssignShopBLL().GetList(s => s.OutsourceId == outsourceId && guidanceIdList.Contains(s.GuidanceId ?? 0));
+            if (!string.IsNullOrWhiteSpace(beginDateStr) && StringHelper.IsDateTime(beginDateStr) && !string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
+            {
+                DateTime beginDate = DateTime.Parse(beginDateStr);
+                DateTime endDate = DateTime.Parse(endDateStr);
+                assignShopList = assignShopList.Where(s => s.order.AddDate >= beginDate && s.order.AddDate < endDate.AddDays(1)).ToList();
+            }
             if (regionList.Any())
             {
                 assignShopList = assignShopList.Where(s => s.shop.RegionName != null && regionList.Contains(s.shop.RegionName.ToLower())).ToList();

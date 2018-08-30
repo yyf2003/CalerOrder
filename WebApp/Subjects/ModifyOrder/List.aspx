@@ -336,7 +336,7 @@
                 <td style="height: 30px;">
                     性别
                 </td>
-                <td style="text-align: left; padding-left: 5px;">
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
                     <div style="position: relative;">
                         <input type="text" id="txtGender" style="width: 120px;" />
                         <div id="divGenderMenu" style="display: none; position: absolute; width: 125px; background-color: White;
@@ -351,10 +351,13 @@
                         <span style="color: Red;">*</span>
                     </div>
                 </td>
+               
+            </tr>
+            <tr>
                 <td style="height: 30px;">
                     数量
                 </td>
-                <td style="text-align: left; padding-left: 5px;">
+                <td colspan="3" style="text-align: left; padding-left: 5px;">
                     <asp:TextBox ID="txtQuantity" runat="server" MaxLength="3"></asp:TextBox>
                     <span style="color: Red;">*</span>
                 </td>

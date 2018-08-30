@@ -2870,6 +2870,7 @@ namespace WebApp.Subjects
                             model.ReceivePrice = double.Parse((item.order.OrderPrice ?? 0).ToString());
                         else
                             model.ReceivePrice = double.Parse((item.order.TotalPrice ?? 0).ToString());
+                        model.Region = item.order.Region;
                         orderList.Add(model);
                     }
                 }
@@ -2894,7 +2895,7 @@ namespace WebApp.Subjects
                         IRow dataRow = sheet.GetRow(startRow);
                         if (dataRow == null)
                             dataRow = sheet.CreateRow(startRow);
-                        for (int i = 0; i < 31; i++)
+                        for (int i = 0; i < 32; i++)
                         {
                             ICell cell = dataRow.GetCell(i);
                             if (cell == null)
@@ -2906,39 +2907,40 @@ namespace WebApp.Subjects
                             dataRow.GetCell(1).SetCellValue(DateTime.Parse(item.AddDate.ToString()).ToShortDateString());
                         dataRow.GetCell(2).SetCellValue(item.ShopNo);
                         dataRow.GetCell(3).SetCellValue(item.ShopName);
-                        dataRow.GetCell(4).SetCellValue(item.Province);
-                        dataRow.GetCell(5).SetCellValue(item.City);
-                        dataRow.GetCell(6).SetCellValue(item.CityTier);
-                        dataRow.GetCell(7).SetCellValue(item.Channel);
-                        dataRow.GetCell(8).SetCellValue(item.Format);
-                        dataRow.GetCell(9).SetCellValue(item.POPAddress);
-                        dataRow.GetCell(10).SetCellValue(item.Contacts);
-                        dataRow.GetCell(11).SetCellValue(item.Tels);
+                        dataRow.GetCell(4).SetCellValue(item.Region);
+                        dataRow.GetCell(5).SetCellValue(item.Province);
+                        dataRow.GetCell(6).SetCellValue(item.City);
+                        dataRow.GetCell(7).SetCellValue(item.CityTier);
+                        dataRow.GetCell(8).SetCellValue(item.Channel);
+                        dataRow.GetCell(9).SetCellValue(item.Format);
+                        dataRow.GetCell(10).SetCellValue(item.POPAddress);
+                        dataRow.GetCell(11).SetCellValue(item.Contacts);
+                        dataRow.GetCell(12).SetCellValue(item.Tels);
 
-                        dataRow.GetCell(12).SetCellValue(item.POSScale);
-                        dataRow.GetCell(13).SetCellValue(item.MaterialSupport);
-                        dataRow.GetCell(14).SetCellValue(item.SubjectName);
-                        dataRow.GetCell(15).SetCellValue(item.Gender);
-                        dataRow.GetCell(16).SetCellValue(item.ChooseImg);
+                        dataRow.GetCell(13).SetCellValue(item.POSScale);
+                        dataRow.GetCell(14).SetCellValue(item.MaterialSupport);
+                        dataRow.GetCell(15).SetCellValue(item.SubjectName);
+                        dataRow.GetCell(16).SetCellValue(item.Gender);
+                        dataRow.GetCell(17).SetCellValue(item.ChooseImg);
 
 
                         //dataRow.GetCell(12).SetCellValue(item.Category);
-                        dataRow.GetCell(17).SetCellValue(item.Sheet);
-                        dataRow.GetCell(18).SetCellValue(item.MachineFrame);
-                        dataRow.GetCell(19).SetCellValue(item.PositionDescription);
-                        dataRow.GetCell(20).SetCellValue(item.Quantity);
-                        dataRow.GetCell(21).SetCellValue(item.GraphicMaterial);
-                        dataRow.GetCell(22).SetCellValue(item.QuoteGraphicMaterial);
-                        dataRow.GetCell(23).SetCellValue(item.UnitPrice);
-                        dataRow.GetCell(24).SetCellValue(item.GraphicWidth);
-                        dataRow.GetCell(25).SetCellValue(item.GraphicLength);
-                        dataRow.GetCell(26).SetCellValue(item.Area);
+                        dataRow.GetCell(18).SetCellValue(item.Sheet);
+                        dataRow.GetCell(19).SetCellValue(item.MachineFrame);
+                        dataRow.GetCell(20).SetCellValue(item.PositionDescription);
+                        dataRow.GetCell(21).SetCellValue(item.Quantity);
+                        dataRow.GetCell(22).SetCellValue(item.GraphicMaterial);
+                        dataRow.GetCell(23).SetCellValue(item.QuoteGraphicMaterial);
+                        dataRow.GetCell(24).SetCellValue(item.UnitPrice);
+                        dataRow.GetCell(25).SetCellValue(item.GraphicWidth);
+                        dataRow.GetCell(26).SetCellValue(item.GraphicLength);
+                        dataRow.GetCell(27).SetCellValue(item.Area);
                         if (item.ReceivePrice>0)
-                          dataRow.GetCell(27).SetCellValue(item.ReceivePrice);
+                          dataRow.GetCell(28).SetCellValue(item.ReceivePrice);
                         //其他备注
-                        dataRow.GetCell(28).SetCellValue(item.OtherRemark);
-                        dataRow.GetCell(29).SetCellValue(item.IsInstall);
-                        dataRow.GetCell(30).SetCellValue(item.SupplimentSubjectName);
+                        dataRow.GetCell(29).SetCellValue(item.OtherRemark);
+                        dataRow.GetCell(30).SetCellValue(item.IsInstall);
+                        dataRow.GetCell(31).SetCellValue(item.SupplimentSubjectName);
                         //dataRow.GetCell(27).SetCellValue(item.NewFormat);
                         startRow++;
 

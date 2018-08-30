@@ -21,6 +21,8 @@ namespace WebApp.OutsourcingOrder.Statistics
         string subjectId = string.Empty;
         string province = string.Empty;
         string city = string.Empty;
+        string beginDateStr = string.Empty;
+        string endDateStr = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["outsourceId"] != null)
@@ -46,6 +48,14 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (Request.QueryString["city"] != null)
             {
                 city = Request.QueryString["city"];
+            }
+            if (Request.QueryString["beginDate"] != null)
+            {
+                beginDateStr = Request.QueryString["beginDate"];
+            }
+            if (Request.QueryString["endDate"] != null)
+            {
+                endDateStr = Request.QueryString["endDate"];
             }
             if (!IsPostBack)
             {
@@ -100,6 +110,12 @@ namespace WebApp.OutsourcingOrder.Statistics
                                   guidance
                               }).ToList();
             var orderList = orderList0.Where(s => s.orderDetail.SubjectId > 0).ToList();
+            if (!string.IsNullOrWhiteSpace(beginDateStr) && StringHelper.IsDateTime(beginDateStr) && !string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
+            {
+                DateTime beginDate = DateTime.Parse(beginDateStr);
+                DateTime endDate = DateTime.Parse(endDateStr);
+                orderList = orderList.Where(s => s.orderDetail.AddDate >= beginDate && s.orderDetail.AddDate < endDate.AddDays(1)).ToList();
+            }
             if (subjectIdList.Any())
             {
                 orderList = orderList.Where(s => subjectIdList.Contains(s.orderDetail.SubjectId ?? 0)).ToList();

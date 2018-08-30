@@ -77,7 +77,7 @@
                 <td style="height: 25px;width: 100px;">
                     公司名称：
                 </td>
-                <td style="text-align: left; padding-left: 5px;width: 250px;">
+                <td style="text-align: left; padding-left: 5px;width: 200px;">
                     <input type="text" id="txtCompanyName" maxlength="40" style="width: 180px;" />
                     <span style="color: Red;">*</span>
                 </td>
@@ -90,18 +90,22 @@
             </tr>
             <tr class="tr_bai">
                 <td style="height: 25px;">
-                    省份：
+                   区域：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
-                    <select id="selProvince">
-                        <option value="0">--请选择--</option>
+                   <select id="selRegion">
+                       <option value="0">--请选择--</option>
                     </select>
                     <span style="color: Red;">*</span>
                 </td>
                 <td>
-                    城市：
+                    省/市：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
+                     <select id="selProvince">
+                        <option value="0">--请选择--</option>
+                    </select>
+                    &nbsp;
                     <select id="selCity">
                         <option value="0">--请选择--</option>
                     </select>
@@ -296,7 +300,7 @@
             href: url,
             type: 'iframe',
             padding: 5,
-            width: "90%"
+            width: "95%"
         });
     }
 </script>

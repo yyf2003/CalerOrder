@@ -36,6 +36,7 @@ $(function () {
     $("#seleRegion").change(function () {
         shop.bindProvince();
         shop.getCustomerService();
+        shop.getOutsourceList();
     })
     $("#seleProvince").change(function () {
         shop.bindCity();
@@ -51,7 +52,7 @@ $(function () {
 
 function AddNewShop() {
     ClearVal();
-    shop.getOutsourceList();
+    //shop.getOutsourceList();
     //shop.getOOHInstallOutsourceList();
     shop.bindChannel();
     shop.add();
@@ -197,9 +198,11 @@ var shop = {
         document.getElementById("seleOutsource").length = 1;
         document.getElementById("seleBCSOutsource").length = 1;
         document.getElementById("seleOOHInstallOutsource").length = 1;
+        document.getElementById("seleProductOutsource").length = 1;
+        var regionId = $("#seleRegion").val()||0;
         $.ajax({
             type: "get",
-            url: "./Handler/Shops.ashx?type=getOutsource",
+            url: "./Handler/Shops.ashx?type=getOutsource&regionId=" + regionId,
             success: function (data) {
 
                 if (data != "") {
@@ -259,9 +262,10 @@ var shop = {
     },
     getOOHInstallOutsourceList: function () {
         document.getElementById("seleOOHInstallOutsource").length = 1;
+        var regionId = $("#seleRegion").val() || 0;
         $.ajax({
             type: "get",
-            url: "./Handler/Shops.ashx?type=getOutsource",
+            url: "./Handler/Shops.ashx?type=getOutsource&regionId=" + regionId,
             success: function (data) {
 
                 if (data != "") {
@@ -527,6 +531,7 @@ var shop = {
                     if (isSelected) {
                         shop.bindProvince();
                         shop.getCustomerService();
+                        shop.getOutsourceList();
                     }
                 }
             }

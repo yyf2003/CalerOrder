@@ -57,9 +57,7 @@
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <asp:RadioButtonList ID="rblAddType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
-                        <%--<asp:ListItem Value="1" Selected="True">新建&nbsp;</asp:ListItem>--%>
-                       <%-- <asp:ListItem Value="2">二次安装&nbsp;</asp:ListItem>--%>
-
+                      
                     </asp:RadioButtonList>
                 </td>
             </tr>

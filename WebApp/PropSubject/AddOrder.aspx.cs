@@ -74,8 +74,9 @@ namespace WebApp.PropSubject
         {
             List<PropOrderDetail> orderList = new List<PropOrderDetail>();
             var list = (from iOrder in CurrentContext.DbContext.PropOrderDetail
-                        join oOrder in CurrentContext.DbContext.PropOutsourceOrderDetail
-                        on iOrder.Id equals oOrder.PropOrderId
+                        join oOrder1 in CurrentContext.DbContext.PropOutsourceOrderDetail
+                        on iOrder.Id equals oOrder1.PropOrderId into temp
+                        from oOrder in temp.DefaultIfEmpty()
                         where iOrder.SubjectId == subjectId
                         select new {
                            iOrder,
@@ -150,15 +151,18 @@ namespace WebApp.PropSubject
                             model.UnitPrice = item.iOrder.UnitPrice;
                         }
                     }
-                    model.PropOrderId = item.oOrder.PropOrderId;
-                    model.OutsourceName = item.oOrder.OutsourceName;
-                    model.PayMaterialName = item.oOrder.MaterialName;
-                    model.PayPackaging = item.oOrder.Packaging;
-                    model.PayQuantity = item.oOrder.Quantity;
-                    model.PayRemark = item.oOrder.Remark;
-                    model.PayUnitName = item.oOrder.UnitName;
-                    model.PayUnitPrice = item.oOrder.UnitPrice;
-
+                    //应付
+                    if (item.oOrder != null)
+                    {
+                        model.PropOrderId = item.oOrder.PropOrderId;
+                        model.OutsourceName = item.oOrder.OutsourceName;
+                        model.PayMaterialName = item.oOrder.MaterialName;
+                        model.PayPackaging = item.oOrder.Packaging;
+                        model.PayQuantity = item.oOrder.Quantity;
+                        model.PayRemark = item.oOrder.Remark;
+                        model.PayUnitName = item.oOrder.UnitName;
+                        model.PayUnitPrice = item.oOrder.UnitPrice;
+                    }
                     orderList.Add(model);
                     index++;
                 }
@@ -341,30 +345,35 @@ namespace WebApp.PropSubject
                                 canSave = false;
                                 msg.Append("运输费填写不正确；");
                             }
-                            if (string.IsNullOrWhiteSpace(outsourceName))
+                            if (!string.IsNullOrWhiteSpace(outsourceName))
                             {
-                                canSave = false;
-                                msg.Append("外协名称不能空；");
+                                //canSave = false;
+                                //msg.Append("外协名称不能空；");
+                                if (string.IsNullOrWhiteSpace(payQuantity))
+                                {
+                                    canSave = false;
+                                    msg.Append("应付数量不能空；");
+                                }
+                                else if (!StringHelper.IsIntVal(payQuantity))
+                                {
+                                    canSave = false;
+                                    msg.Append("应付数量填写不正确；");
+                                }
+                                if (string.IsNullOrWhiteSpace(payUnitPrice))
+                                {
+                                    canSave = false;
+                                    msg.Append("应付单价不能空；");
+                                }
+                                else if (!StringHelper.IsDecimalVal(payUnitPrice))
+                                {
+                                    canSave = false;
+                                    msg.Append("应付单价填写不正确；");
+                                }
                             }
-                            if (string.IsNullOrWhiteSpace(payQuantity))
+                            else
                             {
-                                canSave = false;
-                                msg.Append("应付数量不能空；");
-                            }
-                            else if (!StringHelper.IsIntVal(payQuantity))
-                            {
-                                canSave = false;
-                                msg.Append("应付数量填写不正确；");
-                            }
-                            if (string.IsNullOrWhiteSpace(payUnitPrice))
-                            {
-                                canSave = false;
-                                msg.Append("应付单价不能空；");
-                            }
-                            else if (!StringHelper.IsDecimalVal(payUnitPrice))
-                            {
-                                canSave = false;
-                                msg.Append("应付单价填写不正确；");
+                                payQuantity = "0";
+                                payUnitPrice = "0";
                             }
                             if (canSave)
                             {
@@ -395,7 +404,7 @@ namespace WebApp.PropSubject
                                     propOrderBll.Add(propOrderModel);
                                     propOrderId = propOrderModel.Id;
                                 }
-                                if (StringHelper.IsInt(payQuantity) > 0 && StringHelper.IsDecimal(payUnitPrice) > 0)
+                                if (!string.IsNullOrWhiteSpace(outsourceName) && StringHelper.IsInt(payQuantity) > 0 && StringHelper.IsDecimal(payUnitPrice) > 0)
                                 {
                                     propOutsourceOrderModel = new PropOutsourceOrderDetail();
                                     propOutsourceOrderModel.AddDate = DateTime.Now;
@@ -413,6 +422,7 @@ namespace WebApp.PropSubject
                                     propOutsourceOrderModel.UnitPrice = StringHelper.IsDecimal(payUnitPrice);
                                     propOutsourceOrderBll.Add(propOutsourceOrderModel);
                                 }
+                                
                                 successNum++;
                             }
                             else

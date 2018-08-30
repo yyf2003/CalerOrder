@@ -62,6 +62,7 @@
     <Compile Include="MergeOriginalOrderDAL.cs" />
     <Compile Include="ModuleDAL.cs" />
     <Compile Include="OrderMaterialMappingDAL.cs" />
+    <Compile Include="OutsourceOrderDetailDAL.cs" />
     <Compile Include="PlaceDAL.cs" />
     <Compile Include="POPOrderDAL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -29,5 +29,10 @@ namespace Common
         {
            return RC.Get<T>(key);
         }
+
+        public static void DeleteKey(string key)
+        {
+            RC.Del(key);
+        }
     }
 }

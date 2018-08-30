@@ -21,14 +21,26 @@ namespace WebApp.OutsourcingOrder.Statistics
         {
             if (!IsPostBack)
             {
+               
                 BindCustomerList(ddlCustomer);
                 DateTime now = DateTime.Now;
                 txtGuidanceMonth.Text = now.Year + "-" + now.Month;
                 BindGuidance();
+                ChangeSearchType();
+                Session["OutsourceStatisticOrderList"] = null;
+                Session["OutsourceStatisticShopList"] = null;
+                Session["OutsourceStatisticSubjectList"] = null;
+                Session["OutsourceStatisticGuidanceList"] = null;
+                Session["OutsourceStatisticPropSubjectList"] = null;
+                Session["OutsourceStatisticPropGuidanceList"] = null;
             }
         }
 
-
+        //List<OutsourceOrderDetail> orderList = new List<OutsourceOrderDetail>();
+        //List<Shop> shopList = new List<Shop>();
+        //List<Subject> subjectList = new List<Subject>();
+        //List<SubjectGuidance> guidanceList = new List<SubjectGuidance>();
+        //List<int> guidanceIdList = new List<int>();
        
         void LoadData_old() {
             List<int> guidanceIdList = GetGuidanceSelected();
@@ -157,6 +169,8 @@ namespace WebApp.OutsourcingOrder.Statistics
                                      join guidance in CurrentContext.DbContext.SubjectGuidance
                                      on order.GuidanceId equals guidance.ItemId
                                      where propGuidanceIdList.Contains(order.GuidanceId ?? 0)
+                                     && subject.ApproveState==1 
+                                     && (subject.IsDelete==null || subject.IsDelete==false)
                                      select new
                                      {
                                          order,
@@ -168,20 +182,13 @@ namespace WebApp.OutsourcingOrder.Statistics
                     Session["OutsourceStatisticPropOrderList"] = propOrderList.Select(s => s.order).ToList();
                     List<Subject> propSubjectList=propOrderList.Select(s => s.subject).Distinct().ToList();
                     List<Subject> subjectList = new List<Subject>();
-                    if (Session["OutsourceStatisticSubjectList"] != null)
-                    {
-                        subjectList = Session["OutsourceStatisticSubjectList"] as List<Subject>;
-                    }
-                    subjectList.AddRange(propSubjectList);
-                    subjectList = subjectList.Distinct().ToList();
+                    Session["OutsourceStatisticPropSubjectList"] = propSubjectList;
+                    
                     List<SubjectGuidance> propGuidanceList = propOrderList.Select(s => s.guidance).Distinct().ToList();
                     List<SubjectGuidance> guidanceList = new List<SubjectGuidance>();
-                    if (Session["OutsourceStatisticGuidanceList"] != null)
-                    {
-                        guidanceList = Session["OutsourceStatisticGuidanceList"] as List<SubjectGuidance>;
-                    }
-                    guidanceList.AddRange(propGuidanceList);
-                    guidanceList = guidanceList.Distinct().ToList();
+                    
+                    Session["OutsourceStatisticPropGuidanceList"] = propGuidanceList;
+                    
                 }
             }
             #endregion
@@ -195,6 +202,19 @@ namespace WebApp.OutsourcingOrder.Statistics
         {
             List<int> list = new List<int>();
             foreach (ListItem li in cblGuidanceList.Items)
+            {
+                if (li.Selected && !list.Contains(int.Parse(li.Value)))
+                {
+                    list.Add(int.Parse(li.Value));
+                }
+            }
+            return list;
+        }
+
+        List<int> GetPropGuidanceSelected()
+        {
+            List<int> list = new List<int>();
+            foreach (ListItem li in cblPropGuidanceList.Items)
             {
                 if (li.Selected && !list.Contains(int.Parse(li.Value)))
                 {
@@ -422,7 +442,200 @@ namespace WebApp.OutsourcingOrder.Statistics
             Panel_EmptyPropGuidance.Visible = !propGuidanceList.Any();
         }
 
-        
+        /// <summary>
+        /// 按时间查询
+        /// </summary>
+        void BindaGuidanceByOrderDate()
+        {
+
+            string begin = txtBeginDate.Text.Trim();
+            string end = txtEndDate.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(begin) && StringHelper.IsDateTime(begin) && !string.IsNullOrWhiteSpace(end) && StringHelper.IsDateTime(end))
+            {
+                cbAllGuidance.Checked = false;
+                cblGuidanceList.Items.Clear();
+                cblOutsourceRegion.Items.Clear();
+                //cblShopType.Items.Clear();
+                //cblAddUser.Items.Clear();
+                cblSubjectCategory.Items.Clear();
+                DateTime beginDate = DateTime.Parse(begin);
+                DateTime endDate = DateTime.Parse(end).AddDays(1);
+
+                List<OutsourceOrderDetail> orderDetailList = new List<OutsourceOrderDetail>();
+                var subjectListTemp = (from subject in CurrentContext.DbContext.Subject
+                                       join guidance in CurrentContext.DbContext.SubjectGuidance
+                                       on subject.GuidanceId equals guidance.ItemId
+                                       where (subject.IsDelete == null || subject.IsDelete == false)
+                                       && subject.ApproveState == 1  
+                                       && (guidance.IsDelete == null || guidance.IsDelete == false)
+                                       select new { subject, guidance }
+                                       ).ToList();
+
+                
+
+
+                List<int> subjectIdList = subjectListTemp.Select(s => s.subject.Id).ToList();
+
+                orderDetailList = new OutsourceOrderDetailBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && s.AddDate >= beginDate && s.AddDate < endDate).ToList();
+                subjectIdList = orderDetailList.Select(s => s.SubjectId ?? 0).Distinct().ToList();
+
+                if (orderDetailList.Any())
+                {
+
+                    Session["OutsourceStatisticOrderList"] = orderDetailList;
+                    List<int> shopIdList = orderDetailList.Select(s => s.ShopId ?? 0).Distinct().ToList();
+                    List<Shop> shopList = new ShopBLL().GetList(s => shopIdList.Contains(s.Id)).ToList();
+                    Session["OutsourceStatisticShopList"] = shopList;
+
+
+                    var subjectListTemp1 = (from subject in CurrentContext.DbContext.Subject
+                                            join guidance in CurrentContext.DbContext.SubjectGuidance
+                                            on subject.GuidanceId equals guidance.ItemId
+                                            where (subject.IsDelete == null || subject.IsDelete == false)
+                                            && subject.ApproveState == 1
+                                            && (guidance.IsDelete == null || guidance.IsDelete == false)
+                                            && subjectIdList.Contains(subject.Id)
+                                            select new { subject, guidance }
+                             ).ToList();
+
+
+                    List<SubjectGuidance> guidanceList = subjectListTemp1.Select(s => s.guidance).Distinct().OrderBy(s => s.ItemId).ThenBy(s => s.ItemName).ToList();
+                    List<int> guidanceIdList = guidanceList.Select(s => s.ItemId).ToList();
+
+
+                    Session["OutsourceStatisticGuidanceList"] = guidanceList;
+
+
+                    List<Subject> subjectList = subjectListTemp1.Select(s => s.subject).Distinct().ToList();
+                    Session["OutsourceStatisticSubjectList"] = subjectList;
+                    //List<int> sidList = subjectList.Select(s => s.Id).ToList();
+
+                    guidanceList.ForEach(s =>
+                    {
+                        ListItem li = new ListItem();
+                        string ActivityName = CommonMethod.GetEnumDescription<GuidanceTypeEnum>((s.ActivityTypeId ?? 1).ToString());
+                        li.Value = s.ItemId.ToString();
+                        li.Text = s.ItemName + "-" + ActivityName + "&nbsp;&nbsp;";
+                        cblGuidanceList.Items.Add(li);
+                    });
+
+                    //bool isNull = false;
+                    //List<string> selectedShopTypeList = new List<string>();
+                    //if (Session["shopTypeSelected"] != null)
+                    //{
+                    //    selectedShopTypeList = Session["shopTypeSelected"] as List<string>;
+                    //}
+
+                    
+
+                    //List<int> addUserIdList = subjectList.Select(s => s.AddUserId ?? 0).Distinct().ToList();
+
+                    //var userList = new UserBLL().GetList(s => addUserIdList.Contains(s.UserId));
+                    //if (userList.Any())
+                    //{
+                    //    List<int> selectedUserList = new List<int>();
+                    //    if (Session["userSelected"] != null)
+                    //    {
+                    //        selectedUserList = Session["userSelected"] as List<int>;
+                    //    }
+                    //    userList.ForEach(s =>
+                    //    {
+                    //        ListItem li = new ListItem();
+                    //        li.Text = s.RealName + "&nbsp;&nbsp;";
+                    //        li.Value = s.UserId.ToString();
+                    //        if (selectedUserList.Contains(s.UserId))
+                    //            li.Selected = true;
+                    //        cblAddUser.Items.Add(li);
+                    //    });
+                    //}
+
+                    //bool isNull1 = false;
+                    //List<int> categoryIdList = subjectList.Select(s => s.SubjectCategoryId ?? 0).Distinct().ToList();
+                    //if (categoryIdList.Contains(0))
+                    //{
+                    //    isNull1 = true;
+                    //}
+                    //var categoryList = new ADSubjectCategoryBLL().GetList(s => categoryIdList.Contains(s.Id));
+                    //List<int> selectedsubjectCategoryList = new List<int>();
+                    //if (Session["subjectCategorySelected"] != null)
+                    //{
+                    //    selectedsubjectCategoryList = Session["subjectCategorySelected"] as List<int>;
+                    //}
+                    //categoryList.ForEach(s =>
+                    //{
+                    //    if (s != null)
+                    //    {
+                    //        ListItem li = new ListItem();
+                    //        li.Text = s.CategoryName + "&nbsp;&nbsp;";
+                    //        li.Value = s.Id.ToString();
+                    //        if (selectedsubjectCategoryList.Contains(s.Id))
+                    //            li.Selected = true;
+                    //        cblSubjectCategory.Items.Add(li);
+                    //    }
+                    //});
+                    //if (isNull1)
+                    //{
+                    //    cblSubjectCategory.Items.Add(new ListItem("空", "0"));
+                    //}
+
+
+
+                }
+                else
+                {
+                    Session["OutsourceStatisticOrderList"] = null;
+                    Session["OutsourceStatisticShopList"] = null;
+                    Session["OutsourceStatisticSubjectList"] = null;
+                    Session["OutsourceStatisticGuidanceList"] = null;
+                }
+                Panel_EmptyGuidance.Visible = !orderDetailList.Any();
+            }
+        }
+
+
+        void BindOutsourceRegion()
+        {
+            cblOutsourceRegion.Items.Clear();
+            List<OutsourceOrderDetail> orderList = new List<OutsourceOrderDetail>();
+            if (Session["OutsourceStatisticOrderList"] != null)
+            {
+                orderList = Session["OutsourceStatisticOrderList"] as List<OutsourceOrderDetail>;
+            }
+            List<int> guidanceIdList = GetGuidanceSelected();
+            if (guidanceIdList.Any())
+            {
+                orderList = orderList.Where(s => guidanceIdList.Contains(s.GuidanceId??0)).ToList();
+            }
+            //int subjectChannel = 0;
+            //foreach (ListItem li in cblSubjectChannel.Items)
+            //{
+            //    if (li.Selected)
+            //    {
+            //        subjectChannel = int.Parse(li.Value);
+            //        break;
+            //    }
+            //}
+            
+            if (orderList.Any())
+            {
+                
+                List<int> outsourceIdList = orderList.Select(s => s.OutsourceId ?? 0).Distinct().ToList();
+                List<Region> regionList = (from company in CurrentContext.DbContext.Company
+                                           join region in CurrentContext.DbContext.Region
+                                           on company.RegionId equals region.Id
+                                           where outsourceIdList.Contains(company.Id)
+                                           select region).Distinct().OrderBy(s=>s.Id).ToList();
+                if (regionList.Any())
+                {
+                    regionList.ForEach(s => {
+                        ListItem li = new ListItem();
+                        li.Value = s.Id.ToString();
+                        li.Text = s.RegionName + "&nbsp;";
+                        cblOutsourceRegion.Items.Add(li);
+                    });
+                }
+            }
+        }
 
         void BindSubjectCategory()
         {
@@ -436,7 +649,11 @@ namespace WebApp.OutsourcingOrder.Statistics
                 subjectList = Session["OutsourceStatisticSubjectList"] as List<Subject>;
                 //shopList = Session["OutsourceStatisticShopList"] as List<Shop>;
             }
-
+            List<int> guidanceIdList = GetGuidanceSelected();
+            if (guidanceIdList.Any())
+            {
+                subjectList = subjectList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0)).ToList();
+            }
             if (subjectList.Any())
             {
                 var categoryList = (from subject in subjectList
@@ -476,7 +693,21 @@ namespace WebApp.OutsourcingOrder.Statistics
             cblCity.Items.Clear();
             //List<int> guidanceIdList = GetGuidanceSelected();
             List<int> subjectCategoryIdList = GetSubjectCategorySelected();
-            
+            List<int> outsourceIdList = new List<int>();
+            foreach (ListItem li in cblOutsourceId.Items)
+            {
+                if (li.Selected)
+                {
+                    outsourceIdList.Add(int.Parse(li.Value));
+                }
+            }
+            if (!outsourceIdList.Any())
+            {
+                foreach (ListItem li in cblOutsourceId.Items)
+                {
+                    outsourceIdList.Add(int.Parse(li.Value));
+                }
+            }
             List<Subject> subjectList = new List<Subject>();
             List<OutsourceOrderDetail> orderList = new List<OutsourceOrderDetail>();
             if (Session["OutsourceStatisticOrderList"] != null)
@@ -484,7 +715,11 @@ namespace WebApp.OutsourcingOrder.Statistics
                 orderList = Session["OutsourceStatisticOrderList"] as List<OutsourceOrderDetail>;
                 subjectList = Session["OutsourceStatisticSubjectList"] as List<Subject>;
             }
-
+            List<int> guidanceIdList = GetGuidanceSelected();
+            if (guidanceIdList.Any())
+            {
+                orderList = orderList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0)).ToList();
+            }
             if (orderList.Any())
             {
                 var list = (from order in orderList
@@ -495,6 +730,10 @@ namespace WebApp.OutsourcingOrder.Statistics
                                 order,
                                 subject
                             }).ToList();
+                if (outsourceIdList.Any())
+                {
+                    list = list.Where(s => outsourceIdList.Contains(s.order.OutsourceId??0)).ToList();
+                }
                 if (subjectCategoryIdList.Any())
                 {
                     if (subjectCategoryIdList.Contains(0))
@@ -534,6 +773,21 @@ namespace WebApp.OutsourcingOrder.Statistics
             cblCity.Items.Clear();
             //List<int> guidanceIdList = GetGuidanceSelected();
             List<int> subjectCategoryIdList = GetSubjectCategorySelected();
+            List<int> outsourceIdList = new List<int>();
+            foreach (ListItem li in cblOutsourceId.Items)
+            {
+                if (li.Selected)
+                {
+                    outsourceIdList.Add(int.Parse(li.Value));
+                }
+            }
+            if (!outsourceIdList.Any())
+            {
+                foreach (ListItem li in cblOutsourceId.Items)
+                {
+                    outsourceIdList.Add(int.Parse(li.Value));
+                }
+            }
             List<string> regionList = GetRegionSelected();
             if (regionList.Any())
             {
@@ -545,6 +799,11 @@ namespace WebApp.OutsourcingOrder.Statistics
                     orderList = Session["OutsourceStatisticOrderList"] as List<OutsourceOrderDetail>;
                     subjectList = Session["OutsourceStatisticSubjectList"] as List<Subject>;
                 }
+                List<int> guidanceIdList = GetGuidanceSelected();
+                if (guidanceIdList.Any())
+                {
+                    orderList = orderList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0)).ToList();
+                }
                 if (orderList.Any())
                 {
                     var list = (from order in orderList
@@ -555,6 +814,10 @@ namespace WebApp.OutsourcingOrder.Statistics
                                     order,
                                     subject
                                 }).ToList();
+                    if (outsourceIdList.Any())
+                    {
+                        list = list.Where(s => outsourceIdList.Contains(s.order.OutsourceId??0)).ToList();
+                    }
                     if (subjectCategoryIdList.Any())
                     {
                         if (subjectCategoryIdList.Contains(0))
@@ -601,26 +864,35 @@ namespace WebApp.OutsourcingOrder.Statistics
             List<int> subjectCategoryIdList = GetSubjectCategorySelected();
             List<string> regionList = GetRegionSelected();
             List<string> provinceList = GetProvinceSelected();
+            List<int> outsourceIdList = new List<int>();
+            foreach (ListItem li in cblOutsourceId.Items)
+            {
+                if (li.Selected)
+                {
+                    outsourceIdList.Add(int.Parse(li.Value));
+                }
+            }
+            if (!outsourceIdList.Any())
+            {
+                foreach (ListItem li in cblOutsourceId.Items)
+                {
+                    outsourceIdList.Add(int.Parse(li.Value));
+                }
+            }
             if (provinceList.Any())
             {
-                //var orderList = (from order in CurrentContext.DbContext.OutsourceOrderDetail
-                //                 join subject in CurrentContext.DbContext.Subject
-                //                 on order.SubjectId equals subject.Id
-                //                 where guidanceIdList.Contains(order.GuidanceId ?? 0)
-                //                 && (subject.IsDelete == null || subject.IsDelete == false)
-                //                 && subject.ApproveState == 1
-                //                 && (order.IsDelete == null || order.IsDelete == false)
-                //                 select new
-                //                 {
-                //                     subject,
-                //                     order
-                //                 }).ToList();
+               
                 List<Subject> subjectList = new List<Subject>();
                 List<OutsourceOrderDetail> orderList = new List<OutsourceOrderDetail>();
                 if (Session["OutsourceStatisticOrderList"] != null)
                 {
                     orderList = Session["OutsourceStatisticOrderList"] as List<OutsourceOrderDetail>;
                     subjectList = Session["OutsourceStatisticSubjectList"] as List<Subject>;
+                }
+                List<int> guidanceIdList = GetGuidanceSelected();
+                if (guidanceIdList.Any())
+                {
+                    orderList = orderList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0)).ToList();
                 }
                 if (orderList.Any())
                 {
@@ -632,6 +904,10 @@ namespace WebApp.OutsourcingOrder.Statistics
                                     order,
                                     subject
                                 }).ToList();
+                    if (outsourceIdList.Any())
+                    {
+                        list = list.Where(s => outsourceIdList.Contains(s.order.OutsourceId??0)).ToList();
+                    }
                     if (subjectCategoryIdList.Any())
                     {
                         if (subjectCategoryIdList.Contains(0))
@@ -679,11 +955,25 @@ namespace WebApp.OutsourcingOrder.Statistics
             cblSubjects.Items.Clear();
             cbAll.Checked = false;
             //List<int> guidanceIdList = GetGuidanceSelected();
+            List<int> outsourceIdList = new List<int>();
+            foreach (ListItem li in cblOutsourceId.Items)
+            {
+                if (li.Selected)
+                {
+                    outsourceIdList.Add(int.Parse(li.Value));
+                }
+            }
+            if (!outsourceIdList.Any())
+            {
+                foreach (ListItem li in cblOutsourceId.Items)
+                {
+                    outsourceIdList.Add(int.Parse(li.Value));
+                }
+            }
             List<int> subjectCategoryIdList = GetSubjectCategorySelected();
             List<string> regionList = GetRegionSelected();
             List<string> provinceList = GetProvinceSelected();
             List<string> cityList = GetCitySelected();
-           
             List<Subject> subjectList = new List<Subject>();
             List<OutsourceOrderDetail> orderList = new List<OutsourceOrderDetail>();
             if (Session["OutsourceStatisticOrderList"] != null)
@@ -691,18 +981,26 @@ namespace WebApp.OutsourcingOrder.Statistics
                 orderList = Session["OutsourceStatisticOrderList"] as List<OutsourceOrderDetail>;
                 subjectList = Session["OutsourceStatisticSubjectList"] as List<Subject>;
             }
-
+            List<int> guidanceIdList = GetGuidanceSelected();
+            if (guidanceIdList.Any())
+            {
+                orderList = orderList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0)).ToList();
+            }
             if (orderList.Any())
             {
                 var list = (from order in orderList
                             join subject in subjectList
                             on order.SubjectId equals subject.Id
-                            where (subject.HandMakeSubjectId??0)==0
+                            //where (subject.HandMakeSubjectId??0)==0
                             select new
                             {
                                 order,
                                 subject
                             }).ToList();
+                if (outsourceIdList.Any())
+                {
+                    list = list.Where(s => outsourceIdList.Contains(s.order.OutsourceId??0)).ToList();
+                }
                 if (subjectCategoryIdList.Any())
                 {
                     if (subjectCategoryIdList.Contains(0))
@@ -801,9 +1099,9 @@ namespace WebApp.OutsourcingOrder.Statistics
             cblPropSubjects.Items.Clear();
             cbAllProp.Checked = false;
             List<Subject> propSubjectList = new List<Subject>();
-            if (Session["OutsourceStatisticSubjectList"] != null)
+            if (Session["OutsourceStatisticPropSubjectList"] != null)
             {
-                propSubjectList = Session["OutsourceStatisticSubjectList"] as List<Subject>;
+                propSubjectList = Session["OutsourceStatisticPropSubjectList"] as List<Subject>;
             }
             if (propSubjectList.Any())
             {
@@ -818,7 +1116,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             }
         }
 
-        void BindOutSource()
+        void BindOutSource_Old()
         {
             cblOutsourceId.Items.Clear();
             int customerId = int.Parse(ddlCustomer.SelectedValue);
@@ -828,7 +1126,14 @@ namespace WebApp.OutsourcingOrder.Statistics
             List<string> provinceList = GetProvinceSelected();
             List<string> cityList = GetCitySelected();
             List<int> subjectIdList = GetSubjectSelected();
-
+            List<int> osRegionIdList = new List<int>();
+            foreach (ListItem li in cblOutsourceRegion.Items)
+            {
+                if (li.Selected)
+                {
+                    osRegionIdList.Add(int.Parse(li.Value));
+                }
+            }
             
             List<Subject> subjectList = new List<Subject>();
             List<OutsourceOrderDetail> orderList = new List<OutsourceOrderDetail>();
@@ -888,6 +1193,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                     subjectIdList.AddRange(hMSubjectIdList);
                     outsourceOrderList = outsourceOrderList.Where(s => (s.subject != null && subjectIdList.Contains(s.subject.Id)) || subjectIdList.Contains(s.order.BelongSubjectId??0)).ToList();
                 }
+
                 if (outsourceOrderList.Any())
                 {
                     var companyList = outsourceOrderList.Select(s => s.company).Distinct().OrderBy(s=>s.Id).ToList();
@@ -902,6 +1208,55 @@ namespace WebApp.OutsourcingOrder.Statistics
                 }
             }
             loadOutsource.Style.Add("display", "none");
+        }
+
+        void BindOutSource()
+        {
+            cblOutsourceId.Items.Clear();
+            
+            List<int> osRegionIdList = new List<int>();
+            foreach (ListItem li in cblOutsourceRegion.Items)
+            {
+                if (li.Selected)
+                {
+                    osRegionIdList.Add(int.Parse(li.Value));
+                }
+            }
+
+            List<OutsourceOrderDetail> orderList = new List<OutsourceOrderDetail>();
+            if (Session["OutsourceStatisticOrderList"] != null)
+            {
+                orderList = Session["OutsourceStatisticOrderList"] as List<OutsourceOrderDetail>;
+                
+            }
+            List<int> guidanceIdList = GetGuidanceSelected();
+            if (guidanceIdList.Any())
+            {
+                orderList = orderList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0)).ToList();
+            }
+            if (orderList.Any())
+            {
+                List<int> outsourceIdList = orderList.Select(s => s.OutsourceId ?? 0).Distinct().ToList();
+                List<Company> outsourceList = new CompanyBLL().GetList(s => outsourceIdList.Contains(s.Id));
+                if (osRegionIdList.Any())
+                {
+                    outsourceList = outsourceList.Where(s => osRegionIdList.Contains(s.RegionId??0)).ToList();
+                }
+                if (outsourceList.Any())
+                {
+                    outsourceList.ForEach(s =>
+                    {
+                        ListItem li = new ListItem();
+                        li.Text = s.CompanyName + "&nbsp;&nbsp;";
+                        li.Value = s.Id.ToString();
+                        cblOutsourceId.Items.Add(li);
+
+                    });
+                    loadOutsource.Style.Add("display", "none");
+                }
+
+            }
+            
         }
 
         void BindPropOutsource() 
@@ -943,7 +1298,11 @@ namespace WebApp.OutsourcingOrder.Statistics
                 orderList = Session["OutsourceStatisticOrderList"] as List<OutsourceOrderDetail>;
                 subjectList = Session["OutsourceStatisticSubjectList"] as List<Subject>;
             }
-            
+            guidanceIdList = GetGuidanceSelected();
+            if (guidanceIdList.Any())
+            {
+                orderList = orderList.Where(s => guidanceIdList.Contains(s.GuidanceId ?? 0)).ToList();
+            }
             foreach (ListItem li in cblOutsourceId.Items)
             {
                 if (li.Selected)
@@ -1393,6 +1752,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             decimal receiveOtherPrice = 0;
             List<int> TotalShopCountList = new List<int>();
             decimal propPrice = 0;
+            decimal propReceivePrice = 0;
             #endregion
 
             #region POP订单
@@ -1506,9 +1866,9 @@ namespace WebApp.OutsourcingOrder.Statistics
                         if (subjectIdList.Any())
                         {
                             //百丽
-                            Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
-                            List<int> hMSubjectIdList = new SubjectBLL().GetList(s => s.GuidanceId == gid && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
-                            subjectIdList.AddRange(hMSubjectIdList);
+                            //Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
+                            //List<int> hMSubjectIdList = new SubjectBLL().GetList(s => s.GuidanceId == gid && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
+                            //subjectIdList.AddRange(hMSubjectIdList);
 
                             popOrderList = popOrderList.Where(s => subjectIdList.Contains(s.order.SubjectId ?? 0)).ToList();
                             if (selectedSubject && activityInstallPriceList.Where(s => (s.order.BelongSubjectId ?? 0) > 0).Any())
@@ -1642,9 +2002,11 @@ namespace WebApp.OutsourcingOrder.Statistics
             {
                 propOrderList = Session["OutsourceStatisticPropOrderList"] as List<PropOutsourceOrderDetail>;
             }
+            List<int> propSubjectIdList = GetPropSubjectSelected();
+            List<int> propGuidanceIdList = GetPropGuidanceSelected();
             if (propOrderList.Any())
             {
-                List<int> propSubjectIdList = GetPropSubjectSelected();
+                
                 List<string> propOutsourceList = GetPropOutsourceSelected();
                 propOrderList = propOrderList.Where(s => propSubjectIdList.Contains(s.SubjectId ?? 0) && s.OutsourceName != null && propOutsourceList.Contains(s.OutsourceName.ToUpper())).ToList();
                 if (propOrderList.Any())
@@ -1652,11 +2014,26 @@ namespace WebApp.OutsourcingOrder.Statistics
                     propPrice = propOrderList.Sum(s=>(s.Quantity??1)*(s.UnitPrice??0));
                 }
             }
+            //应收
+            var receiveOrderList = new PropOrderDetailBLL().GetList(s => propGuidanceIdList.Contains(s.GuidanceId??0));
+            if (propSubjectIdList.Any())
+            {
+                receiveOrderList = receiveOrderList.Where(s => propSubjectIdList.Contains(s.SubjectId??0)).ToList();
+            }
+            if (receiveOrderList.Any())
+            {
+                propReceivePrice = receiveOrderList.Sum(s => (s.UnitPrice ?? 0) * (s.Quantity ?? 1));
+                if (propReceivePrice > 0)
+                {
+                    propReceivePrice = Math.Round(propReceivePrice, 2);
+
+                }
+            }
             #endregion
 
             #region 赋值
             decimal totalPrice = (popPrice + installPrice + expressPrice + measurePrice + otherPrice + propPrice);
-            decimal receiveTotalPrice = (receivePOPPrice + receiveinstallPrice + receiveExpressPrice + receiveMeasurePrice + receiveOtherPrice);
+            decimal receiveTotalPrice = (receivePOPPrice + receiveinstallPrice + receiveExpressPrice + receiveMeasurePrice + receiveOtherPrice + propReceivePrice);
             if (totalPrice > 0)
                 totalPrice = Math.Round(totalPrice, 2);
             if (popPrice > 0)
@@ -1757,7 +2134,10 @@ namespace WebApp.OutsourcingOrder.Statistics
                 labROtherPrice.Attributes.Add("style", "text-decoration:underline; cursor:pointer;color:blue;");
                 labROtherPrice.Attributes.Add("name", "checkOtherPrice");
             }
-
+            if (propReceivePrice > 0)
+            {
+                labRPropPrice.Text = propReceivePrice + " 元";
+            }
             labRTotalPrice.Text = receiveTotalPrice.ToString();
             #endregion
         }
@@ -1772,13 +2152,28 @@ namespace WebApp.OutsourcingOrder.Statistics
             ChangePropGuidanceSelected();
         }
 
+        protected void cblOutsourceRegion_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            BindOutSource();
+            BindRegion();
+        }
+
         void ChangeGuidanceSelected()
         {
-            LoadData();
+            if (!string.IsNullOrWhiteSpace(txtBeginDate.Text) && !string.IsNullOrWhiteSpace(txtEndDate.Text))
+            {
+                
+            }
+            else
+            {
+                LoadData();
+            }
+            BindOutsourceRegion();
+            BindOutSource();
             BindSubjectCategory();
             BindRegion();
             BindSubject();
-            BindOutSource();
+           
         }
 
         void ChangePropGuidanceSelected()
@@ -1885,6 +2280,8 @@ namespace WebApp.OutsourcingOrder.Statistics
 
         protected void cblOutspurce_SelectedIndexChanged(object sender, EventArgs e)
         {
+            BindRegion();
+            BindSubject();
             BindMaterial();
         }
 
@@ -1934,6 +2331,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             labRMeasurePrice.Text = "0";
 
             labPropPrice.Text = "0";
+            labRPropPrice.Text = "0";
         }
 
         
@@ -2329,7 +2727,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             List<string> regionList = GetRegionSelected().Distinct().ToList();
             List<string> provinceList = GetProvinceSelected().Distinct().ToList();
             List<string> cityList = GetCitySelected().Distinct().ToList();
-            List<int> subjectIdList = GetSubjectSelected().Distinct().ToList();
+            List<int> subjectIdList = GetSubjectSelected();
             List<int> subjectOutsourceIdList = GetOutSourceSelected().Distinct().ToList();
             List<int> assignTypeList = new List<int>();
             foreach (ListItem li in cblOutsourceType.Items)
@@ -2372,7 +2770,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                     #region
                     guidanceIdList.ForEach(gid =>
                     {
-                        List<int> currSubjectList = subjectIdList;
+                        
                         var orderList0 = (from order in totalOrderList
                                           join guidance in guidanceList
                                           on order.GuidanceId equals guidance.ItemId
@@ -2393,12 +2791,13 @@ namespace WebApp.OutsourcingOrder.Statistics
                                               outsource
                                           }).ToList();
                         var orderList = orderList0;
+                        List<int> currSubjectList = new List<int>();
                         if (subjectIdList.Any())
                         {
                             //百丽
-                            Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
-                            List<int> hMSubjectIdList = new SubjectBLL().GetList(s => s.GuidanceId == gid && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
-                            subjectIdList.AddRange(hMSubjectIdList);
+                            //Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
+                            //List<int> hMSubjectIdList = new SubjectBLL().GetList(s => s.GuidanceId == gid && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
+                            //subjectIdList.AddRange(hMSubjectIdList);
                             orderList = orderList.Where(s => subjectIdList.Contains(s.order.SubjectId ?? 0)).ToList();
                             currSubjectList = subjectIdList;
                         }
@@ -2552,7 +2951,19 @@ namespace WebApp.OutsourcingOrder.Statistics
                                 });
                             }
 
-                            var installPriceList = orderList0.Where(s => s.order.SubjectId == 0 && ((s.order.BelongSubjectId??0)>0 ? currSubjectList.Contains(s.order.BelongSubjectId??0):1==1) && installShopIdList.Contains(s.order.ShopId ?? 0) && s.order.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                            //var installPriceList = orderList0.Where(s => s.order.SubjectId == 0 && ((s.order.BelongSubjectId??0)>0 ? currSubjectList.Contains(s.order.BelongSubjectId??0):1==1) && installShopIdList.Contains(s.order.ShopId ?? 0) && s.order.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                            var installPriceList = orderList0.Where(s => s.order.SubjectId == 0 && s.order.OrderType == (int)OrderTypeEnum.安装费).ToList();
+                            if (subjectIdList.Any())
+                            {
+                                if (installPriceList.Where(s => (s.order.BelongSubjectId ?? 0) > 0).Any())
+                                {
+                                    installPriceList = installPriceList.Where(s => subjectIdList.Contains(s.order.BelongSubjectId ?? 0)).ToList();
+                                }
+                                else if (shopIdList.Any())
+                                {
+                                    installPriceList = installPriceList.Where(s => installShopIdList.Contains(s.order.ShopId ?? 0)).ToList();
+                                }
+                            }
                             if (assignTypeList.Any())
                             {
                                 installPriceList = installPriceList.Where(s => assignTypeList.Contains(s.order.AssignType ?? 0)).ToList();
@@ -2758,5 +3169,54 @@ namespace WebApp.OutsourcingOrder.Statistics
             #endregion
 
         }
+
+        /// <summary>
+        /// 按时间查询
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void btnSearchByDate_Click(object sender, EventArgs e)
+        {
+            BindaGuidanceByOrderDate();
+        }
+
+        protected void rbOnGuidanceSearch_CheckedChanged(object sender, EventArgs e)
+        {
+            ChangeSearchType();
+        }
+
+        protected void rbOnOrderSubjectSearch_CheckedChanged(object sender, EventArgs e)
+        {
+            ChangeSearchType();
+        }
+
+        void ChangeSearchType()
+        {
+            if (rbOnGuidanceSearch.Checked)
+            {
+                txtBeginDate.Text = "";
+                txtEndDate.Text = "";
+                BindGuidance();
+                btnGuidanceSearchByDate.Enabled = false;
+                lbUp.Enabled = true;
+                lbDown.Enabled = true;
+                
+            }
+            else if (rbOnOrderSubjectSearch.Checked)
+            {
+                btnGuidanceSearchByDate.Enabled = true;
+                lbUp.Enabled = false;
+                lbDown.Enabled = false;
+                
+            }
+
+        }
+
+        protected void cblSubjectChannel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+       
     }
 }

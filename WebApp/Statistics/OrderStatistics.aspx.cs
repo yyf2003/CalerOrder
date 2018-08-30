@@ -447,7 +447,6 @@ namespace WebApp.Statistics
             int customerId = int.Parse(ddlCustomer.SelectedValue);
 
             var list = (from guidance in CurrentContext.DbContext.SubjectGuidance
-
                         join subject in CurrentContext.DbContext.Subject
                         on guidance.ItemId equals subject.GuidanceId
                         where guidance.CustomerId == customerId
@@ -722,20 +721,20 @@ namespace WebApp.Statistics
                                        on subject.GuidanceId equals guidance.ItemId
                                        where (subject.IsDelete == null || subject.IsDelete == false)
                                        && subject.ApproveState == 1
-                                       && subject.AddDate >= beginDate
-                                       && subject.AddDate < endDate
+                                       //&& subject.AddDate >= beginDate
+                                       //&& subject.AddDate < endDate
                                        && (guidance.IsDelete == null || guidance.IsDelete == false)
                                        select new { subject, guidance }
                               ).ToList();
-                guidanceList = subjectListTemp.Select(s => s.guidance).Distinct().OrderBy(s => s.ItemId).ThenBy(s => s.ItemName).ToList(); 
-                guidanceIdList = guidanceList.Select(s => s.ItemId).ToList();
 
+                //guidanceList = subjectListTemp.Select(s => s.guidance).Distinct().OrderBy(s => s.ItemId).ThenBy(s => s.ItemName).ToList();
+                //guidanceIdList = guidanceList.Select(s => s.ItemId).ToList();
 
 
                 List<int> subjectIdList = subjectListTemp.Select(s => s.subject.Id).ToList();
-                List<Subject> bailiSubjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && !subjectIdList.Contains(s.Id) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0) && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false));
-                if (bailiSubjectList.Any())
-                   subjectIdList.AddRange(bailiSubjectList.Select(s=>s.Id).ToList());
+                //List<Subject> bailiSubjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && !subjectIdList.Contains(s.Id) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0) && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false));
+                //if (bailiSubjectList.Any())
+                //   subjectIdList.AddRange(bailiSubjectList.Select(s=>s.Id).ToList());
                 int dateSearchType = 1;
                 foreach (ListItem li in rblDateType.Items)
                 {
@@ -744,15 +743,19 @@ namespace WebApp.Statistics
                 }
                 if (dateSearchType == 1)
                 {
-                    //subjectListTemp = subjectListTemp.Where(s => s.subject.AddDate >= beginDate && s.subject.AddDate < endDate).ToList();
-                    //subjectIdList = subjectListTemp.Select(s => s.subject.Id).ToList();
-
+                    subjectListTemp = subjectListTemp.Where(s => s.subject.AddDate >= beginDate && s.subject.AddDate < endDate).ToList();
+                    subjectIdList = subjectListTemp.Select(s => s.subject.Id).ToList();
+                    List<Subject> bailiSubjectList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && !subjectIdList.Contains(s.Id) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0) && s.ApproveState == 1 && (s.IsDelete == null || s.IsDelete == false));
+                    if (bailiSubjectList.Any())
+                        subjectIdList.AddRange(bailiSubjectList.Select(s => s.Id).ToList());
                     orderList = new FinalOrderDetailTempBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0) && (s.IsDelete == null || s.IsDelete == false)).ToList();
                 }
                 else//按下单时间
                 {
                     orderList = new FinalOrderDetailTempBLL().GetList(s => subjectIdList.Contains(s.SubjectId ?? 0) && (s.IsDelete == null || s.IsDelete == false) && s.AddDate >= beginDate && s.AddDate < endDate).ToList();
+                    subjectIdList = orderList.Select(s => s.SubjectId??0).Distinct().ToList();
                 }
+                
                 if (orderList.Any())
                 {
 
@@ -762,14 +765,35 @@ namespace WebApp.Statistics
                     Session["shopStatistics"] = shopList;
 
 
-                    Session["guidanceStatistics"] = guidanceList;
+                    
 
                     //List<int> hmSubjectIdList = subjectListTemp.Select(s => s.subject.HandMakeSubjectId ?? 0).Distinct().ToList();
                     //subjectIdList = subjectIdList.Union(hmSubjectIdList).ToList();
 
-                    subjectList = new SubjectBLL().GetList(s => subjectIdList.Contains(s.Id));
+                    //subjectList = new SubjectBLL().GetList(s => subjectIdList.Contains(s.Id));
+                    var subjectListTemp1 = (from subject in CurrentContext.DbContext.Subject
+                                           join guidance in CurrentContext.DbContext.SubjectGuidance
+                                           on subject.GuidanceId equals guidance.ItemId
+                                           where (subject.IsDelete == null || subject.IsDelete == false)
+                                           && subject.ApproveState == 1
+                                           && (guidance.IsDelete == null || guidance.IsDelete == false)
+                                           && subjectIdList.Contains(subject.Id)
+                                           select new { subject, guidance }
+                             ).ToList();
 
+
+
+                    //subjectListTemp = subjectListTemp.Where(s => subjectIdList.Contains(s.subject.Id)).ToList();
+
+                    guidanceList = subjectListTemp1.Select(s => s.guidance).Distinct().OrderBy(s => s.ItemId).ThenBy(s => s.ItemName).ToList();
+                    guidanceIdList = guidanceList.Select(s => s.ItemId).ToList();
+
+
+                    Session["guidanceStatistics"] = guidanceList;
+
+                    subjectList = subjectListTemp1.Select(s => s.subject).Distinct().ToList();
                     Session["subjectStatistics"] = subjectList;
+                    List<int> sidList = subjectList.Select(s => s.Id).ToList();
 
                     guidanceList.ForEach(s =>
                     {
@@ -1403,8 +1427,7 @@ namespace WebApp.Statistics
                              join guidance in guidanceList
                              on order.GuidanceId equals guidance.ItemId
                              //where (regionList.Any() ? ((subject.PriceBlongRegion != null && subject.PriceBlongRegion != "") ? regionList.Contains(subject.PriceBlongRegion.ToLower()) : regionList.Contains(order.Region.ToLower())) : 1 == 1)
-                             where (regionList.Any() ? regionList.Contains(order.Region.ToLower()) : 1 == 1)
-
+                             where (regionList.Any() ? (order.Region!=null && regionList.Contains(order.Region.ToLower())) : 1 == 1)
                              select new
                              {
                                  order,
@@ -4238,8 +4261,6 @@ namespace WebApp.Statistics
             else
             {
                 LoadSessionData();
-
-
             }
 
             BindSubjectNameList();
@@ -4960,31 +4981,33 @@ namespace WebApp.Statistics
                 }
                 string begin = txtSubjectBegin.Text.Trim();
                 string end = txtSubjectEnd.Text.Trim();
-                if (!string.IsNullOrWhiteSpace(begin))
-                {
-                    DateTime beginDate = DateTime.Parse(begin);
-                    orderList = orderList.Where(s => s.subject.AddDate >= beginDate).ToList();
-                    if (!string.IsNullOrWhiteSpace(end))
-                    {
-                        DateTime endDate = DateTime.Parse(end).AddDays(1);
-                        orderList = orderList.Where(s => s.subject.AddDate < endDate).ToList();
-                    }
-                }
+                //if (!string.IsNullOrWhiteSpace(begin))
+                //{
+                //    DateTime beginDate = DateTime.Parse(begin);
+                //    orderList = orderList.Where(s => s.subject.AddDate >= beginDate).ToList();
+                //    if (!string.IsNullOrWhiteSpace(end))
+                //    {
+                //        DateTime endDate = DateTime.Parse(end).AddDays(1);
+                //        orderList = orderList.Where(s => s.subject.AddDate < endDate).ToList();
+                //    }
+                //}
 
 
 
 
-                var subjectList1 = orderList.Where(s => s.subject.SubjectType != (int)SubjectTypeEnum.费用订单).Select(s => s.subject).Distinct().OrderBy(s => s.GuidanceId).ThenBy(s => s.SubjectName).ToList();
+                var subjectList1 = orderList.Where(s => s.subject.SubjectType != (int)SubjectTypeEnum.费用订单).Select(s => s.subject).Distinct().ToList();
 
-
-                List<int> subjectIdList1 = (from s1 in subjectList1
-                                             where (s1.HandMakeSubjectId ?? 0) == 0
-                                             select s1.Id).Union(
-                                            from s2 in subjectList1
-                                            where (s2.HandMakeSubjectId ?? 0) > 0
-                                            select s2.HandMakeSubjectId ?? 0
-                                            ).ToList();
-                List<Subject> allSubjectList = subjectList.Where(s => subjectIdList1.Contains(s.Id) && (s.HandMakeSubjectId??0)==0).ToList();
+                List<int> handMakeSubjectIdList = subjectList1.Where(s=>(s.HandMakeSubjectId??0)>0).Select(s=>(s.HandMakeSubjectId??0)).Distinct().ToList();
+                List<int> totalSubjectIdList = subjectList1.Select(s => s.Id).ToList().Union(handMakeSubjectIdList).ToList();
+                List<Subject> allSubjectList = new SubjectBLL().GetList(s => totalSubjectIdList.Contains(s.Id) && (s.IsDelete == null || s.IsDelete == false) && s.ApproveState == 1 && (s.HandMakeSubjectId??0)==0).OrderBy(s => s.GuidanceId).ThenBy(s => s.SubjectName).ToList();
+                //List<int> subjectIdList1 = (from s1 in subjectList1
+                //                             where (s1.HandMakeSubjectId ?? 0) == 0
+                //                             select s1.Id).Union(
+                //                            from s2 in subjectList1
+                //                            where (s2.HandMakeSubjectId ?? 0) > 0
+                //                            select s2.HandMakeSubjectId ?? 0
+                //                            ).ToList();
+                //List<Subject> allSubjectList = subjectList.Where(s => subjectIdList1.Contains(s.Id) && (s.HandMakeSubjectId??0)==0).ToList();
 
                 if (allSubjectList.Any())
                 {

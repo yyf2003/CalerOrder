@@ -276,7 +276,7 @@ namespace WebApp.Subjects.InstallPrice
 
 
                         //东区的户外店不自动算安装费，手动下安装费
-                        List<int> terrexIdList = installShopOrderList.Where(s => s.order.Channel != null && s.order.Channel.ToLower().Contains("terrex") && s.order.Region != null && s.order.Region.ToLower().Contains("east")).Select(s => s.order.Id).ToList();
+                        List<int> terrexIdList = installShopOrderList.Where(s => s.order.Region != null && (s.order.Region.ToLower().Contains("east") || s.order.Region.ToLower().Contains("south"))).Select(s => s.order.Id).ToList();
                         installShopOrderList = installShopOrderList.Where(s => !terrexIdList.Contains(s.order.Id)).ToList();
 
                         //活动订单
@@ -300,7 +300,7 @@ namespace WebApp.Subjects.InstallPrice
 
 
                         myInstallShopIdList = activityOrderShopIdList.Concat(genericOrderShopIdList).ToList();
-                        labInstallShopCount.Text = myInstallShopIdList.Count().ToString();
+                        labInstallShopCount.Text = myInstallShopIdList.Distinct().Count().ToString();
 
                         //已提交的店铺
                         var installPriceShopInfoList = InstallPriceShopInfoBll.GetList(s => s.GuidanceId == Id && (s.AddType == null || s.AddType == 1));
@@ -314,7 +314,7 @@ namespace WebApp.Subjects.InstallPrice
 
                         }
 
-                        labFinishCount.Text = activityAssginShopIdList.Concat(genericAssginShopIdList).Count().ToString();
+                        labFinishCount.Text = activityAssginShopIdList.Concat(genericAssginShopIdList).Distinct().Count().ToString();
                     }
 
                     //List<FinalOrderDetailTemp> orderList = installShopOrderList.Where(s => s.GuidanceId == Id && (s.InstallPriceAddType ?? 1) == 1).ToList();

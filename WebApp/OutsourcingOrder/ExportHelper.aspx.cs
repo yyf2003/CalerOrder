@@ -121,6 +121,14 @@ namespace WebApp.OutsourcingOrder
             {
                 materialCategoryIdList = StringHelper.ToIntList(materialCategoryId, ',');
             }
+            if (subjectList.Any())
+            {
+                //orderList = orderList.Where(s => subjectList.Contains(s.SubjectId ?? 0) || s.SubjectId == 0).ToList();
+                //百丽订单项目
+                Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
+                List<int> hMSubjectIdList = new SubjectBLL().GetList(s => guidanceList.Contains(s.GuidanceId ?? 0) && subjectList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
+                subjectList.AddRange(hMSubjectIdList);
+            }
             var orderList = (from assignOrder in CurrentContext.DbContext.OutsourceOrderDetail
                             //join assign in CurrentContext.DbContext.OutsourceAssignShop
                             //on order.ShopId equals assign.ShopId
@@ -686,6 +694,14 @@ namespace WebApp.OutsourcingOrder
             {
                 materialCategoryIdList = StringHelper.ToIntList(materialCategoryId, ',');
             }
+            if (subjectList.Any())
+            {
+                //orderList = orderList.Where(s => subjectList.Contains(s.SubjectId ?? 0) || s.SubjectId == 0).ToList();
+                //百丽订单项目
+                Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
+                List<int> hMSubjectIdList = new SubjectBLL().GetList(s => guidanceList.Contains(s.GuidanceId ?? 0) && subjectList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
+                subjectList.AddRange(hMSubjectIdList);
+            }
             var orderList = (from order in CurrentContext.DbContext.OutsourceOrderDetail
                              //join assign in CurrentContext.DbContext.OutsourceAssignShop
                              //on order.ShopId equals assign.ShopId
@@ -1242,6 +1258,14 @@ namespace WebApp.OutsourcingOrder
             if (!string.IsNullOrWhiteSpace(materialCategoryId))
             {
                 materialCategoryIdList = StringHelper.ToIntList(materialCategoryId, ',');
+            }
+            if (subjectList.Any())
+            {
+                //orderList = orderList.Where(s => subjectList.Contains(s.SubjectId ?? 0) || s.SubjectId == 0).ToList();
+                //百丽订单项目
+                Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
+                List<int> hMSubjectIdList = new SubjectBLL().GetList(s => guidanceList.Contains(s.GuidanceId ?? 0) && subjectList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
+                subjectList.AddRange(hMSubjectIdList);
             }
             var orderList = (from order in CurrentContext.DbContext.OutsourceOrderDetail
                              //join assign in CurrentContext.DbContext.OutsourceAssignShop

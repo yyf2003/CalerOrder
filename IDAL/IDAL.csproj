@@ -74,6 +74,7 @@
     <Compile Include="IMergeOriginalOrder.cs" />
     <Compile Include="IModule.cs" />
     <Compile Include="IOrderMaterialMapping.cs" />
+    <Compile Include="IOutsourceOrderDetailDAL.cs" />
     <Compile Include="IPlace.cs" />
     <Compile Include="IPOPOrder.cs" />
     <Compile Include="IQuoteMaterialDAL.cs" />

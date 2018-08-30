@@ -33,31 +33,65 @@
             <div>
                 <table class="table">
                     <tr class="tr_bai">
-                        <td style="width: 100px;">
+                        <td style="width: 120px;">
                             客户
                         </td>
-                        <td style="width: 200px; text-align: left; padding-left: 5px;">
+                        <td style="text-align: left; padding-left: 5px;">
                             <asp:DropDownList ID="ddlCustomer" runat="server" Style="height: 23px;" AutoPostBack="true"
                                 OnSelectedIndexChanged="ddlCustomer_SelectedIndexChanged">
                             </asp:DropDownList>
                         </td>
-                        <td style="width: 100px;">
-                            活动月份
+                       
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            按活动月查询
+                            <asp:RadioButton ID="rbOnGuidanceSearch" GroupName="rbSearchType" runat="server"
+                                Checked="true" AutoPostBack="true" OnCheckedChanged="rbOnGuidanceSearch_CheckedChanged" />
+                        </td>
+                        <td style="text-align: left;">
+                         
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 100px; text-align: center;">
+                                        活动月份：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <asp:TextBox ID="txtGuidanceMonth" runat="server" CssClass="Wdate" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM',isShowClear:false,readOnly:true,onpicked:getMonth})"
+                                            Style="width: 80px;" OnTextChanged="txtGuidanceMonth_TextChanged" autocomplete="off"
+                                            AutoPostBack="true"></asp:TextBox>
+                                        <asp:LinkButton ID="lbUp" runat="server" Style="margin-left: 20px; cursor: pointer;
+                                            color: Blue;" OnClick="lbUp_Click">上一个月</asp:LinkButton>
+                                        <asp:LinkButton ID="lbDown" runat="server" Style="margin-left: 20px; cursor: pointer;
+                                            color: Blue;" OnClick="lbDown_Click">下一个月</asp:LinkButton>
+                                    </td>
+                                </tr>
+                            </table>
+                           
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            按订单时间查询
+                            <asp:RadioButton ID="rbOnOrderSubjectSearch" GroupName="rbSearchType" AutoPostBack="true"
+                                runat="server" OnCheckedChanged="rbOnOrderSubjectSearch_CheckedChanged" />
                         </td>
                         <td style="text-align: left; padding-left: 5px;">
-                            <asp:TextBox ID="txtGuidanceMonth" runat="server" CssClass="Wdate" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM',isShowClear:false,readOnly:true,onpicked:getMonth})"
-                                Style="width: 80px;" OnTextChanged="txtGuidanceMonth_TextChanged" AutoPostBack="true"></asp:TextBox>
-                            <asp:LinkButton ID="lbUp" runat="server" Style="margin-left: 20px; cursor: pointer;
-                                color: Blue;" OnClick="lbUp_Click">上一个月</asp:LinkButton>
-                            <asp:LinkButton ID="lbDown" runat="server" Style="margin-left: 20px; cursor: pointer;
-                                color: Blue;" OnClick="lbDown_Click">下一个月</asp:LinkButton>
+                            <asp:TextBox ID="txtBeginDate" runat="server" CssClass="Wdate" autocomplete="off"
+                                onclick="WdatePicker()"></asp:TextBox>
+                            —
+                            <asp:TextBox ID="txtEndDate" runat="server" CssClass="Wdate" autocomplete="off" onclick="WdatePicker()"></asp:TextBox>
+                            &nbsp;&nbsp;&nbsp;
+                            <asp:Button ID="btnGuidanceSearchByDate" runat="server" Text="查 询" class="easyui-linkbutton"
+                                Style="width: 65px; height: 26px;" OnClick="btnSearchByDate_Click" OnClientClick="return searchByDateloading()" />
+                            <img id="searchByDateLoadingImg" src="/image/WaitImg/loadingA.gif" style="display: none;" />
                         </td>
                     </tr>
                     <tr class="tr_bai">
                         <td>
                             活动名称
                         </td>
-                        <td colspan="3" style="text-align: left;">
+                        <td style="text-align: left;">
                             <table style="width: 100%;">
                                 <tr>
                                     <td style="width: 80px; text-align: center; font-weight: bold;">
@@ -101,11 +135,74 @@
                             </table>
                         </td>
                     </tr>
+                    <%--<tr class="tr_bai">
+                       <td>订单渠道</td>
+                       <td style="text-align: left; padding-left: 5px;">
+                           <div id="loadSubjectChannel" style="display: none;">
+                                <img src="/image/WaitImg/loadingA.gif" />
+                            </div>
+                            <asp:CheckBoxList ID="cblSubjectChannel" runat="server" CssClass="cbl" CellSpacing="20"
+                                RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="10" AutoPostBack="true"
+                                OnSelectedIndexChanged="cblSubjectChannel_SelectedIndexChanged">
+                                <asp:ListItem Value="1">上海订单&nbsp;</asp:ListItem>
+                                <asp:ListItem Value="2">分区订单</asp:ListItem>
+                            </asp:CheckBoxList>
+                       </td>
+                    </tr>--%>
+                    <tr class="tr_bai">
+                        <td>
+                            外协区域
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <div id="loadOutsourceRegion" style="display: none;">
+                                <img src="/image/WaitImg/loadingA.gif" />
+                            </div>
+                            <asp:CheckBoxList ID="cblOutsourceRegion" runat="server" RepeatDirection="Horizontal"
+                                RepeatLayout="Flow" RepeatColumns="10" AutoPostBack="true" OnSelectedIndexChanged="cblOutsourceRegion_SelectedIndexChanged">
+                            </asp:CheckBoxList>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            外协名称
+                        </td>
+                        <td style="text-align: left;">
+                            <table style="width: 100%;">
+                                <tr>
+                                    <td style="width: 80px; text-align: center; font-weight: bold;">
+                                        POP外协：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <div runat="server" id="loadOutsource" style="display: none;">
+                                            <img src="/image/WaitImg/loadingA.gif" />
+                                        </div>
+                                        <asp:CheckBoxList ID="cblOutsourceId" runat="server" CssClass="cbl" CellSpacing="20"
+                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="8" AutoPostBack="true"
+                                            OnSelectedIndexChanged="cblOutspurce_SelectedIndexChanged">
+                                        </asp:CheckBoxList>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 80px; text-align: center; font-weight: bold;">
+                                        道具外协：
+                                    </td>
+                                    <td style="text-align: left; padding-left: 5px;">
+                                        <div runat="server" id="loadPropOutsource" style="display: none;">
+                                            <img src="/image/WaitImg/loadingA.gif" />
+                                        </div>
+                                        <asp:CheckBoxList ID="cblPropOutsourceId" runat="server" CssClass="cbl" CellSpacing="20"
+                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="8">
+                                        </asp:CheckBoxList>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
                     <tr class="tr_bai">
                         <td>
                             项目类型
                         </td>
-                        <td colspan="3" style="text-align: left; padding-left: 5px;">
+                        <td style="text-align: left; padding-left: 5px;">
                             <div id="loadCategory" style="display: none;">
                                 <img src="/image/WaitImg/loadingA.gif" />
                             </div>
@@ -117,9 +214,9 @@
                     </tr>
                     <tr class="tr_bai">
                         <td>
-                            区域
+                            店铺区域
                         </td>
-                        <td colspan="3" style="text-align: left; padding-left: 5px;" class="style2">
+                        <td  style="text-align: left; padding-left: 5px;" class="style2">
                             <asp:CheckBoxList ID="cblRegion" runat="server" CssClass="cbl" CellSpacing="20" RepeatDirection="Horizontal"
                                 RepeatLayout="Flow" RepeatColumns="5" OnSelectedIndexChanged="cblRegion_SelectedIndexChanged"
                                 AutoPostBack="true">
@@ -128,9 +225,9 @@
                     </tr>
                     <tr class="tr_bai">
                         <td>
-                            省份
+                            店铺省份
                         </td>
-                        <td colspan="3" style="text-align: left; padding-left: 5px;">
+                        <td style="text-align: left; padding-left: 5px;">
                             <div id="loadProvince" style="display: none;">
                                 <img src="/image/WaitImg/loadingA.gif" />
                             </div>
@@ -142,9 +239,9 @@
                     </tr>
                     <tr class="tr_bai">
                         <td>
-                            城市
+                            店铺城市
                         </td>
-                        <td colspan="3" style="text-align: left; padding-left: 5px;">
+                        <td style="text-align: left; padding-left: 5px;">
                             <div id="loadCity" style="display: none;">
                                 <img src="/image/WaitImg/loadingA.gif" />
                             </div>
@@ -157,7 +254,7 @@
                         <td>
                             项目名称
                         </td>
-                        <td colspan="3" style="text-align: left;">
+                        <td style="text-align: left;">
                             <table style="width: 100%;">
                                 <tr>
                                     <td style="width: 80px; text-align: center; font-weight: bold;">
@@ -200,43 +297,6 @@
                     </tr>
                     <tr class="tr_bai">
                         <td>
-                            外协名称
-                        </td>
-                        <td colspan="3" style="text-align: left;">
-                            <table style="width: 100%;">
-                                <tr>
-                                    <td style="width: 80px; text-align: center; font-weight: bold;">
-                                        POP外协：
-                                    </td>
-                                    <td style="text-align: left; padding-left: 5px;">
-                                        <div runat="server" id="loadOutsource" style="display: none;">
-                                            <img src="/image/WaitImg/loadingA.gif" />
-                                        </div>
-                                        <asp:CheckBoxList ID="cblOutsourceId" runat="server" CssClass="cbl" CellSpacing="20"
-                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="8" AutoPostBack="true"
-                                            OnSelectedIndexChanged="cblOutspurce_SelectedIndexChanged">
-                                        </asp:CheckBoxList>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="width: 80px; text-align: center; font-weight: bold;">
-                                        道具外协：
-                                    </td>
-                                    <td style="text-align: left; padding-left: 5px;">
-                                        <div runat="server" id="loadPropOutsource" style="display: none;">
-                                            <img src="/image/WaitImg/loadingA.gif" />
-                                        </div>
-                                        <asp:CheckBoxList ID="cblPropOutsourceId" runat="server" CssClass="cbl" CellSpacing="20"
-                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="8"
-                                            >
-                                        </asp:CheckBoxList>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr class="tr_bai">
-                        <td>
                             材质名称
                         </td>
                         <td colspan="3" style="text-align: left; padding-left: 5px;">
@@ -250,9 +310,9 @@
                     </tr>
                     <tr class="tr_bai">
                         <td>
-                            外协类型
+                            类型
                         </td>
-                        <td colspan="3" style="text-align: left; padding-left: 5px;">
+                        <td style="text-align: left; padding-left: 5px;">
                             <asp:CheckBoxList ID="cblOutsourceType" runat="server" RepeatDirection="Horizontal"
                                 RepeatLayout="Flow">
                                 <asp:ListItem Value="1">安装&nbsp;</asp:ListItem>
@@ -263,7 +323,7 @@
                     <tr class="tr_bai">
                         <td>
                         </td>
-                        <td colspan="3" style="text-align: left; padding-left: 5px; height: 35px;">
+                        <td style="text-align: left; padding-left: 5px; height: 35px;">
                             <asp:Button ID="btnSearch" runat="server" Text="查 询" class="easyui-linkbutton" Style="width: 65px;
                                 height: 26px;" OnClick="btnSearch_Click" OnClientClick="return loading()" />
                             <img id="loadingImg" src="/image/WaitImg/loadingA.gif" style="display: none;" />
@@ -339,10 +399,10 @@
                                     <asp:Label ID="labOtherPrice" runat="server" Text="0"></asp:Label>
                                 </td>
                                 <td>
-                                   道具费用：
+                                    道具费用：
                                 </td>
                                 <td style="text-align: left; padding-left: 5px;">
-                                   <asp:Label ID="labPropPrice" runat="server" Text="0"></asp:Label>
+                                    <asp:Label ID="labPropPrice" runat="server" Text="0"></asp:Label>
                                 </td>
                             </tr>
                             <tr class="tr_bai">
@@ -398,8 +458,10 @@
                                     <asp:Label ID="labROtherPrice" runat="server" Text="0"></asp:Label>
                                 </td>
                                 <td>
+                                   道具费用(总数)：
                                 </td>
                                 <td style="text-align: left; padding-left: 5px;">
+                                    <asp:Label ID="labRPropPrice" runat="server" Text="0"></asp:Label>
                                 </td>
                             </tr>
                             <tr class="tr_bai">

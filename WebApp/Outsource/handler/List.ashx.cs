@@ -105,8 +105,11 @@ namespace WebApp.Outsource.handler
             //    return "[" + json.ToString().TrimEnd(',') + "]";
             //}
             #endregion
-            //int typeId=(int)CompanyTypeEnum.Outsource;
+            int typeId=(int)CompanyTypeEnum.Outsource;
             var list = (from company in CurrentContext.DbContext.Company
+                        join region1 in CurrentContext.DbContext.Region
+                        on company.RegionId equals region1.Id into regionTemp
+                        from region in regionTemp.DefaultIfEmpty()
                         join province1 in CurrentContext.DbContext.Place
                         on company.ProvinceId equals province1.ID into provinceTemp
                         from province in provinceTemp.DefaultIfEmpty()
@@ -116,11 +119,12 @@ namespace WebApp.Outsource.handler
                         join user1 in CurrentContext.DbContext.UserInfo
                         on company.CustomerServiceId equals user1.UserId into userTemp
                         from user in userTemp.DefaultIfEmpty()
-                        //where company.TypeId == typeId
-                        where company.ParentId>0
+                        where company.TypeId == typeId
+                        //where company.ParentId>0
                         select new
                         {
                             company,
+                            Region=region.RegionName,
                             Province = province.PlaceName,
                             City = city.PlaceName,
                             user.RealName
@@ -151,7 +155,7 @@ namespace WebApp.Outsource.handler
                     }
                     string joinDate = s.company.JoinDate != null ? DateTime.Parse(s.company.JoinDate.ToString()).ToShortDateString() : "";
                     string state = s.company.IsDelete != null && s.company.IsDelete == true ? "0" : "1";
-                    json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.company.Id + "\",\"TypeId\":\"" + s.company.TypeId + "\",\"CompanyName\":\"" + s.company.CompanyName + "\",\"ShortName\":\"" + s.company.ShortName + "\",\"ParentId\":\"" + s.company.ParentId + "\",\"ProvinceId\":\"" + s.company.ProvinceId + "\",\"CityId\":\"" + s.company.CityId + "\",\"Province\":\"" + s.Province + "\",\"City\":\"" + s.City + "\",\"Contact\":\"" + s.company.Contact + "\",\"Tel\":\"" + s.company.Tel + "\",\"Address\":\"" + s.company.Address + "\",\"State\":\"" + state + "\",\"ProvinceIds\":\"" + inchargeProvinceIds + "\",\"CityIds\":\"" + inchargeCityIds + "\",\"InchargeProvince\":\"" + inchargeProvince + "\",\"InchargeCity\":\"" + inchargeCity + "\",\"JoinDate\":\"" + joinDate + "\",\"CompanyCode\":\"" + s.company.CompanyCode + "\",\"CustomerServiceId\":\"" + s.company.CustomerServiceId + "\",\"CustomerServiceName\":\""+s.RealName+"\"},");
+                    json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.company.Id + "\",\"TypeId\":\"" + s.company.TypeId + "\",\"CompanyName\":\"" + s.company.CompanyName + "\",\"ShortName\":\"" + s.company.ShortName + "\",\"ParentId\":\"" + s.company.ParentId + "\",\"RegionId\":\""+s.company.RegionId+"\",\"ProvinceId\":\"" + s.company.ProvinceId + "\",\"CityId\":\"" + s.company.CityId + "\",\"Region\":\""+s.Region+"\",\"Province\":\"" + s.Province + "\",\"City\":\"" + s.City + "\",\"Contact\":\"" + s.company.Contact + "\",\"Tel\":\"" + s.company.Tel + "\",\"Address\":\"" + s.company.Address + "\",\"State\":\"" + state + "\",\"ProvinceIds\":\"" + inchargeProvinceIds + "\",\"CityIds\":\"" + inchargeCityIds + "\",\"InchargeProvince\":\"" + inchargeProvince + "\",\"InchargeCity\":\"" + inchargeCity + "\",\"JoinDate\":\"" + joinDate + "\",\"CompanyCode\":\"" + s.company.CompanyCode + "\",\"CustomerServiceId\":\"" + s.company.CustomerServiceId + "\",\"CustomerServiceName\":\""+s.RealName+"\"},");
                     index++;
                 });
                 if (json.Length > 0)
@@ -191,6 +195,7 @@ namespace WebApp.Outsource.handler
                                    {
                                        //newModel.CompanyCode = model.CompanyCode;
                                        newModel.Address = model.Address;
+                                       newModel.RegionId = model.RegionId;
                                        newModel.CityId = model.CityId;
                                        newModel.CompanyName = model.CompanyName;
                                        newModel.Contact = model.Contact;

@@ -22,6 +22,8 @@ namespace WebApp.OutsourcingOrder.Statistics
         string region = string.Empty;
         string province = string.Empty;
         string city = string.Empty;
+        string beginDateStr = string.Empty;
+        string endDateStr = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["outsourceId"] != null)
@@ -47,6 +49,14 @@ namespace WebApp.OutsourcingOrder.Statistics
             if (Request.QueryString["city"] != null)
             {
                 city = Request.QueryString["city"];
+            }
+            if (Request.QueryString["beginDate"] != null)
+            {
+                beginDateStr = Request.QueryString["beginDate"];
+            }
+            if (Request.QueryString["endDate"] != null)
+            {
+                endDateStr = Request.QueryString["endDate"];
             }
             if (!IsPostBack)
             {
@@ -278,15 +288,15 @@ namespace WebApp.OutsourcingOrder.Statistics
                 guidanceIdList = StringHelper.ToIntList(guidanceId, ',');
 
             }
-            bool selectedSubject = false;
-            if (!string.IsNullOrWhiteSpace(subjectId))
-            {
-                subjectIdList = StringHelper.ToIntList(subjectId, ',');
-                Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
-                List<int> hMSubjectIdList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
-                subjectIdList.AddRange(hMSubjectIdList);
-                selectedSubject = true;
-            }
+            //bool selectedSubject = false;
+            //if (!string.IsNullOrWhiteSpace(subjectId))
+            //{
+            //    subjectIdList = StringHelper.ToIntList(subjectId, ',');
+            //    Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
+            //    List<int> hMSubjectIdList = new SubjectBLL().GetList(s => guidanceIdList.Contains(s.GuidanceId ?? 0) && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
+            //    subjectIdList.AddRange(hMSubjectIdList);
+            //    selectedSubject = true;
+            //}
             if (!string.IsNullOrWhiteSpace(region))
             {
                 regionList = StringHelper.ToStringList(region, ',', LowerUpperEnum.ToLower);
@@ -315,6 +325,12 @@ namespace WebApp.OutsourcingOrder.Statistics
                                       orderDetail,
                                       guidance
                                   }).ToList();
+                if (!string.IsNullOrWhiteSpace(beginDateStr) && StringHelper.IsDateTime(beginDateStr) && !string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
+                {
+                    DateTime beginDate = DateTime.Parse(beginDateStr);
+                    DateTime endDate = DateTime.Parse(endDateStr);
+                    orderList0 = orderList0.Where(s => s.orderDetail.AddDate >= beginDate && s.orderDetail.AddDate < endDate.AddDays(1)).ToList();
+                }
                 if (regionList.Any())
                 {
                     orderList0 = orderList0.Where(s => s.orderDetail.Region != null && regionList.Contains(s.orderDetail.Region.ToLower())).ToList();
@@ -328,13 +344,17 @@ namespace WebApp.OutsourcingOrder.Statistics
                     orderList0 = orderList0.Where(s => cityList.Contains(s.orderDetail.City)).ToList();
                 }
                 var orderList = orderList0.Where(s => s.orderDetail.SubjectId > 0).ToList();
+                List<int> newSubjectIdList = new List<int>();
                 if (subjectIdList.Any())
                 {
-
                     orderList = orderList.Where(s => subjectIdList.Contains(s.orderDetail.SubjectId ?? 0)).ToList();
-                    
+                    newSubjectIdList = subjectIdList;
                 }
-
+                else
+                {
+                    newSubjectIdList = orderList.Select(s => s.orderDetail.SubjectId ?? 0).Distinct().ToList();
+                }
+                
                 List<int> shopIdList = orderList.Select(s => s.orderDetail.ShopId ?? 0).ToList();
                 //List<int> installShopIdList = shopIdList;
                
@@ -415,7 +435,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                 var orderList3 = orderList0.Where(s => s.orderDetail.SubjectId == 0 && s.orderDetail.OrderType == (int)OrderTypeEnum.安装费).ToList();
                 if (subjectIdList.Any())
                 {
-                    if (selectedSubject && orderList3.Where(s => (s.orderDetail.BelongSubjectId ?? 0) > 0).Any())
+                    if (orderList3.Where(s => (s.orderDetail.BelongSubjectId ?? 0) > 0).Any())
                     {
                         orderList3 = orderList3.Where(s => subjectIdList.Contains(s.orderDetail.BelongSubjectId ?? 0)).ToList();
                     }

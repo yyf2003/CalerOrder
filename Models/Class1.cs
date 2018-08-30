@@ -45,7 +45,7 @@ namespace Models
         public int PriceItemId { get; set; }
         public int? OutsourceType { get; set; }
         public int? CustomerId { get; set; }
-        
+        public int? OutsourceId { get; set; }
         
     }
 

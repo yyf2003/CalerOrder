@@ -64,17 +64,17 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
 })
 
 Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
-    $("#loadGuidance").hide();
-    $("#loadPropGuidance").hide();
-    $("#loadShopType").hide();
-    $("#loadUser").hide();
-    $("#loadCategory").hide();
-    $("#loadProvince").hide();
-    $("#loadCity").hide();
-    $("#loadSubject").hide();
-    $("#loadPropSubject").hide();
-    $("#loadCustomerService").hide();
-    $("#loadSubjectNames").hide();
+//    $("#loadGuidance").hide();
+//    $("#loadPropGuidance").hide();
+//    $("#loadShopType").hide();
+//    $("#loadUser").hide();
+//    $("#loadCategory").hide();
+//    $("#loadProvince").hide();
+//    $("#loadCity").hide();
+//    $("#loadSubject").hide();
+//    $("#loadPropSubject").hide();
+//    $("#loadCustomerService").hide();
+//    $("#loadSubjectNames").hide();
     $("#cbCheckAllGuidance").change(function () {
         var checked = this.checked;
         $("input[name^='cblGuidanceList']").each(function () {
@@ -390,7 +390,7 @@ $(function () {
     $("#btnExport").click(function () {
         var guidanceIds = ""; //pop活动
         var subjectIds = ""; //pop项目
-       
+
         var regions = "";
         var provinces = "";
         var citys = "";
@@ -459,14 +459,18 @@ $(function () {
         var isExportInstall = 0;
         var installPrice = "";
         var freight = "";
+
         if ($("#cbInstallPrice").attr("checked") == "checked") {
             isExportInstall = 1;
             installPrice = $("#labInstallPrice").html();
         }
+        var dateSearchType = $("input:radio[name$='rblDateType']:checked").val() || 1;
+        //alert(dateSearchType);
+        //return false;
         freight = $("#labExpressPrice").html();
         $("#exportWaiting").show();
         checkExport();
-        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&subjectIds=" + subjectIds + "&regions=" + regions + "&provinces=" + provinces + "&citys=" + citys + "&isExportInstall=" + isExportInstall + "&installPrice=" + installPrice + "&freight=" + freight + "&subjectChannel=" + subjectChannel + "&shopType=" + shopType + "&customerServiceIds=" + customerServiceIds + "&subjectCategory=" + subjectCategory+"&beginDate=" + beginDate + "&endDate=" + endDate;
+        var url = "handler/ExportDetail.ashx?guidanceIds=" + guidanceIds + "&subjectIds=" + subjectIds + "&regions=" + regions + "&provinces=" + provinces + "&citys=" + citys + "&isExportInstall=" + isExportInstall + "&installPrice=" + installPrice + "&freight=" + freight + "&subjectChannel=" + subjectChannel + "&shopType=" + shopType + "&customerServiceIds=" + customerServiceIds + "&subjectCategory=" + subjectCategory + "&beginDate=" + beginDate + "&endDate=" + endDate + "&dateSearchType=" + dateSearchType;
         $("#exportFrame").attr("src", url);
     })
 

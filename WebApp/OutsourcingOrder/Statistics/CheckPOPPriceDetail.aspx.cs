@@ -133,6 +133,12 @@ namespace WebApp.OutsourcingOrder.Statistics
                                      order,
                                      subject
                                  }).ToList();
+            if (!string.IsNullOrWhiteSpace(beginDateStr) && StringHelper.IsDateTime(beginDateStr) && !string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
+            {
+                DateTime beginDate = DateTime.Parse(beginDateStr);
+                DateTime endDate = DateTime.Parse(endDateStr);
+                assignShopList = assignShopList.Where(s => s.order.AddDate >= beginDate && s.order.AddDate < endDate.AddDays(1)).ToList();
+            }
             if (guidanceIdList.Any())
             {
                 assignShopList = assignShopList.Where(s => guidanceIdList.Contains(s.order.GuidanceId??0)).ToList();
@@ -163,16 +169,16 @@ namespace WebApp.OutsourcingOrder.Statistics
                 string shopNo = txtShopNo.Text.Trim().ToUpper();
                 assignShopList = assignShopList.Where(s => s.order.ShopNo.ToUpper().Contains(shopNo)).ToList();
             }
-            if (!string.IsNullOrWhiteSpace(checkType) && checkType=="byDate")
-            {
-                if (!string.IsNullOrWhiteSpace(beginDateStr) && StringHelper.IsDateTime(beginDateStr) && !string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
-                {
-                    DateTime beginDate = DateTime.Parse(beginDateStr);
-                    DateTime endDate = DateTime.Parse(endDateStr);
-                    assignShopList = assignShopList.Where(s =>s.subject.AddDate>=beginDate && s.subject.AddDate < endDate.AddDays(1)).ToList();
-                }
+            //if (!string.IsNullOrWhiteSpace(checkType) && checkType=="byDate")
+            //{
+            //    if (!string.IsNullOrWhiteSpace(beginDateStr) && StringHelper.IsDateTime(beginDateStr) && !string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
+            //    {
+            //        DateTime beginDate = DateTime.Parse(beginDateStr);
+            //        DateTime endDate = DateTime.Parse(endDateStr);
+            //        assignShopList = assignShopList.Where(s =>s.subject.AddDate>=beginDate && s.subject.AddDate < endDate.AddDays(1)).ToList();
+            //    }
                 
-            }
+            //}
             if (!IsPostBack)
             {
                 decimal materialPrice = 0;

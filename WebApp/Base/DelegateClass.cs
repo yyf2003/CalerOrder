@@ -3219,11 +3219,7 @@ namespace WebApp.Base
                 List<FinalOrderDetailTemp> orderListSave = RedisHelper.Get<List<FinalOrderDetailTemp>>(redisOrderKey);
                 if (orderListSave == null || !orderListSave.Any())
                 {
-                    //List<int> guidanceIdTempList = (from guidance in CurrentContext.DbContext.SubjectGuidance
-                    //                                where ((guidance.ActivityTypeId ?? 1) == (int)GuidanceTypeEnum.Install)
-                    //                                && (guidance.HasInstallFees ?? true)
-                    //                                && (guidance.IsDelete == null || guidance.IsDelete == false)
-                    //                                select guidance.ItemId).OrderByDescending(s => s).Take(30).ToList();
+                   
                     orderListSave = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
                                      join subject in CurrentContext.DbContext.Subject
                                      on order.SubjectId equals subject.Id
@@ -3288,6 +3284,55 @@ namespace WebApp.Base
             }
         }
 
+
+        #endregion
+
+        #region 删除缓存数据
+
+        public delegate void DeleDeleteOrderRedisData(int guidanceId,int subjectId, int subjectType);
+        void CallBackMethod5(IAsyncResult ia)
+        {
+            DeleDeleteOrderRedisData dele = ia.AsyncState as DeleDeleteOrderRedisData;
+            dele.EndInvoke(ia);
+        }
+
+        public void DeleteOrderRedisData(int guidanceId, int subjectId, int subjectType)
+        {
+            DeleDeleteOrderRedisData dele = new DeleDeleteOrderRedisData(DeleteOrderRedisDataHandler);
+            AsyncCallback callback = new AsyncCallback(CallBackMethod5);
+            dele.BeginInvoke(guidanceId, subjectId, subjectType, callback, dele);
+        }
+
+        void DeleteOrderRedisDataHandler(int guidanceId, int subjectId, int subjectType)
+        {
+            string redisOrderKey = "InstallPriceOrderList" + guidanceId;
+            List<FinalOrderDetailTemp> orderListSave = RedisHelper.Get<List<FinalOrderDetailTemp>>(redisOrderKey);
+            if (orderListSave != null && orderListSave.Any())
+            {
+                List<int> deleteOrderIdList = new List<int>();
+                if (subjectType == (int)SubjectTypeEnum.HC订单 || subjectType == (int)SubjectTypeEnum.分区补单 || subjectType == (int)SubjectTypeEnum.分区增补 || subjectType == (int)SubjectTypeEnum.新开店订单)
+                {
+                    deleteOrderIdList = orderListSave.Where(s => s.RegionSupplementId == subjectId).Select(s=>s.Id).ToList();
+                }
+                else
+                {
+                    deleteOrderIdList = orderListSave.Where(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0).Select(s => s.Id).ToList();
+                }
+                if (deleteOrderIdList.Any())
+                {
+                    orderListSave = orderListSave.Where(s => !deleteOrderIdList.Contains(s.Id)).ToList();
+                    RedisHelper.Set(redisOrderKey, orderListSave);
+                    //if (orderListSave.Any())
+                    //{
+                    //    RedisHelper.Set(redisOrderKey, orderListSave);
+                    //}
+                    //else
+                    //{
+                    //    RedisHelper.DeleteKey(redisOrderKey);
+                    //}
+                }
+            }
+        }
         #endregion
 
     }

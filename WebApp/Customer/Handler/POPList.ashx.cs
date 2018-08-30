@@ -209,13 +209,13 @@ namespace WebApp.Customer.Handler
                 
                 if (model != null)
                 {
-                    int outsourceId = 0;
+                    //int outsourceId = 0;
                     int shopId = model.ShopId ?? 0;
-                    if (shopId == 0 || (model.ProduceOutsourceId ?? 0) > 0)
-                        shopId = GetShopId(model.ShopNo, out outsourceId);
+                    //if (shopId == 0 || (model.ProduceOutsourceId ?? 0) > 0)
+                    //    shopId = GetShopId(model.ShopNo, out outsourceId);
                     if (shopId > 0)
                     {
-                        
+                        //int outsourceId=GetShopOutsourceId(shopId);
                         model.ShopId = shopId;
                         if (!CheckPOP(model))
                         {
@@ -372,6 +372,17 @@ namespace WebApp.Customer.Handler
             {
                 outsourceId = model.OutsourceId ?? 0;
                 return model.Id;
+            }
+            else
+                return 0;
+        }
+
+        int GetShopOutsourceId(int shopId)
+        {
+            var model = new ShopBLL().GetModel(shopId);
+            if (model != null)
+            {
+                return (model.OutsourceId ?? 0);
             }
             else
                 return 0;

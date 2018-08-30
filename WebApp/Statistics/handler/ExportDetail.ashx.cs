@@ -84,6 +84,10 @@ namespace WebApp.Statistics.handler
             {
                 end = context.Request.QueryString["endDate"];
             }
+            if (context.Request.QueryString["dateSearchType"] != null)
+            {
+                dateSearchType = int.Parse(context.Request.QueryString["dateSearchType"]);
+            }
             if (exportType == "byShop")
                 ExportByShop();
             else
@@ -148,7 +152,7 @@ namespace WebApp.Statistics.handler
                                     && (subject.IsDelete == null || subject.IsDelete == false)
                                     && (subject.ApproveState == 1)
                                     && (order.IsDelete == null || order.IsDelete == false)   
-                                     && (regionList.Any() ? regionList.Contains(order.Region.ToLower()) : 1 == 1)
+                                     && (regionList.Any() ? (order.Region!=null && regionList.Contains(order.Region.ToLower())) : 1 == 1)
 
                                      select new
                                      {
@@ -1035,7 +1039,7 @@ namespace WebApp.Statistics.handler
                             ms.Flush();
                             sheet = null;
                             workBook = null;
-                            OperateFile.DownLoadFile(ms, guidanceName + fileName);
+                            OperateFile.DownLoadFile(ms, fileName);
 
                         }
                     }

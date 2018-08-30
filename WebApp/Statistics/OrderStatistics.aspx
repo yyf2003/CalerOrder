@@ -58,34 +58,18 @@
                     </tr>
                     <tr class="tr_bai">
                         <td style="width: 120px;">
-                            按活动时间查询
+                            按活动月查询
                             <asp:RadioButton ID="rbOnGuidanceSearch" GroupName="rbSearchType" runat="server"
                                 Checked="true" AutoPostBack="true" OnCheckedChanged="rbOnGuidanceSearch_CheckedChanged" />
                         </td>
                         <td style="text-align: left;">
-                            <%--<div style="margin-left: 5px;">
-                                <asp:TextBox ID="txtGuidanceBegin" runat="server" onclick="WdatePicker()" autocomplete="off"
-                                    CssClass="Wdate"></asp:TextBox>
-                                —
-                                <asp:TextBox ID="txtGuidanceEnd" runat="server" onclick="WdatePicker()" autocomplete="off"
-                                    CssClass="Wdate"></asp:TextBox>
-                                &nbsp;&nbsp;
-                                <asp:Button ID="btnGetGuidance" runat="server" Text="获取活动" class="easyui-linkbutton"
-                                    Style="width: 65px; height: 26px;" OnClick="btnGetGuidance_Click" OnClientClick="return CheckGuidanceDate()" />
-                            </div>--%>
+                           
                             <div>
                                 <table style="width: 100%;">
                                     <tr>
+                                       
                                         <td style="width: 120px; text-align: center;">
-                                            按时间段显示：
-                                        </td>
-                                        <td style="width: 200px; text-align: left;">
-                                            <asp:Label ID="labBeginDate" runat="server" Text=""></asp:Label>
-                                            <asp:Label ID="labSeparator" runat="server" Text="—" Visible="false"></asp:Label>
-                                            <asp:Label ID="labEndDate" runat="server" Text=""></asp:Label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            按活动月显示：
+                                            活动月份：
                                         </td>
                                         <td style="text-align: left; padding-left: 8px;">
                                             <%--<asp:Label ID="labGuidanceMonth" runat="server" Text=""></asp:Label>--%>
@@ -290,9 +274,7 @@
                     <asp:CheckBox ID="cbShowSubjectNameList" runat="server" AutoPostBack="true" OnCheckedChanged="cbShowSubjectNameList_CheckedChanged" />显示
                     <img id="loadSubjectNames" style="display: none;" src="../image/WaitImg/loadingA.gif" />
                 </div>
-                <%-- <asp:Panel ID="Panel_SubjectNameList" runat="server" Visible="false">
-                   
-                </asp:Panel>--%>
+              
                 <div id="Panel_SubjectNameList" runat="server" style="display: none;">
                     <table class="table">
                         <tr class="tr_bai">

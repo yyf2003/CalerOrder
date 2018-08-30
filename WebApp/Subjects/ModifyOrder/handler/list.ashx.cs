@@ -657,6 +657,7 @@ namespace WebApp.Subjects.ModifyOrder.handler
                                     {
                                         newOrderModel.OrderPrice = orderModel.OrderPrice;
                                         newOrderModel.PayOrderPrice = orderModel.PayOrderPrice;
+                                        newOrderModel.Quantity = orderModel.Quantity;
                                     }
                                     else
                                     {

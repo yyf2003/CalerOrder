@@ -158,9 +158,9 @@
                  <asp:Button ID="btnExport" runat="server" Text="导出报价单模板" class="layui-btn layui-btn-small"
                         OnClick="btnExport_Click" />
 
-                 &nbsp;&nbsp;&nbsp;&nbsp;
+                <%-- &nbsp;&nbsp;&nbsp;&nbsp;
                  <asp:Button ID="btnExportOrder" runat="server" Text="导出订单" class="layui-btn layui-btn-small"
-                        OnClick="btnExportOrder_Click" />
+                        OnClick="btnExportOrder_Click" />--%>
               </td>
             </tr>
         </table>
@@ -340,7 +340,7 @@
                 </td>
                 <td style="text-align: center;">
                     <div style="position: relative;">
-                        <asp:TextBox ID="txtAddRate" runat="server" MaxLength="5" Style="width: 40px; text-align: center;"></asp:TextBox>
+                        <asp:TextBox ID="txtAddRate" runat="server" MaxLength="5" autocomplete="off" Style="width: 40px; text-align: center;"></asp:TextBox>
                         <span style="font-weight: bolder;">%</span>
                         <div id="divAddRate" style="display: none; position: absolute; width: 40px; background-color: White;
                             border: 1px solid #ccc; padding-top: 2px; z-index: 100;">

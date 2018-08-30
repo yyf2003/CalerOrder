@@ -30,5 +30,6 @@ namespace Models
         public Nullable<System.DateTime> AddDate { get; set; }
         public Nullable<bool> IsDelete { get; set; }
         public Nullable<int> CustomerServiceId { get; set; }
+        public Nullable<int> RegionId { get; set; }
     }
 }

@@ -1198,7 +1198,7 @@ namespace WebApp.QuoteOrderManager
             }
             List<QuoteModel> quoteOrderList = new List<QuoteModel>();
             List<QuoteOrderDetail> popOrderList = new List<QuoteOrderDetail>();
-            //保存每个位置区域的订单
+            //保存pop的订单
             Session["AddQuoteOrderList"] = null;
             if (orderList.Any())
             {
@@ -1622,6 +1622,7 @@ namespace WebApp.QuoteOrderManager
         /// <param name="orderList"></param>
         /// 
         List<InstallPriceQuoteModel> InstallPriceQuoteModelList = new List<InstallPriceQuoteModel>();
+        List<Shop> oohInstalShopList = new List<Shop>();
         void BindInstallPrice(List<QuoteOrderDetail> orderList)
         {
             //List<string> cityTierList = new List<string>() { "T1", "T2", "T3" };
@@ -1667,7 +1668,7 @@ namespace WebApp.QuoteOrderManager
             importInstallQuoteList = importQuoteOrderBll.GetList(s => s.ItemId == itemId && s.OrderType == (int)OrderTypeEnum.安装费);
             guidanceIdList.ForEach(gid =>
             {
-                //安装费
+                #region 活动安装费（自动归类）
                 List<int> installShopIdList = orderList.Where(s => s.GuidanceId == gid).Select(s => s.ShopId ?? 0).Distinct().ToList();
 
                 var installPriceList = (from install in CurrentContext.DbContext.InstallPriceShopInfo
@@ -1736,10 +1737,23 @@ namespace WebApp.QuoteOrderManager
                             if ((s.install.OOHPrice ?? 0) > 0)
                             {
                                 //installPriceTotal += (s.install.OOHPrice ?? 0);
-                                Shop shop = new Shop();
-                                shop = s.shop;
-                                shop.OOHInstallPrice = s.install.OOHPrice ?? 0;
-                                //OOHInstallPriceList.Add(shop);
+                                bool isExist0 = false;
+                                for (int i = 0; i < oohInstalShopList.Count; i++)
+                                {
+                                    if (oohInstalShopList[i].Id == s.install.ShopId)
+                                    {
+                                        oohInstalShopList[i].OOHInstallPrice += (s.install.OOHPrice ?? 0);
+                                        isExist0 = true;
+                                    }
+                                }
+                                if (!isExist0)
+                                {
+                                    Shop shop = new Shop();
+                                    shop = s.shop;
+                                    shop.OOHInstallPrice = s.install.OOHPrice ?? 0;
+                                    oohInstalShopList.Add(shop);
+                                }
+                                
                                 if (s.install.OOHPrice == 5000)
                                 {
                                     oohLevelOneCount++;
@@ -1962,7 +1976,65 @@ namespace WebApp.QuoteOrderManager
                 }
 
 
+                #endregion
 
+                #region 安装费订单
+                var installnstallPriceOrderList = orderList.Where(s=>s.GuidanceId==gid && (subjectIdList.Any() ? subjectIdList.Contains(s.SubjectId ?? 0) : 1 == 1) && s.OrderType==(int)OrderTypeEnum.安装费 && (s.OrderPrice??0)>0).ToList();
+                if (itemId == 0)
+                {
+                    installnstallPriceOrderList = installnstallPriceOrderList.Where(s => (s.QuoteItemId ?? 0) == 0).ToList();
+                }
+                if (installnstallPriceOrderList.Any())
+                {
+                    List<decimal> orderInstallPriceList = installnstallPriceOrderList.Select(s => s.OrderPrice ?? 0).ToList();
+                    orderInstallPriceList.ForEach(price => {
+                        if (price == 800)
+                        {
+                            basicLevelOneCount++;
+                            basicLevelOnePrice += 800;
+                            installPriceStandard += 800;
+                        }
+                        else if (price == 400)
+                        {
+                            basicLevelTwoCount++;
+                            basicLevelTwoPrice += 400;
+                            installPriceStandard += 400;
+                        }
+                        else if (price == 150)
+                        {
+                            basicLevelThreeCount++;
+                            basicLevelThreePrice += 150;
+                            installPriceStandard += 150;
+                        }
+                        else
+                        {
+                            bool isExist = false;
+                            int index = 0;
+                            foreach (var oh in otherInstallPriceList)
+                            {
+                                if (oh.PriceType == "店铺安装费" && oh.Price == price)
+                                {
+                                    isExist = true;
+                                    break;
+                                }
+                                index++;
+                            }
+                            if (isExist)
+                            {
+                                otherInstallPriceList[index].Count++;
+                            }
+                            else
+                            {
+                                otherInstallPrice = new OtherInstallPriceClass();
+                                otherInstallPrice.Count = 1;
+                                otherInstallPrice.Price = price;
+                                otherInstallPrice.PriceType = "店铺安装费";
+                                otherInstallPriceList.Add(otherInstallPrice);
+                            }
+                        }
+                    });
+                }
+                #endregion
             });
             #region 赋值
             labInstallShop.Text = installShopList.Distinct().Count().ToString();
@@ -2312,6 +2384,10 @@ namespace WebApp.QuoteOrderManager
             {
                 Session["InstallPriceQuoteModel"] = InstallPriceQuoteModelList;
             }
+            if (oohInstalShopList.Any())
+            {
+                Session["AddQuoteOOHInstalShopList"] = oohInstalShopList;
+            }
         }
 
         void OtherInstallPriceCombineCell()
@@ -2629,8 +2705,7 @@ namespace WebApp.QuoteOrderManager
         decimal popImportTotalPrice = 0;
         decimal popImportTotalArea = 0;
         decimal addRateTotalPrie = 0;
-        //decimal popSupplementTotalPrice = 0;
-        //decimal popSupplementTotalArea = 0;
+       
         List<ImportQuoteOrder> importPOPQuoteList = new List<ImportQuoteOrder>();
         List<QuoteOrderDetail> quoteOrderDetailList = new List<QuoteOrderDetail>();
         List<QuoteDifferenceDetail> differenceDetailList = new List<QuoteDifferenceDetail>();
@@ -4133,6 +4208,7 @@ namespace WebApp.QuoteOrderManager
                 
 
                 #region 导出POP
+                
                 exportQuoteOrderList.ToList().ForEach(s =>
                 {
                     bool isGo = false;
@@ -4200,10 +4276,7 @@ namespace WebApp.QuoteOrderManager
                             if (!string.IsNullOrWhiteSpace(cellVal) && StringHelper.ReplaceSpace(cellVal).ToLower() == StringHelper.ReplaceSpace(s.Sheet).ToLower())
                             {
                                 isGo = true;
-                                //if (oneSheetRowCount < 3)
-                                //{
-                                //    startRow += (3 - oneSheetRowCount) - 1;
-                                //}
+                              
                                 oneSheetRowCount = 0;
                                 currSheet = s.Sheet;
                                 int listCount = exportQuoteOrderList.Where(q => q.Sheet == currSheet).Count();
@@ -4213,9 +4286,7 @@ namespace WebApp.QuoteOrderManager
                                     int insertRowCount = listCount - 3;
                                     insertRowTotalCount += insertRowCount;
                                     InsertRow(sheet, startRow + 2, insertRowCount, sourceRow);
-                                    //sheet.ShiftRows(startRow + 2, sheet.LastRowNum + ((startRow + 2)*2), -(startRow + 2), true, false);
-
-                                    //sourceRow.GetCell(7).SetCellFormula(string.Format("SUM(G{0}:G{1})", startRow + 1, startRow + 3 + insertRowCount));
+                                   
                                 }
                             }
                         }
@@ -4256,14 +4327,20 @@ namespace WebApp.QuoteOrderManager
                 #endregion
 
 
+                #region 安装费
+                decimal oohLevel1Count = 0;
+                decimal oohLevel2Count = 0;
+                decimal oohLevel3Count = 0;
+                decimal oohLevel4Count = 0;
+                decimal basicLevel1Count = 0;
+                decimal basicLevel2Count = 0;
+                decimal basicLevel3Count = 0;
+                
 
-
-
-                    #region 安装费
-                    if (Session["InstallPriceQuoteModel"] != null)
-                    {
+                if (Session["InstallPriceQuoteModel"] != null)
+                {
                         InstallPriceQuoteModelList = Session["InstallPriceQuoteModel"] as List<InstallPriceQuoteModel>;
-                    }
+                }
                 if (InstallPriceQuoteModelList.Any())
                 {
                     //startRow += insertRowTotalCount;
@@ -4277,25 +4354,26 @@ namespace WebApp.QuoteOrderManager
                             {
                                 //sheet.Cells[46 + addRowCount, 7].Value = s.Amount.ToString();
                                 rowIndex = 46 + insertRowTotalCount;
+                                oohLevel1Count+=s.Amount;
 
                             }
                             if (s.UnitPrice == 2700)
                             {
                                 //sheet.Cells[47 + addRowCount, 7].Value = s.Amount.ToString();
                                 rowIndex = 47 + insertRowTotalCount;
-
+                                oohLevel2Count += s.Amount;
                             }
                             if (s.UnitPrice == 1800)
                             {
                                 //sheet.Cells[48 + addRowCount, 7].Value = s.Amount.ToString();
                                 rowIndex = 48 + insertRowTotalCount;
-
+                                oohLevel3Count += s.Amount;
                             }
                             if (s.UnitPrice == 600)
                             {
                                 //sheet.Cells[49 + addRowCount, 7].Value = s.Amount.ToString();
                                 rowIndex = 49 + insertRowTotalCount;
-
+                                oohLevel4Count += s.Amount;
                             }
                             if (rowIndex > 0)
                             {
@@ -4380,16 +4458,19 @@ namespace WebApp.QuoteOrderManager
                                 {
                                     //sheet.Cells[51 + addRowCount, 7].Value = s.Amount.ToString();
                                     rowIndex = 51 + insertRowTotalCount;
+                                    basicLevel1Count += s.Amount;
                                 }
                                 if (s.UnitPrice == 400)
                                 {
                                     //sheet.Cells[53 + addRowCount, 7].Value = s.Amount.ToString();
                                     rowIndex = 53 + insertRowTotalCount;
+                                    basicLevel2Count += s.Amount;
                                 }
                                 if (s.UnitPrice == 150)
                                 {
                                     //sheet.Cells[55 + addRowCount, 7].Value = s.Amount.ToString();
                                     rowIndex = 55 + insertRowTotalCount;
+                                    basicLevel3Count += s.Amount;
                                 }
                             }
                             if (rowIndex > 0)
@@ -4409,12 +4490,153 @@ namespace WebApp.QuoteOrderManager
                         });
                     }
                 }
+                //折算的安装费
+                List<SpecialPriceQuoteDetail> otherInstallPriceList = new SpecialPriceQuoteDetailBLL().GetList(s => s.ItemId == itemId);
+                var otherOohList = otherInstallPriceList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.OOH).ToList();
+                otherOohList.ForEach(s => {
+                    int rowIndex = 0;
+                    if (s.InstallPriceLevel == 5000)
+                    {
+                        //sheet.Cells[46 + addRowCount, 7].Value = s.Amount.ToString();
+                        rowIndex = 46 + insertRowTotalCount;
+                        oohLevel1Count += (s.Quantity ?? 0);
+                        IRow dataRow = sheet.GetRow(rowIndex);
+                        if (dataRow == null)
+                            dataRow = sheet.CreateRow(rowIndex);
+                        for (int i = 0; i < 20; i++)
+                        {
+                            ICell cell = dataRow.GetCell(i);
+                            if (cell == null)
+                                cell = dataRow.CreateCell(i);
+
+                        }
+                        dataRow.GetCell(6).SetCellValue(double.Parse(oohLevel1Count.ToString()));
+                    }
+                    if (s.InstallPriceLevel == 2700)
+                    {
+                        //sheet.Cells[47 + addRowCount, 7].Value = s.Amount.ToString();
+                        rowIndex = 47 + insertRowTotalCount;
+                        oohLevel2Count += (s.Quantity ?? 0);
+
+                        IRow dataRow = sheet.GetRow(rowIndex);
+                        if (dataRow == null)
+                            dataRow = sheet.CreateRow(rowIndex);
+                        for (int i = 0; i < 20; i++)
+                        {
+                            ICell cell = dataRow.GetCell(i);
+                            if (cell == null)
+                                cell = dataRow.CreateCell(i);
+
+                        }
+                        dataRow.GetCell(6).SetCellValue(double.Parse(oohLevel2Count.ToString()));
+                    }
+                    if (s.InstallPriceLevel == 1800)
+                    {
+                        //sheet.Cells[48 + addRowCount, 7].Value = s.Amount.ToString();
+                        rowIndex = 48 + insertRowTotalCount;
+                        oohLevel3Count += (s.Quantity ?? 0);
+                       
+                        IRow dataRow = sheet.GetRow(rowIndex);
+                        if (dataRow == null)
+                            dataRow = sheet.CreateRow(rowIndex);
+                        for (int i = 0; i < 20; i++)
+                        {
+                            ICell cell = dataRow.GetCell(i);
+                            if (cell == null)
+                                cell = dataRow.CreateCell(i);
+
+                        }
+                        dataRow.GetCell(6).SetCellValue(double.Parse(oohLevel3Count.ToString()));
+                    }
+                    if (s.InstallPriceLevel == 600)
+                    {
+                        //sheet.Cells[49 + addRowCount, 7].Value = s.Amount.ToString();
+                        rowIndex = 49 + insertRowTotalCount;
+                        oohLevel4Count += (s.Quantity ?? 0);
+
+                        IRow dataRow = sheet.GetRow(rowIndex);
+                        if (dataRow == null)
+                            dataRow = sheet.CreateRow(rowIndex);
+                        for (int i = 0; i < 20; i++)
+                        {
+                            ICell cell = dataRow.GetCell(i);
+                            if (cell == null)
+                                cell = dataRow.CreateCell(i);
+
+                        }
+                        dataRow.GetCell(6).SetCellValue(double.Parse(oohLevel4Count.ToString()));
+                    }
+                    
+                });
+                var otherBasicList = otherInstallPriceList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.Basic).ToList();
+                otherBasicList.ForEach(s => {
+                    int rowIndex = 0;
+                    if (s.InstallPriceLevel == 800)
+                    {
+                        //sheet.Cells[51 + addRowCount, 7].Value = s.Amount.ToString();
+                        rowIndex = 51 + insertRowTotalCount;
+                        basicLevel1Count += (s.Quantity ?? 0);
+
+                        IRow dataRow = sheet.GetRow(rowIndex);
+                        if (dataRow == null)
+                            dataRow = sheet.CreateRow(rowIndex);
+                        for (int i = 0; i < 20; i++)
+                        {
+                            ICell cell = dataRow.GetCell(i);
+                            if (cell == null)
+                                cell = dataRow.CreateCell(i);
+
+                        }
+                        dataRow.GetCell(6).SetCellValue(double.Parse(basicLevel1Count.ToString()));
+                    }
+                    if (s.InstallPriceLevel == 400)
+                    {
+                        //sheet.Cells[53 + addRowCount, 7].Value = s.Amount.ToString();
+                        rowIndex = 53 + insertRowTotalCount;
+                        basicLevel2Count += (s.Quantity ?? 0);
+
+                        IRow dataRow = sheet.GetRow(rowIndex);
+                        if (dataRow == null)
+                            dataRow = sheet.CreateRow(rowIndex);
+                        for (int i = 0; i < 20; i++)
+                        {
+                            ICell cell = dataRow.GetCell(i);
+                            if (cell == null)
+                                cell = dataRow.CreateCell(i);
+
+                        }
+                        dataRow.GetCell(6).SetCellValue(double.Parse(basicLevel2Count.ToString()));
+
+                    }
+                    if (s.InstallPriceLevel == 150)
+                    {
+                        //sheet.Cells[55 + addRowCount, 7].Value = s.Amount.ToString();
+                        rowIndex = 55 + insertRowTotalCount;
+                        basicLevel3Count += (s.Quantity ?? 0);
+
+                        IRow dataRow = sheet.GetRow(rowIndex);
+                        if (dataRow == null)
+                            dataRow = sheet.CreateRow(rowIndex);
+                        for (int i = 0; i < 20; i++)
+                        {
+                            ICell cell = dataRow.GetCell(i);
+                            if (cell == null)
+                                cell = dataRow.CreateCell(i);
+
+                        }
+                        dataRow.GetCell(6).SetCellValue(double.Parse(basicLevel3Count.ToString()));
+                    }
+                    
+                });
                 #endregion
                 HSSFDataValidation validate = SetValidata(12,
                     totalRow, 2, 2, formulaBeginRow, formulaEndRow);
                 // 设定规则  
-                sheet.AddValidationData(validate);  
+                sheet.AddValidationData(validate);
                 sheet.ForceFormulaRecalculation = true;
+
+                HSSFWorkbook book11 = new HSSFWorkbook();
+                
                 
                 #region 导出快递费
 
@@ -4448,7 +4670,100 @@ namespace WebApp.QuoteOrderManager
                     expressSheet = null;
                 }
                 #endregion
-                
+
+                #region 高空安装店铺明细
+                List<Shop> OOHInstallShopList = new List<Shop>();
+                if (Session["AddQuoteOOHInstalShopList"] != null)
+                {
+                    OOHInstallShopList = Session["AddQuoteOOHInstalShopList"] as List<Shop>;
+                }
+                if (OOHInstallShopList.Any())
+                {
+                    ISheet oohInstallShopSheet = workBook.GetSheetAt(2);
+                    int rowIndex = 11;
+                    OOHInstallShopList.ForEach(ooh => {
+                        IRow dataRow = oohInstallShopSheet.GetRow(rowIndex);
+                        if (dataRow == null)
+                            dataRow = oohInstallShopSheet.CreateRow(rowIndex);
+                        for (int i = 0; i < 10; i++)
+                        {
+                            ICell cell = dataRow.GetCell(i);
+                            if (cell == null)
+                                cell = dataRow.CreateCell(i);
+
+                        }
+                        dataRow.GetCell(1).SetCellValue(ooh.ShopNo);
+                        dataRow.GetCell(2).SetCellValue(ooh.ShopName);
+                        dataRow.GetCell(6).SetCellValue(double.Parse(ooh.OOHInstallPrice.ToString()));
+                        rowIndex++;
+                    });
+                    oohInstallShopSheet = null;
+                }
+                #endregion
+
+                #region POP订单
+                if (Session["AddQuoteOrderList"] != null)
+                {
+                    List<QuoteOrderDetail> quoteOrderDetailList = Session["AddQuoteOrderList"] as List<QuoteOrderDetail>;
+                    if (quoteOrderDetailList.Any())
+                    {
+                        var list = (from order in quoteOrderDetailList
+                                   join guidance in CurrentContext.DbContext.SubjectGuidance
+                                   on order.GuidanceId equals guidance.ItemId
+                                   join subject in CurrentContext.DbContext.Subject
+                                   on order.SubjectId equals subject.Id
+                                   select new {
+                                       order,
+                                       subject,
+                                       guidance
+                                   }).ToList();
+                        ISheet orderSheet = workBook.GetSheetAt(3);
+                        int rowIndex = 1;
+                        list.ForEach(s => {
+                            IRow dataRow = orderSheet.GetRow(rowIndex);
+                            if (dataRow == null)
+                                dataRow = orderSheet.CreateRow(rowIndex);
+                            for (int i = 0; i < 25; i++)
+                            {
+                                ICell cell = dataRow.GetCell(i);
+                                if (cell == null)
+                                    cell = dataRow.CreateCell(i);
+
+                            }
+                            dataRow.GetCell(0).SetCellValue(s.guidance.ItemName);
+                            dataRow.GetCell(1).SetCellValue(s.subject.SubjectName);
+                            dataRow.GetCell(2).SetCellValue("POP");
+                            if(s.order.AddDate!=null)
+                                dataRow.GetCell(3).SetCellValue(DateTime.Parse(s.order.AddDate.ToString()).ToShortDateString());
+                            dataRow.GetCell(4).SetCellValue(s.order.ShopNo);
+                            dataRow.GetCell(5).SetCellValue(s.order.ShopName);
+                            dataRow.GetCell(6).SetCellValue(s.order.Province);
+                            dataRow.GetCell(7).SetCellValue(s.order.City);
+                            dataRow.GetCell(8).SetCellValue(s.order.CityTier);
+                            dataRow.GetCell(9).SetCellValue(s.order.Channel);
+                            dataRow.GetCell(10).SetCellValue(s.order.Format);
+                            dataRow.GetCell(11).SetCellValue(s.order.Gender);
+                            dataRow.GetCell(12).SetCellValue(s.order.ChooseImg);
+                            dataRow.GetCell(13).SetCellValue(s.order.Sheet);
+                            dataRow.GetCell(14).SetCellValue(s.order.MachineFrame);
+                            dataRow.GetCell(15).SetCellValue(s.order.PositionDescription);
+                            int quantity = int.Parse((s.order.Quantity ?? 0).ToString());
+                            dataRow.GetCell(16).SetCellValue(quantity);
+                            dataRow.GetCell(17).SetCellValue(s.order.GraphicMaterial);
+                            dataRow.GetCell(18).SetCellValue(s.order.QuoteGraphicMaterial);
+                            dataRow.GetCell(19).SetCellValue(double.Parse((s.order.UnitPrice??0).ToString()));
+                            double width = double.Parse((s.order.TotalGraphicWidth ?? 0).ToString());
+                            double length = double.Parse((s.order.TotalGraphicLength ?? 0).ToString());
+                            double area = (width * length) / 1000000 * quantity;
+                            dataRow.GetCell(20).SetCellValue(width);
+                            dataRow.GetCell(21).SetCellValue(length);
+                            dataRow.GetCell(22).SetCellValue(area);
+                            rowIndex++;
+                        });
+                        orderSheet = null;
+                    }
+                }
+                #endregion
                 using (MemoryStream ms = new MemoryStream())
                 {
                     workBook.Write(ms);

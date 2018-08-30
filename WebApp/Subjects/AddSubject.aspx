@@ -75,12 +75,6 @@
                         </asp:DropDownList>
                         <span style="color: Red;">*</span>
                     </td>
-                    <%--<td style="width: 120px;">
-                        ：
-                    </td>
-                    <td style="text-align: left; padding-left: 5px;">
-                       
-                    </td>--%>
                 </tr>
                 <tr class="tr_bai" id="supplementSubjectListTr" runat="server">
                   <td>
@@ -150,7 +144,6 @@
                     <td colspan="3" style="text-align: left; padding-left: 5px;">
                         <asp:RadioButtonList ID="rblPriceBlong" runat="server" RepeatDirection="Horizontal"
                             RepeatLayout="Flow">
-                          
                         </asp:RadioButtonList>
                     </td>
                 </tr>
@@ -175,8 +168,7 @@
                         &nbsp;&nbsp;&nbsp;&nbsp;
                         基础安装费类型：
                         <asp:RadioButtonList ID="rblSecondInstallType" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
-                           <%--<asp:ListItem Value="1">全部150</asp:ListItem>
-                           <asp:ListItem Value="2">T1-T3级别150,T4-T7按实际算</asp:ListItem>--%>
+                           
                         </asp:RadioButtonList>
                     </td>
                 </tr>
@@ -203,8 +195,7 @@
                         class="easyui-linkbutton" Style="width: 65px; height: 26px;" OnClick="btnNext_Click" />
                     <img id="loadingImg" src="../image/WaitImg/loadingA.gif" style="display: none;" />
                     &nbsp;&nbsp;&nbsp;
-                    <%--<input type="button" value="返 回" onclick="javascript:window.history.go(-1)" class="easyui-linkbutton" 
-            style="width: 65px; height:26px;"/>--%>
+                   
                     <asp:Button ID="btnBack" runat="server" Text="返 回" class="easyui-linkbutton" Style="width: 65px;
                         height: 26px;" OnClick="btnBack_Click" />
                 </asp:Panel>

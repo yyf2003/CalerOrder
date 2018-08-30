@@ -21,8 +21,10 @@ namespace WebApp.Customer.Handler
         ShopBLL shopBll = new ShopBLL();
         //Shop model;
         int customerId;
+        HttpContext context1;
         public void ProcessRequest(HttpContext context)
         {
+            context1 = context;
             context.Response.ContentType = "text/plain";
             string type = string.Empty;
             string result = string.Empty;
@@ -221,6 +223,10 @@ namespace WebApp.Customer.Handler
                         if (newModel.IsDelete == null || newModel.IsDelete == false)
                         {
                             canGo = !CheckShop(model);
+                            if (!canGo)
+                            {
+                                result = "exist";
+                            }
                         }
                         if (canGo)
                         {
@@ -325,10 +331,7 @@ namespace WebApp.Customer.Handler
                                 result = "ok";
                             }
                         }
-                        else
-                        {
-                            result = "exist";
-                        }
+                        
                     }
                 }
                 catch (Exception ex)
@@ -573,9 +576,18 @@ namespace WebApp.Customer.Handler
 
         string GetOutsourceList()
         {
-            //var list = new CompanyBLL().GetList(s => s.TypeId == (int)CompanyTypeEnum.Outsource && (s.IsDelete == null || s.IsDelete == false));
-            var list = new CompanyBLL().GetList(s =>s.ParentId>0 && (s.IsDelete == null || s.IsDelete == false));
-            
+            string region = string.Empty;
+            int regionId = 0;
+            if (context1.Request.QueryString["regionId"] != null)
+            {
+                regionId =int.Parse(context1.Request.QueryString["regionId"]);
+            }
+            var list = new CompanyBLL().GetList(s => s.TypeId == (int)CompanyTypeEnum.Outsource && (s.IsDelete == null || s.IsDelete == false)).OrderBy(s=>s.RegionId).ToList();
+            //var list = new CompanyBLL().GetList(s =>s.ParentId>0 && (s.IsDelete == null || s.IsDelete == false));
+            if (regionId > 0)
+            {
+                list = list.Where(s => s.RegionId == regionId || s.CompanyName.Contains("北京卡乐")).ToList();
+            }
             if (list.Any())
             {
                 StringBuilder json = new StringBuilder();

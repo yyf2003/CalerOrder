@@ -6,8 +6,15 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
         $("#loadPropGuidance").show();
     }
     if (eleId.indexOf("cblGuidanceList") != -1) {
+        $("#loadOutsourceRegion").show();
         $("#loadCategory").show();
         $("#loadSubject").show();
+        $("#loadOutsource").show();
+
+    }
+
+    if (eleId.indexOf("cblOutsourceRegion") != -1) {
+        
         $("#loadOutsource").show();
 
     }
@@ -21,32 +28,33 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
     if (eleId.indexOf("cblSubjectCategory") != -1) {
 
         $("#loadSubject").show();
-        $("#loadOutsource").show();
+        
     }
     if (eleId.indexOf("cblRegion") != -1) {
         $("#loadProvince").show();
         $("#loadSubject").show();
-        $("#loadOutsource").show();
+      
     }
     if (eleId.indexOf("cblProvince") != -1) {
         $("#loadCity").show();
         $("#loadSubject").show();
-        $("#loadOutsource").show();
+       
     }
     if (eleId.indexOf("cblCity") != -1) {
         $("#loadSubject").show();
-        $("#loadOutsource").show();
+       
     }
-    if (eleId.indexOf("cblSubjects") != -1) {
-        $("#loadOutsource").show();
-    }
+    
     if (eleId.indexOf("cblOutsourceId") != -1) {
         $("#loadMaterial").show();
     }
     if (eleId.indexOf("cbAllGuidance") != -1) {
+        $("#loadOutsourceRegion").show();
+        $("#loadOutsource").show();
         $("#loadCategory").show();
         $("#loadSubject").show();
-        $("#loadOutsource").show();
+
+       
     }
     if (eleId.indexOf("cbAllPropGuidance") != -1) {
         $("#loadPropSubject").show();
@@ -68,7 +76,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
     $("span[name='checkPOPOrderPrice']").click(function () {
 
         GetCondition();
-        var url = "CheckPOPPriceDetail.aspx?outsourceId=" + currOutsourceId + "&guidanceId=" + guidanceId + "&region=" + region + "&province=" + province + "&city=" + city + "&assignType=" + assignType + "&guidanceMonth=" + guidanceMonth + "&customerId=" + customerId + "&subjectId=" + subjectId;
+        var url = "CheckPOPPriceDetail.aspx?outsourceId=" + currOutsourceId + "&guidanceId=" + guidanceId + "&region=" + region + "&province=" + province + "&city=" + city + "&assignType=" + assignType + "&guidanceMonth=" + guidanceMonth + "&customerId=" + customerId + "&subjectId=" + subjectId + "&beginDate=" + beginDate + "&endDate=" + endDate;
         layer.open({
             type: 2,
             time: 0,
@@ -84,7 +92,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
 
     $("span[name='checkInstallPrice']").click(function () {
         GetCondition();
-        var url = "InstallOrderDetail.aspx?outsourceId=" + currOutsourceId + "&guidanceId=" + guidanceId + "&region=" + region + "&province=" + province + "&city=" + city + "&subjectId=" + subjectId;
+        var url = "InstallOrderDetail.aspx?outsourceId=" + currOutsourceId + "&guidanceId=" + guidanceId + "&region=" + region + "&province=" + province + "&city=" + city + "&subjectId=" + subjectId + "&beginDate=" + beginDate + "&endDate=" + endDate;
         var layer1 = layer.open({
             type: 2,
             title: '安装费明细',
@@ -97,7 +105,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
 
     $("span[name='checkExpressPrice']").click(function () {
         GetCondition();
-        var url = "ExpressPriceDetail.aspx?outsourceId=" + currOutsourceId + "&guidanceId=" + guidanceId + "&region=" + region + "&province=" + province + "&city=" + city + "&subjectId=" + subjectId;
+        var url = "ExpressPriceDetail.aspx?outsourceId=" + currOutsourceId + "&guidanceId=" + guidanceId + "&region=" + region + "&province=" + province + "&city=" + city + "&subjectId=" + subjectId + "&beginDate=" + beginDate + "&endDate=" + endDate;
         var layer1 = layer.open({
             type: 2,
             title: "快递费明细",
@@ -111,7 +119,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
     $("span[name='checkOtherPrice']").click(function () {
         GetCondition();
 
-        var url = "CheckOtherPriceDetail.aspx?outsourceId=" + currOutsourceId + "&guidanceId=" + guidanceId + "&region=" + region + "&province=" + province + "&city=" + city + "&assignType=" + assignType;
+        var url = "CheckOtherPriceDetail.aspx?outsourceId=" + currOutsourceId + "&guidanceId=" + guidanceId + "&region=" + region + "&province=" + province + "&city=" + city + "&assignType=" + assignType + "&beginDate=" + beginDate + "&endDate=" + endDate;
         layer.open({
             type: 2,
             time: 0,
@@ -173,6 +181,20 @@ function loading() {
     return true;
 }
 
+function searchByDateloading() {
+    var begin = $.trim($("#txtBeginDate").val());
+    var end = $.trim($("#txtEndDate").val());
+    if (begin == "") {
+        layer.alert("请选择开始时间");
+        return false;
+    }
+    if (end == "") {
+        layer.alert("请选择结束时间");
+        return false;
+    }
+    $("#searchByDateLoadingImg").show();
+    return true;
+}
 
 var customerId = 0;
 var currOutsourceId = "";
@@ -183,10 +205,18 @@ var region = "";
 var province = "";
 var city = "";
 var assignType = "";
+var beginDate = "";
+var endDate = "";
 function GetCondition() {
 
     customerId = $("#ddlCustomer").val();
     guidanceMonth = $("#txtMonth").val();
+    beginDate = "";
+    endDate = "";
+    if ($.trim($("#txtBeginDate").val()) != "")
+        beginDate = $.trim($("#txtBeginDate").val());
+    if ($.trim($("#txtEndDate").val()) != "")
+        endDate = $.trim($("#txtEndDate").val());
     guidanceId = "";
     $("input[name^='cblGuidanceList']:checked").each(function () {
         guidanceId += $(this).val() + ",";

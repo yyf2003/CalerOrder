@@ -129,5 +129,11 @@ namespace FactoryClass
             string className = assemlyPath + ".QuoteOrderDetailDAL";
             return (IQuoteOrderDetailDAL)CreateObject(assemlyPath, className);
         }
+
+        public static IOutsourceOrderDetailDAL CreateOutsourceOrderDetail()
+        {
+            string className = assemlyPath + ".OutsourceOrderDetailDAL";
+            return (IOutsourceOrderDetailDAL)CreateObject(assemlyPath, className);
+        }
     }
 }

@@ -405,7 +405,7 @@ var Order = {
         var orderType = $("#seleOrderType").val();
         var sheet = $("#seleSheet").val();
         var gender = $("#seleGender").val();
-        
+
         $.getJSON('handler/List.ashx', {
             type: "getList",
             subjectId: subjectId,
@@ -533,6 +533,8 @@ var Order = {
     submit: function () {
         if (CheckVal()) {
             jsonStr = '{"Id":' + (this.model.Id || 0) + ',"SubjectId":' + this.model.SubjectId + ',"RegionSupplementId":' + this.model.RegionSupplementId + ',"OrderType":' + this.model.OrderType + ',"ShopNo":"' + this.model.ShopNo + '","PositionDescription":"' + this.model.PositionDescription + '","Sheet":"' + this.model.Sheet + '","POSScale":"' + this.model.POSScale + '","MaterialSupport":"' + this.model.MaterialSupport + '","MachineFrame":"' + this.model.MachineFrame + '","Gender":"' + this.model.Gender + '","Quantity":' + this.model.Quantity + ',"GraphicWidth":"' + this.model.GraphicWidth + '","GraphicLength":"' + this.model.GraphicLength + '","GraphicMaterial":"' + this.model.GraphicMaterial + '","Remark":"' + this.model.Remark + '","ChooseImg":"' + this.model.ChooseImg + '","OrderPrice":' + this.model.OrderPrice + ',"PayOrderPrice":' + this.model.PayOrderPrice + '}';
+//            alert(jsonStr);
+//            return false;
             var loadIndex = layer.load(0, { shade: false });
             $.ajax({
                 type: "post",

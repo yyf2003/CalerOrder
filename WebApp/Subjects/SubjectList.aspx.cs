@@ -9,6 +9,7 @@ using DAL;
 using Models;
 using Common;
 using System.Transactions;
+using WebApp.Base;
 
 namespace WebApp.Subjects
 {
@@ -464,19 +465,7 @@ namespace WebApp.Subjects
                         {
                             FinalOrderDetailTempBLL orderBll = new FinalOrderDetailTempBLL();
                             var totalOrderList = orderBll.GetList(s => s.SubjectId == id);
-                            //if (model.SubjectType == (int)SubjectTypeEnum.HC订单 || model.SubjectType == (int)SubjectTypeEnum.分区补单)
-                            //{
-
-                            //}
-                            //else
-                            //{
-                            //    var regionOrderList = totalOrderList.Where(s => (s.RegionSupplementId ?? 0) > 0 && (s.IsDelete == null || s.IsDelete == false));
-                            //    if (regionOrderList.Any())
-                            //    {
-                            //        isOk = false;
-                            //        msg = "该项目包含分区订单，请先联系分区客服把分区订单删除后才能删除项目！";
-                            //    }
-                            //}
+                           
                             var regionOrderList = totalOrderList.Where(s => ((s.RegionSupplementId ?? 0) > 0) && s.RegionSupplementId!=s.SubjectId && (s.IsDelete == null || s.IsDelete == false));
                             if (regionOrderList.Any())
                             {
@@ -553,11 +542,7 @@ namespace WebApp.Subjects
                                 if (shopIdList.Any() && model.SubjectType != (int)SubjectTypeEnum.二次安装 && model.SubjectType != (int)SubjectTypeEnum.费用订单)
                                 {
                                     SubjectGuidance guianceModel = new SubjectGuidanceBLL().GetModel(model.GuidanceId ?? 0);
-                                    //if (guianceModel != null && guianceModel.ActivityTypeId != (int)GuidanceTypeEnum.Others)
-                                    //{
-                                    //    if ((guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guianceModel.HasInstallFees ?? true)) || (guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Promotion))
-                                    //        ResetOutsourceInstallPrice(model.GuidanceId ?? 0, shopIdList);
-                                    //}
+                                   
                                     if (guianceModel != null && guianceModel.ActivityTypeId != (int)GuidanceTypeEnum.Others)
                                     {
                                         if ((guianceModel.ActivityTypeId == (int)GuidanceTypeEnum.Install && (guianceModel.HasInstallFees ?? true)))
@@ -589,11 +574,13 @@ namespace WebApp.Subjects
                         {
                             isOk = false;
                             msg = "删除失败：" + ex.Message;
-                            //Alert("删除失败：" + ex.Message);
+                            
                         }
                     }
                     if (isOk)
                     {
+                        //更新redis缓存
+                        new DelegateClass().DeleteOrderRedisData(model.GuidanceId ?? 0, model.Id, model.SubjectType??1);
                         BindData();
                     }
                     else

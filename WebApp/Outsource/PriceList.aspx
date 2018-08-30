@@ -39,16 +39,35 @@
         
     </div>
     <div data-options="region:'center',title:'',height:'100%',iconCls:'icon-ok'" style="overflow: hidden;">
+        <div>
+          <table class="table">
+             <tr class=" tr_bai"">
+                <td style=" width:90px;">客户：</td>
+                <td style=" text-align:left; padding-left:5px;">
+                   <select id="seleCustomer"></select>
+                </td>
+             </tr>
+             <tr class=" tr_bai"">
+                <td>报价：</td>
+                <td style=" text-align:left; padding-left:5px;">
+                   <select id="selePriceItem"></select>
+                </td>
+             </tr>
+          </table>
+        </div>
         <div id="materialTitle" class="easyui-panel" title=">>信息列表" data-options="height:'100%',overflow:'auto'">
-            <table id="tbList" style="width: 100%;">
-            </table>
+           <table id="tbList" style="width: 100%;">
+           </table>
             <div id="toolbar" style="height: 28px">
                 <a id="btnRefresh" style="float: left;" class="easyui-linkbutton" plain="true" icon="icon-reload">
                     刷新</a>
                 <div class='datagrid-btn-separator'>
                 </div>
                 <a id="btnAdd" style="float: left; display:;" class="easyui-linkbutton" plain="true"
-                    icon="icon-add">新增</a> <a id="btnEdit" style="float: left; display:;" class="easyui-linkbutton"
+                    icon="icon-add">新增</a> 
+                    <a id="btnAddBatch" style="float: left; display:;" class="easyui-linkbutton" plain="true"
+                    icon="icon-add">批量新增</a>
+                    <a id="btnEdit" style="float: left; display:;" class="easyui-linkbutton"
                         plain="true" icon="icon-edit">编辑</a> <a id="btnDelete" style="float: left; display:;"
                             class="easyui-linkbutton" plain="true" icon="icon-remove">删除</a>
                 
@@ -86,6 +105,15 @@
             </tr>
             <tr class="tr_bai">
                 <td style="width: 100px; height: 25px;">
+                    安装+生产单价：
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <input type="text" id="txtInstallAndProducePrice" maxlength="10" style="width: 100px;" />
+                    <span style="color: Red;">*</span>
+                </td>
+            </tr>
+            <tr class="tr_bai">
+                <td style="width: 100px; height: 25px;">
                     发货单价：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
@@ -106,7 +134,39 @@
             </tr>
         </table>
     </div>
-
+    <div id="batchAddContainer" title="批量添加材质报价" style="display: none;">
+        
+            <table class="table">
+                <thead>
+                    <tr class="tr_hui">
+                        <td style="width: 40px;">
+                            删除
+                        </td>
+                        <td style="width: 40px;">
+                            序号
+                        </td>
+                        <td>
+                            材质名称
+                        </td>
+                        <td style="width: 80px;">
+                            单位
+                        </td>
+                        <td style="width: 120px;">
+                            安装单价
+                        </td>
+                        <td style="width: 120px;">
+                            安装+生产单价
+                        </td>
+                        <td style="width: 120px;">
+                            发货单价
+                        </td>
+                    </tr>
+                </thead>
+                <tbody id="tbMaterialDetail">
+                </tbody>
+            </table>
+       
+    </div>
     </form>
 </body>
 </html>

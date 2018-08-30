@@ -241,7 +241,7 @@ namespace WebApp.Subjects.InstallPrice
 
                
                 //东区的户外店不自动算安装费，手动下安装费
-                List<int> terrexIdList = finalOrderDetailTempList.Where(s => s.Channel != null && s.Channel.ToLower().Contains("terrex") && s.Region != null && s.Region.ToLower().Contains("east")).Select(s => s.Id).ToList();
+                List<int> terrexIdList = finalOrderDetailTempList.Where(s =>s.Region != null && (s.Region.ToLower().Contains("east")|| s.Region.ToLower().Contains("south"))).Select(s => s.Id).ToList();
                 finalOrderDetailTempList = finalOrderDetailTempList.Where(s => !terrexIdList.Contains(s.Id)).ToList();
 
                 //活动订单

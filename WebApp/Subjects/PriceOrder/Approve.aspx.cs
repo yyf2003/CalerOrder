@@ -90,8 +90,8 @@ namespace WebApp.Subjects.PriceOrder
             bool isApproveOk = false;
             string msg = "ok";
             //int subjectType = 1;
-            using (TransactionScope tran = new TransactionScope())
-            {
+            //using (TransactionScope tran = new TransactionScope())
+            //{
 
                 try
                 {
@@ -180,6 +180,7 @@ namespace WebApp.Subjects.PriceOrder
                                     finalOrderTempModel.PayOrderPrice = o.order.PayAmount;
                                     finalOrderTempModel.GuidanceId = o.order.GuidanceId;
                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
+                                    finalOrderTempModel.OutsourceId = o.order.OutsourceId;
                                     finalOrderTempBll.Add(finalOrderTempModel);
                                     //new BasePage().SaveQuotationOrder(finalOrderTempModel, false);
                                 });
@@ -220,7 +221,7 @@ namespace WebApp.Subjects.PriceOrder
                             //保存报价单
                             new BasePage().SaveQuotationOrder(model.GuidanceId??0, subjectId, model.SubjectType ?? 0);
                         }
-                        tran.Complete();
+                        //tran.Complete();
                         isApproveOk = true;
                     }
                 }
@@ -228,7 +229,7 @@ namespace WebApp.Subjects.PriceOrder
                 {
                     msg = ex.Message;
                 }
-            }
+            //}
             if (isApproveOk)
             {
 

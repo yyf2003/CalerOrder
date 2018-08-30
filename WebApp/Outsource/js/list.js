@@ -2,6 +2,7 @@
 
 var pageIndex = 1;
 var pageSize = 15;
+var regionId = 0;
 var provinceId = 0;
 var cityId = 0;
 var companyProvinceIds = "";
@@ -14,9 +15,9 @@ $(function () {
 
     $("#btnAdd").click(function () {
         ClearVal();
-
-        Outsource.getProvince();
-        Outsource.loadProvince();
+        Outsource.getRegion();
+        //Outsource.getProvince();
+        //Outsource.loadProvince();
         Outsource.getCustomerService();
         $("#editDiv").show().dialog({
             modal: true,
@@ -60,9 +61,10 @@ $(function () {
             $("#txtCompanyCode").val(row.CompanyCode);
             $("#txtCompanyName").val(row.CompanyName);
             $("#txtShortName").val(row.ShortName);
+            regionId = row.RegionId;
             provinceId = row.ProvinceId;
             cityId = row.CityId;
-            Outsource.getProvince();
+            Outsource.getRegion();
             $("#txtAddress").val(row.Address);
             $("#txtContact").val(row.Contact);
             $("#txtTel").val(row.Tel);
@@ -152,6 +154,11 @@ $(function () {
         }
     });
 
+    $("#selRegion").change(function () {
+        Outsource.getProvince();
+        Outsource.loadProvince();
+    });
+
     $("#selProvince").change(function () {
         Outsource.getCity();
     });
@@ -168,7 +175,7 @@ var Outsource = {
         this.Id = 0;
         this.CompanyName = "";
         this.ShortName = "";
-        //this.CompanyCode = "";
+        this.RegionId = 0;
         this.ProvinceId = 0;
         this.CityId = 0;
         this.Address = "";
@@ -192,6 +199,7 @@ var Outsource = {
                         { field: 'CompanyName', title: '外协名称', width: 200 },
                         { field: 'ShortName', title: '简称', width: 200 },
                         { field: 'CompanyCode', title: '公司编码', width: 100 },
+                        { field: 'Region', title: '区域', width: 100 },
                         { field: 'Province', title: '省份', width: 100 },
                         { field: 'City', title: '城市', width: 150 },
                         { field: 'Contact', title: '联系人', width: 100 },
@@ -243,12 +251,12 @@ var Outsource = {
             }
         });
     },
-    getProvince: function () {
-        document.getElementById("selProvince").length = 1;
+    getRegion: function () {
+        document.getElementById("selRegion").length = 1;
         $.ajax({
             type: "get",
             url: "/CompanyManage/handler/List1.ashx",
-            data: { type: "getPlace", parentId: 0 },
+            data: { type: "getRegion" },
             cache: true,
             success: function (data) {
 
@@ -257,11 +265,40 @@ var Outsource = {
                     var isSelected = false;
                     for (var i = 0; i < json.length; i++) {
                         var selected = "";
-                        if (provinceId == json[i].PlaceId) {
+                        if (regionId == json[i].RegionId) {
                             selected = "selected='selected'";
                             isSelected = true;
                         }
-                        var option = "<option value='" + json[i].PlaceId + "' " + selected + ">" + json[i].PlaceName + "</option>";
+                        var option = "<option value='" + json[i].RegionId + "' " + selected + ">" + json[i].RegionName + "</option>";
+                        $("#selRegion").append(option);
+                    }
+                    if (isSelected)
+                        $("#selRegion").change();
+                }
+            }
+        })
+    },
+    loadRegion: function () { },
+    getProvince: function () {
+        document.getElementById("selProvince").length = 1;
+        var regionId = $("#selRegion").val();
+        $.ajax({
+            type: "get",
+            url: "/CompanyManage/handler/List1.ashx",
+            data: { type: "getProvince", regionId: regionId },
+            cache: true,
+            success: function (data) {
+
+                if (data != "") {
+                    var json = eval(data);
+                    var isSelected = false;
+                    for (var i = 0; i < json.length; i++) {
+                        var selected = "";
+                        if (provinceId == json[i].ProvinceId) {
+                            selected = "selected='selected'";
+                            isSelected = true;
+                        }
+                        var option = "<option value='" + json[i].ProvinceId + "' " + selected + ">" + json[i].ProvinceName + "</option>";
                         $("#selProvince").append(option);
                     }
                     if (isSelected)
@@ -271,10 +308,11 @@ var Outsource = {
         })
     },
     loadProvince: function () {
+        var regionId = $("#selRegion").val();
         $.ajax({
             type: "get",
             url: "/CompanyManage/handler/List1.ashx",
-            data: { type: "getPlace", parentId: 0 },
+            data: { type: "getProvince", regionId: regionId },
             cache: true,
             success: function (data) {
 
@@ -290,13 +328,13 @@ var Outsource = {
                         var checked = "";
                         if (arr.length > 0) {
                             $.each(arr, function (key, val) {
-                                if (parseInt(val) == parseInt(json[i].PlaceId)) {
+                                if (parseInt(val) == parseInt(json[i].ProvinceId)) {
                                     checked = "checked='checked'";
                                     flag = true;
                                 }
                             })
                         }
-                        div += "<div style='float:left;width:70px; margin-bottom:5px;'><input type='checkbox' name='cbProvince' value='" + json[i].PlaceId + "' " + checked + ">&nbsp;" + json[i].PlaceName + "</div>";
+                        div += "<div style='float:left;width:70px; margin-bottom:5px;'><input type='checkbox' name='cbProvince' value='" + json[i].ProvinceId + "' " + checked + ">&nbsp;" + json[i].ProvinceName + "</div>";
                     }
                     $("#provinceContainer").html(div);
                     if (flag) {
@@ -397,8 +435,8 @@ var Outsource = {
     },
     submit: function () {
         if (CheckVal()) {
-            var jsonStr = '{"Id":' + (Outsource.model.Id || 0) + ',"CompanyName":"' + Outsource.model.CompanyName + '","ShortName":"' + Outsource.model.ShortName + '","Contact":"' + Outsource.model.Contact + '","Tel":"' + Outsource.model.Tel + '","ProvinceId":' + Outsource.model.ProvinceId + ',"CityId":' + Outsource.model.CityId + ',"Address":"' + Outsource.model.Address + '","Regions":"' + Outsource.model.Regions + '","JoinDate":"' + Outsource.model.JoinDate + '","CustomerServiceId":"' + Outsource.model.CustomerServiceId + '"}';
-
+            var jsonStr = '{"Id":' + (Outsource.model.Id || 0) + ',"CompanyName":"' + Outsource.model.CompanyName + '","ShortName":"' + Outsource.model.ShortName + '","Contact":"' + Outsource.model.Contact + '","Tel":"' + Outsource.model.Tel + '","RegionId":' + Outsource.model.RegionId + ',"ProvinceId":' + Outsource.model.ProvinceId + ',"CityId":' + Outsource.model.CityId + ',"Address":"' + Outsource.model.Address + '","Regions":"' + Outsource.model.Regions + '","JoinDate":"' + Outsource.model.JoinDate + '","CustomerServiceId":"' + Outsource.model.CustomerServiceId + '"}';
+            
             $.ajax({
                 type: "post",
                 url: "handler/List.ashx",
@@ -498,6 +536,7 @@ function CheckVal() {
     var companyCode = $.trim($("#txtCompanyCode").val());
     var companyName = $.trim($("#txtCompanyName").val());
     var shortName = $.trim($("#txtShortName").val());
+    var regionId = $("#selRegion").val();
     var provinceId = $("#selProvince").val();
     var cityId = $("#selCity").val();
     var address = $.trim($("#txtAddress").val());
@@ -507,6 +546,10 @@ function CheckVal() {
     var csId = $.trim($("#seleCustomerService").val());
     if (companyName == "") {
         alert("请填写公司名称");
+        return false;
+    }
+    if (regionId == 0) {
+        alert("请选择区域");
         return false;
     }
     if (provinceId == 0) {
@@ -530,8 +573,8 @@ function CheckVal() {
 
     })
     $("#cityContainer").find("input[name='cbCity']:checked").each(function () {
-        var regionId = $(this).val();
-        cityIds += regionId + ",";
+        var cId = $(this).val();
+        cityIds += cId + ",";
 
     })
     if (provinceIds != "")
@@ -549,6 +592,7 @@ function CheckVal() {
     Outsource.model.ShortName = shortName;
     Outsource.model.Contact = contact;
     Outsource.model.Tel = tel;
+    Outsource.model.RegionId = regionId;
     Outsource.model.ProvinceId = provinceId;
     Outsource.model.CityId = cityId;
     Outsource.model.Address = address;

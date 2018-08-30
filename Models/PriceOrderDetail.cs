@@ -33,5 +33,6 @@ namespace Models
         public string Remark { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
         public Nullable<int> ApproveState { get; set; }
+        public Nullable<int> OutsourceId { get; set; }
     }
 }

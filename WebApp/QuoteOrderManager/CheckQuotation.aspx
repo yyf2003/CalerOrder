@@ -99,8 +99,10 @@
                 <td>
                 </td>
                 <td colspan="5" style="text-align: left; padding-left: 5px; height: 40px;">
-                    <asp:Button ID="btnExport" runat="server" Text="导出报价单" class="layui-btn layui-btn-small"
-                        OnClick="btnExport_Click" />
+                    <asp:Button ID="btnExportTemplete" runat="server" Text="导出报价单模板" class="layui-btn layui-btn-small"
+                        OnClick="btnExportTemplete_Click" />
+                    <asp:Button ID="btnExport" runat="server" Text="导出客服报价单" class="layui-btn layui-btn-small"
+                      style=" margin-left:20px;"  OnClick="btnExport_Click" />
                 </td>
             </tr>
         </table>

@@ -79,6 +79,18 @@ namespace WebApp.CompanyManage.handler
                 case "recover":
                     result = Recover();
                     break;
+                case "getRegion":
+                    result = GetRegion();
+                    break;
+                case "getProvince":
+                    int regionId = 0;
+                    if (context.Request.QueryString["regionId"] != null)
+                    {
+                        regionId = int.Parse(context.Request.QueryString["regionId"]);
+                        
+                    }
+                    result = GetProvince(regionId);
+                    break;
                 default:
                     break;
             }
@@ -163,6 +175,39 @@ namespace WebApp.CompanyManage.handler
             }
             else
                 return "{\"total\":0,\"rows\":[] }";
+        }
+
+        string GetRegion() {
+            string result = string.Empty;
+            List<Region> regionList = new RegionBLL().GetList(s=>s.CustomerId==1).OrderBy(s=>s.Id).ToList();
+            if (regionList.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                regionList.ForEach(s => {
+                    json.Append("{\"RegionId\":\""+s.Id+"\",\"RegionName\":\""+s.RegionName+"\"},");
+                });
+                result = "["+json.ToString().TrimEnd(',')+"]";
+            }
+            return result;
+        }
+
+        string GetProvince(int regionId)
+        {
+            string result = string.Empty;
+            var list = (from pr in CurrentContext.DbContext.ProvinceInRegion
+                        join province in CurrentContext.DbContext.Place
+                        on pr.ProvinceId equals province.ID
+                        where pr.RegionId == regionId
+                        select province).ToList();
+            if (list.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                list.ForEach(s => {
+                    json.Append("{\"ProvinceId\":\""+s.ID+"\",\"ProvinceName\":\""+s.PlaceName+"\"},");
+                });
+                result = "["+json.ToString().TrimEnd(',')+"]";
+            }
+            return result;
         }
 
         string GetPlace(int parentId)

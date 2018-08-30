@@ -38,6 +38,9 @@ namespace WebApp.Outsource.handler
                 case "edit":
                     result = Edit();
                     break;
+                case "addBatch":
+                    result = BatchAddPrice();
+                    break;
                 case "delete":
                     result = Delete();
                     break;
@@ -45,7 +48,9 @@ namespace WebApp.Outsource.handler
             context.Response.Write(result);
         }
 
-        string GetMaterialList()
+        
+
+        string GetMaterialList_old()
         {
             int currPage=0, pageSize=0;
             int companyId = 0;
@@ -117,33 +122,120 @@ namespace WebApp.Outsource.handler
             }
         }
 
+        string GetMaterialList()
+        {
+            //int currPage = 0, pageSize = 0;
+            int companyId = 0;
+            int customerId = 0;
+            int priceItemId = 0;
+            string materialName = string.Empty;
+            //if (context1.Request.QueryString["currpage"] != null)
+            //{
+            //    currPage = int.Parse(context1.Request.QueryString["currpage"]);
+            //}
+            //if (context1.Request.QueryString["pagesize"] != null)
+            //{
+            //    pageSize = int.Parse(context1.Request.QueryString["pagesize"]);
+            //}
+            if (context1.Request.QueryString["companyId"] != null)
+            {
+                companyId = int.Parse(context1.Request.QueryString["companyId"]);
+            }
+            if (context1.Request.QueryString["customerId"] != null)
+            {
+                customerId = int.Parse(context1.Request.QueryString["customerId"]);
+            }
+            if (context1.Request.QueryString["priceItemId"] != null)
+            {
+                priceItemId = int.Parse(context1.Request.QueryString["priceItemId"]);
+            }
+            if (context1.Request.QueryString["materialName"] != null)
+            {
+                materialName = context1.Request.QueryString["materialName"];
+            }
+            try
+            {
+
+                var list = (from cm in CurrentContext.DbContext.OutsourceMaterialInfo
+                            join company in CurrentContext.DbContext.Company
+                            on cm.OutsourctId equals company.Id
+                            join bm in CurrentContext.DbContext.BasicMaterial
+                            on cm.BasicMaterialId equals bm.Id
+                            join category in CurrentContext.DbContext.MaterialCategory
+                            on cm.BasicCategoryId equals category.Id
+                            join unit1 in CurrentContext.DbContext.UnitInfo
+                            on bm.UnitId equals unit1.Id into unitTemp
+                            from unit in unitTemp.DefaultIfEmpty()
+                            where cm.OutsourctId == companyId
+                            && cm.CustomerId == customerId
+                            && cm.PriceItemId == priceItemId
+                            select new
+                            {
+                                cm,
+                                company.CompanyName,
+                                unit.UnitName,
+                                category.CategoryName,
+                                bm
+                            }).OrderBy(s => s.cm.BasicCategoryId).ToList();
+                if (!string.IsNullOrWhiteSpace(materialName))
+                {
+                    list = list.Where(s => s.bm.MaterialName.ToLower().Contains(materialName.ToLower())).ToList();
+                }
+                if (list.Any())
+                {
+                    StringBuilder json = new StringBuilder();
+                    int totalCount = list.Count;
+                    //list = list.OrderBy(s => s.cm.BasicCategoryId).Skip((currPage - 1) * pageSize).Take(pageSize).ToList();
+                    int index = 1;
+                    list.ForEach(s =>
+                    {
+
+                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.cm.Id + "\",\"CompanyId\":\"" + s.cm.OutsourctId + "\",\"CompanyName\":\"" + s.CompanyName + "\",\"UnitId\":\"" + s.bm.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"InstallPrice\":\"" + s.cm.InstallPrice + "\",\"InstallAndProductPrice\":\"" + s.cm.InstallAndProductPrice + "\",\"SendPrice\":\"" + s.cm.SendPrice + "\",\"BasicMaterialName\":\"" + s.bm.MaterialName + "\",\"BasicMaterialId\":\"" + s.cm.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.cm.BasicCategoryId + "\",\"BasicCategoryName\":\"" + s.CategoryName + "\"},");
+                        index++;
+                    });
+                    if (json.Length > 0)
+                        return "{\"total\":" + totalCount + ",\"rows\":[" + json.ToString().TrimEnd(',') + "]}";
+                    else
+                        return "{\"total\":0,\"rows\":[] }";
+                }
+                else
+                    return "{\"total\":0,\"rows\":[] }";
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
         string Edit()
         {
             string result = "提交失败！";
             string jsonStr = string.Empty;
-            if (context1.Request.QueryString["jsonStr"] != null)
+            if (context1.Request.Form["jsonStr"] != null)
             {
-                jsonStr = context1.Request.QueryString["jsonStr"];
+                jsonStr = context1.Request.Form["jsonStr"];
                 if (!string.IsNullOrWhiteSpace(jsonStr))
                 {
                     try
                     {
-                        OutsourceMaterialPriceBLL bll = new OutsourceMaterialPriceBLL();
-                        jsonStr = jsonStr.Replace("+", "%2B");
-                        jsonStr = HttpUtility.UrlDecode(jsonStr);
-                        OutsourceMaterialPrice model = JsonConvert.DeserializeObject<OutsourceMaterialPrice>(jsonStr);
+                        OutsourceMaterialInfoBLL bll = new OutsourceMaterialInfoBLL();
+                        //jsonStr = jsonStr.Replace("+", "%2B");
+                        //jsonStr = HttpUtility.UrlDecode(jsonStr);
+                        OutsourceMaterialInfo model = JsonConvert.DeserializeObject<OutsourceMaterialInfo>(jsonStr);
                         if (model != null)
                         {
                             if (model.Id > 0)
                             {
                                 //更新
-                                OutsourceMaterialPrice newModel = bll.GetModel(model.Id);
+                                OutsourceMaterialInfo newModel = bll.GetModel(model.Id);
                                 if (newModel != null)
                                 {
                                     newModel.BasicCategoryId = model.BasicCategoryId;
                                     newModel.BasicMaterialId = model.BasicMaterialId;
                                     newModel.InstallPrice = model.InstallPrice;
+                                    newModel.InstallAndProductPrice = model.InstallAndProductPrice;
                                     newModel.SendPrice = model.SendPrice;
+                                    newModel.UnitId = model.UnitId;
                                     bll.Update(newModel);
                                     result = "ok";
                                 }
@@ -162,16 +254,19 @@ namespace WebApp.Outsource.handler
                             else
                             {
                                 //新增
-                                var list = bll.GetList(s=>s.OutsourceId==model.OutsourceId && s.BasicMaterialId==model.BasicMaterialId);
-                                if (!list.Any())
+                                var list = bll.GetList(s=>s.OutsourctId==model.OutsourctId && s.PriceItemId==model.PriceItemId && s.CustomerId==model.CustomerId && s.BasicMaterialId==model.BasicMaterialId);
+                                if (list.Any())
+                                {
+                                    result = "此材质报价已经存在！";
+                                }
+                                else
                                 {
                                     model.AddDate = DateTime.Now;
                                     model.AddUserId = new BasePage().CurrentUser.UserId;
+                                    model.IsDelete = false;
                                     bll.Add(model);
                                     result = "ok";
                                 }
-                                else
-                                    result = "此材质报价已经存在！";
                             }
                         }
                     }
@@ -205,6 +300,62 @@ namespace WebApp.Outsource.handler
                     catch (Exception ex)
                     {
                         result = "删除失败："+ex.Message;
+                    }
+                }
+            }
+            return result;
+        }
+
+        string BatchAddPrice()
+        {
+            string result = "提交失败！";
+            string jsonStr = string.Empty;
+            if (context1.Request.Form["jsonStr"] != null)
+            {
+                jsonStr = context1.Request.Form["jsonStr"];
+                if (!string.IsNullOrWhiteSpace(jsonStr))
+                {
+                    try
+                    {
+                        OutsourceMaterialInfoBLL bll = new OutsourceMaterialInfoBLL();
+                        //jsonStr = jsonStr.Replace("+", "%2B");
+                        //jsonStr = HttpUtility.UrlDecode(jsonStr);
+                        List<OutsourceMaterialInfo> submitList = JsonConvert.DeserializeObject<List<OutsourceMaterialInfo>>(jsonStr);
+                        if (submitList.Any())
+                        {
+                            submitList.ForEach(s => {
+                                var oldModel = bll.GetList(p=>p.OutsourctId==s.OutsourctId && p.PriceItemId==s.PriceItemId && p.CustomerId==s.CustomerId && p.BasicMaterialId==s.BasicMaterialId).FirstOrDefault();
+                                if (oldModel != null)
+                                {
+                                    oldModel.InstallAndProductPrice = s.InstallAndProductPrice;
+                                    oldModel.InstallPrice = s.InstallPrice;
+                                    oldModel.SendPrice = s.SendPrice;
+                                    bll.Update(oldModel);
+                                }
+                                else
+                                {
+                                    OutsourceMaterialInfo model = new OutsourceMaterialInfo();
+                                    model.AddDate = DateTime.Now;
+                                    model.AddUserId = new BasePage().CurrentUser.UserId;
+                                    model.BasicCategoryId = s.BasicCategoryId;
+                                    model.BasicMaterialId = s.BasicMaterialId;
+                                    model.CustomerId = s.CustomerId;
+                                    model.InstallAndProductPrice = s.InstallAndProductPrice;
+                                    model.InstallPrice = s.InstallPrice;
+                                    model.IsDelete = false;
+                                    model.OutsourctId = s.OutsourctId;
+                                    model.PriceItemId = s.PriceItemId;
+                                    model.SendPrice = s.SendPrice;
+                                    model.UnitId = s.UnitId;
+                                    bll.Add(model);
+                                }
+                            });
+                        }
+                        result = "ok";
+                    }
+                    catch(Exception ex)
+                    {
+                        result ="提交失败："+ ex.Message;
                     }
                 }
             }

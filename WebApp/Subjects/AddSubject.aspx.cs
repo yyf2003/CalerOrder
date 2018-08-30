@@ -485,7 +485,7 @@ namespace WebApp.Subjects
                     subjectModel.EndDate = DateTime.Parse(txtEndDate.Text.Trim());
                     subjectModel.Remark = txtRemark.Text;
 
-                    subjectModel.SubjectName = txtSubjectName.Text.Trim();
+                    subjectModel.SubjectName = StringHelper.ReplaceSpecialChar(txtSubjectName.Text.Trim());
 
                     subjectModel.SubjectCategoryId = int.Parse(ddlSubjectCategory.SelectedValue);
                     if (ddlSubjectCategory.SelectedItem.Text == CornerTypeEnum.三叶草.ToString())
