@@ -57,7 +57,8 @@ namespace WebApp.Outsource.handler
 
         string GetList()
         {
-            
+            int regionId=0;
+            string name = string.Empty;
             int currPage = 0;
             int pageSize = 0;
             //string whereStr = string.Empty;
@@ -68,6 +69,14 @@ namespace WebApp.Outsource.handler
             if (context1.Request.QueryString["pagesize"] != null)
             {
                 pageSize = int.Parse(context1.Request.QueryString["pagesize"]);
+            }
+            if (context1.Request.QueryString["regionId"] != null)
+            {
+                regionId = int.Parse(context1.Request.QueryString["regionId"]);
+            }
+            if (context1.Request.QueryString["outsourceName"] != null) 
+            {
+                name = context1.Request.QueryString["outsourceName"];
             }
             #region
             //var list = (from company in CurrentContext.DbContext.OutsourceInfo
@@ -129,7 +138,21 @@ namespace WebApp.Outsource.handler
                             City = city.PlaceName,
                             user.RealName
                         }).ToList();
-            
+            if (regionId > 0)
+            {
+                list = list.Where(s => s.company.RegionId == regionId).ToList();
+            }
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                list = list.Where(s=>s.company.CompanyName.ToLower().Contains(name.ToLower())).ToList();
+            }
+            int roleId = new BasePage().CurrentUser.RoleId;
+            int userId=new BasePage().CurrentUser.UserId;
+            if (roleId == 2 || roleId == 5)
+            { 
+               //客服
+                list = list.Where(s => s.company.CustomerServiceId == userId).ToList();
+            }
             if (list.Any())
             {
                 StringBuilder json = new StringBuilder();
@@ -366,17 +389,38 @@ namespace WebApp.Outsource.handler
 
         string GetCustomerService()
         {
+            int regionId = 0;
+            if (context1.Request.QueryString["regionId"] != null && context1.Request.QueryString["regionId"]!="")
+            {
+                regionId = int.Parse(context1.Request.QueryString["regionId"]);
+            }
             var list = (
                         from user in CurrentContext.DbContext.UserInfo
                         join userRole in CurrentContext.DbContext.UserInRole
                         on user.UserId equals userRole.UserId
-                        where userRole.RoleId == 5
+                        where (userRole.RoleId == 2 || userRole.RoleId == 5)
                         && (user.IsDelete == null || user.IsDelete == false)
-                        select user).ToList();
+                        select new { user, userRole.RoleId }).ToList();
+            if (regionId > 0)
+            {
+                List<int> userIdList = list.Select(s=>s.user.UserId).Distinct().ToList();
+                List<int> userIdListNew = new List<int>();
+                var regionUserList = new UserInRegionBLL().GetList(s => userIdList.Contains(s.UserId??0) && s.RegionId.Length>0);
+                regionUserList.ForEach(s => {
+                    List<int> rList = StringHelper.ToIntList(s.RegionId, ',');
+                    if (rList.Contains(regionId))
+                    {
+                        userIdListNew.Add(s.UserId??0);
+                    }
+                });
+                list = list.Where(s => userIdListNew.Contains(s.user.UserId) || s.RoleId==2).ToList();
+            }
             if (list.Any())
             {
+                var userList = list.Select(s=>s.user).Distinct().ToList();
                 StringBuilder json = new StringBuilder();
-                list.ForEach(s => {
+                userList.ForEach(s =>
+                {
                     json.Append("{\"UserId\":\""+s.UserId+"\",\"UserName\":\""+s.RealName+"\"},");
                 });
                 return "["+json.ToString().TrimEnd(',')+"]";

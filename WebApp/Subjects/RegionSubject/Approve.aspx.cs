@@ -41,14 +41,17 @@ namespace WebApp.Subjects.RegionSubject
                          on subject.CustomerId equals customer.Id
                          join user in CurrentContext.DbContext.UserInfo
                          on subject.AddUserId equals user.UserId
+                         join outsource1 in CurrentContext.DbContext.Company
+                        on subject.OutsourceId equals outsource1.Id into temp
+                         from outsource in temp.DefaultIfEmpty()
                          where subject.Id == subjectId
                          select new
                          {
                              subject,
                              customer.CustomerName,
                              user.RealName,
-                             guidance.ItemName
-
+                             guidance.ItemName,
+                             OutsourceName = outsource.CompanyName
                          }).FirstOrDefault();
             if (model != null)
             {
@@ -61,7 +64,7 @@ namespace WebApp.Subjects.RegionSubject
                 hfSubjectType.Value = subjectType.ToString();
                 labSubjectType.Text = CommonMethod.GetEnumDescription<SubjectTypeEnum>(subjectType.ToString());
                 labRegion.Text = model.subject.SupplementRegion;
-
+                labProduceOutsource.Text = model.OutsourceName;
                 if (subjectType == (int)SubjectTypeEnum.分区增补 || subjectType == (int)SubjectTypeEnum.新开店订单)
                 {
                     Panel1.Visible = false;
@@ -90,14 +93,17 @@ namespace WebApp.Subjects.RegionSubject
                             on order.ShopId equals shop.Id
                             join subject in CurrentContext.DbContext.Subject
                             on order.HandMakeSubjectId equals subject.Id
+                            join outsource1 in CurrentContext.DbContext.Company
+                            on order.OutsourceId equals outsource1.Id into temp
+                            from outsource in temp.DefaultIfEmpty()
                             where order.SubjectId == subjectId
-                            //&& order.IsSubmit == 1 
-                            //&& (order.ApproveState == null || order.ApproveState == 0)
+                          
                             select new
                             {
                                 shop,
                                 order,
-                                subject.SubjectName
+                                subject.SubjectName,
+                                OutsourceName = outsource.CompanyName
                             }).OrderBy(s=>s.shop.Id).ToList();
 
                 if (list.Any())
@@ -131,6 +137,8 @@ namespace WebApp.Subjects.RegionSubject
                         model.MaterialSupport = s.order.MaterialSupport;
                         model.ReceivePrice = double.Parse((s.order.Price ?? 0).ToString());
                         model.PayPrice = double.Parse((s.order.PayPrice ?? 0).ToString());
+                        model.ProduceOutsourceId = s.order.OutsourceId;
+                        model.ProduceOutsourceName = s.OutsourceName;
                         orderList.Add(model);
                     });
                 }
@@ -203,14 +211,16 @@ namespace WebApp.Subjects.RegionSubject
             var list = (from order in CurrentContext.DbContext.RegionOrderDetail
                         join shop in CurrentContext.DbContext.Shop
                         on order.ShopId equals shop.Id
-                        
+                        join outsource1 in CurrentContext.DbContext.Company
+                        on order.OutsourceId equals outsource1.Id into temp
+                        from outsource in temp.DefaultIfEmpty()
                         where order.SubjectId == subjectId
                         && order.IsSubmit == 1 && (order.ApproveState == null || order.ApproveState == 0)
                         select new
                         {
                             shop,
                             order,
-                            
+                            OutsourceName = outsource.CompanyName
                         }).OrderBy(s => s.shop.Id).ToList();
 
             if (list.Any())
@@ -236,7 +246,8 @@ namespace WebApp.Subjects.RegionSubject
                         model.ShopName = s.shop.ShopName;
                         model.ShopNo = s.shop.ShopNo;
                         model.OtherRemark = s.order.Remark;
-                       
+                        model.ProduceOutsourceId = s.order.OutsourceId;
+                        model.ProduceOutsourceName = s.OutsourceName;
                         orderList.Add(model);
                     }
                     else
@@ -262,22 +273,12 @@ namespace WebApp.Subjects.RegionSubject
                         model.OtherRemark = s.order.Remark;
                         model.POSScale = s.order.POSScale;
                         model.MaterialSupport = s.order.MaterialSupport;
+                        model.ProduceOutsourceId = s.order.OutsourceId;
+                        model.ProduceOutsourceName = s.OutsourceName;
                         orderList.Add(model);
                     }
                 });
-                //费用信息
-                //var priceOrderList = (from price in CurrentContext.DbContext.RegionOrderPrice
-                //                      join shop in CurrentContext.DbContext.Shop
-                //                      on price.ShopId equals shop.Id
-                //                      where price.SubjectId == subjectId
-                //                      && price.IsSubmit == 1 && (price.ApproveState == null || price.ApproveState == 0)
-                //                      select new { price, shop }).ToList();
-                //if (priceOrderList.Any())
-                //{
-                //    priceOrderList.ForEach(s => {
-                        
-                //    });
-                //}
+               
 
             }
             AspNetPager2.RecordCount = orderList.Count;
@@ -479,6 +480,15 @@ namespace WebApp.Subjects.RegionSubject
                                     finalOrderTempModel.GuidanceId = o.guidance.ItemId;
                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                     finalOrderTempModel.UnitName = unitName;
+                                    if ((o.order.OutsourceId ?? 0) > 0)
+                                    {
+                                        finalOrderTempModel.ProduceOutsourceId = o.order.OutsourceId;
+                                    }
+                                    else if ((model.OutsourceId ?? 0) > 0)
+                                    {
+                                        finalOrderTempModel.ProduceOutsourceId = model.OutsourceId;
+                                    }
+
                                     finalOrderTempBll.Add(finalOrderTempModel);
                                     //new BasePage().SaveQuotationOrder(finalOrderTempModel, useQuoteSetting);
                                 }

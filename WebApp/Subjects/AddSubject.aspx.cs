@@ -34,6 +34,7 @@ namespace WebApp.Subjects
                 BindSubjectItemType();
                 ChangeSubjectItemType();
                 BindMyCustomerList(ddlCustomer);
+                GetOutsourceRegion(ddlOutsourceRegion);
                 BindSBCInstallType();
                 if (subjectId == 0)
                 {
@@ -75,7 +76,7 @@ namespace WebApp.Subjects
 
         void BindRegion()
         {
-            //rblPriceBlong.Items.Clear();
+            rblPriceBlong.Items.Clear();
             rblRegion.Items.Clear();
             ListItem li0 = new ListItem();
             li0.Value = "";
@@ -83,7 +84,7 @@ namespace WebApp.Subjects
             li0.Selected = true;
             rblPriceBlong.Items.Add(li0);
             int customerId = int.Parse(ddlCustomer.SelectedValue);
-            List<string> regions = new RegionBLL().GetList(s => s.CustomerId == customerId).Select(s => s.RegionName).Distinct().ToList();
+            List<string> regions = new RegionBLL().GetList(s =>s.IsDelete==null || s.IsDelete==false).Select(s => s.RegionName).Distinct().ToList();
 
             if (regions.Any())
             {
@@ -272,9 +273,22 @@ namespace WebApp.Subjects
                         rblSubjectType.Enabled = false;
                         ddlSubjectCategory.Enabled = false;
                     }
+
+                    if ((subjectModel.OutsourceId ?? 0) > 0)
+                    {
+                        Company outsourceModel = new CompanyBLL().GetModel(subjectModel.OutsourceId ?? 0);
+                        if (outsourceModel != null)
+                        {
+                            ddlOutsourceRegion.SelectedValue = (outsourceModel.RegionId ?? 0).ToString();
+                            ChangeOutsourceRegion();
+                            ddlOutsource.SelectedValue = (subjectModel.OutsourceId ?? 0).ToString();
+                        }
+                    }
                 }
             }
         }
+
+        
 
         /// <summary>
         /// 下一步
@@ -284,6 +298,7 @@ namespace WebApp.Subjects
         protected void btnNext_Click(object sender, EventArgs e)
         {
             labMsg.Text = "";
+
             if (CheckSubject(txtSubjectName.Text.Trim(), subjectId))
             {
                 labMsg.Text = "项目名称重复";
@@ -352,7 +367,8 @@ namespace WebApp.Subjects
                 subjectModel.IsSecondInstall = false;
                 subjectModel.SecondBasicInstallPriceType = null;
             }
-
+            int outsourceId = int.Parse(ddlOutsource.SelectedValue);
+            subjectModel.OutsourceId = outsourceId;
             if (subjectId > 0)
             {
                 subjectBll.Update(subjectModel);
@@ -578,25 +594,7 @@ namespace WebApp.Subjects
             }
         }
 
-        protected void cblOrderType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //bool selected = false;
-            //foreach (ListItem li in cblOrderType.Items)
-            //{
-            //    if (li.Selected)
-            //        selected = true;
-            //}
-            //if (selected)
-            //{
-            //    Panel1.Visible = true;
-            //    Panel2.Visible = false;
-            //}
-            //else
-            //{
-            //    Panel1.Visible = false;
-            //    Panel2.Visible = true;
-            //}
-        }
+       
 
         protected void ddlCustomer_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -644,22 +642,7 @@ namespace WebApp.Subjects
                     rblSecondInstallType.SelectedItem.Selected = false;
                 trSecondInstall.Style.Add("display", "none");
             }
-            //if (orderType == (int)SubjectTypeEnum.补单)
-            //{
-            //    ddlSubjectName.Visible = true;
-            //    txtSubjectName.Visible = false;
-            //    rblPriceBlong.Enabled = false;
-            //    cbNoOrderList.Enabled = false;
-            //    rblRegion.Enabled = false;
-            //}
-            //else
-            //{
-            //    ddlSubjectName.Visible = false;
-            //    txtSubjectName.Visible = true;
-            //    rblPriceBlong.Enabled = true;
-            //    cbNoOrderList.Enabled = true;
-            //    rblRegion.Enabled = true;
-            //}
+           
         }
 
         void ChangeSubjectItemType()
@@ -734,7 +717,28 @@ namespace WebApp.Subjects
             }
         }
 
-       
+        protected void ddlOutsourceRegion_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ChangeOutsourceRegion();
+        }
+
+        void ChangeOutsourceRegion()
+        {
+            ddlOutsource.Items.Clear();
+            int regionId = int.Parse(ddlOutsourceRegion.SelectedValue);
+            var list = new CompanyBLL().GetList(s => s.RegionId == regionId && s.TypeId == (int)CompanyTypeEnum.Outsource && (s.IsDelete == null || s.IsDelete == false));
+            if (list.Any())
+            {
+                list.ForEach(s =>
+                {
+                    ListItem li = new ListItem();
+                    li.Value = s.Id.ToString();
+                    li.Text = s.CompanyName;
+                    ddlOutsource.Items.Add(li);
+                });
+            }
+            ddlOutsource.Items.Insert(0, new ListItem("--请选择外协--", "0"));
+        }
 
     }
 }

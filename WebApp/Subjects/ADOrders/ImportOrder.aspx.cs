@@ -408,11 +408,15 @@ namespace WebApp.Subjects.ADOrders
             var list = (from order in CurrentContext.DbContext.HandMadeOrderDetail
                         join shop in CurrentContext.DbContext.Shop
                         on order.ShopId equals shop.Id
+                        join outsource1 in CurrentContext.DbContext.Company
+                        on order.OutsourceId equals outsource1.Id into temp
+                        from outsource in temp.DefaultIfEmpty()
                         where order.SubjectId == subjectId
                         select new
                         {
                             order,
-                            shop
+                            shop,
+                            OutsourceName = outsource.CompanyName
                         }).ToList();
             string shopNo = txtPOP1ShopNo.Text.Trim();
             if (!string.IsNullOrWhiteSpace(shopNo))
@@ -3215,6 +3219,10 @@ namespace WebApp.Subjects.ADOrders
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                             finalOrderTempModel.UnitName = unitName;
                             finalOrderTempModel.AddDate = DateTime.Now;
+                            if ((subjectModel.OutsourceId ?? 0) > 0)
+                            {
+                                finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
+                            }
                             finalOrderTempBll.Add(finalOrderTempModel);
                             //保存报价单
                             
@@ -3545,6 +3553,8 @@ namespace WebApp.Subjects.ADOrders
                 string materialSupport = string.Empty;
                 string posScale = string.Empty;
                 string installPositionDescription = string.Empty;
+                string outsourceName = string.Empty;
+                int outsourceId = 0;
                 HandMakeOrderCols = ds.Tables[0].Columns;
                 HMPOPErrorTB = CommonMethod.CreateErrorTB(HandMakeOrderCols);
                 HandMadeOrderDetail handOrderModel;
@@ -3552,6 +3562,28 @@ namespace WebApp.Subjects.ADOrders
                 //int failNum = 0;
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
+                    orderType = string.Empty;
+                    shopNo = string.Empty;
+                    shopId = 0;
+                    sheet = string.Empty;
+                    machineFrame = string.Empty;
+                    levelNum = string.Empty;
+                    gender = string.Empty;
+                    num = string.Empty;
+                    width = string.Empty;
+                    length = string.Empty;
+                    material = string.Empty;
+                    chooseImg = string.Empty;
+                    positionDescription = string.Empty;
+                    remark = string.Empty;
+                    category = string.Empty;
+                    materialSupport = string.Empty;
+                    posScale = string.Empty;
+                    installPositionDescription = string.Empty;
+                    outsourceName = string.Empty;
+                    outsourceId = 0;
+
+
                     StringBuilder msg = new StringBuilder();
                     if (HandMakeOrderCols.Contains("订单类型"))
                     {
@@ -3653,6 +3685,11 @@ namespace WebApp.Subjects.ADOrders
 
                     if (HandMakeOrderCols.Contains("安装位置描述"))
                         installPositionDescription = StringHelper.ReplaceSpecialChar(dr["安装位置描述"].ToString().Trim());
+
+                    if (HandMakeOrderCols.Contains("外协"))
+                        outsourceName = StringHelper.ReplaceSpecialChar(dr["外协"].ToString().Trim());
+                    else if (HandMakeOrderCols.Contains("外协名称"))
+                        outsourceName = StringHelper.ReplaceSpecialChar(dr["外协名称"].ToString().Trim());
 
                     bool canSave = true;
                     //decimal materialPrice = 0;
@@ -3854,6 +3891,15 @@ namespace WebApp.Subjects.ADOrders
 
 
                     }
+
+                    if (!string.IsNullOrWhiteSpace(outsourceName))
+                    {
+                        if (!GetOutsourceName(outsourceName, out outsourceId))
+                        {
+                            canSave = false;
+                            msg.Append("外协不存在；");
+                        }
+                    }
                     if (canSave)
                     {
 
@@ -3879,6 +3925,7 @@ namespace WebApp.Subjects.ADOrders
                         handOrderModel.POSScale = posScale;
                         handOrderModel.InstallPositionDescription = installPositionDescription;
                         handOrderModel.MachineFrame = machineFrame;
+                        handOrderModel.OutsourceId = outsourceId;
                         handOrderBll.Add(handOrderModel);
                         successNum++;
                     }
@@ -4611,6 +4658,15 @@ namespace WebApp.Subjects.ADOrders
                             orderModel.ShopStatus = s.shop.Status;
                             orderModel.GuidanceId = s.subject.GuidanceId;
                             orderModel.CSUserId = s.shop.CSUserId;
+                            
+                            if ((s.order.OutsourceId ?? 0) > 0)
+                            {
+                                orderModel.ProduceOutsourceId = s.order.OutsourceId;
+                            }
+                            else if ((s.subject.OutsourceId ?? 0) > 0)
+                            {
+                                orderModel.ProduceOutsourceId = s.subject.OutsourceId;
+                            }
                             orderBll.Add(orderModel);
                             //保存报价订单
                             //orderModel.UnitName = unitName;

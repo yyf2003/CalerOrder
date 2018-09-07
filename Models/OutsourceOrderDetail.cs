@@ -89,5 +89,6 @@ namespace Models
         public Nullable<int> InstallPriceAddType { get; set; }
         public Nullable<int> InstallPriceSubjectType { get; set; }
         public Nullable<int> BelongSubjectId { get; set; }
+        public Nullable<bool> IsFromRegion { get; set; }
     }
 }

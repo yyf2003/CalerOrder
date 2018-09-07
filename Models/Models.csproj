@@ -313,6 +313,9 @@
     <Compile Include="OutsourceInfo.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="OutsourceInstallPriceLevel.cs">
+      <DependentUpon>Model1.tt</DependentUpon>
+    </Compile>
     <Compile Include="OutsourceInUser.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

@@ -164,6 +164,19 @@ namespace WebApp.OutsourcingOrder.PayRecord
                     int rowCount = guidanceList.Count();
                     List<OutsourceOrderDetail> outsourceOrderList = list.Select(s => s.order).ToList();
                     OutsourcePayRecordBLL payRecordBll = new OutsourcePayRecordBLL();
+
+                    //总数（分页前）
+                    decimal allShouldPay = 0;
+                    decimal allPay = 0;
+                    decimal allDebt = 0;
+                    allShouldPay = list.Sum(s => (s.order.TotalPrice ?? 0));
+                    allShouldPay += list.Sum(s => ((s.order.Quantity ?? 1) * (s.order.PayOrderPrice??0)));
+                    allShouldPay = Math.Round(allShouldPay,2);
+                    List<int> gIdList = guidanceList.Select(s => s.ItemId).Distinct().ToList();
+                    List<OutsourcePayRecord> payRecordList = payRecordBll.GetList(p => p.OutsourceId == outsourceId && gIdList.Contains(p.GuidanceId??0));
+                    allPay = payRecordList.Sum(p => p.PayAmount ?? 0);
+                    allDebt = allShouldPay - allPay;
+
                     guidanceList.OrderBy(s => s.ItemId).Skip((currPage - 1) * pageSize).Take(pageSize).ToList().ForEach(s =>
                     {
                         var orderList = outsourceOrderList.Where(order=>order.GuidanceId==s.ItemId).ToList();
@@ -183,24 +196,26 @@ namespace WebApp.OutsourcingOrder.PayRecord
                         }
                         string gmonth = s.GuidanceYear + "-" + s.GuidanceMonth;
                         decimal totalPay = 0;
+                        
                         string lastPayDate = string.Empty;
                         int payRecordCount = 0;
-                        List<OutsourcePayRecord> payRecordList = payRecordBll.GetList(p => p.OutsourceId == outsourceId && p.GuidanceId==s.ItemId);
-                        if (payRecordList.Any())
+                        var oneGuidancePayList = payRecordList.Where(p=>p.GuidanceId==s.ItemId).ToList();
+                        if (oneGuidancePayList.Any())
                         {
-                            payRecordCount = payRecordList.Count;
-                            totalPay = payRecordList.Sum(p => p.PayAmount ?? 0);
-                            var m = payRecordList.OrderByDescending(p => p.Id).FirstOrDefault();
+                            payRecordCount = oneGuidancePayList.Count;
+                            totalPay = oneGuidancePayList.Sum(p => p.PayAmount ?? 0);
+                            var m = oneGuidancePayList.OrderByDescending(p => p.Id).FirstOrDefault();
                             if (m.PayDate != null)
                             {
                                 lastPayDate = DateTime.Parse(m.PayDate.ToString()).ToShortDateString();
                             }
                         }
-
-                        json.Append("{\"RowIndex\":\"" + index + "\",\"GuidanceId\":\"" + s.ItemId + "\",\"GuidanceName\":\"" + s.ItemName + "\",\"GuidanceMonth\":\"" + gmonth + "\",\"PayPrice\":\"" + totalPrice + "\",\"Pay\":\"" + totalPay + "\",\"LastPayDate\":\"" + lastPayDate + "\",\"PayRecordCount\":\"" + payRecordCount + "\"},");
+                        decimal debtPrice = totalPrice - totalPay;
+                        debtPrice = debtPrice <= 0 ? 0 : debtPrice;
+                        json.Append("{\"RowIndex\":\"" + index + "\",\"GuidanceId\":\"" + s.ItemId + "\",\"GuidanceName\":\"" + s.ItemName + "\",\"GuidanceMonth\":\"" + gmonth + "\",\"ShouldPayPrice\":\"" + totalPrice + "\",\"PayPrice\":\"" + totalPay + "\",\"DebtPrice\":\"" + debtPrice + "\",\"LastPayDate\":\"" + lastPayDate + "\",\"PayRecordCount\":\"" + payRecordCount + "\"},");
                         index++;
                     });
-                    result = "{\"code\":0,\"msg\":\"\",\"count\":"+rowCount+",\"data\":["+json.ToString().TrimEnd(',')+"]}";
+                    result = "{\"code\":0,\"msg\":\"\",\"count\":" + rowCount + ",\"AllShouldPay\":" + allShouldPay + ",\"AllPay\":" + allPay + ",\"AllDebt\":" + allDebt + ",\"data\":[" + json.ToString().TrimEnd(',') + "]}";
                 }
             }
             if (string.IsNullOrWhiteSpace(result))

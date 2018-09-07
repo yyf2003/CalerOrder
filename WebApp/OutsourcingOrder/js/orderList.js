@@ -13,9 +13,13 @@ var materialName = "";
 
 $(function () {
     CheckPrimissionWithMoreBtn(url, null, null, new Array($("#btnEditOrder"), $("#btnChangeOS")), new Array($("#btnDeleteOrder")), new Array($("#btnRecoverOrder")), null);
-
-    GetOutsourceList();
+    GetOutsourceRegion();
+    //GetOutsourceList();
     //Order.getOrderList(orderPageIndex, orderPageSize);
+
+    $("#outsourceRegionDiv").delegate("input[name='cbosRegion']", "change", function () {
+        GetOutsourceList();
+    })
 
     $("#guidanceDiv").delegate("input[name='guidanceCB']", "change", function () {
         GetSubjectList();
@@ -378,12 +382,37 @@ var Order = {
     }
 };
 
+function GetOutsourceRegion() {
+    $("#outsourceRegionDiv").html("");
+    $.ajax({
+        type: "get",
+        url: "handler/OrderList.ashx",
+        data: { type: "getOutsourceRegion" },
+        success: function (data) {
+
+            if (data != "") {
+                var json = eval(data);
+
+                for (var i = 0; i < json.length; i++) {
+                    var cbox = "<input type='checkbox' name='cbosRegion' value='" + json[i].RegionId + "'>" + json[i].RegionName + "&nbsp;&nbsp;";
+                    $("#outsourceRegionDiv").append(cbox);
+                }
+            }
+        },
+        complete: function () { GetOutsourceList(); }
+    })
+}
+
+
 function GetOutsourceList() {
 
- 
+    var regionId = "";
+    $("input[name='cbosRegion']:checked").each(function () {
+        regionId += $(this).val() + ",";
+    })
     $("#tbOutsource").datagrid({
         method: 'get',
-        url: 'handler/OrderList.ashx?type=getOutsource',
+        url: 'handler/OrderList.ashx?type=getOutsource&regionId=' + regionId,
         //data: json,
         columns: [[
                     { field: 'Id', hidden: true },

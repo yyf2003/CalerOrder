@@ -180,5 +180,6 @@ namespace Models
         public DbSet<UserInRole> UserInRole { get; set; }
         public DbSet<UserLevel> UserLevel { get; set; }
         public DbSet<OutsourcePayRecord> OutsourcePayRecord { get; set; }
+        public DbSet<OutsourceInstallPriceLevel> OutsourceInstallPriceLevel { get; set; }
     }
 }

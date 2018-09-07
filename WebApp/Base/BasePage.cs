@@ -6864,8 +6864,8 @@ namespace WebApp
                 outsourceOrderDetailModel.ReceiveTotalPrice = s.order.TotalPrice;
                 outsourceOrderDetailModel.RegionSupplementId = s.order.RegionSupplementId;
                 outsourceOrderDetailModel.CSUserId = s.order.CSUserId;
-                if ((s.order.OutsourceId ?? 0) > 0)
-                    outsourceOrderDetailModel.OutsourceId = s.order.OutsourceId ?? 0;
+                if ((s.order.ProduceOutsourceId ?? 0) > 0)
+                    outsourceOrderDetailModel.OutsourceId = s.order.ProduceOutsourceId ?? 0;
                 else
                     outsourceOrderDetailModel.OutsourceId = s.shop.OutsourceId ?? 0;
                 outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
@@ -8322,7 +8322,7 @@ namespace WebApp
                         int mainOutsourceId = shop.OutsourceId ?? 0;
                         //生产外协
                         int produceOutsourceId = shop.ProductOutsourceId ?? 0;
-
+                        
                         bool isInstallShop = shop.IsInstall == "Y";
                         bool isBCSInstallShop = shop.BCSIsInstall == "Y";//三叶草是否安装
                         //if (shop.Id == 709)
@@ -8671,8 +8671,7 @@ namespace WebApp
                                 {
                                     orderList1.ForEach(s =>
                                     {
-                                        //if ((s.order.ProduceOutsourceId ?? 0) > 0)
-                                        //    produceOutsourceId = s.order.ProduceOutsourceId ?? 0;
+                                       
                                         int Quantity = s.order.Quantity ?? 1;
                                         if (!string.IsNullOrWhiteSpace(s.order.Sheet) && ChangePOPCountSheetList.Any() && ChangePOPCountSheetList.Contains(s.order.Sheet.ToUpper()))
                                         {
@@ -9246,12 +9245,24 @@ namespace WebApp
                                                     {
                                                         outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                                                     }
+                                                    
                                                 }
                                                 if (s.order.OrderType == (int)OrderTypeEnum.发货费)
                                                 {
                                                     outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
                                                     if (s.order.Province == "内蒙古" && !s.order.City.Contains("通辽"))
                                                         outsourceOrderDetailModel.PayOrderPrice = 0;
+                                                }
+                                                if (s.order.OrderType == (int)OrderTypeEnum.其他费用 || s.order.OrderType == (int)OrderTypeEnum.发货费 || s.order.OrderType == (int)OrderTypeEnum.快递费)
+                                                {
+                                                    if ((s.order.ProduceOutsourceId ?? 0) > 0)
+                                                    {
+                                                        outsourceOrderDetailModel.OutsourceId = s.order.ProduceOutsourceId;
+                                                    }
+                                                    else if ((subjectModel.subject.OutsourceId ?? 0) > 0)
+                                                    {
+                                                        outsourceOrderDetailModel.OutsourceId = subjectModel.subject.OutsourceId;
+                                                    }
                                                 }
                                             }
                                             if (guidanceType == (int)GuidanceTypeEnum.Promotion || guidanceType == (int)GuidanceTypeEnum.Delivery)
@@ -9426,6 +9437,17 @@ namespace WebApp
                                         if (s.OrderType == (int)OrderTypeEnum.发货费)
                                         {
                                             outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                        }
+                                        if (s.OrderType == (int)OrderTypeEnum.其他费用 || s.OrderType == (int)OrderTypeEnum.发货费 || s.OrderType == (int)OrderTypeEnum.快递费)
+                                        {
+                                            if ((s.ProduceOutsourceId ?? 0) > 0)
+                                            {
+                                                outsourceOrderDetailModel.OutsourceId = s.ProduceOutsourceId;
+                                            }
+                                            else if ((subjectModel.subject.OutsourceId ?? 0) > 0)
+                                            {
+                                                outsourceOrderDetailModel.OutsourceId = subjectModel.subject.OutsourceId;
+                                            }
                                         }
                                     }
                                     if (guidanceType == (int)GuidanceTypeEnum.Promotion || guidanceType == (int)GuidanceTypeEnum.Delivery)
@@ -9859,15 +9881,21 @@ namespace WebApp
                                 outsourceOrderDetailModel.CSUserId = oneShopOrderList[0].CSUserId;
                                 outsourceOrderDetailModel.InstallPriceAddType = 1;
                                 //outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
-
-                                if (shop.ProvinceName == "天津")
-                                    outsourceOrderDetailModel.OutsourceId = calerOutsourceId;
+                                if ((subjectModel.subject.OutsourceId ?? 0) > 0)
+                                {
+                                    outsourceOrderDetailModel.OutsourceId = subjectModel.subject.OutsourceId ?? 0;
+                                }
                                 else
                                 {
-                                    if (isBCSSubject)
-                                        outsourceOrderDetailModel.OutsourceId = (shop.BCSOutsourceId ?? 0) > 0 ? (shop.BCSOutsourceId ?? 0) : (shop.OutsourceId ?? 0);
+                                    if (shop.ProvinceName == "天津")
+                                        outsourceOrderDetailModel.OutsourceId = calerOutsourceId;
                                     else
-                                        outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
+                                    {
+                                        if (isBCSSubject)
+                                            outsourceOrderDetailModel.OutsourceId = (shop.BCSOutsourceId ?? 0) > 0 ? (shop.BCSOutsourceId ?? 0) : (shop.OutsourceId ?? 0);
+                                        else
+                                            outsourceOrderDetailModel.OutsourceId = shop.OutsourceId ?? 0;
+                                    }
                                 }
                                 outsourceOrderDetailBll.Add(outsourceOrderDetailModel);
 
@@ -9880,6 +9908,67 @@ namespace WebApp
                 }
             }
             #endregion
+        }
+
+
+
+        /// <summary>
+        /// 获取外协区域list
+        /// </summary>
+        /// <param name="ddlOutsourceRegion"></param>
+        public void GetOutsourceRegion(DropDownList ddlOutsourceRegion)
+        {
+            var list = (from company in CurrentContext.DbContext.Company
+                        join region in CurrentContext.DbContext.Region
+                        on company.RegionId equals region.Id
+                        where company.IsDelete == null || company.IsDelete == false
+                        select region).Distinct().OrderBy(s=>s.Id).ToList();
+            if (list.Any())
+            {
+                list.ForEach(s => {
+                    ListItem li = new ListItem();
+                    li.Value = s.Id.ToString();
+                    li.Text = s.RegionName;
+                    ddlOutsourceRegion.Items.Add(li);
+                });
+            }
+            ddlOutsourceRegion.Items.Insert(0, new ListItem("--请选择区域--", "0"));
+        }
+
+
+
+        Dictionary<string, int> outsourceDic = new Dictionary<string, int>();
+        CompanyBLL companyBll = new CompanyBLL();
+        /// <summary>
+        /// 按照外协名称获取外协id
+        /// </summary>
+        /// <param name="outsourceName"></param>
+        /// <param name="outsourceId"></param>
+        /// <returns></returns>
+        public bool GetOutsourceName(string outsourceName, out int outsourceId)
+        {
+            bool flag = false;
+            outsourceId = 0;
+            if (!string.IsNullOrWhiteSpace(outsourceName))
+            {
+                outsourceName = outsourceName.ToLower();
+            }
+            if (outsourceDic.Keys.Contains(outsourceName))
+            {
+                outsourceId = outsourceDic[outsourceName];
+                flag = true;
+            }
+            else
+            {
+                Company model = companyBll.GetList(s => s.TypeId == (int)CompanyTypeEnum.Outsource && (s.CompanyName.ToLower() == outsourceName || (s.ShortName != null && s.ShortName.ToLower() == outsourceName)) && (s.IsDelete == null || s.IsDelete == false)).FirstOrDefault();
+                if (model != null)
+                {
+                    outsourceId = model.Id;
+                    outsourceDic.Add(outsourceName, outsourceId);
+                    flag = true;
+                }
+            }
+            return flag;
         }
     }
 }

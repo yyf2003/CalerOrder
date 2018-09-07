@@ -180,7 +180,14 @@ namespace WebApp.Subjects.PriceOrder
                                     finalOrderTempModel.PayOrderPrice = o.order.PayAmount;
                                     finalOrderTempModel.GuidanceId = o.order.GuidanceId;
                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
-                                    finalOrderTempModel.OutsourceId = o.order.OutsourceId;
+                                    if ((o.order.OutsourceId ?? 0) > 0)
+                                    {
+                                        finalOrderTempModel.ProduceOutsourceId = o.order.OutsourceId;
+                                    }
+                                    else if ((model.OutsourceId ?? 0) > 0)
+                                    {
+                                        finalOrderTempModel.ProduceOutsourceId = model.OutsourceId;
+                                    }
                                     finalOrderTempBll.Add(finalOrderTempModel);
                                     //new BasePage().SaveQuotationOrder(finalOrderTempModel, false);
                                 });

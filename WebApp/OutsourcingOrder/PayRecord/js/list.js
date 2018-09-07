@@ -4,6 +4,11 @@ var currOutsourceId = "";
 var currOutsourceName = "";
 var loadingImg;
 var selectedGuidanceId = "";
+
+var totalShouldPayPrice = 0;
+var totalPayPrice = 0;
+var totalDebtPrice = 0;
+
 $(function () {
 
 
@@ -39,6 +44,25 @@ $(function () {
         }
     })
 
+    $("#guidanceCBALL").click(function () {
+        var checked = this.checked;
+        $("input[name='guidanceCB']").each(function () {
+            this.checked = checked;
+        })
+    })
+
+    $("#guidanceDiv").delegate("input[name='guidanceCB']", "change", function () {
+        var totalLen = $("input[name='guidanceCB']").length;
+        var chckedLen = $("input[name='guidanceCB']:checked").length;
+        if (chckedLen<totalLen) {
+            $("#guidanceCBALL").prop("checked", false);
+        }
+        else if (totalLen > 0 && chckedLen == totalLen) {
+            $("#guidanceCBALL").prop("checked", true);
+        }
+    })
+
+
     $("#btnSearch").click(function () {
 
         $("#loadingImg").show();
@@ -49,8 +73,8 @@ $(function () {
     })
 
     $("#btnSubmitMore").click(function () {
-        var price = $("#selectTotalPrice").html() || 0;
-        if (parseFloat(price) == 0) {
+        //var price = $("#selectTotalPrice").html() || 0;
+        if (selectedGuidanceId == "") {
             layer.alert("请选择活动");
             return false;
         }
@@ -113,14 +137,40 @@ $(function () {
             selectedGuidanceId = "";
             var checkRow = table.checkStatus('tbGuidanceList');
             var checkData = checkRow.data;
-            var totalPrice = 0;
+            var selectShouldPayPrice = 0;
+            var selectPayPrice = 0;
+            var selectDebtPrice = 0;
             if (checkData.length > 0) {
                 for (var i = 0; i < checkData.length; i++) {
-                    totalPrice = parseFloat(totalPrice) + parseFloat(checkData[i].PayPrice);
+                    selectShouldPayPrice = parseFloat(selectShouldPayPrice) + parseFloat(checkData[i].ShouldPayPrice);
+                    selectPayPrice = parseFloat(selectPayPrice) + parseFloat(checkData[i].PayPrice);
+                    selectDebtPrice = parseFloat(selectDebtPrice) + parseFloat(checkData[i].DebtPrice);
                     selectedGuidanceId += checkData[i].GuidanceId + ",";
                 }
+                $("#SpanAllShouldPay").html(selectShouldPayPrice.toFixed(2));
+                $("#SpanAllPay").html(selectPayPrice.toFixed(2));
+                $("#SpanAllDebt").html(selectDebtPrice.toFixed(2));
+                if (selectDebtPrice > 0) {
+                    $("#SpanAllDebt").addClass("redFont");
+                }
+                else {
+                    $("#SpanAllDebt").removeClass("redFont");
+                }
             }
-            $("#selectTotalPrice").html(totalPrice.toFixed(2));
+            else {
+                $("#SpanAllShouldPay").html(totalShouldPayPrice.toFixed(2));
+                $("#SpanAllPay").html(totalPayPrice.toFixed(2));
+                $("#SpanAllDebt").html(totalDebtPrice.toFixed(2));
+                if (totalDebtPrice > 0) {
+                    $("#SpanAllDebt").addClass("redFont");
+                }
+                else {
+                    $("#SpanAllDebt").removeClass("redFont");
+                }
+            }
+
+            //$("#selectTotalPrice").html(totalPrice.toFixed(2));
+
         });
 
     });
@@ -220,7 +270,7 @@ var payRecord = {
                     "customerId": customerId,
                     "guidanceMonth": guidanceMonth,
                     "outsourceId": outsourceId,
-                    "guidanceId":guidanceId
+                    "guidanceId": guidanceId
                 },
                 method: "post",
                 cols: [[
@@ -228,14 +278,36 @@ var payRecord = {
                       { field: 'RowIndex', width: 60, title: '序号', style: 'color: #000;' },
                       { field: 'GuidanceMonth', width: 90, title: '活动月份', style: 'color: #000;' },
                       { field: 'GuidanceName', title: '活动名称', minWidth: 200, style: 'color: #000;' },
-                      { field: 'PayPrice', width: 120, title: '应付金额', style: 'color: #000;' },
-                      { field: 'Pay', title: '实付金额', width: 120, style: 'color: #000;' },
+                      { field: 'ShouldPayPrice', width: 120, title: '应付金额', style: 'color: #000;' },
+                      { field: 'PayPrice', title: '实付金额', width: 120, style: 'color: #000;' },
+                      { field: 'DebtPrice', title: '欠款金额', width: 120, style: 'color: #000;', templet: function (d) {
+                          if (d.DebtPrice > 0) {
+                              return '<span style="color:red;">' + d.DebtPrice + '</span>';
+                          }
+                          else
+                              return d.DebtPrice;
+                      }
+                      },
                       { field: 'PayRecordCount', width: 90, title: '付款记录', style: 'color: #000;' },
                       { field: 'LastPayDate', title: '最后付款时间', width: 120, style: 'color: #000;' },
                       { field: '', width: 150, title: '操作', style: 'color: #000;', toolbar: '#barDemo' }
                     ]],
                 page: true,
-                limit: 20
+                limit: 20,
+                done: function (res, curr, count) {
+                    totalShouldPayPrice = res.AllShouldPay;
+                    totalPayPrice = res.AllPay;
+                    totalDebtPrice = res.AllDebt;
+                    $("#SpanAllShouldPay").html(totalShouldPayPrice.toFixed(2));
+                    $("#SpanAllPay").html(totalPayPrice.toFixed(2));
+                    $("#SpanAllDebt").html(totalDebtPrice.toFixed(2));
+                    if (res.AllDebt > 0) {
+                        $("#SpanAllDebt").addClass("redFont");
+                    }
+                    else {
+                        $("#SpanAllDebt").removeClass("redFont");
+                    }
+                }
 
             });
 

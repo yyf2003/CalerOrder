@@ -50,8 +50,8 @@ namespace WebApp.Users.Handler
                     result = AddUser(jsonString, optype);
                     break;
                 case "getRegion":
-                    int customerId=int.Parse(context.Request.QueryString["customerId"].ToString());
-                    result=GetRegions(customerId); 
+                    //int customerId=int.Parse(context.Request.QueryString["customerId"].ToString());
+                    result=GetRegions(); 
                     break;
                 case "getProvince":
                     if (context.Request.QueryString["regionId"] != null)
@@ -380,9 +380,9 @@ namespace WebApp.Users.Handler
             return list.Any();
         }
 
-        string GetRegions(int customerId) 
+        string GetRegions() 
         {
-            var list = new RegionBLL().GetList(s=>s.CustomerId==customerId).OrderBy(s=>s.Id).ToList();
+            var list = new RegionBLL().GetList(s=>s.IsDelete==null ||s.IsDelete==false).OrderBy(s=>s.Id).ToList();
             if (list.Any())
             {
                 StringBuilder json = new StringBuilder();

@@ -43,5 +43,6 @@ namespace Models
         public Nullable<bool> IsValid { get; set; }
         public Nullable<int> ApproveState { get; set; }
         public Nullable<int> IsSubmit { get; set; }
+        public Nullable<int> OutsourceId { get; set; }
     }
 }

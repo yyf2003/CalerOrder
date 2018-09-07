@@ -1311,6 +1311,9 @@
                                                 <td>
                                                     备注
                                                 </td>
+                                                <td>
+                                                    外协
+                                                </td>
                                             </tr>
                                     </HeaderTemplate>
                                     <ItemTemplate>
@@ -1366,13 +1369,16 @@
                                             <td>
                                                 <%#Eval("order.Remark")%>
                                             </td>
+                                            <td>
+                                                <%#Eval("OutsourceName")%>
+                                            </td>
                                         </tr>
                                     </ItemTemplate>
                                     <FooterTemplate>
                                         <%if (repeater_POP1List.Items.Count == 0)
                                           { %>
                                         <tr class="tr_bai">
-                                            <td colspan="20" style="text-align: center;">
+                                            <td colspan="21" style="text-align: center;">
                                                 --无数据信息--
                                             </td>
                                         </tr>

@@ -174,6 +174,9 @@
                             <td>
                                 备注
                             </td>
+                            <td>
+                                外协
+                            </td>
                         </tr>
                 </HeaderTemplate>
                 <ItemTemplate>
@@ -185,35 +188,38 @@
                             <asp:Label ID="labOrderType" runat="server" Text=""></asp:Label>
                         </td>
                         <td>
-                            <%#Eval("ShopNo")%>
+                            <%#Eval("order.ShopNo")%>
                         </td>
                         <td>
-                            <%#Eval("ShopName")%>
+                            <%#Eval("order.ShopName")%>
                         </td>
                         <td>
-                            <%#Eval("Region")%>
+                            <%#Eval("order.Region")%>
                         </td>
                         <td>
-                            <%#Eval("Province")%>
+                            <%#Eval("order.Province")%>
                         </td>
                         <td>
-                            <%#Eval("City")%>
+                            <%#Eval("order.City")%>
                         </td>
                         <td>
-                            <%#Eval("Amount")%>
+                            <%#Eval("order.Amount")%>
                         </td>
                         <td>
-                            <%#Eval("PayAmount")%>
+                            <%#Eval("order.PayAmount")%>
                         </td>
                         <td>
-                            <%#Eval("Quantity")%>
+                            <%#Eval("order.Quantity")%>
                         </td>
                        
                         <td>
-                            <%#Eval("Contents")%>
+                            <%#Eval("order.Contents")%>
                         </td>
                         <td>
-                            <%#Eval("Remark")%>
+                            <%#Eval("order.Remark")%>
+                        </td>
+                        <td>
+                           <%#Eval("CompanyName")%>
                         </td>
                     </tr>
                 </ItemTemplate>
@@ -221,7 +227,7 @@
                     <%if (orderListRepeater.Items.Count == 0)
                       { %>
                     <tr class="tr_bai">
-                        <td colspan="12" style="text-align: center;">
+                        <td colspan="13" style="text-align: center;">
                             --暂无数据--
                         </td>
                     </tr>

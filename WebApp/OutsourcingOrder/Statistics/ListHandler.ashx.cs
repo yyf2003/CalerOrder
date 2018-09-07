@@ -47,8 +47,7 @@ namespace WebApp.OutsourcingOrder.Statistics
             context.Response.Write(result);
         }
 
-
-
+        
         string GetData()
         {
             string result = string.Empty;

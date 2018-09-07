@@ -12,6 +12,7 @@ namespace WebApp.Outsource
     public partial class PriceList : BasePage
     {
         public int companyId;
+        public int isOperator;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["companyId"] != null)
@@ -23,7 +24,17 @@ namespace WebApp.Outsource
             {
                 Company model = new CompanyBLL().GetModel(companyId);
                 if (model != null)
+                {
                     labName.Text = model.CompanyName;
+                    if (CurrentUser.RoleId == 1)
+                    {
+                        isOperator = 1;
+                    }
+                    else if (model.CustomerServiceId == CurrentUser.UserId)
+                    {
+                        isOperator = 1;
+                    }
+                }
             }
         }
 

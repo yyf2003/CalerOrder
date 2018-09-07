@@ -41,5 +41,6 @@ namespace Models
         public Nullable<bool> IsValid { get; set; }
         public Nullable<decimal> Price { get; set; }
         public Nullable<decimal> PayPrice { get; set; }
+        public Nullable<int> OutsourceId { get; set; }
     }
 }

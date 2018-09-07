@@ -2188,6 +2188,10 @@ namespace WebApp.Subjects.Handler
                                                         finalOrderTempModel.CSUserId = shop1.shop.CSUserId;
                                                         finalOrderTempModel.UnitName = unitName;
                                                         finalOrderTempModel.ProduceOutsourceId =pop.ProduceOutsourceId;
+                                                        if ((subjectModel.OutsourceId ?? 0) > 0)
+                                                        {
+                                                            finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
+                                                        }
                                                         finalOrderTempModel.AddDate = DateTime.Now;
                                                         finalOrderTempBll.Add(finalOrderTempModel);
                                                         
@@ -2344,6 +2348,10 @@ namespace WebApp.Subjects.Handler
                                                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                             finalOrderTempModel.UnitName = unitName;
                                                             finalOrderTempModel.AddDate = DateTime.Now;
+                                                            if ((subjectModel.OutsourceId ?? 0) > 0)
+                                                            {
+                                                                finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
+                                                            }
                                                             finalOrderTempBll.Add(finalOrderTempModel);
                                                            
                                                         }
@@ -2453,6 +2461,10 @@ namespace WebApp.Subjects.Handler
                                                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                                     finalOrderTempModel.UnitName = unitName;
                                                                     finalOrderTempModel.AddDate = DateTime.Now;
+                                                                    if ((subjectModel.OutsourceId ?? 0) > 0)
+                                                                    {
+                                                                        finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
+                                                                    }
                                                                     finalOrderTempBll.Add(finalOrderTempModel);
                                                                    
                                                                 }
@@ -2628,6 +2640,10 @@ namespace WebApp.Subjects.Handler
                                                                 finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                                 finalOrderTempModel.UnitName = unitName;
                                                                 finalOrderTempModel.AddDate = DateTime.Now;
+                                                                if ((subjectModel.OutsourceId ?? 0) > 0)
+                                                                {
+                                                                    finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
+                                                                }
                                                                 bool isOk = true;
                                                                 
                                                                 if (isOk)
@@ -2746,6 +2762,10 @@ namespace WebApp.Subjects.Handler
                                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                             finalOrderTempModel.UnitName = unitName;
                                             finalOrderTempModel.AddDate = DateTime.Now;
+                                            if ((subjectModel.OutsourceId ?? 0) > 0)
+                                            {
+                                                finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
+                                            }
                                             finalOrderTempBll.Add(finalOrderTempModel);
 
                                            
@@ -2854,6 +2874,10 @@ namespace WebApp.Subjects.Handler
                                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                     finalOrderTempModel.UnitName = unitName;
                                                     finalOrderTempModel.AddDate = DateTime.Now;
+                                                    if ((subjectModel.OutsourceId ?? 0) > 0)
+                                                    {
+                                                        finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
+                                                    }
                                                     finalOrderTempBll.Add(finalOrderTempModel);
                                                    
                                                 }
@@ -3034,6 +3058,10 @@ namespace WebApp.Subjects.Handler
                                                 finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                 finalOrderTempModel.AddDate = DateTime.Now;
                                                 finalOrderTempModel.UnitName = unitName;
+                                                if ((subjectModel.OutsourceId ?? 0) > 0)
+                                                {
+                                                    finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
+                                                }
                                                 bool isOk = true;
                                                
                                                 if (isOk)
@@ -3145,6 +3173,10 @@ namespace WebApp.Subjects.Handler
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                             finalOrderTempModel.UnitName = unitName;
                             finalOrderTempModel.AddDate = DateTime.Now;
+                            if ((subjectModel.OutsourceId ?? 0) > 0)
+                            {
+                                finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
+                            }
                             if (o.subject.SubjectType == (int)SubjectTypeEnum.正常单)
                             {
                                 finalOrderTempModel.IsFromRegion = true;
@@ -3237,6 +3269,10 @@ namespace WebApp.Subjects.Handler
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                             finalOrderTempModel.UnitName = unitName;
                             finalOrderTempModel.AddDate = DateTime.Now;
+                            //if ((subjectModel.OutsourceId ?? 0) > 0)
+                            //{
+                            //    finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
+                            //}
                             finalOrderTempBll.Add(finalOrderTempModel);
                             
                         });

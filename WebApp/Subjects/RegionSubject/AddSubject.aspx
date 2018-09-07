@@ -31,12 +31,12 @@
                     <td style="width: 120px;">
                         所属客户：
                     </td>
-                    <td style="text-align: left; padding-left: 5px; width: 300px;">
+                    <td style="text-align: left; padding-left: 5px; width: 250px;">
                         <asp:DropDownList ID="ddlCustomer" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlCustomer_SelectedIndexChanged">
                         </asp:DropDownList>
                         <span style="color: Red;">*</span>
                     </td>
-                    <td style="width: 120px;">
+                    <td style="width: 100px;">
                         订单类型：
                     </td>
                     <td style="text-align: left; padding-left: 5px;">
@@ -72,11 +72,11 @@
                     <td>
                         开始时间：
                     </td>
-                    <td style="text-align: left; padding-left: 5px; width: 300px;">
+                    <td style="text-align: left; padding-left: 5px;">
                         <asp:TextBox ID="txtBeginDate" runat="server" onclick="WdatePicker()" MaxLength="20"></asp:TextBox>
                         <span style="color: Red;">*</span>
                     </td>
-                    <td style="width: 120px;">
+                    <td>
                         结束时间：
                     </td>
                     <td style="text-align: left; padding-left: 5px;">
@@ -88,15 +88,18 @@
                     <td>
                         区域：
                     </td>
-                    <td style="text-align: left; padding-left: 5px;">
+                    <td colspan="3"  style="text-align: left; padding-left: 5px;">
                         <asp:RadioButtonList ID="rblRegion" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
                         </asp:RadioButtonList>
                         <span style="color: Red;">*</span>
                     </td>
+                   
+                </tr>
+                <tr class="tr_bai">
                     <td>
                         是否二次安装：
                     </td>
-                    <td style="text-align: left; padding-left: 5px;">
+                    <td colspan="3" style="text-align: left; padding-left: 5px;">
                         <asp:CheckBox ID="cbIsSecondInstall" runat="server" />是（安装费单独算）
                          &nbsp;&nbsp;&nbsp;&nbsp;
                         基础安装费类型：
@@ -113,6 +116,32 @@
                         <asp:TextBox ID="txtRemark" runat="server" Style="width: 280px;"></asp:TextBox>
                     </td>
                 </tr>
+            </table>
+
+            <br />
+            <div class="tr">>>外协选择
+              <span style="color:Red; font-weight:bolder;">*</span>
+            </div>
+            <table class="table">
+               <tr class="tr_bai">
+                  <td style="width: 120px;">生产外协：</td>
+                  <td style=" text-align:left; padding-left:5px;">
+                      <asp:DropDownList ID="ddlOutsourceRegion" runat="server" 
+                          onselectedindexchanged="ddlOutsourceRegion_SelectedIndexChanged" AutoPostBack="true">
+                        
+                      </asp:DropDownList>
+                      <asp:DropDownList ID="ddlOutsource" runat="server">
+                         <asp:ListItem Value="0">--请选择外协--</asp:ListItem>
+                      </asp:DropDownList>
+                      
+                  </td>
+               </tr>
+               <tr class="tr_bai">
+                  <td></td>
+                  <td style=" text-align:left; padding-left:5px;">
+                     <span style=" color:Blue;">提示：如果此项目中所有订单都是非店铺默认外协生产，就请选择生产外协；如果订单中需要多个生产外协，请在订单模板中填写！</span>
+                  </td>
+               </tr>
             </table>
             <br />
         </ContentTemplate>

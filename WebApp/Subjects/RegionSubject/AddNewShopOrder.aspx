@@ -72,14 +72,14 @@
             添加订单信息
         </p>
     </div>
-    <blockquote class="layui-elem-quote" style="height: 20px; font-weight: bold;">
+    <blockquote class="layui-elem-quote" style="height: 10px; font-weight: bold; line-height:10px; padding-left:10px;">
         项目信息</blockquote>
     <table class="layui-table" style="margin-top: -10px;">
         <tr>
             <td style="width: 100px;">
                 项目编号：
             </td>
-            <td style="text-align: left; padding-left: 5px; width: 300px;">
+            <td style="text-align: left; padding-left: 5px; width: 280px;">
                 <asp:Label ID="labSubjectNo" runat="server" Text=""></asp:Label>
             </td>
             <td style="width: 100px;">
@@ -123,6 +123,14 @@
             </td>
             <td colspan="3" style="text-align: left; padding-left: 5px;">
                 <asp:Label ID="labRemark" runat="server" Text=""></asp:Label>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                生产外协：
+            </td>
+            <td colspan="3" style="text-align: left; padding-left: 5px;">
+                <asp:Label ID="labProduceOutsource" runat="server" Text=""></asp:Label>
             </td>
         </tr>
     </table>
@@ -549,11 +557,14 @@
                         <th>
                             备注
                         </th>
+                        <th>
+                            生产外协
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="tbodyOrderEmpty">
                     <tr>
-                        <td colspan="18" style="text-align: center;">
+                        <td colspan="19" style="text-align: center;">
                             --暂无数据--
                         </td>
                     </tr>

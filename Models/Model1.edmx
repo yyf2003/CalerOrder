@@ -93,6 +93,7 @@
           <EntitySet Name="OrderType" EntityType="KalerOrderDBModel.Store.OrderType" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="OutsourceAssignShop" EntityType="KalerOrderDBModel.Store.OutsourceAssignShop" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="OutsourceInfo" EntityType="KalerOrderDBModel.Store.OutsourceInfo" store:Type="Tables" Schema="dbo" />
+          <EntitySet Name="OutsourceInstallPriceLevel" EntityType="KalerOrderDBModel.Store.OutsourceInstallPriceLevel" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="OutsourceInUser" EntityType="KalerOrderDBModel.Store.OutsourceInUser" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="OutSourceMaterial" EntityType="KalerOrderDBModel.Store.OutSourceMaterial" store:Type="Tables" Schema="dbo" />
           <EntitySet Name="OutsourceMaterialInfo" EntityType="KalerOrderDBModel.Store.OutsourceMaterialInfo" store:Type="Tables" Schema="dbo" />
@@ -826,6 +827,7 @@
           <Property Name="IsValid" Type="bit" />
           <Property Name="ApproveState" Type="int" />
           <Property Name="IsSubmit" Type="int" />
+          <Property Name="OutsourceId" Type="int" />
         </EntityType>
         <EntityType Name="HCOrderDetail">
           <Key>
@@ -1535,6 +1537,19 @@
           <Property Name="AddDate" Type="datetime" />
           <Property Name="Remark" Type="varchar" MaxLength="200" />
         </EntityType>
+        <EntityType Name="OutsourceInstallPriceLevel">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerId" Type="int" />
+          <Property Name="RegionId" Type="int" />
+          <Property Name="ProvinceId" Type="int" />
+          <Property Name="CityId" Type="int" />
+          <Property Name="BasicMaterialSupportId" Type="int" />
+          <Property Name="MaterialSupport" Type="varchar" MaxLength="50" />
+          <Property Name="BasicInstallPrice" Type="decimal" Scale="2" />
+        </EntityType>
         <EntityType Name="OutsourceInUser">
           <Key>
             <PropertyRef Name="Id" />
@@ -1724,6 +1739,7 @@
           <Property Name="InstallPriceAddType" Type="int" />
           <Property Name="InstallPriceSubjectType" Type="int" />
           <Property Name="BelongSubjectId" Type="int" />
+          <Property Name="IsFromRegion" Type="bit" />
         </EntityType>
         <EntityType Name="OutsourceOrderDetailNew">
           <Key>
@@ -2414,6 +2430,7 @@
           <Property Name="IsValid" Type="bit" />
           <Property Name="Price" Type="decimal" Scale="2" />
           <Property Name="PayPrice" Type="decimal" Scale="2" />
+          <Property Name="OutsourceId" Type="int" />
         </EntityType>
         <EntityType Name="RegionOrderPrice">
           <Key>
@@ -3188,6 +3205,7 @@
           <EntitySet Name="UserInRole" EntityType="KalerOrderDBModel.UserInRole" />
           <EntitySet Name="UserLevel" EntityType="KalerOrderDBModel.UserLevel" />
           <EntitySet Name="OutsourcePayRecord" EntityType="KalerOrderDBModel.OutsourcePayRecord" />
+          <EntitySet Name="OutsourceInstallPriceLevel" EntityType="KalerOrderDBModel.OutsourceInstallPriceLevel" />
         </EntityContainer>
         <EntityType Name="AccountCheckSupplement">
           <Key>
@@ -3837,6 +3855,7 @@
           <Property Type="Boolean" Name="IsValid" />
           <Property Type="Int32" Name="ApproveState" />
           <Property Type="Int32" Name="IsSubmit" />
+          <Property Type="Int32" Name="OutsourceId" />
         </EntityType>
         <EntityType Name="HCOrderDetail">
           <Key>
@@ -4732,6 +4751,7 @@
           <Property Type="Int32" Name="InstallPriceAddType" />
           <Property Type="Int32" Name="InstallPriceSubjectType" />
           <Property Type="Int32" Name="BelongSubjectId" />
+          <Property Type="Boolean" Name="IsFromRegion" />
         </EntityType>
         <EntityType Name="OutsourceOrderDetailNew">
           <Key>
@@ -5405,6 +5425,7 @@
           <Property Type="Boolean" Name="IsValid" />
           <Property Type="Decimal" Name="Price" Precision="18" Scale="2" />
           <Property Type="Decimal" Name="PayPrice" Precision="18" Scale="2" />
+          <Property Type="Int32" Name="OutsourceId" />
         </EntityType>
         <EntityType Name="RegionOrderPrice">
           <Key>
@@ -6032,6 +6053,19 @@
           <Property Type="DateTime" Name="AddDate" />
           <Property Type="String" Name="SubjectIds" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="Remark" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="OutsourceInstallPriceLevel">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="CustomerId" />
+          <Property Type="Int32" Name="RegionId" />
+          <Property Type="Int32" Name="ProvinceId" />
+          <Property Type="Int32" Name="CityId" />
+          <Property Type="Int32" Name="BasicMaterialSupportId" />
+          <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="BasicInstallPrice" Precision="18" Scale="2" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -6692,6 +6726,7 @@
           <EntitySetMapping Name="HandMadeOrderDetail">
             <EntityTypeMapping TypeName="KalerOrderDBModel.HandMadeOrderDetail">
               <MappingFragment StoreEntitySet="HandMadeOrderDetail">
+                <ScalarProperty Name="OutsourceId" ColumnName="OutsourceId" />
                 <ScalarProperty Name="IsSubmit" ColumnName="IsSubmit" />
                 <ScalarProperty Name="ApproveState" ColumnName="ApproveState" />
                 <ScalarProperty Name="IsValid" ColumnName="IsValid" />
@@ -7585,6 +7620,7 @@
           <EntitySetMapping Name="OutsourceOrderDetail">
             <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourceOrderDetail">
               <MappingFragment StoreEntitySet="OutsourceOrderDetail">
+                <ScalarProperty Name="IsFromRegion" ColumnName="IsFromRegion" />
                 <ScalarProperty Name="BelongSubjectId" ColumnName="BelongSubjectId" />
                 <ScalarProperty Name="InstallPriceSubjectType" ColumnName="InstallPriceSubjectType" />
                 <ScalarProperty Name="InstallPriceAddType" ColumnName="InstallPriceAddType" />
@@ -8339,6 +8375,7 @@
           <EntitySetMapping Name="RegionOrderDetail">
             <EntityTypeMapping TypeName="KalerOrderDBModel.RegionOrderDetail">
               <MappingFragment StoreEntitySet="RegionOrderDetail">
+                <ScalarProperty Name="OutsourceId" ColumnName="OutsourceId" />
                 <ScalarProperty Name="PayPrice" ColumnName="PayPrice" />
                 <ScalarProperty Name="Price" ColumnName="Price" />
                 <ScalarProperty Name="IsValid" ColumnName="IsValid" />
@@ -9032,6 +9069,20 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="OutsourceInstallPriceLevel">
+            <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourceInstallPriceLevel">
+              <MappingFragment StoreEntitySet="OutsourceInstallPriceLevel">
+                <ScalarProperty Name="BasicInstallPrice" ColumnName="BasicInstallPrice" />
+                <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+                <ScalarProperty Name="BasicMaterialSupportId" ColumnName="BasicMaterialSupportId" />
+                <ScalarProperty Name="CityId" ColumnName="CityId" />
+                <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -9209,6 +9260,7 @@
         <EntityTypeShape EntityType="KalerOrderDBModel.UserInRole" Width="1.5" PointX="38.75" PointY="38.75" Height="1.5506396484374818" />
         <EntityTypeShape EntityType="KalerOrderDBModel.UserLevel" Width="1.5" PointX="14.75" PointY="39.75" Height="1.365845540364603" />
         <EntityTypeShape EntityType="KalerOrderDBModel.OutsourcePayRecord" Width="1.5" PointX="31.375" PointY="40.75" Height="2.6594042968749818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInstallPriceLevel" Width="1.5" PointX="33.375" PointY="40.75" Height="2.474610188802103" />
       </Diagram>
     </Diagrams>
   </Designer>

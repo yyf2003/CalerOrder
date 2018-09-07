@@ -154,7 +154,8 @@ namespace WebApp.Customer.Handler
         string GetRegion()
         {
             RegionBLL regionBll = new RegionBLL();
-            var regioList = regionBll.GetList(s=>s.CustomerId==customerId && (s.IsDelete==null || s.IsDelete==false));
+            //var regioList = regionBll.GetList(s=>s.CustomerId==customerId && (s.IsDelete==null || s.IsDelete==false));
+            var regioList = regionBll.GetList(s => (s.IsDelete == null || s.IsDelete == false));
             if (regioList.Any())
             {
                 StringBuilder jsonStr = new StringBuilder();

@@ -12,6 +12,9 @@
     <script src="/My97DatePicker/WdatePicker.js" type="text/javascript"></script>
     <link href="/layui230/css/layui.css" rel="stylesheet" type="text/css" media="all" />
     <script src="/layui230/layui.all.js" type="text/javascript"></script>
+    <style type="text/css">
+        .redFont{ color:Red;}
+    </style>
     <script type="text/javascript">
         function submitSuccess() {
             layer.closeAll();
@@ -89,8 +92,15 @@
                         <a href="javascript:void(0)" class="layui-btn layui-btn-sm" id="btnSubmitMore">
                             批量添加</a>
                     </div>
-                    <div style="width: 500px; float: left; line-height:30px;">
-                        所选活动总金额：<span id="selectTotalPrice" style=" font-weight:bold;">0</span>
+                    <%--<div style="width: 400px; float: left; line-height:30px;">
+                        所选活动应付总数：<span id="selectTotalPrice" style=" font-weight:bold;">0</span>
+                    </div>--%>
+                    <div style=" float: left; line-height:30px; text-align:left;">
+                        应付金额：<span id="SpanAllShouldPay" style=" font-weight:bold;">0</span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        已付金额：<span id="SpanAllPay" style=" font-weight:bold;">0</span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        欠款金额：<span id="SpanAllDebt" style=" font-weight:bold;">0</span>
                     </div>
                 </div>
                 <div style="clear: both; margin-top: 5px;">

@@ -50,5 +50,7 @@ namespace Models
         public double ReceivePrice { get; set; }
         public double PayPrice { get; set; }
         public DateTime? AddDate { get; set; }
+        public int? ProduceOutsourceId { get; set; }
+        public string ProduceOutsourceName { get; set; }
     }
 }

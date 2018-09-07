@@ -138,6 +138,7 @@
     <Compile Include="OrderTypeBLL.cs" />
     <Compile Include="OutsourceAssignShopBLL.cs" />
     <Compile Include="OutsourceInfoBLL.cs" />
+    <Compile Include="OutsourceInstallPriceLevelBLL.cs" />
     <Compile Include="OutsourceInUserBLL.cs" />
     <Compile Include="OutSourceMaterialBLL.cs" />
     <Compile Include="OutsourceMaterialInfoBLL.cs" />

@@ -9,7 +9,12 @@ var province = "";
 var city = "";
 var assignType = "";
 $(function () {
-    GetOutsourceList();
+
+    GetOutsourceRegion();
+
+    $("#outsourceRegionDiv").delegate("input[name='cbosRegion']", "change", function () {
+        GetOutsourceList();
+    })
 
     $("#ddlCustomer").change(function () {
         GetGuidacneList();
@@ -99,10 +104,9 @@ $(function () {
 
                     $("#labTotalPrice").html(json[0].TotalPrice);
 
-                    var expressPriceTxt="0";
-                    if(json[0].ExpressPrice>0)
-                    {
-                       expressPriceTxt="<a href='javascript:void(0)' onclick='CheckExpressPrice()' style='text-decoration:underline;color:blue;'>" + json[0].ExpressPrice + "</a>";
+                    var expressPriceTxt = "0";
+                    if (json[0].ExpressPrice > 0) {
+                        expressPriceTxt = "<a href='javascript:void(0)' onclick='CheckExpressPrice()' style='text-decoration:underline;color:blue;'>" + json[0].ExpressPrice + "</a>";
                     }
                     $("#labExpressPrice").html(expressPriceTxt);
 
@@ -263,11 +267,36 @@ function init1() {
     $("#labRExpressPrice1").html("0");
 }
 
-function GetOutsourceList() {
+function GetOutsourceRegion() {
+    $("#outsourceRegionDiv").html("");
+    $.ajax({
+        type: "get",
+        url: "../handler/OrderList.ashx",
+        data: { type: "getOutsourceRegion" },
+        success: function (data) {
+            
+            if (data != "") {
+                var json = eval(data);
 
+                for (var i = 0; i < json.length; i++) {
+                    var cbox = "<input type='checkbox' name='cbosRegion' value='" + json[i].RegionId + "'>" + json[i].RegionName + "&nbsp;&nbsp;";
+                    $("#outsourceRegionDiv").append(cbox);
+                }
+            }
+        },
+        complete: function () { GetOutsourceList(); }
+    })
+}
+
+
+function GetOutsourceList() {
+    var regionId = "";
+    $("input[name='cbosRegion']:checked").each(function () {
+        regionId += $(this).val() + ",";
+    })
     $("#tbOutsource").datagrid({
         method: 'get',
-        url: '../handler/OrderList.ashx?type=getOutsource',
+        url: '../handler/OrderList.ashx?type=getOutsource&regionId=' + regionId,
         columns: [[
                     { field: 'Id', hidden: true },
                     { field: 'CompanyName', title: '外协名称' }
@@ -314,8 +343,6 @@ function GetGuidacneList() {
     });
 }
 
-
-
 function selectOutsource() {
     var rows = $("#tbOutsource").datagrid("getSelections");
     var oName = "";
@@ -340,7 +367,6 @@ function selectOutsource() {
     GetGuidacneList();
     $("#subjectDiv").html("");
 }
-
 
 function GetSubjectList() {
     var guidanceIds = "";
@@ -371,8 +397,6 @@ function GetSubjectList() {
         }
     })
 }
-
-
 
 function GetProvince() {
     var guidanceIds = "";

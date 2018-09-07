@@ -23,7 +23,7 @@
         <a href="/index.aspx">
             <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" /></a><p
                 class="nav_table_p">
-                外协订单统计
+                外协项目统计
             </p>
     </div>
     <div class="tr">
@@ -287,8 +287,7 @@
                                             <hr align="left" style="width: 100px; margin-bottom: 5px;" />
                                         </div>
                                         <asp:CheckBoxList ID="cblPropSubjects" runat="server" CssClass="cbl" CellSpacing="20"
-                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5" AutoPostBack="true"
-                                            OnSelectedIndexChanged="cblPropSubjects_SelectedIndexChanged">
+                                            RepeatDirection="Horizontal" RepeatLayout="Flow" RepeatColumns="5">
                                         </asp:CheckBoxList>
                                     </td>
                                 </tr>

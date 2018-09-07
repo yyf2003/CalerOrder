@@ -40,9 +40,7 @@ namespace WebApp.Subjects.RegionSubject.handler
                 case "getOrderShopList":
                     result = GetOrderShopList();
                     break;
-                //case "getMaterialList":
-                //    result = GetMaterialList();
-                //    break;
+               
                 case "getPOP":
                     result = GetPOPList();
                     break;
@@ -52,15 +50,7 @@ namespace WebApp.Subjects.RegionSubject.handler
                 case "deleteOrder":
                     result = DeleteOrder();
                     break;
-                //case "deleteMaterail":
-                //    result = DeleteMaterial();
-                //    break;
-                //case "getCustomerMaterail":
-                //    result = GetCustomerMaterial();
-                //    break;
-                //case "getSheetList":
-                //    result = GetSheetList();
-                //    break;
+                
                 case "getOrder":
                     result = GetOrder();
                     break;
@@ -107,12 +97,16 @@ namespace WebApp.Subjects.RegionSubject.handler
             var list = (from order in CurrentContext.DbContext.RegionOrderDetail
                         join shop in CurrentContext.DbContext.Shop
                         on order.ShopId equals shop.Id
+                        join outsource1 in CurrentContext.DbContext.Company
+                        on order.OutsourceId equals outsource1.Id into temp
+                        from outsource in temp.DefaultIfEmpty()
                         where order.SubjectId == subjectId
                         && (shopId > 0 ? order.ShopId == shopId : 1 == 1)
                         select new
                         {
                             order,
-                            shop
+                            shop,
+                            OutsourceName = outsource.CompanyName
                         }).OrderBy(s => s.order.OrderType).ToList();
             if (list.Any())
             {
@@ -124,38 +118,11 @@ namespace WebApp.Subjects.RegionSubject.handler
                     string addDate = string.Empty;
                     if (s.order.AddDate != null)
                         addDate = s.order.AddDate.ToString();
-                    //string Quantity = (s.order.Quantity ?? 1).ToString();
-                    //if ((s.order.OrderType ?? 1) > (int)OrderTypeEnum.物料)
-                    //{
-                        
-                        //json.Append("{\"Id\":\"" + s.order.Id + "\",\"OrderType\":\"" + type + "\",\"ShopId\":\"" + s.shop.Id + "\",\"ShopNo\":\"" + s.shop.ShopNo + "\",\"ShopName\":\"" + s.shop.ShopName + "\",\"RegionName\":\"" + s.shop.RegionName + "\",\"ProvinceName\":\"" + s.shop.ProvinceName + "\",\"CityName\":\"" + s.shop.CityName + "\",\"MaterialSupport\":\"\",\"POSScale\":\"\",\"Channel\":\"\",\"Format\":\"\",\"Sheet\":\"\",\"GraphicNo\":\"\",\"Gender\":\"\",\"Quantity\":\"" + s.order.Quantity + "\",\"GraphicWidth\":\"\",\"GraphicLength\":\"\",\"GraphicMaterial\":\"\",\"PositionDescription\":\"\",\"ChooseImg\":\"\",\"Remark\":\"" + s.order.Remark + "\",\"IsApprove\":\"" + (s.order.ApproveState ?? 0) + "\",\"AddDate\":\"" + addDate + "\",\"Price\":\"\"},");
-                    //}
-                    //else
-                    //{
-                    json.Append("{\"Id\":\"" + s.order.Id + "\",\"OrderType\":\"" + (s.order.OrderType ?? 1) + "\",\"OrderTypeName\":\"" + type + "\",\"ShopId\":\"" + s.order.ShopId + "\",\"ShopNo\":\"" + s.shop.ShopNo + "\",\"ShopName\":\"" + s.shop.ShopName + "\",\"RegionName\":\"" + s.shop.RegionName + "\",\"ProvinceName\":\"" + s.shop.ProvinceName + "\",\"CityName\":\"" + s.shop.CityName + "\",\"MaterialSupport\":\"" + s.order.MaterialSupport + "\",\"POSScale\":\"" + s.order.POSScale + "\",\"Channel\":\"" + s.shop.Channel + "\",\"Format\":\"" + s.shop.Format + "\",\"Sheet\":\"" + s.order.Sheet + "\",\"GraphicNo\":\"" + s.order.GraphicNo + "\",\"Gender\":\"" + s.order.Gender + "\",\"Quantity\":\"" + s.order.Quantity + "\",\"GraphicWidth\":\"" + s.order.GraphicWidth + "\",\"GraphicLength\":\"" + s.order.GraphicLength + "\",\"GraphicMaterial\":\"" + s.order.GraphicMaterial + "\",\"PositionDescription\":\"" + s.order.PositionDescription + "\",\"ChooseImg\":\"" + s.order.ChooseImg + "\",\"Remark\":\"" + s.order.Remark + "\",\"IsApprove\":\"" + (s.order.ApproveState ?? 0) + "\",\"AddDate\":\"" + addDate + "\",\"Price\":\"" + s.order.Price + "\",\"PayPrice\":\"" + s.order.PayPrice + "\"},");
-                    //}
+
+                    json.Append("{\"Id\":\"" + s.order.Id + "\",\"OrderType\":\"" + (s.order.OrderType ?? 1) + "\",\"OrderTypeName\":\"" + type + "\",\"ShopId\":\"" + s.order.ShopId + "\",\"ShopNo\":\"" + s.shop.ShopNo + "\",\"ShopName\":\"" + s.shop.ShopName + "\",\"RegionName\":\"" + s.shop.RegionName + "\",\"ProvinceName\":\"" + s.shop.ProvinceName + "\",\"CityName\":\"" + s.shop.CityName + "\",\"MaterialSupport\":\"" + s.order.MaterialSupport + "\",\"POSScale\":\"" + s.order.POSScale + "\",\"Channel\":\"" + s.shop.Channel + "\",\"Format\":\"" + s.shop.Format + "\",\"Sheet\":\"" + s.order.Sheet + "\",\"GraphicNo\":\"" + s.order.GraphicNo + "\",\"Gender\":\"" + s.order.Gender + "\",\"Quantity\":\"" + s.order.Quantity + "\",\"GraphicWidth\":\"" + s.order.GraphicWidth + "\",\"GraphicLength\":\"" + s.order.GraphicLength + "\",\"GraphicMaterial\":\"" + s.order.GraphicMaterial + "\",\"PositionDescription\":\"" + s.order.PositionDescription + "\",\"ChooseImg\":\"" + s.order.ChooseImg + "\",\"Remark\":\"" + s.order.Remark + "\",\"IsApprove\":\"" + (s.order.ApproveState ?? 0) + "\",\"AddDate\":\"" + addDate + "\",\"Price\":\"" + s.order.Price + "\",\"PayPrice\":\"" + s.order.PayPrice + "\",\"OutsourceName\":\"" + s.OutsourceName + "\"},");
+                   
 
                 });
-                //var orderPriceList = (from price in CurrentContext.DbContext.RegionOrderPrice
-                //                      join shop in CurrentContext.DbContext.Shop
-                //                      on price.ShopId equals shop.Id
-                //                      where price.SubjectId == subjectId && price.ShopId == shopId
-                //                      select new
-                //                      {
-                //                          price,
-                //                          shop
-                //                      }).ToList();
-                //if (orderPriceList.Any())
-                //{
-                //    orderPriceList.ForEach(s => {
-                //        string type = CommonMethod.GetEnumDescription<RegionOrderPriceTypeEnum>((s.price.PriceTypeId??1).ToString());
-                //        string addDate = string.Empty;
-                //        if (s.price.AddDate != null)
-                //        addDate = s.price.AddDate.ToString();
-                //        json.Append("{\"Id\":\"" + s.price.Id + "\",\"OrderType\":\"" + type + "\",\"ShopId\":\"" + s.shop.Id + "\",\"ShopNo\":\"" + s.shop.ShopNo + "\",\"ShopName\":\"" + s.shop.ShopName + "\",\"RegionName\":\"" + s.shop.RegionName + "\",\"ProvinceName\":\"" + s.shop.ProvinceName + "\",\"CityName\":\"" + s.shop.CityName + "\",\"MaterialSupport\":\"\",\"POSScale\":\"\",\"Channel\":\"\",\"Format\":\"\",\"Sheet\":\"\",\"GraphicNo\":\"\",\"Gender\":\"\",\"Quantity\":\"" + s.price.Price + "\",\"GraphicWidth\":\"\",\"GraphicLength\":\"\",\"GraphicMaterial\":\"\",\"PositionDescription\":\"\",\"ChooseImg\":\"\",\"Remark\":\"" + s.price.Remark + "\",\"IsApprove\":\"" + (s.price.ApproveState ?? 0) + "\",\"AddDate\":\"" + addDate + "\"},");
-
-                //    });
-                //}
                 result = "[" + json.ToString().TrimEnd(',') + "]";
             }
             return result;

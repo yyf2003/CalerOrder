@@ -67,6 +67,7 @@
             </tr>
         </table>
         <br />
+        <!--
         <div class="tab" style="margin-top: 10px;">
             <span style="font-size:13px;">区域信息</span>  
             <hr style="margin-top: 8px; margin-bottom: 5px; border: 1px solid; color: #000;" />
@@ -92,6 +93,7 @@
        </table>
        <br />
        <div id="regionDiv" class="tab"></div>
+       -->
        <br />
        <div style="text-align: center; height: 35px;">
         

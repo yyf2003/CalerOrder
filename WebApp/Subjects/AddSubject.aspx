@@ -182,6 +182,32 @@
                 </tr>
             </table>
             <br />
+            <div class="tr">>>外协选择
+              <span style="color:Red; font-weight:bolder;">*</span>
+            </div>
+            <table class="table">
+               <tr class="tr_bai">
+                  <td style="width: 120px;">生产外协：</td>
+                  <td style=" text-align:left; padding-left:5px;">
+                      <asp:DropDownList ID="ddlOutsourceRegion" runat="server" 
+                          onselectedindexchanged="ddlOutsourceRegion_SelectedIndexChanged" AutoPostBack="true">
+                        <%-- <asp:ListItem Value="0">--请选择区域--</asp:ListItem>--%>
+                      </asp:DropDownList>
+                      <asp:DropDownList ID="ddlOutsource" runat="server">
+                         <asp:ListItem Value="0">--请选择外协--</asp:ListItem>
+                      </asp:DropDownList>
+                      
+                  </td>
+               </tr>
+               <tr class="tr_bai">
+                  <td></td>
+                  <td style=" text-align:left; padding-left:5px;">
+                     <span style=" color:Blue;">提示：如果此项目中所有订单都是非店铺默认外协生产，就请选择生产外协；如果订单中需要多个生产外协，请在订单模板中填写！</span>
+                  </td>
+               </tr>
+            </table>
+
+            <br />
             <div style="text-align: center; height: 35px;">
                 <div id="div0" style="display: none;">
                 </div>

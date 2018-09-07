@@ -78,10 +78,22 @@ namespace WebApp.Subjects.PriceOrder
 
         void BindOrderData()
         {
-            var orderList = new PriceOrderDetailBLL().GetList(s => s.SubjectId == subjectId);
+            //var orderList = new PriceOrderDetailBLL().GetList(s => s.SubjectId == subjectId);
+            var orderList = (from order in CurrentContext.DbContext.PriceOrderDetail
+                             join outsource1 in CurrentContext.DbContext.Company
+                             on order.OutsourceId equals outsource1.Id into temp
+                             from outsource in temp.DefaultIfEmpty()
+                             where order.SubjectId == subjectId
+                             select new
+                             {
+                                 order,
+                                 outsource.CompanyName,
+                                 OrderType = order.OrderType
+                             }).ToList();
+
             AspNetPager1.RecordCount = orderList.Count;
             this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
-            orderListRepeater.DataSource = orderList.OrderBy(s => s.ShopId).ThenBy(s => s.OrderType).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            orderListRepeater.DataSource = orderList.OrderBy(s => s.order.ShopId).ThenBy(s => s.order.OrderType).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
             orderListRepeater.DataBind();
             Panel_OrderList.Visible = orderList.Any();
         }
@@ -388,10 +400,17 @@ namespace WebApp.Subjects.PriceOrder
         {
             if (e.Item.ItemIndex != -1)
             {
-                PriceOrderDetail model = (PriceOrderDetail)e.Item.DataItem;
-                if (model != null)
+                //PriceOrderDetail model = (PriceOrderDetail)e.Item.DataItem;
+                //if (model != null)
+                //{
+                //    string orderType = (model.OrderType ?? 0).ToString();
+                //    ((Label)e.Item.FindControl("labOrderType")).Text = CommonMethod.GeEnumName<OrderTypeEnum>(orderType);
+                //}
+                object item = e.Item.DataItem;
+                if (item != null)
                 {
-                    string orderType = (model.OrderType ?? 0).ToString();
+                    object objOrderType = item.GetType().GetProperty("OrderType").GetValue(item, null);
+                    string orderType = objOrderType != null ? objOrderType.ToString() : "0";
                     ((Label)e.Item.FindControl("labOrderType")).Text = CommonMethod.GeEnumName<OrderTypeEnum>(orderType);
                 }
             }
@@ -428,32 +447,6 @@ namespace WebApp.Subjects.PriceOrder
             Response.Redirect(string.Format("/Subjects/AddSubject.aspx?subjectId={0}", subjectId), false);
         }
 
-        Dictionary<string, int> outsourceDic = new Dictionary<string, int>();
-        CompanyBLL companyBll = new CompanyBLL();
-        bool GetOutsourceName(string outsourceName, out int outsourceId)
-        {
-            bool flag = false;
-            outsourceId = 0;
-            if (!string.IsNullOrWhiteSpace(outsourceName))
-            {
-                outsourceName = outsourceName.ToLower();
-            }
-            if (outsourceDic.Keys.Contains(outsourceName))
-            {
-                outsourceId = outsourceDic[outsourceName];
-                flag = true;
-            }
-            else
-            {
-                Company model = companyBll.GetList(s => s.TypeId == (int)CompanyTypeEnum.Outsource && (s.CompanyName.ToLower() == outsourceName || (s.ShortName != null && s.ShortName.ToLower() == outsourceName)) && (s.IsDelete == null || s.IsDelete == false)).FirstOrDefault();
-                if (model != null)
-                {
-                    outsourceId = model.Id;
-                    outsourceDic.Add(outsourceName, outsourceId);
-                    flag = true;
-                }
-            }
-            return flag;
-        }
+       
     }
 }

@@ -625,6 +625,7 @@ var Order = {
                                 tr += "<td></td>";
                                 tr += "<td></td>";
                                 tr += "<td>" + json[i].Remark + "</td>";
+                                tr += "<td>" + json[i].OutsourceName + "</td>";
                                 tr += "</tr>";
                             }
                             else {
@@ -643,6 +644,7 @@ var Order = {
                                 tr += "<td>" + json[i].PositionDescription + "</td>";
                                 tr += "<td>" + json[i].ChooseImg + "</td>";
                                 tr += "<td>" + json[i].Remark + "</td>";
+                                tr += "<td>" + json[i].OutsourceName + "</td>";
                                 tr += "</tr>";
                             }
                         }

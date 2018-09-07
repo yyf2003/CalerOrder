@@ -24,6 +24,7 @@ namespace WebApp.Subjects.RegionSubject
             if (!IsPostBack)
             {
                 BindMyCustomerList(ddlCustomer);
+                GetOutsourceRegion(ddlOutsourceRegion);
                 BindSBCInstallType();
                 if (subjectId == 0)
                 {
@@ -77,6 +78,17 @@ namespace WebApp.Subjects.RegionSubject
                     rblSecondInstallType.SelectedValue = (model.SecondBasicInstallPriceType ?? 1).ToString();
                 }
                 txtRemark.Text = model.Remark;
+
+                if ((model.OutsourceId ?? 0) > 0)
+                {
+                    Company outsourceModel = new CompanyBLL().GetModel(model.OutsourceId ?? 0);
+                    if (outsourceModel != null)
+                    {
+                        ddlOutsourceRegion.SelectedValue = (outsourceModel.RegionId ?? 0).ToString();
+                        ChangeOutsourceRegion();
+                        ddlOutsource.SelectedValue = (model.OutsourceId ?? 0).ToString();
+                    }
+                }
             }
         }
 
@@ -322,6 +334,8 @@ namespace WebApp.Subjects.RegionSubject
                 subjectModel.IsSecondInstall = false;
                 subjectModel.SecondBasicInstallPriceType = null;
             }
+            int outsourceId = int.Parse(ddlOutsource.SelectedValue);
+            subjectModel.OutsourceId = outsourceId;
             if (subjectId > 0)
             {
                 subjectBll.Update(subjectModel);
@@ -390,6 +404,28 @@ namespace WebApp.Subjects.RegionSubject
             }
         }
 
+        protected void ddlOutsourceRegion_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ChangeOutsourceRegion();
+        }
+
+        void ChangeOutsourceRegion()
+        {
+            ddlOutsource.Items.Clear();
+            int regionId = int.Parse(ddlOutsourceRegion.SelectedValue);
+            var list = new CompanyBLL().GetList(s => s.RegionId == regionId && s.TypeId == (int)CompanyTypeEnum.Outsource && (s.IsDelete == null || s.IsDelete == false));
+            if (list.Any())
+            {
+                list.ForEach(s =>
+                {
+                    ListItem li = new ListItem();
+                    li.Value = s.Id.ToString();
+                    li.Text = s.CompanyName;
+                    ddlOutsource.Items.Add(li);
+                });
+            }
+            ddlOutsource.Items.Insert(0, new ListItem("--请选择外协--", "0"));
+        }
        
     }
 }

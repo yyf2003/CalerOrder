@@ -17,81 +17,94 @@
 </head>
 <body>
     <form id="form1" runat="server">
-    <div>
-        <table class="table">
-            <tr class="tr_bai">
-                <td style="width: 100px;">
-                    外协名称：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labOutsourceName" runat="server" Text=""></asp:Label>
-                </td>
-            </tr>
-            <tr class="tr_bai">
-                <td>
-                    活动名称：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labGuidanceName" runat="server" Text=""></asp:Label>
-                </td>
-            </tr>
-            <tr class="tr_bai">
-                <td>
-                    项目类型：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:CheckBoxList ID="cblSubjectCategory" runat="server" RepeatDirection="Horizontal"
-                        RepeatLayout="Flow">
-                    </asp:CheckBoxList>
-                </td>
-            </tr>
-            <tr class="tr_bai">
-                <td>
-                    项目名称：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <div><span id="spanExpend" style=" color:Blue; text-decoration:underline; cursor:pointer;">展开</span></div>
-                    <div id="subjectListDiv" style=" display:none;">
-                      <asp:CheckBoxList ID="cblSubject" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
-                      </asp:CheckBoxList>
-                    </div>
-                </td>
-            </tr>
-            <tr class="tr_bai">
-                <td>
-                    应付金额：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:Label ID="labShouldPay" runat="server" Text="0"></asp:Label>
-                </td>
-            </tr>
-            <tr class="tr_bai">
-                <td>
-                    实付金额：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtPay" runat="server" MaxLength="10" autocomplete="off"></asp:TextBox>
-                    <span style=" color:Red;">*</span>
-                </td>
-            </tr>
-            <tr class="tr_bai">
-                <td>
-                    付款日期：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtPayDate" runat="server" CssClass="Wdate" onclick="WdatePicker()"></asp:TextBox>
-                </td>
-            </tr>
-            <tr class="tr_bai">
-                <td>
-                    备注：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <asp:TextBox ID="txtRemark" runat="server" autocomplete="off" Style="width: 350px;"></asp:TextBox>
-                </td>
-            </tr>
-        </table>
-    </div>
+    <asp:ScriptManager ID="ScriptManager1" runat="server">
+    </asp:ScriptManager>
+    <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+        <ContentTemplate>
+            <div>
+                <table class="table">
+                    <tr class="tr_bai">
+                        <td style="width: 100px;">
+                            外协名称：
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <asp:Label ID="labOutsourceName" runat="server" Text=""></asp:Label>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            活动名称：
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <asp:Label ID="labGuidanceName" runat="server" Text=""></asp:Label>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            项目类型：
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <asp:CheckBoxList ID="cblSubjectCategory" runat="server" RepeatDirection="Horizontal"
+                                RepeatLayout="Flow" AutoPostBack="true" OnSelectedIndexChanged="cblSubjectCategory_SelectedIndexChanged">
+                            </asp:CheckBoxList>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            项目名称：
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <div>
+                                <asp:LinkButton ID="lbShowSubject" runat="server" Style="color: Blue;" OnClick="lbShowSubject_Click">展开</asp:LinkButton>
+                            </div>
+                            <asp:Panel ID="PanelSubject" runat="server" Visible="false">
+                                <%--<div>
+                                   <asp:CheckBox ID="cbAllSubject" runat="server" 
+                                        oncheckedchanged="cbAllSubject_CheckedChanged" /><span style="color:Blue;">全选</span>
+                                </div>
+                                <asp:CheckBoxList ID="cblSubject" runat="server" RepeatDirection="Horizontal" RepeatLayout="Flow">
+                                </asp:CheckBoxList>--%>
+                                <asp:Label ID="labSubject" runat="server" Text=""></asp:Label>
+                            </asp:Panel>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            应付金额：
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <asp:Label ID="labShouldPay" runat="server" Text="0"></asp:Label>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            实付金额：
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <asp:TextBox ID="txtPay" runat="server" MaxLength="10" autocomplete="off"></asp:TextBox>
+                            <span style="color: Red;">*</span>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            付款日期：
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <asp:TextBox ID="txtPayDate" runat="server" CssClass="Wdate" onclick="WdatePicker()"></asp:TextBox>
+                        </td>
+                    </tr>
+                    <tr class="tr_bai">
+                        <td>
+                            备注：
+                        </td>
+                        <td style="text-align: left; padding-left: 5px;">
+                            <asp:TextBox ID="txtRemark" runat="server" autocomplete="off" Style="width: 350px;"></asp:TextBox>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </ContentTemplate>
+    </asp:UpdatePanel>
     <div style="text-align: center; margin-top: 20px;">
         <asp:Button ID="btnSubmit" runat="server" Text="提 交" class="layui-btn layui-btn-normal"
             OnClick="btnSubmit_Click" OnClientClick="return check();" />

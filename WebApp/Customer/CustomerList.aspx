@@ -80,12 +80,12 @@
                 </ItemTemplate>
                 <HeaderStyle Width="80px"></HeaderStyle>
            </asp:TemplateField>
-             <asp:TemplateField HeaderText="区域信息" HeaderStyle-Width="80px" HeaderStyle-BorderColor="#dce0e9">
+             <%--<asp:TemplateField HeaderText="区域信息" HeaderStyle-Width="80px" HeaderStyle-BorderColor="#dce0e9">
                 <ItemTemplate>
                     <a href="/Regions/List.aspx?customerId=<%#Eval("Id") %>" style=" color:Blue;">查看</a>
                 </ItemTemplate>
                 <HeaderStyle Width="80px"></HeaderStyle>
-            </asp:TemplateField>
+            </asp:TemplateField>--%>
             <asp:TemplateField HeaderText="订单类型" HeaderStyle-Width="80px" HeaderStyle-BorderColor="#dce0e9">
                 <ItemTemplate>
                     <a href="CustomerOrderTypeList.aspx?customerId=<%#Eval("Id") %>" style=" color:Blue;">查看</a>

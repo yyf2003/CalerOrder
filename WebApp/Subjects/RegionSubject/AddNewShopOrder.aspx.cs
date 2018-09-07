@@ -33,13 +33,16 @@ namespace WebApp.Subjects.RegionSubject
                          on subject.CustomerId equals customer.Id
                          join user in CurrentContext.DbContext.UserInfo
                          on subject.AddUserId equals user.UserId
+                         join outsource1 in CurrentContext.DbContext.Company
+                         on subject.OutsourceId equals outsource1.Id into temp
+                         from outsource in temp.DefaultIfEmpty()
                          where subject.Id == SubjectId
                          select new
                          {
                              subject,
                              customer.CustomerName,
-                             user.RealName
-
+                             user.RealName,
+                             OutsourceName = outsource.CompanyName
                          }).FirstOrDefault();
             if (model != null)
             {
@@ -50,7 +53,7 @@ namespace WebApp.Subjects.RegionSubject
                 int subjectType = model.subject.SubjectType ?? 1;
                 labSubjectType.Text = CommonMethod.GeEnumName<SubjectTypeEnum>(subjectType.ToString());
                 labRegion.Text = model.subject.SupplementRegion;
-
+                labProduceOutsource.Text = model.OutsourceName;
             }
         }
 
@@ -97,19 +100,7 @@ namespace WebApp.Subjects.RegionSubject
                     subjectBll.Update(model);
                     //submitIsValid = true;
                 }
-                //if (!submitIsValid)
-                //{
-                //    var orderList0 = orderBll.GetList(s => s.SubjectId == SubjectId && s.IsSubmit == 1);
-                //    if (orderList0.Any())
-                //    {
-                //        orderList0 = orderList0.Where(s => s.ApproveState == null || s.ApproveState == 0).ToList();
-                //        if (!orderList0.Any())
-                //        {
-                //            model.ApproveState = 1;
-                //            subjectBll.Update(model);
-                //        }
-                //    }
-                //}
+               
                 Alert("提交成功", "List.aspx");
             }
             else

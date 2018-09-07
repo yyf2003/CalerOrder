@@ -7,9 +7,10 @@ var provinceId = 0;
 var cityId = 0;
 var companyProvinceIds = "";
 var companyCityIds = "";
+var csUserId = 0;
 $(function () {
     CheckPrimission(url, null, $("#btnAdd"), $("#btnEdit"), $("#btnDelete"), $("#btnRecover"), $("#separator1"));
-
+    Outsource.getSearchRegion();
     Outsource.getList(pageIndex, pageSize);
 
 
@@ -64,12 +65,13 @@ $(function () {
             regionId = row.RegionId;
             provinceId = row.ProvinceId;
             cityId = row.CityId;
+            csUserId = row.CustomerServiceId || 0;
             Outsource.getRegion();
             $("#txtAddress").val(row.Address);
             $("#txtContact").val(row.Contact);
             $("#txtTel").val(row.Tel);
             $("#txtJoinDate").val(row.JoinDate);
-            Outsource.getCustomerService(row.CustomerServiceId);
+            //Outsource.getCustomerService(row.CustomerServiceId);
             companyProvinceIds = row.ProvinceIds;
             companyCityIds = row.CityIds;
             Outsource.loadProvince();
@@ -157,6 +159,8 @@ $(function () {
     $("#selRegion").change(function () {
         Outsource.getProvince();
         Outsource.loadProvince();
+        regionId = $(this).val();
+        Outsource.getCustomerService();
     });
 
     $("#selProvince").change(function () {
@@ -164,9 +168,14 @@ $(function () {
     });
 
     $("#provinceContainer").delegate("input[name='cbProvince']", "change", function () {
-
         Outsource.loadCity();
     });
+
+    $("#btnSearchOutsource").click(function () {
+         pageIndex = 1;
+         pageSize = 15;
+        Outsource.getList(pageIndex, pageSize);
+    })
 })
 
 
@@ -187,8 +196,11 @@ var Outsource = {
 
     },
     getList: function (pageIndex, pageSize) {
+        var selRegionId = $("#seleSearchRegion").val();
+        var outsourceName = $.trim($("#txtSearchName").val());
+        
         $("#tbCompany").datagrid({
-            queryParams: { type: "getList", currpage: pageIndex, pagesize: pageSize },
+            queryParams: { type: "getList", currpage: pageIndex, pagesize: pageSize, regionId: selRegionId, outsourceName: outsourceName },
             method: 'get',
             url: 'handler/List.ashx',
             columns: [[
@@ -208,7 +220,7 @@ var Outsource = {
                         { field: 'JoinDate', title: '加盟时间', width: 180 },
                         { field: 'InchargeProvince', title: '负责省份', width: 150 },
                         { field: 'InchargeCity', title: '负责城市', width: 350 },
-
+                        { field: 'CustomerServiceName', title: '负责客服', width: 350 },
                         { field: 'State', title: '状态', formatter: function (value, row) {
                             if (value == 0)
                                 return "<span style='color:Red;'>已删除</span>";
@@ -250,6 +262,27 @@ var Outsource = {
                 Outsource.getList(curIndex, curSize);
             }
         });
+    },
+    getSearchRegion: function () {
+        document.getElementById("seleSearchRegion").length = 1;
+        $.ajax({
+            type: "get",
+            url: "/CompanyManage/handler/List1.ashx",
+            data: { type: "getRegion" },
+            cache: true,
+            success: function (data) {
+
+                if (data != "") {
+                    var json = eval(data);
+                    for (var i = 0; i < json.length; i++) {
+                        var option = "<option value='" + json[i].RegionId + "'>" + json[i].RegionName + "</option>";
+                        $("#seleSearchRegion").append(option);
+                    }
+
+                }
+            }
+        })
+
     },
     getRegion: function () {
         document.getElementById("selRegion").length = 1;
@@ -436,7 +469,7 @@ var Outsource = {
     submit: function () {
         if (CheckVal()) {
             var jsonStr = '{"Id":' + (Outsource.model.Id || 0) + ',"CompanyName":"' + Outsource.model.CompanyName + '","ShortName":"' + Outsource.model.ShortName + '","Contact":"' + Outsource.model.Contact + '","Tel":"' + Outsource.model.Tel + '","RegionId":' + Outsource.model.RegionId + ',"ProvinceId":' + Outsource.model.ProvinceId + ',"CityId":' + Outsource.model.CityId + ',"Address":"' + Outsource.model.Address + '","Regions":"' + Outsource.model.Regions + '","JoinDate":"' + Outsource.model.JoinDate + '","CustomerServiceId":"' + Outsource.model.CustomerServiceId + '"}';
-            
+
             $.ajax({
                 type: "post",
                 url: "handler/List.ashx",
@@ -509,18 +542,19 @@ var Outsource = {
             })
         }
     },
-    getCustomerService: function (uid) {
+    getCustomerService: function () {
+        //var regionId = $("#selRegion").val();
 
         document.getElementById("seleCustomerService").length = 1;
         $.ajax({
             type: "get",
-            url: "handler/List.ashx?type=getCustomerService",
+            url: "handler/List.ashx?type=getCustomerService&regionId=" + regionId,
             success: function (data) {
                 if (data != "") {
                     var json = eval(data);
                     for (var i = 0; i < json.length; i++) {
                         var selected = "";
-                        if (json[i].UserId == uid) {
+                        if (json[i].UserId == csUserId) {
                             selected = "selected='selected'";
                         }
                         var option = "<option value='" + json[i].UserId + "' " + selected + ">" + json[i].UserName + "</option>";
@@ -603,10 +637,12 @@ function CheckVal() {
 }
 
 function ClearVal() {
+    regionId = 0;
     provinceId = 0;
     cityId = 0;
     companyProvinceIds = "";
     companyCityIds = "";
+    csUserId = 0;
     $("#provinceContainer").html("");
     $("#cityContainer").html("");
     $("#editDiv").find("input").val("");

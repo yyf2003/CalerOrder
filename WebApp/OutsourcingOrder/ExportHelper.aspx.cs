@@ -1406,8 +1406,8 @@ namespace WebApp.OutsourcingOrder
                                         subjectName += "(" + item.subject.Remark + ")";
                                     model.SubjectName = subjectName;
                                     model.Tels = item.shop.Tel1 + "/" + item.shop.Tel2;
-                                    if (item.CategoryName != null && item.CategoryName.Contains("童店"))//童店
-                                        model.OtherRemark =item.order.Remark;
+                                    //if (item.CategoryName != null && item.CategoryName.Contains("童店"))//童店
+                                    model.OtherRemark =item.order.Remark;
                                     model.POSScale = item.order.POSScale;
                                     model.MaterialSupport = item.order.MaterialSupport;
                                     modelList.Add(model);
@@ -1463,8 +1463,8 @@ namespace WebApp.OutsourcingOrder
 
                             model.SubjectName = subjectName;
                             model.Tels = item.shop.Tel1 + "/" + item.shop.Tel2;
-                            if (item.CategoryName != null && item.CategoryName.Contains("童店"))//童店
-                                model.OtherRemark = item.order.Remark;
+                            //if (item.CategoryName != null && item.CategoryName.Contains("童店"))//童店
+                            model.OtherRemark = item.order.Remark;
                             model.POSScale = item.order.POSScale;
                             model.MaterialSupport = item.order.MaterialSupport;
 
@@ -1530,9 +1530,8 @@ namespace WebApp.OutsourcingOrder
                     sheet.Cells[startRow, 17].Value = item.GraphicWidth;
                     sheet.Cells[startRow, 18].Value = item.GraphicLength;
                     sheet.Cells[startRow, 19].Value = item.Area;
-                    sheet.Cells[startRow, 20].Value = item.PositionDescription;
-                    sheet.Cells[startRow, 21].Value = item.OtherRemark;
-
+                    sheet.Cells[startRow, 20].Value = item.OtherRemark;
+                    sheet.Cells[startRow, 21].Value = item.PositionDescription;
                     startRow++;
 
                 }

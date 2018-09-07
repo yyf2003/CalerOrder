@@ -27,6 +27,10 @@
         </div>
     </div>
     <div data-options="region:'west',split:true,title:'外协信息'" style="width: 200px;">
+        <div class="tr_hui" style="height: 30px; text-align: left; padding-left: 5px;">
+            外协区域：</div>
+        <div id="outsourceRegionDiv" style="padding-left: 5px; padding-top: 8px; padding-bottom: 8px;">
+        </div>
         <table id="tbOutsource" style="width: 100%;">
         </table>
     </div>

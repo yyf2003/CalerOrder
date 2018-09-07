@@ -4,10 +4,10 @@ var customerJsonStr = "";
 var currProvinceIds = "";
 var isCopy = false;
 $(function () {
-    region.getProvince();
-    if (currCustomerId > 0) {
-        region.loadRegion(currCustomerId);
-    }
+    //region.getProvince();
+    //if (currCustomerId > 0) {
+        //region.loadRegion(currCustomerId);
+    //}
     $("#btnAddRegion").on("click", function () {
         region.addRegion();
     })

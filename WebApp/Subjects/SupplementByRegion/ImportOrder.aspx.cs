@@ -242,8 +242,54 @@ namespace WebApp.Subjects.SupplementByRegion
                         string installPositionDescription = string.Empty;
                         //其他备注
                         string remark = string.Empty;
+                        string outsourceName = string.Empty;
+                        int outsourceId = 0;
+
                         foreach (DataRow dr in ds.Tables[0].Rows)
                         {
+
+                            shopId = 0;
+                            //项目名称
+                            subjectName = string.Empty;
+                            //店铺编号
+                            shopNo = string.Empty;
+                            //系列/选图
+                            chooseImg = string.Empty;
+                            //性别
+                            gender = string.Empty;
+                            //费用类型
+                            priceType = string.Empty;
+                            //应收费用金额
+                            price = string.Empty;
+                            //应付费用金额
+                            payPrice = string.Empty;
+
+                            //pop位置
+                            sheet = string.Empty;
+                            //器架名称
+                            machineFrame = string.Empty;
+                            //数量
+                            num = string.Empty;
+                            //pop材质
+                            material = string.Empty;
+                            //pop宽
+                            width = string.Empty;
+                            //pop高
+                            length = string.Empty;
+                            //POP位置明细
+                            positionDescription = string.Empty;
+                            //店铺大小
+                            posScale = string.Empty;
+                            //店铺级别
+                            materialSupport = string.Empty;
+                            //安装位置描述
+                            installPositionDescription = string.Empty;
+                            //其他备注
+                            remark = string.Empty;
+                            outsourceName = string.Empty;
+                            outsourceId = 0;
+
+
                             StringBuilder msg = new StringBuilder();
                             //是否特殊活动
                             //bool isSpecialSubject = false;
@@ -355,7 +401,12 @@ namespace WebApp.Subjects.SupplementByRegion
 
                             if (cols.Contains("安装位置描述"))
                                 installPositionDescription = StringHelper.ReplaceSpecialChar(dr["安装位置描述"].ToString().Trim());
-                            
+
+                            if (cols.Contains("外协"))
+                                outsourceName = StringHelper.ReplaceSpecialChar(dr["外协"].ToString().Trim());
+                            else if (cols.Contains("外协名称"))
+                                outsourceName = StringHelper.ReplaceSpecialChar(dr["外协名称"].ToString().Trim());
+
                             bool canSave = true;
                             //int supplementSubjectId = 0;
                             Subject supplementSubject = null;
@@ -565,6 +616,15 @@ namespace WebApp.Subjects.SupplementByRegion
                                 //}
 
                             }
+
+                            if (!string.IsNullOrWhiteSpace(outsourceName))
+                            {
+                                if (!GetOutsourceName(outsourceName, out outsourceId))
+                                {
+                                    canSave = false;
+                                    msg.Append("外协不存在；");
+                                }
+                            }
                             if (canSave)
                             {
 
@@ -592,6 +652,7 @@ namespace WebApp.Subjects.SupplementByRegion
                                     detailModel.AddUserId = CurrentUser.UserId;
                                     detailModel.MaterialSupport = string.Empty;
                                     detailModel.IsSubmit = 1;
+                                    detailModel.OutsourceId = outsourceId;
                                     detailBll.Add(detailModel);
                                 }
                                 else
@@ -614,6 +675,7 @@ namespace WebApp.Subjects.SupplementByRegion
                                     detailModel.AddDate = DateTime.Now;
                                     detailModel.AddUserId = CurrentUser.UserId;
                                     detailModel.IsSubmit = 1;
+                                    detailModel.OutsourceId = outsourceId;
                                     detailBll.Add(detailModel);
                                 }
                                 successNum++;

@@ -5,7 +5,9 @@ var pageSize = 15;
 var currBasicCategoryId = 0;
 var currBasicMaterialId = 0;
 $(function () {
-
+    if (isOperator == 1) {
+        $("#btnAdd, #btnAddBatch, #btnEdit, #btnDelete, #separator1").show();
+    }
     Price.bindUnit();
     Price.getCustomer();
     $("#btnAdd").click(function () {

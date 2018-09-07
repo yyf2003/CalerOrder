@@ -15,6 +15,7 @@
     <script src="/easyui1.4/locale/easyui-lang-zh_CN.js" type="text/javascript"></script>
     <script type="text/javascript">
         var companyId = '<%=companyId %>';
+        var isOperator = '<%=isOperator %>';
     </script>
 </head>
 <body class="easyui-layout">
@@ -63,15 +64,14 @@
                     刷新</a>
                 <div class='datagrid-btn-separator'>
                 </div>
-                <a id="btnAdd" style="float: left; display:;" class="easyui-linkbutton" plain="true"
+                <a id="btnAdd" style="float: left; display:none;" class="easyui-linkbutton" plain="true"
                     icon="icon-add">新增</a> 
-                    <a id="btnAddBatch" style="float: left; display:;" class="easyui-linkbutton" plain="true"
+                    <a id="btnAddBatch" style="float: left; display:none;" class="easyui-linkbutton" plain="true"
                     icon="icon-add">批量新增</a>
-                    <a id="btnEdit" style="float: left; display:;" class="easyui-linkbutton"
-                        plain="true" icon="icon-edit">编辑</a> <a id="btnDelete" style="float: left; display:;"
+                    <a id="btnEdit" style="float: left; display:none;" class="easyui-linkbutton"
+                        plain="true" icon="icon-edit">编辑</a> <a id="btnDelete" style="float: left; display:none;"
                             class="easyui-linkbutton" plain="true" icon="icon-remove">删除</a>
-                
-                <div class='datagrid-btn-separator'>
+                 <div id="separator1" class='datagrid-btn-separator' style=" display:none;">
                 </div>
             </div>
         </div>

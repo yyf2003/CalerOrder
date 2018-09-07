@@ -140,6 +140,8 @@ namespace WebApp.Subjects.RegionSubject
                         //其他备注
                         string remark = string.Empty;
 
+                        string outsourceName = string.Empty;
+                        int outsourceId = 0;
                         List<string> orderTypeList = new List<string>();
                         var EnumList = CommonMethod.GetEnumList<OrderTypeEnum>();
                         if (EnumList.Any())
@@ -154,6 +156,52 @@ namespace WebApp.Subjects.RegionSubject
 
                         foreach (DataRow dr in ds.Tables[0].Rows)
                         {
+
+                            shopId = 0;
+                            orderType = string.Empty;
+
+                            //店铺编号
+                            shopNo = string.Empty;
+                            //店铺大小
+                            posScale = string.Empty;
+                            //店铺级别
+                            materialSupport = string.Empty;
+                            //费用金额
+                            price = string.Empty;
+                            //费用应付金额
+                            payPrice = string.Empty;
+                            //性别
+                            gender = string.Empty;
+
+                            //系列/选图
+                            chooseImg = string.Empty;
+
+                            //string category = string.Empty;
+
+                            //string levelNum = string.Empty;
+                            //pop位置
+                            sheet = string.Empty;
+                            //pop编号
+                            popNo = string.Empty;
+                            //POP位置明细
+                            positionDescription = string.Empty;
+                            //数量
+                            num = string.Empty;
+                            //pop材质
+                            material = string.Empty;
+                            //pop宽
+                            width = string.Empty;
+                            //pop高
+                            length = string.Empty;
+
+                            //其他备注
+                            remark = string.Empty;
+
+                            outsourceName = string.Empty;
+                            outsourceId = 0;
+
+
+
                             StringBuilder msg = new StringBuilder();
 
                             if (cols.Contains("订单类型"))
@@ -263,7 +311,12 @@ namespace WebApp.Subjects.RegionSubject
                             else if (cols.Contains("其他备注"))
                                 remark = StringHelper.ReplaceSpecialChar(dr["其他备注"].ToString().Trim());
 
-                            
+                            if (cols.Contains("外协"))
+                                outsourceName = StringHelper.ReplaceSpecialChar(dr["外协"].ToString().Trim());
+                            else if (cols.Contains("外协名称"))
+                                outsourceName = StringHelper.ReplaceSpecialChar(dr["外协名称"].ToString().Trim());
+
+
                             bool canSave = true;
                             
                             if (string.IsNullOrWhiteSpace(shopNo))
@@ -445,6 +498,16 @@ namespace WebApp.Subjects.RegionSubject
                                 }
                                
                             }
+                            
+                            if (!string.IsNullOrWhiteSpace(outsourceName))
+                            {
+                                if (!GetOutsourceName(outsourceName, out outsourceId))
+                                {
+                                    canSave = false;
+                                    msg.Append("外协不存在；");
+                                }
+                            }
+
                             if (canSave)
                             {
 
@@ -463,6 +526,7 @@ namespace WebApp.Subjects.RegionSubject
                                     orderDetailModel.HandMakeSubjectId = 0;
                                     orderDetailModel.AddDate = DateTime.Now;
                                     orderDetailModel.AddUserId = CurrentUser.UserId;
+                                    orderDetailModel.OutsourceId = outsourceId;
                                     orderDetailBll.Add(orderDetailModel);
                                 }
                                 else
@@ -482,13 +546,11 @@ namespace WebApp.Subjects.RegionSubject
                                     orderDetailModel.ShopId = shopId;
                                     orderDetailModel.SubjectId = subjectId;
                                     orderDetailModel.HandMakeSubjectId = 0;
-
                                     orderDetailModel.MaterialSupport = materialSupport;
                                     orderDetailModel.POSScale = posScale;
-
                                     orderDetailModel.AddDate = DateTime.Now;
                                     orderDetailModel.AddUserId = CurrentUser.UserId;
-                                   
+                                    orderDetailModel.OutsourceId = outsourceId;
                                     orderDetailBll.Add(orderDetailModel);
                                 }
                                 successNum++;

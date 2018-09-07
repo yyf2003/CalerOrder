@@ -21,7 +21,7 @@ namespace WebApp.Customer
             }
             if (!IsPostBack)
             {
-                InitProvince();
+                //InitProvince();
                 BindData();
             }
         }

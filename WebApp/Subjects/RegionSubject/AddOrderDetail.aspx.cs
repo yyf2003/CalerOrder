@@ -82,22 +82,7 @@ namespace WebApp.Subjects.RegionSubject
                     model.ApproveState = 0;
                     subjectBll.Update(model);
                 }
-                //else
-                //{
-
-                //    var orderList0 = orderBll.GetList(s => s.SubjectId == SubjectId && s.IsSubmit ==1);
-                //    if (orderList0.Any())
-                //    {
-                //        orderList0 = orderList0.Where(s=>s.ApproveState==null || s.ApproveState==0).ToList();
-                //        if (!orderList0.Any())
-                //        {
-                //            model.ApproveState = 1;
-                //            subjectBll.Update(model);
-                //        }
-                //    }
-                    
-                //}
-
+               
 
                 Alert("提交成功","List.aspx");
             }

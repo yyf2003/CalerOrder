@@ -155,6 +155,8 @@ namespace WebApp.Subjects.RegionSubject
                         //其他备注
                         string remark = string.Empty;
 
+                        string outsourceName = string.Empty;
+                        int outsourceId = 0;
 
                         foreach (DataRow dr in ds.Tables[0].Rows)
                         {
@@ -253,6 +255,11 @@ namespace WebApp.Subjects.RegionSubject
 
                             if (cols.Contains("安装位置描述"))
                                 installPositionDescription = StringHelper.ReplaceSpecialChar(dr["安装位置描述"].ToString().Trim());
+
+                            if (cols.Contains("外协"))
+                                outsourceName = StringHelper.ReplaceSpecialChar(dr["外协"].ToString().Trim());
+                            else if (cols.Contains("外协名称"))
+                                outsourceName = StringHelper.ReplaceSpecialChar(dr["外协名称"].ToString().Trim());
 
                             bool canSave = true;
                             int supplementSubjectId = 0;
@@ -430,6 +437,15 @@ namespace WebApp.Subjects.RegionSubject
                                 }
                             }
 
+                            if (!string.IsNullOrWhiteSpace(outsourceName))
+                            {
+                                if (!GetOutsourceName(outsourceName, out outsourceId))
+                                {
+                                    canSave = false;
+                                    msg.Append("外协不存在；");
+                                }
+                            }
+
                             if (canSave)
                             {
 
@@ -441,7 +457,6 @@ namespace WebApp.Subjects.RegionSubject
                                 orderDetailModel.GraphicLength = length1;
                                 orderDetailModel.GraphicMaterial = material;
                                 orderDetailModel.GraphicWidth = width1;
-                                
                                 orderDetailModel.OrderType = 1;
                                 orderDetailModel.PositionDescription = positionDescription;
                                 orderDetailModel.Quantity = int.Parse(num);
@@ -450,14 +465,13 @@ namespace WebApp.Subjects.RegionSubject
                                 orderDetailModel.ShopId = shopId;
                                 orderDetailModel.SubjectId = subjectId;
                                 orderDetailModel.HandMakeSubjectId = supplementSubjectId;
-
                                 orderDetailModel.MaterialSupport = materialSupport;
                                 orderDetailModel.POSScale = posScale;
-
                                 orderDetailModel.MachineFrame = machineFrame;
                                 orderDetailModel.AddDate = DateTime.Now;
                                 orderDetailModel.AddUserId = CurrentUser.UserId;
                                 orderDetailModel.IsSubmit = 0;
+                                orderDetailModel.OutsourceId = outsourceId;
                                 orderDetailBll.Add(orderDetailModel);
                                 successNum++;
                             }

@@ -342,4 +342,29 @@ namespace Models
         public string Format { get; set; }
     }
 
+    /// <summary>
+    /// 外协安装费级别设置
+    /// </summary>
+    public class OutsourceIPSetting {
+        public int SettingType { get; set; }
+        public int CustomerId { get; set; }
+        public string CustomerName { get; set; }
+        public int RegionId { get; set; }
+        public int ProvinceId { get; set; }
+        public int CityId { get; set; }
+        public string Region { get; set; }
+        public string Province { get; set; }
+        public string City { get; set; }
+        public int BasicMaterialSupportId { get; set; }
+        public string MaterialSupport { get; set; }
+        public decimal InstallPrice { get; set; }
+        public decimal BasicPrice { get; set; }
+        public decimal PremiumPrice { get; set; }
+        public decimal VVIPPrice { get; set; }
+        public decimal MCSPrice { get; set; }
+        public decimal OthersPrice { get; set; }
+        public decimal GenericPrice { get; set; }
+    }
+
+   
 }

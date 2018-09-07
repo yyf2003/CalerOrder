@@ -2270,13 +2270,14 @@ namespace WebApp.OutsourcingOrder.Statistics
 
         protected void cblSubjects_SelectedIndexChanged(object sender, EventArgs e)
         {
-            BindOutSource();
+            //BindOutSource();
+            BindMaterial();
         }
 
-        protected void cblPropSubjects_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            BindPropOutsource();
-        }
+        //protected void cblPropSubjects_SelectedIndexChanged(object sender, EventArgs e)
+        //{
+            //BindPropOutsource();
+        //}
 
         protected void cblOutspurce_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -2790,36 +2791,35 @@ namespace WebApp.OutsourcingOrder.Statistics
                                               guidance,
                                               outsource
                                           }).ToList();
-                        var orderList = orderList0;
+                        //var orderList = orderList0;
                         List<int> currSubjectList = new List<int>();
+                        
+                        if (regionList.Any())
+                        {
+                            orderList0 = orderList0.Where(s => regionList.Contains(s.order.Region)).ToList();
+                        }
+                        if (provinceList.Any())
+                        {
+                            orderList0 = orderList0.Where(s => provinceList.Contains(s.order.Province)).ToList();
+                        }
+                        if (cityList.Any())
+                        {
+                            orderList0 = orderList0.Where(s => cityList.Contains(s.order.City)).ToList();
+                        }
+                        if (assignTypeList.Any())
+                        {
+                            orderList0 = orderList0.Where(s => assignTypeList.Contains(s.order.AssignType ?? 0)).ToList();
+                        }
+                        var orderList = orderList0;
                         if (subjectIdList.Any())
                         {
-                            //百丽
-                            //Dictionary<int, int> handMakeSubjectIdDic = new Dictionary<int, int>();
-                            //List<int> hMSubjectIdList = new SubjectBLL().GetList(s => s.GuidanceId == gid && subjectIdList.Contains(s.HandMakeSubjectId ?? 0)).Select(s => s.Id).ToList();
-                            //subjectIdList.AddRange(hMSubjectIdList);
+
                             orderList = orderList.Where(s => subjectIdList.Contains(s.order.SubjectId ?? 0)).ToList();
                             currSubjectList = subjectIdList;
                         }
                         else
                         {
-                            currSubjectList = orderList.Select(s=>s.order.SubjectId??0).Distinct().ToList();
-                        }
-                        if (regionList.Any())
-                        {
-                            orderList = orderList.Where(s => regionList.Contains(s.order.Region)).ToList();
-                        }
-                        if (provinceList.Any())
-                        {
-                            orderList = orderList.Where(s => provinceList.Contains(s.order.Province)).ToList();
-                        }
-                        if (cityList.Any())
-                        {
-                            orderList = orderList.Where(s => cityList.Contains(s.order.City)).ToList();
-                        }
-                        if (assignTypeList.Any())
-                        {
-                            orderList = orderList.Where(s => assignTypeList.Contains(s.order.AssignType ?? 0)).ToList();
+                            currSubjectList = orderList.Select(s => s.order.SubjectId ?? 0).Distinct().ToList();
                         }
                         if (orderList.Any())
                         {

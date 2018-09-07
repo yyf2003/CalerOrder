@@ -37,6 +37,9 @@ namespace WebApp.OutsourcingOrder.handler
             }
             switch (type)
             {
+                case "getOutsourceRegion":
+                    result = GetOutsourceRegion();
+                    break;
                 case "getOutsource":
                     result = GetOutsourceList();
                     break;
@@ -457,10 +460,44 @@ namespace WebApp.OutsourcingOrder.handler
             return "";
         }
 
-        string GetOutsourceList()
+        string GetOutsourceRegion()
         {
             string result = string.Empty;
-            var companyList = new CompanyBLL().GetList(s => s.TypeId == (int)CompanyTypeEnum.Outsource && (s.IsDelete == null || s.IsDelete == false)).OrderBy(s => s.ProvinceId).ToList();
+            List<Region> regionList = (from company in CurrentContext.DbContext.Company
+                                       join region in CurrentContext.DbContext.Region
+                                       on company.RegionId equals region.Id
+                                       where company.TypeId == (int)CompanyTypeEnum.Outsource
+                                       select region).Distinct().ToList();
+            if (regionList.Any())
+            {
+                StringBuilder json = new StringBuilder();
+                regionList.ForEach(s =>
+                {
+                    json.Append("{\"RegionId\":\"" + s.Id + "\",\"RegionName\":\"" + s.RegionName + "\"},");
+                });
+                result = "[" + json.ToString().TrimEnd(',') + "]";
+            }
+            return result;
+        }
+
+
+        string GetOutsourceList()
+        {
+            List<int> regionIdList = new List<int>();
+            if (context1.Request.QueryString["regionId"] != null)
+            {
+                string regionId = context1.Request.QueryString["regionId"];
+                if (!string.IsNullOrWhiteSpace(regionId))
+                {
+                    regionIdList = StringHelper.ToIntList(regionId, ',');
+                }
+            }
+            string result = string.Empty;
+            var companyList = new CompanyBLL().GetList(s => s.TypeId == (int)CompanyTypeEnum.Outsource && (s.IsDelete == null || s.IsDelete == false)).OrderBy(s=>s.RegionId).ThenBy(s => s.ProvinceId).ToList();
+            if (regionIdList.Any())
+            {
+                companyList = companyList.Where(s => regionIdList.Contains(s.RegionId??0)).ToList();
+            }
             if (companyList.Any())
             {
                 if (new BasePage().CurrentUser.RoleId == 5)
