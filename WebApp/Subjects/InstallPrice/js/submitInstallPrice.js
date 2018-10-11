@@ -64,7 +64,7 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function (sender, e
 
     var val = $("#hfIsFinishEdit").val() || 0;
     var leftShopCount = $("#labTotalShopCount").html();
-   
+
 
 
     $("img[name='loadImg']").hide();
@@ -115,9 +115,10 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function (sender, e
         $("input[name^='cblPOSScale']:checked").each(function () {
             posScale += $(this).val() + ",";
         })
-       
-        var url = "EditPOSScale.aspx?guidanceId=" + guidanceId + "&region=" + region + "&subjectTypeId=" + subjectTypeId + "&subjectId=" + subjectId + "&posScale=" + posScale;
-        //var url = "EditPOSScale.aspx";
+        var shopIds = $(this).data("shopids")||"";
+        //var url = "EditPOSScale.aspx?guidanceId=" + guidanceId + "&region=" + region + "&subjectTypeId=" + subjectTypeId + "&subjectId=" + subjectId + "&posScale=" + posScale + "&shopId=" + shopIds;
+        var url = "EditPOSScale.aspx?guidanceId=" + guidanceId+"&shopId=" + shopIds;
+        
         var layer2 = layer.open({
 
             type: 2,

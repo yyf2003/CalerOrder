@@ -67,7 +67,7 @@ $(function () {
             Material.bindBasicCategory(row.BasicCategoryId);
             $("#txtPrice").val(row.Price);
             $("#txtPayPriceInstall").val(row.PayPriceInstall);
-            $("#txtPayPriceInstallAndProduct").val(row.PayPriceInstallAndProduct);
+            $("#txtPayPriceSubInstall").val(row.PayPriceSubInstall);
             $("#txtPayPriceSend").val(row.PayPriceSend);
             Material.bindUnit(row.UnitId);
             $("#editMaterialDiv").show().dialog({
@@ -120,15 +120,21 @@ $(function () {
     });
 
     $("#selBasicMaterial").on("change", function () {
-
+       
         var option = $("#selBasicMaterial option:selected");
         var unitId = $(option).data("unitid") || 0;
         var payInstallPrice = $(option).data("installprice") || 0;
         var paySendPrice = $(option).data("sentprice") || 0;
         var outsourceMaterialId = $(option).data("outsourcematerialid") || 0;
         currOutsourceMaterialId = outsourceMaterialId;
-        $("#selUnit").val(unitId);
-        if (payInstallPrice>0)
+        $("#selUnit").val(0).prop("disabled", false);
+        $("#selUnit option").each(function () {
+            if (unitId >0 && $(this).val() == unitId) {
+                $(this).attr("selected", "selected");
+                $("#selUnit").prop("disabled", "disabled");
+            }
+        })
+        if (payInstallPrice > 0)
             $("#txtPayPriceInstall").val(payInstallPrice);
         if (paySendPrice > 0)
             $("#txtPayPriceSend").val(paySendPrice);
@@ -291,7 +297,7 @@ var Material = {
         this.UnitId = 0;
         this.PriceItemId = 0;
         this.PayPriceInstall = 0;
-        this.PayPriceInstallAndProduct = 0;
+        this.PayPriceSubInstall = 0;
         this.PayPriceSend = 0;
     },
     getCustomer: function () {
@@ -357,6 +363,7 @@ var Material = {
         })
     },
     bindCustomer: function () {
+        $("#selCustomer").prop("disabled", "");
         document.getElementById("selCustomer").length = 1;
         document.getElementById("selOtherCustomer").length = 1;
         $.ajax({
@@ -376,8 +383,10 @@ var Material = {
                         $("#selCustomer").append(option);
                         $("#selOtherCustomer").append(option);
                     }
-                    if (isSelected)
+                    if (isSelected) {
+                        $("#selCustomer").prop("disabled", "disabled");
                         Material.bindPriceItem();
+                    }
                 }
             }
 
@@ -415,6 +424,7 @@ var Material = {
         $.ajax({
             type: "get",
             url: "./Handler/CustomerMaterialList1.ashx?type=getBasicMaterial&categoryId=" + categoryId + "&customerId=" + currCustomerId,
+
             success: function (data) {
 
                 if (data != "") {
@@ -431,6 +441,7 @@ var Material = {
         })
     },
     bindUnit: function (unitId) {
+        $("#selUnit").prop("disabled", "");
         document.getElementById("selUnit").length = 1
         $.ajax({
             type: "get",
@@ -439,12 +450,18 @@ var Material = {
 
                 if (data != "") {
                     var json = eval(data);
+                    var isSelete = false;
                     for (var i = 0; i < json.length; i++) {
                         var selected = "";
-                        if (unitId == json[i].Id)
+                        if (unitId == json[i].Id) {
                             selected = "selected='selected'";
+                            isSelete = true;
+                        }
                         var option = "<option value='" + json[i].Id + "' " + selected + ">" + json[i].UnitName + "</option>";
                         $("#selUnit").append(option);
+                    }
+                    if (isSelete) {
+                        $("#selUnit").prop("disabled", "disabled");
                     }
                 }
             }
@@ -463,8 +480,8 @@ var Material = {
                         { field: 'MaterialName', title: '客户材料名称' },
                         { field: 'Price', title: '应收单价' },
                         { field: 'PayPriceInstall', title: '应付单价(安装)', width: 200 },
-                        { field: 'PayPriceInstallAndProduct', title: '应付单价(生产+安装)', width: 250 },
                         { field: 'PayPriceSend', title: '应付单价(发货)', width: 200 },
+                        //{ field: 'PayPriceSubInstall', title: '应付单价(辅料+安装)', width: 250 },
                         { field: 'Unit', title: '单位' },
 
                         { field: 'State', title: '状态', formatter: function (value, row) {
@@ -508,8 +525,9 @@ var Material = {
 
         if (CheckVal()) {
             //var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"MaterialName":"' + this.model.MaterialName + '","UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + '}';
-            var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + ',"PayPriceInstall":' + this.model.PayPriceInstall + ',"PayPriceInstallAndProduct":' + this.model.PayPriceInstallAndProduct + ',"PayPriceSend":' + this.model.PayPriceSend + ',"OutsourceMaterialId":' + currOutsourceMaterialId + '}';
-            
+            //var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + ',"PayPriceInstall":' + this.model.PayPriceInstall + ',"PayPriceSubInstall":' + this.model.PayPriceSubInstall + ',"PayPriceSend":' + this.model.PayPriceSend + ',"OutsourceMaterialId":' + currOutsourceMaterialId + '}';
+            var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + ',"PayPriceInstall":' + this.model.PayPriceInstall + ',"PayPriceSend":' + this.model.PayPriceSend + ',"OutsourceMaterialId":' + currOutsourceMaterialId + '}';
+
             $.ajax({
                 type: "get",
                 url: "./Handler/CustomerMaterialList1.ashx",
@@ -656,7 +674,7 @@ function CheckVal() {
     var basicMaterialId = $("#selBasicMaterial").val();
     var price = $.trim($("#txtPrice").val());
     var payPriceInstall = $.trim($("#txtPayPriceInstall").val()) || 0;
-    var payPriceInstallAndProduct = $.trim($("#txtPayPriceInstallAndProduct").val()) || 0;
+    var payPriceSubInstall = $.trim($("#txtPayPriceSubInstall").val()) || 0;
     var payPriceSend = $.trim($("#txtPayPriceSend").val())||0;
     var unitId = $("#selUnit").val();
     if (customerId == "0") {
@@ -679,13 +697,12 @@ function CheckVal() {
         alert("应付单价（安装）必须为数字");
         return false;
     }
-    if (payPriceInstallAndProduct != "" && isNaN(payPriceInstallAndProduct)) {
-        alert("应付单价（生产+安装）必须为数字");
-        return false;
-    }
-
     if (payPriceSend != "" && isNaN(payPriceSend)) {
         alert("应付单价（发货）必须为数字");
+        return false;
+    }
+    if (payPriceSubInstall != "" && isNaN(payPriceSubInstall)) {
+        alert("应付单价（生产+安装）必须为数字");
         return false;
     }
     if (unitId == 0) {
@@ -698,7 +715,7 @@ function CheckVal() {
     Material.model.BasicMaterialId = basicMaterialId;
     Material.model.Price = price;
     Material.model.PayPriceInstall = payPriceInstall;
-    Material.model.PayPriceInstallAndProduct = payPriceInstallAndProduct;
+    Material.model.PayPriceSubInstall = payPriceSubInstall;
     Material.model.PayPriceSend = payPriceSend;
     Material.model.UnitId = unitId;
 
@@ -715,8 +732,9 @@ function CleanVal() {
     $("#selCategory").val("0");
     $("#selBasicMaterial").val("0");
     $("#txtPrice").val("");
-    $("#selUnit").val("0");
+    $("#selUnit").val("0").prop("disabled", "");
     $("#txtPayPriceInstall").val("");
     $("#txtPayPriceSend").val("");
+    $("#txtPayPriceSubInstall").val("");
 }
 

@@ -101,7 +101,7 @@ $(function () {
                             Order.bindMaterialCategory(json[0].MaterialCategoryId);
                             $("#txtChooseImg").val(json[0].ChooseImg);
                             $("#txtRemark").val(json[0].Remark);
-                            
+
                             if ($("#hfIsRegionSubject").val() == "1") {
                                 $("tr.showSubjectList").show();
                                 $("#ddlSubjectList").val(json[0].SubjectId);
@@ -335,6 +335,28 @@ $(function () {
             $("tr.price").hide();
         }
     })
+
+    $("#spanChangeGuidance").click(function () {
+        layer.open({
+            type: 1,
+            time: 0,
+            title: '更换活动名称',
+            skin: 'layui-layer-rim', //加上边框
+            area: ['760', '500'],
+            content: $("#changeGuidanceDiv"),
+            id: 'popLayer1',
+            btn: ['提 交'],
+            btnAlign: 'c',
+            yes: function () {
+                Order.changeGuidance();
+            },
+            cancel: function () {
+                $("#changeGuidanceDiv").hide();
+                layer.closeAll();
+            }
+
+        });
+    })
 })
 var Order = {
     model: function () {
@@ -533,8 +555,8 @@ var Order = {
     submit: function () {
         if (CheckVal()) {
             jsonStr = '{"Id":' + (this.model.Id || 0) + ',"SubjectId":' + this.model.SubjectId + ',"RegionSupplementId":' + this.model.RegionSupplementId + ',"OrderType":' + this.model.OrderType + ',"ShopNo":"' + this.model.ShopNo + '","PositionDescription":"' + this.model.PositionDescription + '","Sheet":"' + this.model.Sheet + '","POSScale":"' + this.model.POSScale + '","MaterialSupport":"' + this.model.MaterialSupport + '","MachineFrame":"' + this.model.MachineFrame + '","Gender":"' + this.model.Gender + '","Quantity":' + this.model.Quantity + ',"GraphicWidth":"' + this.model.GraphicWidth + '","GraphicLength":"' + this.model.GraphicLength + '","GraphicMaterial":"' + this.model.GraphicMaterial + '","Remark":"' + this.model.Remark + '","ChooseImg":"' + this.model.ChooseImg + '","OrderPrice":' + this.model.OrderPrice + ',"PayOrderPrice":' + this.model.PayOrderPrice + '}';
-//            alert(jsonStr);
-//            return false;
+            //            alert(jsonStr);
+            //            return false;
             var loadIndex = layer.load(0, { shade: false });
             $.ajax({
                 type: "post",
@@ -575,6 +597,31 @@ var Order = {
                 }
             })
         }
+    },
+    changeGuidance: function () {
+        var newGid = $("#ddlGuidanceList").val();
+        if (newGid == 0) {
+            layer.msg("请选择新活动名称！");
+            return false;
+        }
+        var loadIndex = layer.load(0, { shade: false });
+        $.ajax({
+            type: "get",
+            url: "handler/List.ashx",
+            data: { type: 'changeGuidance', subjectId: subjectId, newGuidanceId: newGid },
+            success: function (data) {
+                if (data == "ok") {
+                    layer.msg("更新成功！");
+                    $("#changeGuidanceDiv").hide();
+                    layer.closeAll();
+                    //Order.getList(currPage);
+                    $("#btnRefreshSubject").click();
+                }
+                else {
+                    layer.confirm(data);
+                }
+            }
+        })
     }
 };
 

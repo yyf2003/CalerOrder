@@ -70,12 +70,51 @@ $(function () {
             var checkRow = table.checkStatus('tbSetList');
             settingRowSelectedRow = checkRow.data;
         });
+        //监听编辑
+        table.on('edit(tbSetList)', function (obj) {
+            var editData = obj.data;
+            var customerId = editData.CustomerId;
+            var provinceId = editData.ProvinceId;
+            var cityId = editData.CityId;
+            var filed = obj.field;
+            var val = obj.value||0;
+            var materialSupport = filed.replace("Price", "");
+            var jsonStr = '{"CustomerId":' + customerId + ',"ProvinceId":' + provinceId + ',"CityId":' + cityId + ',"MaterialSupport":"' + materialSupport + '","BasicInstallPrice":'+val+'}';
+            if (jsonStr != "") {
+               
+                $.ajax({
+                    type: 'post',
+                    url: 'Handler1.ashx',
+                    data: { type: 'edit', jsonStr: jsonStr },
+                    success: function (data) {
+                        if (data != "ok") {
+                            layer.alert(data);
+                        }
+                    }
+                })
+            }
+        })
     })
 
+    $("#btnEdit").click(function () {
+        var txt = $("#editSpan").html();
+        if (txt == "编辑设置") {
+            $(this).attr("class", "layui-btn layui-btn-danger layui-btn-sm");
+            $("#editSpan").html("取消编辑");
+            setting.getSettingListOnEdit();
+        }
+        else {
+            $(this).attr("class", "layui-btn layui-btn-sm");
+            $("#editSpan").html("编辑设置");
+            setting.getSettingList();
+        }
+    })
 
     $("#btnDelete").click(function () {
         setting.deleteSetting();
     })
+
+
 })
 
 
@@ -205,6 +244,36 @@ var setting = {
                     { field: 'MCSPrice', width: 80, title: 'MCS', style: 'color: #000;' },
                     { field: 'GenericPrice', width: 80, title: 'Generic', style: 'color: #000;' },
                     { field: 'OthersPrice', width: 80, title: 'Others', style: 'color: #000;' }
+
+                ]],
+                page: false
+            })
+        })
+    },
+    getSettingListOnEdit: function () {
+        layui.use('table', function () {
+            var table = layui.table;
+            table.render({
+                elem: '#tbSetList',
+                url: 'Handler1.ashx',
+                where: {
+                    'type': 'getSettingList',
+                    'regionId': currRegionId
+                },
+                method: 'get',
+                cols: [[
+                    { type: 'checkbox', fixed: 'left' },
+                    { field: 'RowIndex', width: 60, title: '序号', style: 'color: #000;' },
+                    { field: 'CustomerName', width: 100, title: '客户', style: 'color: #000;' },
+                    { field: 'RegionName', width: 80, title: '区域', style: 'color: #000;' },
+                    { field: 'ProvinceName', width: 100, title: '省份', style: 'color: #000;' },
+                    { field: 'CityName', minWidth: 90, title: '城市', style: 'color: #000;' },
+                    { field: 'BasicPrice', width: 80, title: 'Basic', edit: 'text', style: 'color: #000;' },
+                    { field: 'PremiumPrice', width: 90, title: 'Premium', edit: 'text', style: 'color: #000;' },
+                    { field: 'VVIPPrice', width: 80, title: 'VVIP', edit: 'text', style: 'color: #000;' },
+                    { field: 'MCSPrice', width: 80, title: 'MCS', edit: 'text', style: 'color: #000;' },
+                    { field: 'GenericPrice', width: 80, title: 'Generic', edit: 'text', style: 'color: #000;' },
+                    { field: 'OthersPrice', width: 80, title: 'Others', edit: 'text', style: 'color: #000;' }
 
                 ]],
                 page: false

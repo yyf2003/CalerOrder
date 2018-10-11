@@ -59,6 +59,9 @@ namespace WebApp.Subjects.ModifyOrder.handler
                 case "getSheetList":
                     result = GetSheetList();
                     break;
+                case "changeGuidance":
+                    result = ChangeGuidanceName();
+                    break;
                 default:
                     break;
             }
@@ -1034,6 +1037,103 @@ namespace WebApp.Subjects.ModifyOrder.handler
                 catch (Exception ex)
                 {
                     result = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        string ChangeGuidanceName()
+        {
+            string result = "更新失败";
+            int newGuidanceId = 0;
+            int subjectId = 0;
+            if (context1.Request.QueryString["subjectId"] != null)
+            {
+                subjectId = int.Parse(context1.Request.QueryString["subjectId"]);
+            }
+            if (context1.Request.QueryString["newGuidanceId"] != null)
+            {
+                newGuidanceId = int.Parse(context1.Request.QueryString["newGuidanceId"]);
+            }
+            if (subjectId > 0 && newGuidanceId > 0)
+            {
+                try
+                {
+                    SubjectBLL subjectBll = new SubjectBLL();
+                    Subject subjectModel = subjectBll.GetModel(subjectId);
+                    if (subjectModel != null && (subjectModel.GuidanceId ?? 0) != newGuidanceId)
+                    {
+                        FinalOrderDetailTempBLL orderBll = new FinalOrderDetailTempBLL();
+                        OutsourceOrderDetailBLL outsourceOrderBll = new OutsourceOrderDetailBLL();
+                        QuoteOrderDetailBLL quoteOrderBll = new QuoteOrderDetailBLL();
+                        if (subjectModel.SubjectType == (int)SubjectTypeEnum.HC订单 || subjectModel.SubjectType == (int)SubjectTypeEnum.分区补单)
+                        {
+                            var orderList = orderBll.GetList(s => s.RegionSupplementId == subjectId);
+                            if (orderList.Any())
+                            {
+                                orderList.ForEach(s =>
+                                {
+                                    s.GuidanceId = newGuidanceId;
+                                    orderBll.Update(s);
+                                });
+                            }
+                            var osOrderList = outsourceOrderBll.GetList(s => s.RegionSupplementId == subjectId);
+                            if (osOrderList.Any())
+                            {
+                                osOrderList.ForEach(s =>
+                                {
+                                    s.GuidanceId = newGuidanceId;
+                                    outsourceOrderBll.Update(s);
+                                });
+                            }
+                            var quoteOrderList = quoteOrderBll.GetList(s => s.RegionSupplementId == subjectId);
+                            if (quoteOrderList.Any())
+                            {
+                                quoteOrderList.ForEach(s =>
+                                {
+                                    s.GuidanceId = newGuidanceId;
+                                    quoteOrderBll.Update(s);
+                                });
+                            }
+                        }
+                        else
+                        {
+                            var orderList = orderBll.GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0);
+                            if (orderList.Any())
+                            {
+                                orderList.ForEach(s =>
+                                {
+                                    s.GuidanceId = newGuidanceId;
+                                    orderBll.Update(s);
+                                });
+                            }
+                            var osOrderList = outsourceOrderBll.GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0);
+                            if (osOrderList.Any())
+                            {
+                                osOrderList.ForEach(s =>
+                                {
+                                    s.GuidanceId = newGuidanceId;
+                                    outsourceOrderBll.Update(s);
+                                });
+                            }
+                            var quoteOrderList = quoteOrderBll.GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0);
+                            if (quoteOrderList.Any())
+                            {
+                                quoteOrderList.ForEach(s =>
+                                {
+                                    s.GuidanceId = newGuidanceId;
+                                    quoteOrderBll.Update(s);
+                                });
+                            }
+                        }
+                        subjectModel.GuidanceId = newGuidanceId;
+                        subjectBll.Update(subjectModel);
+                        result = "ok";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result = "更新失败："+ex.Message;
                 }
             }
             return result;

@@ -153,6 +153,7 @@ namespace WebApp.OutsourcingOrder.ChangeMaterialPrice
 
         void BindPriceItem()
         {
+            ddlPriceItem.Items.Clear();
             int customerId = int.Parse(ddlCustomer.SelectedValue);
             var list = new OutsourceMaterialPriceItemBLL().GetList(s => s.CustomerId == customerId).OrderByDescending(s => s.BeginDate).ToList();
             if (list.Any())
@@ -165,11 +166,13 @@ namespace WebApp.OutsourcingOrder.ChangeMaterialPrice
                     ddlPriceItem.Items.Add(li);
                 });
             }
+            ddlPriceItem.Items.Insert(0, new ListItem("--请选择价格条目--", "0"));
         }
 
         protected void ddlCustomer_SelectedIndexChanged(object sender, EventArgs e)
         {
             BindGuidance();
+            BindPriceItem();
         }
 
         protected void txtGuidanceMonth_TextChanged(object sender, EventArgs e)

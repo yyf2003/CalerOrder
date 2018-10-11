@@ -317,13 +317,20 @@ namespace WebApp.OutsourcingOrder.Statistics
                 var orderList0 = (from orderDetail in CurrentContext.DbContext.OutsourceOrderDetail
                                   join guidance in CurrentContext.DbContext.SubjectGuidance
                                   on orderDetail.GuidanceId equals guidance.ItemId
+                                  join subject1 in CurrentContext.DbContext.Subject
+                                  on orderDetail.SubjectId equals subject1.Id into subject1Temp
+                                  from subject in subject1Temp.DefaultIfEmpty()
+                                  join subject2 in CurrentContext.DbContext.Subject
+                                  on orderDetail.BelongSubjectId equals subject2.Id into subject2Temp
+                                  from belongSubject in subject2Temp.DefaultIfEmpty()
                                   where outsourceIdList.Contains(orderDetail.OutsourceId ?? 0)
                                   && orderDetail.GuidanceId == gid
                                   && (orderDetail.IsDelete == null || orderDetail.IsDelete == false)
                                   select new
                                   {
                                       orderDetail,
-                                      guidance
+                                      guidance,
+                                      subjectName = (subject != null ? subject.SubjectName : (belongSubject!=null?belongSubject.SubjectName:""))
                                   }).ToList();
                 if (!string.IsNullOrWhiteSpace(beginDateStr) && StringHelper.IsDateTime(beginDateStr) && !string.IsNullOrWhiteSpace(endDateStr) && StringHelper.IsDateTime(endDateStr))
                 {
@@ -426,6 +433,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                         shopModel.ReceiveInstallPrice = rInstallPrice;
                         shopModel.GuidanceName = s.guidance.ItemName;
                         shopModel.Remark = s.orderDetail.Remark;
+                        shopModel.SubjectName = s.subjectName;
                         shopList.Add(shopModel);
 
                     });
@@ -465,6 +473,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                         shopModel.ReceiveInstallPrice = rInstallPrice;
                         shopModel.GuidanceName = s.guidance.ItemName;
                         shopModel.Remark = s.orderDetail.Remark;
+                        shopModel.SubjectName = s.subjectName;
                         shopList.Add(shopModel);
 
                     });
@@ -548,7 +557,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                     dataRow.GetCell(11).SetCellValue(item.MaterialSupport);
                     dataRow.GetCell(12).SetCellValue(InstallPrice);
                     dataRow.GetCell(13).SetCellValue(RInstallPrice);
-                   
+                    dataRow.GetCell(14).SetCellValue(item.Remark);
                     startRow++;
 
                 }

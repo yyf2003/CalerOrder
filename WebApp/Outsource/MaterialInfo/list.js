@@ -22,6 +22,10 @@ $(function () {
     });
     //添加报价
     $("#btnAdd").click(function () {
+        if (currPriceItemId == 0) {
+            alert("请选择报价类型");
+            return false;
+        }
         CleanVal();
         Material.bindCustomer();
         Material.bindBasicCategory();
@@ -67,8 +71,8 @@ $(function () {
 
             Material.bindBasicCategory(row.BasicCategoryId);
             $("#txtInstallPrice").val(row.InstallPrice);
-            $("#txtInstallAndProductPrice").val(row.InstallAndProductPrice);
             $("#txtSendPrice").val(row.SendPrice);
+            $("#txtSubInstallPrice").val(row.SubInstallPrice);
             Material.bindUnit(row.UnitId);
             $("#editMaterialDiv").show().dialog({
                 modal: true,
@@ -129,8 +133,10 @@ $(function () {
         //Material.bindPriceItem();
         $("#editPriceTypeDiv").show().dialog({
             modal: true,
-            width: 800,
-            height: '90%',
+            //width: 800,
+            //height: '90%',
+            width: 700,
+            height: 120,
             iconCls: 'icon-add',
             resizable: false,
             buttons: [
@@ -190,7 +196,7 @@ $(function () {
     });
 
     $("#btnChangeTypeState").click(function () {
-      
+
         $.ajax({
             type: "get",
             url: 'ListHandler.ashx?type=changePriceItemState&id=' + currPriceItemId,
@@ -217,7 +223,7 @@ var Material = {
         this.BasicCategoryId = 0;
         this.BasicMaterialId = 0;
         this.InstallPrice = 0;
-        this.InstallAndProductPrice = 0;
+        this.SubInstallPrice = 0;
         this.SendPrice = 0;
         this.UnitId = 0;
 
@@ -285,6 +291,7 @@ var Material = {
         })
     },
     bindCustomer: function () {
+        $("#selCustomer").prop("disabled", "");
         document.getElementById("selCustomer").length = 1;
         document.getElementById("selOtherCustomer").length = 1;
         $.ajax({
@@ -304,8 +311,10 @@ var Material = {
                         $("#selCustomer").append(option);
                         $("#selOtherCustomer").append(option);
                     }
-                    if (isSelected)
+                    if (isSelected) {
+                        $("#selCustomer").prop("disabled", "disabled");
                         Material.bindPriceItem();
+                    }
                 }
             }
 
@@ -314,6 +323,7 @@ var Material = {
     },
     bindBasicCategory: function (categoryId) {
         document.getElementById("selCategory").length = 1;
+        document.getElementById("selBasicMaterial").length = 1;
         $.ajax({
             type: "get",
             url: "/Materials/Handler/CustomerMaterialList1.ashx?type=getBasicCategory",
@@ -342,7 +352,7 @@ var Material = {
         document.getElementById("selBasicMaterial").length = 1;
         $.ajax({
             type: "get",
-            url: "/Materials/Handler/CustomerMaterialList1.ashx?type=getBasicMaterial&categoryId=" + categoryId,
+            url: "/Materials/Handler/CustomerMaterialList1.ashx?type=getBasicMaterial&customerId=" + currCustomerId + "&categoryId=" + categoryId,
             success: function (data) {
 
                 if (data != "") {
@@ -390,9 +400,9 @@ var Material = {
                         { field: 'CustomerName', title: '客户名称' },
                         { field: 'MaterialName', title: '客户材料名称' },
                         { field: 'InstallPrice', title: '安装单价' },
-                        { field: 'InstallAndProductPrice', title: '生产+安装单价' },
                         { field: 'SendPrice', title: '发货单价' },
-                        { field: 'Unit', title: '单位' },
+            //{ field: 'SubInstallPrice', title: '辅料+安装单价' },
+                        {field: 'Unit', title: '单位' },
                         { field: 'State', title: '状态', formatter: function (value, row) {
                             if (value == "已删除")
                                 return "<span style='color:Red;'>" + value + "</span>";
@@ -434,8 +444,9 @@ var Material = {
 
         if (CheckVal()) {
             //var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + this.model.CustomerId + ',"MaterialName":"' + this.model.MaterialName + '","UnitId":' + this.model.UnitId + ',"Price":' + this.model.Price + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + '}';
-            var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"InstallPrice":' + this.model.InstallPrice + ',"InstallAndProductPrice":' + this.model.InstallAndProductPrice + ',"SendPrice":' + this.model.SendPrice + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + '}';
-           
+            //var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"InstallPrice":' + this.model.InstallPrice + ',"SubInstallPrice":' + this.model.SubInstallPrice + ',"SendPrice":' + this.model.SendPrice + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + '}';
+            var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"UnitId":' + this.model.UnitId + ',"InstallPrice":' + this.model.InstallPrice + ',"SendPrice":' + this.model.SendPrice + ',"BasicMaterialId":' + this.model.BasicMaterialId + ',"BasicCategoryId":' + this.model.BasicCategoryId + ',"PriceItemId":' + currPriceItemId + '}';
+
             $.ajax({
                 type: "get",
                 url: "ListHandler.ashx",
@@ -492,7 +503,6 @@ var Material = {
     },
     submitNewPriceItem: function () {
         var itemName = $.trim($("#txtPriceItemName").val());
-
         var beginDate = $.trim($("#txtPriceItemBeginDate").val());
         if (itemName == "") {
             layer.msg("请填写类型名称");
@@ -518,7 +528,7 @@ var Material = {
                             installPrice = 0;
                         }
                         //if (isNaN(installAndProducePrice)) {
-                            //installAndProducePrice = 0;
+                        //installAndProducePrice = 0;
                         //}
                         if (isNaN(sendPrice)) {
                             sendPrice = 0;
@@ -556,7 +566,6 @@ var Material = {
 };
 
 function SelectPriceItem() {
-
     var row = $("#tbPriceType").datagrid('getSelected');
     if (row != null) {
         currPriceItemId = row.ItemId || 0;
@@ -571,6 +580,7 @@ function SelectPriceItem() {
 }
 
 function selectCustomer() {
+    currPriceItemId = 0;
     var row = $("#tbCustomer").datagrid('getSelected');
     if (row != null) {
 
@@ -590,11 +600,9 @@ function CleanVal() {
     Material.model.Id = 0;
     currBasicMaterialId = 0;
     $("#selCustomer").val("0");
-    //$("#txtCustomerMaterialName").val("");
-    $("#selCategory").val("0");
-    $("#selBasicMaterial").val("0");
     $("#txtInstallPrice").val("");
     $("#txtSendPrice").val("");
+    $("#txtSubInstallPrice").val("");
     $("#selUnit").val("0");
 }
 
@@ -604,7 +612,7 @@ function CheckVal() {
     var basicCategoryId = $("#selCategory").val();
     var basicMaterialId = $("#selBasicMaterial").val();
     var installPrice = $.trim($("#txtInstallPrice").val());
-    var installAndProductPrice = $.trim($("#txtInstallAndProductPrice").val());
+    var subInstallPrice = $.trim($("#txtSubInstallPrice").val());
     var sendPrice = $.trim($("#txtSendPrice").val());
     var unitId = $("#selUnit").val();
     if (customerId == "0") {
@@ -623,14 +631,6 @@ function CheckVal() {
         alert("安装单价必须为数字");
         return false;
     }
-    if (installAndProductPrice == "") {
-        alert("请填写生产+安装单价");
-        return false;
-    }
-    else if (isNaN(installAndProductPrice)) {
-        alert("生产+安装单价必须为数字");
-        return false;
-    }
     if (sendPrice == "") {
         alert("请填写发货单价");
         return false;
@@ -639,11 +639,15 @@ function CheckVal() {
         alert("发货单价必须为数字");
         return false;
     }
+    if (subInstallPrice != "" && isNaN(subInstallPrice)) {
+        alert("辅料+安装单价必须为数字");
+        return false;
+    }
     Material.model.CustomerId = customerId;
     Material.model.BasicCategoryId = basicCategoryId;
     Material.model.BasicMaterialId = basicMaterialId;
     Material.model.InstallPrice = installPrice;
-    Material.model.InstallAndProductPrice = installAndProductPrice;
+    Material.model.SubInstallPrice = subInstallPrice;
     Material.model.SendPrice = sendPrice;
     Material.model.UnitId = unitId;
 

@@ -116,21 +116,22 @@
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
-            <tr class="tr_bai">
-                <td style="width: 100px; height: 25px;">
-                    生产+安装单价：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <input type="text" id="txtInstallAndProductPrice" maxlength="20" style="width: 100px;" />
-                    <span style="color: Red;">*</span>
-                </td>
-            </tr>
+            
             <tr class="tr_bai">
                 <td style="width: 100px; height: 25px;">
                     发货单价：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <input type="text" id="txtSendPrice" maxlength="20" style="width: 100px;" />
+                    <span style="color: Red;">*</span>
+                </td>
+            </tr>
+            <tr class="tr_bai" style=" display:none;">
+                <td style="width: 100px; height: 25px;">
+                    辅料+安装单价：
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <input type="text" id="txtSubInstallPrice" maxlength="20" style="width: 100px;" />
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
@@ -167,7 +168,7 @@
                    <input type="text" id="txtPriceItemBeginDate" onclick="WdatePicker()" class="Wdate" maxlength="20"/>
                 </td>
             </tr>
-            <tr class="tr_bai">
+            <tr class="tr_bai" style=" display:none;">
                 <td>
                     使用其他报价
                 </td>
@@ -182,7 +183,7 @@
                 </td>
             </tr>
         </table>
-        <div id="itemContainer" style=" overflow: auto;">
+        <div id="itemContainer" style=" display:none; overflow: auto;">
             <table class="table">
                 <thead>
                     <tr class="tr_hui">

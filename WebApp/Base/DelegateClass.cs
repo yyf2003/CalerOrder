@@ -3169,16 +3169,29 @@ namespace WebApp.Base
             {
                 List<int> shopIdList = list.Select(s => s.ShopId ?? 0).Distinct().ToList();
                 OutsourceOrderDetailBLL outsourceOrderBll = new OutsourceOrderDetailBLL();
-                //OutsourceOrderDetail model;
                 var outsourceInstallOrderList = outsourceOrderBll.GetList(s => s.GuidanceId == guidanceId && shopIdList.Contains(s.ShopId ?? 0) && s.OrderType == (int)OrderTypeEnum.安装费 && (s.SubjectId ?? 0) == 0);
-                if (outsourceInstallOrderList.Any())
+                List<int> activityShopId = list.Where(s => s.SubjectType == (int)InstallPriceSubjectTypeEnum.活动安装费).Select(s=>s.ShopId??0).Distinct().ToList();
+                List<int> genericShopId = list.Where(s => s.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费).Select(s => s.ShopId ?? 0).Distinct().ToList();
+                //OutsourceOrderDetail model;
+                var activityOutsourceList = outsourceInstallOrderList.Where(s => activityShopId.Contains(s.ShopId ?? 0) && s.InstallPriceSubjectType == (int)InstallPriceSubjectTypeEnum.活动安装费).ToList();
+                if (activityOutsourceList.Any())
                 {
-                    outsourceInstallOrderList.ForEach(s =>
+                    activityOutsourceList.ForEach(s =>
                     {
                         s.BelongSubjectId = installSubjectId;
                         outsourceOrderBll.Update(s);
                     });
                 }
+                var genericOutsourceList = outsourceInstallOrderList.Where(s => genericShopId.Contains(s.ShopId ?? 0) && s.InstallPriceSubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费).ToList();
+                if (genericOutsourceList.Any())
+                {
+                    genericOutsourceList.ForEach(s =>
+                    {
+                        s.BelongSubjectId = installSubjectId;
+                        outsourceOrderBll.Update(s);
+                    });
+                }
+
             }
         }
 
@@ -3271,10 +3284,10 @@ namespace WebApp.Base
                          join subject in CurrentContext.DbContext.Subject
                          on order.SubjectId equals subject.Id
                          where (subject.IsDelete == null || subject.IsDelete == false)
-
                          //&& (order.IsDelete == null || order.IsDelete == false)
                          && order.GuidanceId == guidanceId
                          && order.OrderType == (int)OrderTypeEnum.POP
+                         && ((order.IsInstall != null && order.IsInstall.ToUpper() == "Y") || (order.BCSIsInstall != null && order.BCSIsInstall.ToUpper() == "Y"))
                          select order).ToList();
             if (orderList.Any())
             {

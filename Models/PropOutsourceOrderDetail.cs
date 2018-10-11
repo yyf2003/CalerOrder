@@ -18,15 +18,15 @@ namespace Models
         public Nullable<int> PropOrderId { get; set; }
         public Nullable<int> GuidanceId { get; set; }
         public Nullable<int> SubjectId { get; set; }
-        public string Packaging { get; set; }
+        public string MaterialName { get; set; }
         public string OutsourceName { get; set; }
+        public string Packaging { get; set; }
+        public string UnitName { get; set; }
         public Nullable<int> Quantity { get; set; }
         public Nullable<decimal> UnitPrice { get; set; }
-        public string UnitName { get; set; }
         public string Remark { get; set; }
         public Nullable<int> AddUserId { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
         public Nullable<bool> IsDelete { get; set; }
-        public string MaterialName { get; set; }
     }
 }

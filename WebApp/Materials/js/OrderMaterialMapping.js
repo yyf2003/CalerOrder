@@ -11,6 +11,10 @@ $(function () {
     Material.getCategory();
     Material.getMaterialList(pageIndex, pageSize);
     //go();
+    $("#ddlCustmoer").change(function () {
+        pageIndex = 1;
+        Material.getMaterialList(pageIndex, pageSize);
+    })
 
     $("#txtSearchOrderMaterialName").searchbox({
         width: 180,
@@ -235,11 +239,11 @@ var Material = {
     },
     bindBasicMaterial: function () {
         document.getElementById("selBasicMaterial").length = 1;
-        var customerId = $("#selCustomer").val();
+        var customerId = $("#ddlCustmoer").val() || 1;
         var categoryId = $("#selCategory").val();
         $.ajax({
             type: "get",
-            url: "./Handler/OrderMaterialMapping.ashx?type=getBasicMaterial&categoryId=" + categoryId,
+            url: "./Handler/OrderMaterialMapping.ashx?type=getBasicMaterial&customerId=" + customerId + "&categoryId=" + categoryId,
             success: function (data) {
 
                 if (data != "") {
@@ -276,6 +280,7 @@ var Material = {
     },
     bindBasicCategory: function (categoryId) {
         document.getElementById("selCategory").length = 1;
+        document.getElementById("selBasicMaterial").length = 1;
         $.ajax({
             type: "get",
             url: "./Handler/OrderMaterialMapping.ashx?type=getBasicCategory",
@@ -301,19 +306,18 @@ var Material = {
     },
     getMaterialList: function (pageIndex, pageSize) {
         var orderMaterialName = $("#txtSearchOrderMaterialName").val();
-
+        var customerId = $("#ddlCustmoer").val() || 1;
         $("#tbOrderMaterial").datagrid({
             //queryParams: { type: "getList", customerId: currCustomerId, currpage: pageIndex, pagesize: pageSize, orderMaterialName: orderMaterialName },
-            queryParams: { type: "getList", categoryId: currCategoryId, currpage: pageIndex, pagesize: pageSize, orderMaterialName: orderMaterialName },
+            queryParams: { type: "getList",customerId:customerId, categoryId: currCategoryId, currpage: pageIndex, pagesize: pageSize, orderMaterialName: orderMaterialName },
             method: 'get',
             url: './Handler/OrderMaterialMapping.ashx',
             columns: [[
                         { field: 'rowIndex', title: '序号' },
             //{ field: 'BasicMaterialId', title: '单价',hidden:true },
-            //{ field: 'CustomerName', title: '客户名称' },
+                        { field: 'CustomerName', title: '客户名称' },
                         {field: 'CategoryName', title: '材质类型' },
                         {field: 'OrderMaterialName', title: '订单材质名称' },
-                        
                         {field: 'BasicMaterialName', title: '对应基础材质' },
                         { field: 'State', title: '状态', formatter: function (value, row) {
                             if (value == "已删除")
@@ -356,8 +360,8 @@ var Material = {
 
         if (CheckVal()) {
             //var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"CustomerId":' + this.model.CustomerId + ',"OrderMaterialName":"' + this.model.OrderMaterialName + '","BasicCategoryId":' + this.model.BasicCategoryId + ',"BasicMaterialId":' + this.model.BasicMaterialId + '}';
-
-            var jsonStr = '{"Id":' + (this.model.Id || 0) + ',"OrderMaterialName":"' + this.model.OrderMaterialName + '","BasicCategoryId":' + this.model.BasicCategoryId + ',"BasicMaterialId":' + this.model.BasicMaterialId + '}';
+            var customerId = $("#ddlCustmoer").val() || 1;
+            var jsonStr = '{"CustomerId":' + customerId + ',"Id":' + (this.model.Id || 0) + ',"OrderMaterialName":"' + this.model.OrderMaterialName + '","BasicCategoryId":' + this.model.BasicCategoryId + ',"BasicMaterialId":' + this.model.BasicMaterialId + '}';
 
             $.ajax({
                 type: "get",

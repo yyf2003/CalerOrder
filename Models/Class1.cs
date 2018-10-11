@@ -95,6 +95,7 @@ namespace Models
         public string Channel { get; set; }
         public string Format { get; set; }
         public string CustomServiceName { get; set; }
+        public string AddUserName { get; set; }
     }
 
     public partial class Shop {
@@ -118,6 +119,7 @@ namespace Models
         //其他费
         public decimal OtherPrice { get; set; }
         public string CSUserName { get; set; }
+        public int? Quantity { get; set; }
     }
 
     public partial class NewMaterialSupport {
@@ -184,9 +186,9 @@ namespace Models
         /// </summary>
         public decimal? PayPriceInstall { get; set; }
         /// <summary>
-        /// 应付生产+安装单价
+        /// 应付辅料+安装单价
         /// </summary>
-        public decimal? PayPriceInstallAndProduct { get; set; }
+        public decimal? PayPriceSubInstall { get; set; }
         /// <summary>
         /// 应付发货单价
         /// </summary>
@@ -304,7 +306,7 @@ namespace Models
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal TotalPrice { get; set; }
-        public string UnitName { get; set; }
+        //public string UnitName { get; set; }
     }
     /// <summary>
     /// POP报价模板导出模型

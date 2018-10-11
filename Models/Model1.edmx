@@ -332,6 +332,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerId" Type="int" />
           <Property Name="MaterialCategoryId" Type="int" />
           <Property Name="MaterialName" Type="varchar" MaxLength="200" />
           <Property Name="Units" Type="varchar" MaxLength="50" />
@@ -1580,8 +1581,8 @@
           <Property Name="PriceItemId" Type="int" />
           <Property Name="UnitId" Type="int" />
           <Property Name="InstallPrice" Type="decimal" Scale="2" />
-          <Property Name="InstallAndProductPrice" Type="decimal" Scale="2" />
           <Property Name="SendPrice" Type="decimal" Scale="2" />
+          <Property Name="SubInstallPrice" Type="decimal" Scale="2" />
           <Property Name="BasicCategoryId" Type="int" />
           <Property Name="BasicMaterialId" Type="int" />
           <Property Name="IsDelete" Type="bit" />
@@ -3127,6 +3128,7 @@
           <EntitySet Name="OrderType" EntityType="KalerOrderDBModel.OrderType" />
           <EntitySet Name="OutsourceAssignShop" EntityType="KalerOrderDBModel.OutsourceAssignShop" />
           <EntitySet Name="OutsourceInfo" EntityType="KalerOrderDBModel.OutsourceInfo" />
+          <EntitySet Name="OutsourceInstallPriceLevel" EntityType="KalerOrderDBModel.OutsourceInstallPriceLevel" />
           <EntitySet Name="OutsourceInUser" EntityType="KalerOrderDBModel.OutsourceInUser" />
           <EntitySet Name="OutSourceMaterial" EntityType="KalerOrderDBModel.OutSourceMaterial" />
           <EntitySet Name="OutsourceMaterialInfo" EntityType="KalerOrderDBModel.OutsourceMaterialInfo" />
@@ -3140,6 +3142,7 @@
           <EntitySet Name="OutsourceOrderPlaceConfig" EntityType="KalerOrderDBModel.OutsourceOrderPlaceConfig" />
           <EntitySet Name="OutsourceOrderPrice" EntityType="KalerOrderDBModel.OutsourceOrderPrice" />
           <EntitySet Name="OutsourceOrderSavingLog" EntityType="KalerOrderDBModel.OutsourceOrderSavingLog" />
+          <EntitySet Name="OutsourcePayRecord" EntityType="KalerOrderDBModel.OutsourcePayRecord" />
           <EntitySet Name="OutsourcePriceOrder" EntityType="KalerOrderDBModel.OutsourcePriceOrder" />
           <EntitySet Name="OutsourceReceivePriceOrder" EntityType="KalerOrderDBModel.OutsourceReceivePriceOrder" />
           <EntitySet Name="Place" EntityType="KalerOrderDBModel.Place" />
@@ -3204,8 +3207,6 @@
           <EntitySet Name="UserInRegion" EntityType="KalerOrderDBModel.UserInRegion" />
           <EntitySet Name="UserInRole" EntityType="KalerOrderDBModel.UserInRole" />
           <EntitySet Name="UserLevel" EntityType="KalerOrderDBModel.UserLevel" />
-          <EntitySet Name="OutsourcePayRecord" EntityType="KalerOrderDBModel.OutsourcePayRecord" />
-          <EntitySet Name="OutsourceInstallPriceLevel" EntityType="KalerOrderDBModel.OutsourceInstallPriceLevel" />
         </EntityContainer>
         <EntityType Name="AccountCheckSupplement">
           <Key>
@@ -3360,6 +3361,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="CustomerId" />
           <Property Type="Int32" Name="MaterialCategoryId" />
           <Property Type="String" Name="MaterialName" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="Units" MaxLength="50" FixedLength="false" Unicode="false" />
@@ -3460,6 +3462,7 @@
           <Property Type="String" Name="ShortName" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="Contact" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="Tel" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Int32" Name="RegionId" />
           <Property Type="Int32" Name="ProvinceId" />
           <Property Type="Int32" Name="CityId" />
           <Property Type="String" Name="Address" MaxLength="200" FixedLength="false" Unicode="false" />
@@ -3467,7 +3470,6 @@
           <Property Type="DateTime" Name="AddDate" />
           <Property Type="Boolean" Name="IsDelete" />
           <Property Type="Int32" Name="CustomerServiceId" />
-          <Property Type="Int32" Name="RegionId" />
         </EntityType>
         <EntityType Name="CompanyInRegion">
           <Key>
@@ -4562,6 +4564,19 @@
           <Property Type="DateTime" Name="AddDate" />
           <Property Type="String" Name="Remark" MaxLength="200" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="OutsourceInstallPriceLevel">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="CustomerId" />
+          <Property Type="Int32" Name="RegionId" />
+          <Property Type="Int32" Name="ProvinceId" />
+          <Property Type="Int32" Name="CityId" />
+          <Property Type="Int32" Name="BasicMaterialSupportId" />
+          <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="BasicInstallPrice" Precision="18" Scale="2" />
+        </EntityType>
         <EntityType Name="OutsourceInUser">
           <Key>
             <PropertyRef Name="Id" />
@@ -4586,19 +4601,19 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="RegionId" />
+          <Property Type="Int32" Name="OutsourctId" />
           <Property Type="Int32" Name="CustomerId" />
           <Property Type="Int32" Name="PriceItemId" />
           <Property Type="Int32" Name="UnitId" />
           <Property Type="Decimal" Name="InstallPrice" Precision="18" Scale="2" />
           <Property Type="Decimal" Name="SendPrice" Precision="18" Scale="2" />
+          <Property Type="Decimal" Name="SubInstallPrice" Precision="18" Scale="2" />
           <Property Type="Int32" Name="BasicCategoryId" />
           <Property Type="Int32" Name="BasicMaterialId" />
           <Property Type="Boolean" Name="IsDelete" />
           <Property Type="Int32" Name="AddUserId" />
           <Property Type="DateTime" Name="AddDate" />
-          <Property Type="Decimal" Name="InstallAndProductPrice" Precision="18" Scale="2" />
-          <Property Type="Int32" Name="OutsourctId" />
-          <Property Type="Int32" Name="RegionId" />
         </EntityType>
         <EntityType Name="OutsourceMaterialOrderDetail">
           <Key>
@@ -4622,10 +4637,10 @@
           <Property Type="Int32" Name="BasicCategoryId" />
           <Property Type="Int32" Name="BasicMaterialId" />
           <Property Type="Decimal" Name="InstallPrice" Precision="18" Scale="2" />
+          <Property Type="Decimal" Name="InstallAndProductPrice" Precision="18" Scale="2" />
           <Property Type="Decimal" Name="SendPrice" Precision="18" Scale="2" />
           <Property Type="Int32" Name="AddUserId" />
           <Property Type="DateTime" Name="AddDate" />
-          <Property Type="Decimal" Name="InstallAndProductPrice" Precision="18" Scale="2" />
         </EntityType>
         <EntityType Name="OutsourceMaterialPriceItem">
           <Key>
@@ -4661,7 +4676,7 @@
           <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Type="Int32" Name="CustomerId" />
           <Property Type="Int32" Name="ConfigTypeId" />
-          <Property Type="String" Name="MaterialName" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="MaterialName" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Type="Int32" Name="ProductOutsourctId" />
           <Property Type="Int32" Name="AssignType" />
           <Property Type="String" Name="Channel" MaxLength="500" FixedLength="false" Unicode="true" />
@@ -4856,6 +4871,20 @@
           <Property Type="DateTime" Name="AddDate" />
           <Property Type="String" Name="State" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="ErrorMsg" MaxLength="500" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="OutsourcePayRecord">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="GuidanceId" />
+          <Property Type="Int32" Name="OutsourceId" />
+          <Property Type="Decimal" Name="PayAmount" Precision="18" Scale="2" />
+          <Property Type="DateTime" Name="PayDate" />
+          <Property Type="Int32" Name="AddUserId" />
+          <Property Type="DateTime" Name="AddDate" />
+          <Property Type="String" Name="SubjectIds" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="String" Name="Remark" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="OutsourcePriceOrder">
           <Key>
@@ -5133,16 +5162,16 @@
           <Property Type="Int32" Name="PropOrderId" />
           <Property Type="Int32" Name="GuidanceId" />
           <Property Type="Int32" Name="SubjectId" />
-          <Property Type="String" Name="Packaging" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="MaterialName" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="OutsourceName" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Packaging" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="UnitName" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Type="Int32" Name="Quantity" />
           <Property Type="Decimal" Name="UnitPrice" Precision="18" Scale="2" />
-          <Property Type="String" Name="UnitName" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="Remark" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Type="Int32" Name="AddUserId" />
           <Property Type="DateTime" Name="AddDate" />
           <Property Type="Boolean" Name="IsDelete" />
-          <Property Type="String" Name="MaterialName" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ProvinceInOrderPlan">
           <Key>
@@ -5337,6 +5366,7 @@
           <Property Type="String" Name="GraphicMaterial" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="QuoteGraphicMaterial" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Type="String" Name="UnitName" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Type="Decimal" Name="DefaultUnitPrice" Precision="18" Scale="2" />
           <Property Type="Decimal" Name="UnitPrice" Precision="18" Scale="2" />
           <Property Type="Decimal" Name="DefaultTotalPrice" Precision="18" Scale="6" />
           <Property Type="Decimal" Name="AutoAddTotalPrice" Precision="18" Scale="6" />
@@ -5373,7 +5403,6 @@
           <Property Type="Int32" Name="FinalOrderId" />
           <Property Type="Int32" Name="QuoteItemId" />
           <Property Type="Decimal" Name="AddSizeRate" Precision="18" Scale="2" />
-          <Property Type="Decimal" Name="DefaultUnitPrice" Precision="18" Scale="2" />
         </EntityType>
         <EntityType Name="QuoteOrderSetting">
           <Key>
@@ -6040,33 +6069,6 @@
           <Property Type="Int32" Name="LevelId" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Type="String" Name="LevelName" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="OutsourcePayRecord">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="Int32" Name="GuidanceId" />
-          <Property Type="Int32" Name="OutsourceId" />
-          <Property Type="Decimal" Name="PayAmount" Precision="18" Scale="2" />
-          <Property Type="DateTime" Name="PayDate" />
-          <Property Type="Int32" Name="AddUserId" />
-          <Property Type="DateTime" Name="AddDate" />
-          <Property Type="String" Name="SubjectIds" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="String" Name="Remark" MaxLength="50" FixedLength="false" Unicode="false" />
-        </EntityType>
-        <EntityType Name="OutsourceInstallPriceLevel">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="Int32" Name="CustomerId" />
-          <Property Type="Int32" Name="RegionId" />
-          <Property Type="Int32" Name="ProvinceId" />
-          <Property Type="Int32" Name="CityId" />
-          <Property Type="Int32" Name="BasicMaterialSupportId" />
-          <Property Type="String" Name="MaterialSupport" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Type="Decimal" Name="BasicInstallPrice" Precision="18" Scale="2" />
-        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -6242,6 +6244,7 @@
                 <ScalarProperty Name="Units" ColumnName="Units" />
                 <ScalarProperty Name="MaterialName" ColumnName="MaterialName" />
                 <ScalarProperty Name="MaterialCategoryId" ColumnName="MaterialCategoryId" />
+                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -6334,7 +6337,6 @@
           <EntitySetMapping Name="Company">
             <EntityTypeMapping TypeName="KalerOrderDBModel.Company">
               <MappingFragment StoreEntitySet="Company">
-                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
                 <ScalarProperty Name="CustomerServiceId" ColumnName="CustomerServiceId" />
                 <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
                 <ScalarProperty Name="AddDate" ColumnName="AddDate" />
@@ -6342,6 +6344,7 @@
                 <ScalarProperty Name="Address" ColumnName="Address" />
                 <ScalarProperty Name="CityId" ColumnName="CityId" />
                 <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
                 <ScalarProperty Name="Tel" ColumnName="Tel" />
                 <ScalarProperty Name="Contact" ColumnName="Contact" />
                 <ScalarProperty Name="ShortName" ColumnName="ShortName" />
@@ -7499,6 +7502,20 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="OutsourceInstallPriceLevel">
+            <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourceInstallPriceLevel">
+              <MappingFragment StoreEntitySet="OutsourceInstallPriceLevel">
+                <ScalarProperty Name="BasicInstallPrice" ColumnName="BasicInstallPrice" />
+                <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
+                <ScalarProperty Name="BasicMaterialSupportId" ColumnName="BasicMaterialSupportId" />
+                <ScalarProperty Name="CityId" ColumnName="CityId" />
+                <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
+                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
+                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="OutsourceInUser">
             <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourceInUser">
               <MappingFragment StoreEntitySet="OutsourceInUser">
@@ -7523,19 +7540,19 @@
           <EntitySetMapping Name="OutsourceMaterialInfo">
             <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourceMaterialInfo">
               <MappingFragment StoreEntitySet="OutsourceMaterialInfo">
-                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
-                <ScalarProperty Name="OutsourctId" ColumnName="OutsourctId" />
-                <ScalarProperty Name="InstallAndProductPrice" ColumnName="InstallAndProductPrice" />
                 <ScalarProperty Name="AddDate" ColumnName="AddDate" />
                 <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
                 <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
                 <ScalarProperty Name="BasicMaterialId" ColumnName="BasicMaterialId" />
                 <ScalarProperty Name="BasicCategoryId" ColumnName="BasicCategoryId" />
+                <ScalarProperty Name="SubInstallPrice" ColumnName="SubInstallPrice" />
                 <ScalarProperty Name="SendPrice" ColumnName="SendPrice" />
                 <ScalarProperty Name="InstallPrice" ColumnName="InstallPrice" />
                 <ScalarProperty Name="UnitId" ColumnName="UnitId" />
                 <ScalarProperty Name="PriceItemId" ColumnName="PriceItemId" />
                 <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="OutsourctId" ColumnName="OutsourctId" />
+                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -7557,10 +7574,10 @@
           <EntitySetMapping Name="OutsourceMaterialPrice">
             <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourceMaterialPrice">
               <MappingFragment StoreEntitySet="OutsourceMaterialPrice">
-                <ScalarProperty Name="InstallAndProductPrice" ColumnName="InstallAndProductPrice" />
                 <ScalarProperty Name="AddDate" ColumnName="AddDate" />
                 <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
                 <ScalarProperty Name="SendPrice" ColumnName="SendPrice" />
+                <ScalarProperty Name="InstallAndProductPrice" ColumnName="InstallAndProductPrice" />
                 <ScalarProperty Name="InstallPrice" ColumnName="InstallPrice" />
                 <ScalarProperty Name="BasicMaterialId" ColumnName="BasicMaterialId" />
                 <ScalarProperty Name="BasicCategoryId" ColumnName="BasicCategoryId" />
@@ -7802,6 +7819,21 @@
                 <ScalarProperty Name="State" ColumnName="State" />
                 <ScalarProperty Name="AddDate" ColumnName="AddDate" />
                 <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+                <ScalarProperty Name="GuidanceId" ColumnName="GuidanceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="OutsourcePayRecord">
+            <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourcePayRecord">
+              <MappingFragment StoreEntitySet="OutsourcePayRecord">
+                <ScalarProperty Name="Remark" ColumnName="Remark" />
+                <ScalarProperty Name="SubjectIds" ColumnName="SubjectIds" />
+                <ScalarProperty Name="AddDate" ColumnName="AddDate" />
+                <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
+                <ScalarProperty Name="PayDate" ColumnName="PayDate" />
+                <ScalarProperty Name="PayAmount" ColumnName="PayAmount" />
+                <ScalarProperty Name="OutsourceId" ColumnName="OutsourceId" />
                 <ScalarProperty Name="GuidanceId" ColumnName="GuidanceId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
@@ -8090,16 +8122,16 @@
           <EntitySetMapping Name="PropOutsourceOrderDetail">
             <EntityTypeMapping TypeName="KalerOrderDBModel.PropOutsourceOrderDetail">
               <MappingFragment StoreEntitySet="PropOutsourceOrderDetail">
-                <ScalarProperty Name="MaterialName" ColumnName="MaterialName" />
                 <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
                 <ScalarProperty Name="AddDate" ColumnName="AddDate" />
                 <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
                 <ScalarProperty Name="Remark" ColumnName="Remark" />
-                <ScalarProperty Name="UnitName" ColumnName="UnitName" />
                 <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
                 <ScalarProperty Name="Quantity" ColumnName="Quantity" />
-                <ScalarProperty Name="OutsourceName" ColumnName="OutsourceName" />
+                <ScalarProperty Name="UnitName" ColumnName="UnitName" />
                 <ScalarProperty Name="Packaging" ColumnName="Packaging" />
+                <ScalarProperty Name="OutsourceName" ColumnName="OutsourceName" />
+                <ScalarProperty Name="MaterialName" ColumnName="MaterialName" />
                 <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
                 <ScalarProperty Name="GuidanceId" ColumnName="GuidanceId" />
                 <ScalarProperty Name="PropOrderId" ColumnName="PropOrderId" />
@@ -8262,7 +8294,6 @@
           <EntitySetMapping Name="QuoteOrderDetail">
             <EntityTypeMapping TypeName="KalerOrderDBModel.QuoteOrderDetail">
               <MappingFragment StoreEntitySet="QuoteOrderDetail">
-                <ScalarProperty Name="DefaultUnitPrice" ColumnName="DefaultUnitPrice" />
                 <ScalarProperty Name="AddSizeRate" ColumnName="AddSizeRate" />
                 <ScalarProperty Name="QuoteItemId" ColumnName="QuoteItemId" />
                 <ScalarProperty Name="FinalOrderId" ColumnName="FinalOrderId" />
@@ -8299,6 +8330,7 @@
                 <ScalarProperty Name="AutoAddTotalPrice" ColumnName="AutoAddTotalPrice" />
                 <ScalarProperty Name="DefaultTotalPrice" ColumnName="DefaultTotalPrice" />
                 <ScalarProperty Name="UnitPrice" ColumnName="UnitPrice" />
+                <ScalarProperty Name="DefaultUnitPrice" ColumnName="DefaultUnitPrice" />
                 <ScalarProperty Name="UnitName" ColumnName="UnitName" />
                 <ScalarProperty Name="QuoteGraphicMaterial" ColumnName="QuoteGraphicMaterial" />
                 <ScalarProperty Name="GraphicMaterial" ColumnName="GraphicMaterial" />
@@ -9054,35 +9086,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="OutsourcePayRecord">
-            <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourcePayRecord">
-              <MappingFragment StoreEntitySet="OutsourcePayRecord">
-                <ScalarProperty Name="Remark" ColumnName="Remark" />
-                <ScalarProperty Name="SubjectIds" ColumnName="SubjectIds" />
-                <ScalarProperty Name="AddDate" ColumnName="AddDate" />
-                <ScalarProperty Name="AddUserId" ColumnName="AddUserId" />
-                <ScalarProperty Name="PayDate" ColumnName="PayDate" />
-                <ScalarProperty Name="PayAmount" ColumnName="PayAmount" />
-                <ScalarProperty Name="OutsourceId" ColumnName="OutsourceId" />
-                <ScalarProperty Name="GuidanceId" ColumnName="GuidanceId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="OutsourceInstallPriceLevel">
-            <EntityTypeMapping TypeName="KalerOrderDBModel.OutsourceInstallPriceLevel">
-              <MappingFragment StoreEntitySet="OutsourceInstallPriceLevel">
-                <ScalarProperty Name="BasicInstallPrice" ColumnName="BasicInstallPrice" />
-                <ScalarProperty Name="MaterialSupport" ColumnName="MaterialSupport" />
-                <ScalarProperty Name="BasicMaterialSupportId" ColumnName="BasicMaterialSupportId" />
-                <ScalarProperty Name="CityId" ColumnName="CityId" />
-                <ScalarProperty Name="ProvinceId" ColumnName="ProvinceId" />
-                <ScalarProperty Name="RegionId" ColumnName="RegionId" />
-                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -9117,13 +9120,13 @@
         <EntityTypeShape EntityType="KalerOrderDBModel.BaseDataChangeLog" Width="1.5" PointX="4.75" PointY="7.75" Height="2.1050219726562318" />
         <EntityTypeShape EntityType="KalerOrderDBModel.BaseInfo" Width="1.5" PointX="6.75" PointY="7.75" Height="1.920227864583353" />
         <EntityTypeShape EntityType="KalerOrderDBModel.BasicMachineFrame" Width="1.5" PointX="8.75" PointY="0.75" Height="1.7354337565104174" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.BasicMaterial" Width="1.5" PointX="8.75" PointY="3.75" Height="2.2898160807291674" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.BasicMaterial" Width="1.5" PointX="8.75" PointY="3.75" Height="2.474610188802103" />
         <EntityTypeShape EntityType="KalerOrderDBModel.BasicMaterialSupport" Width="1.5" PointX="8.75" PointY="7.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.CheckOrder" Width="1.5" PointX="10.75" PointY="0.75" Height="2.8441984049479174" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.CheckOrderPlanDetail" Width="1.5" PointX="2.75" PointY="10.75" Height="3.9529630533854174" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.CheckOrderResult" Width="1.5" PointX="10.75" PointY="4.75" Height="4.8769335937500387" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.CheckOrder" Width="1.5" PointX="10.75" PointY="0.75" Height="2.8441984049478606" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.CheckOrderPlanDetail" Width="1.5" PointX="2.75" PointY="10.75" Height="3.9529630533853606" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.CheckOrderResult" Width="1.5" PointX="10.75" PointY="4.75" Height="4.8769335937500955" />
         <EntityTypeShape EntityType="KalerOrderDBModel.CityInOrderPlan" Width="1.5" PointX="4.75" PointY="10.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Company" Width="1.5" PointX="6.75" PointY="10.75" Height="3.9529630533853606" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Company" Width="1.5" PointX="6.75" PointY="10.75" Height="4.137757161458353" />
         <EntityTypeShape EntityType="KalerOrderDBModel.CompanyInRegion" Width="1.5" PointX="8.75" PointY="10.75" Height="1.7354337565104743" />
         <EntityTypeShape EntityType="KalerOrderDBModel.CompanyType" Width="1.5" PointX="10.75" PointY="10.75" Height="1.5506396484374818" />
         <EntityTypeShape EntityType="KalerOrderDBModel.Cooperation" Width="1.5" PointX="12.75" PointY="0.75" Height="3.028992513020853" />
@@ -9139,8 +9142,8 @@
         <EntityTypeShape EntityType="KalerOrderDBModel.ExpressPriceDetail" Width="1.5" PointX="0.75" PointY="15.75" Height="2.2898160807292243" />
         <EntityTypeShape EntityType="KalerOrderDBModel.ExtraOrderDetail" Width="1.5" PointX="2.75" PointY="15.75" Height="6.909668782552103" />
         <EntityTypeShape EntityType="KalerOrderDBModel.FinalOrderDetail" Width="1.5" PointX="4.75" PointY="15.75" Height="10.420756835937482" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.FinalOrderDetailTemp" Width="1.5" PointX="16.75" PointY="0.75" Height="19.106079915364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.HandMadeOrderDetail" Width="1.5" PointX="6.75" PointY="16.75" Height="6.355286458333353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.FinalOrderDetailTemp" Width="1.5" PointX="16.75" PointY="0.75" Height="19.290874023437482" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.HandMadeOrderDetail" Width="1.5" PointX="6.75" PointY="16.75" Height="6.5400805664062318" />
         <EntityTypeShape EntityType="KalerOrderDBModel.HCOrderDetail" Width="1.5" PointX="8.75" PointY="16.75" Height="5.4313159179687318" />
         <EntityTypeShape EntityType="KalerOrderDBModel.HCPOP" Width="1.5" PointX="10.75" PointY="16.75" Height="3.028992513020853" />
         <EntityTypeShape EntityType="KalerOrderDBModel.HCSmallGraphicSize" Width="1.5" PointX="12.75" PointY="17.75" Height="2.6594042968749818" />
@@ -9152,115 +9155,115 @@
         <EntityTypeShape EntityType="KalerOrderDBModel.InstallPriceTemp" Width="1.5" PointX="20.75" PointY="0.75" Height="2.8441984049479743" />
         <EntityTypeShape EntityType="KalerOrderDBModel.KidsNewShopProp" Width="1.5" PointX="20.75" PointY="4.75" Height="2.8441984049479743" />
         <EntityTypeShape EntityType="KalerOrderDBModel.ListOrderDetail" Width="1.5" PointX="20.75" PointY="8.75" Height="5.9856982421874818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrame" Width="1.5" PointX="14.75" PointY="20.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrameBlackList" Width="1.5" PointX="20.75" PointY="15.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrameCornerType" Width="1.5" PointX="20.75" PointY="18.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrameSize" Width="1.5" PointX="10.75" PointY="21.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrameType" Width="1.5" PointX="20.75" PointY="21.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Material" Width="1.5" PointX="22.75" PointY="0.75" Height="3.583374837239603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MaterialBrand" Width="1.5" PointX="22.75" PointY="5.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MaterialCategory" Width="1.5" PointX="22.75" PointY="8.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MaterialPrice" Width="1.5" PointX="22.75" PointY="11.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MaterialTemp" Width="1.5" PointX="22.75" PointY="15.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MaterialType" Width="1.5" PointX="22.75" PointY="19.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MeasurePriceInfo" Width="1.5" PointX="22.75" PointY="22.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.MergeOriginalOrder" Width="1.5" PointX="0.75" PointY="23.75" Height="6.909668782552103" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Module" Width="1.5" PointX="12.75" PointY="23.75" Height="2.8441984049479743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ModuleMenuImg" Width="1.5" PointX="14.75" PointY="23.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.NewMaterialSupport" Width="1.5" PointX="16.75" PointY="23.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.NewShopMachineFrame" Width="1.5" PointX="24.75" PointY="0.75" Height="2.6594042968749818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderApprovePermission" Width="1.5" PointX="24.75" PointY="4.75" Height="1.7354337565104743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeApplication" Width="1.5" PointX="6.75" PointY="24.75" Height="3.583374837239603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeApplicationDetail" Width="1.5" PointX="24.75" PointY="7.75" Height="2.8441984049479743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeApproveInfo" Width="1.5" PointX="24.75" PointY="11.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeLog" Width="1.5" PointX="24.75" PointY="14.75" Height="11.714315592447974" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterial" Width="1.5" PointX="18.75" PointY="24.75" Height="3.7681689453124818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterialBaseInfo" Width="1.5" PointX="8.75" PointY="25.75" Height="2.8441984049479743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrame" Width="1.5" PointX="20.75" PointY="15.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrameBlackList" Width="1.5" PointX="20.75" PointY="18.75" Height="2.1050219726562318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrameCornerType" Width="1.5" PointX="10.75" PointY="21.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrameSize" Width="1.5" PointX="12.75" PointY="21.75" Height="2.2898160807292243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MachineFrameType" Width="1.5" PointX="14.75" PointY="21.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Material" Width="1.5" PointX="20.75" PointY="21.75" Height="3.583374837239603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MaterialBrand" Width="1.5" PointX="22.75" PointY="0.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MaterialCategory" Width="1.5" PointX="22.75" PointY="3.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MaterialPrice" Width="1.5" PointX="22.75" PointY="6.75" Height="3.028992513020853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MaterialTemp" Width="1.5" PointX="22.75" PointY="10.75" Height="2.2898160807292243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MaterialType" Width="1.5" PointX="22.75" PointY="14.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MeasurePriceInfo" Width="1.5" PointX="22.75" PointY="17.75" Height="2.2898160807292243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.MergeOriginalOrder" Width="1.5" PointX="22.75" PointY="21.75" Height="6.909668782552103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Module" Width="1.5" PointX="0.75" PointY="23.75" Height="2.8441984049479743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ModuleMenuImg" Width="1.5" PointX="16.75" PointY="23.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.NewMaterialSupport" Width="1.5" PointX="24.75" PointY="0.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.NewShopMachineFrame" Width="1.5" PointX="24.75" PointY="3.75" Height="2.6594042968749818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderApprovePermission" Width="1.5" PointX="6.75" PointY="24.75" Height="1.7354337565104743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeApplication" Width="1.5" PointX="24.75" PointY="7.75" Height="3.583374837239603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeApplicationDetail" Width="1.5" PointX="8.75" PointY="24.75" Height="2.8441984049479743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeApproveInfo" Width="1.5" PointX="24.75" PointY="12.75" Height="2.1050219726562318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderChangeLog" Width="1.5" PointX="24.75" PointY="15.75" Height="11.714315592447974" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterial" Width="1.5" PointX="10.75" PointY="25.75" Height="3.7681689453124818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterialBaseInfo" Width="1.5" PointX="12.75" PointY="25.75" Height="2.8441984049479743" />
         <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterialItem" Width="1.5" PointX="26.75" PointY="0.75" Height="1.920227864583353" />
         <EntityTypeShape EntityType="KalerOrderDBModel.OrderMaterialMpping" Width="1.5" PointX="26.75" PointY="3.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OrderPlan" Width="1.5" PointX="26.75" PointY="7.75" Height="8.9424039713542243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OrderPlan" Width="1.5" PointX="26.75" PointY="7.75" Height="9.127198079427103" />
         <EntityTypeShape EntityType="KalerOrderDBModel.OrderType" Width="1.5" PointX="14.75" PointY="26.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceAssignShop" Width="1.5" PointX="26.75" PointY="17.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInfo" Width="1.5" PointX="20.75" PointY="26.75" Height="4.3225512695312318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInUser" Width="1.5" PointX="26.75" PointY="22.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutSourceMaterial" Width="1.5" PointX="26.75" PointY="25.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialInfo" Width="1.5" PointX="2.75" PointY="27.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialOrderDetail" Width="1.5" PointX="10.75" PointY="27.75" Height="2.474610188802103" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialPrice" Width="1.5" PointX="22.75" PointY="27.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceAssignShop" Width="1.5" PointX="16.75" PointY="26.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInfo" Width="1.5" PointX="26.75" PointY="17.75" Height="4.3225512695312318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInstallPriceLevel" Width="1.5" PointX="18.75" PointY="26.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInUser" Width="1.5" PointX="26.75" PointY="23.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutSourceMaterial" Width="1.5" PointX="26.75" PointY="26.75" Height="2.1050219726562318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialInfo" Width="1.5" PointX="0.75" PointY="27.75" Height="3.583374837239603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialOrderDetail" Width="1.5" PointX="2.75" PointY="27.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialPrice" Width="1.5" PointX="4.75" PointY="27.75" Height="2.6594042968749818" />
         <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialPriceItem" Width="1.5" PointX="28.75" PointY="0.75" Height="2.2898160807292243" />
         <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceMaterialSubject" Width="1.5" PointX="28.75" PointY="4.75" Height="2.8441984049479743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderAssignConfig" Width="1.5" PointX="28.75" PointY="8.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderDetail" Width="1.5" PointX="28.75" PointY="13.75" Height="14.855815429687482" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderDetailNew" Width="1.5" PointX="24.75" PointY="28.75" Height="12.268697916666724" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderPlaceConfig" Width="1.5" PointX="4.75" PointY="29.75" Height="1.7354337565104743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderPrice" Width="1.5" PointX="6.75" PointY="29.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderSavingLog" Width="1.5" PointX="12.75" PointY="29.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourcePriceOrder" Width="1.5" PointX="14.75" PointY="29.75" Height="3.7681689453124818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceReceivePriceOrder" Width="1.5" PointX="16.75" PointY="29.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Place" Width="1.5" PointX="26.75" PointY="29.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Place1" Width="1.5" PointX="28.75" PointY="29.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.POP" Width="1.5" PointX="30.75" PointY="0.75" Height="10.975139160156232" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.POPBlackList" Width="1.5" PointX="30.75" PointY="12.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.POPChangeDetail" Width="1.5" PointX="30.75" PointY="15.75" Height="5.4313159179687318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.POPOrderDetail" Width="1.5" PointX="30.75" PointY="22.75" Height="7.2792569986979743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Position" Width="1.5" PointX="0.75" PointY="31.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.POSScaleInfo" Width="1.5" PointX="8.75" PointY="31.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.PriceOrderDetail" Width="1.5" PointX="30.75" PointY="31.75" Height="4.5073453776042243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.PropOrderDetail" Width="1.5" PointX="32.75" PointY="0.75" Height="6.7248746744792243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.PropOutsourceOrderDetail" Width="1.5" PointX="2.75" PointY="32.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ProvinceInOrderPlan" Width="1.5" PointX="32.75" PointY="8.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ProvinceInRegion" Width="1.5" PointX="10.75" PointY="32.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationAccount" Width="1.5" PointX="32.75" PointY="11.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationBlongs" Width="1.5" PointX="32.75" PointY="14.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationCategory" Width="1.5" PointX="32.75" PointY="17.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationClassification" Width="1.5" PointX="18.75" PointY="32.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationItem" Width="1.5" PointX="32.75" PointY="20.75" Height="4.3225512695312318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Quotations" Width="1.5" PointX="20.75" PointY="32.75" Height="4.5073453776042243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationTaxRate" Width="1.5" PointX="32.75" PointY="26.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteAddRateAtSize" Width="1.5" PointX="26.75" PointY="32.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteDifferenceDetail" Width="1.5" PointX="32.75" PointY="29.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderAssignConfig" Width="1.5" PointX="6.75" PointY="28.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderDetail" Width="1.5" PointX="28.75" PointY="8.75" Height="15.040609537760474" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderDetailNew" Width="1.5" PointX="28.75" PointY="24.75" Height="12.268697916666724" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderPlaceConfig" Width="1.5" PointX="12.75" PointY="29.75" Height="1.7354337565104743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderPrice" Width="1.5" PointX="20.75" PointY="29.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceOrderSavingLog" Width="1.5" PointX="22.75" PointY="29.75" Height="2.1050219726562318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourcePayRecord" Width="1.5" PointX="24.75" PointY="29.75" Height="2.6594042968749818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourcePriceOrder" Width="1.5" PointX="30.75" PointY="0.75" Height="3.7681689453124818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceReceivePriceOrder" Width="1.5" PointX="30.75" PointY="5.75" Height="3.028992513020853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Place" Width="1.5" PointX="8.75" PointY="30.75" Height="2.1050219726562318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Place1" Width="1.5" PointX="30.75" PointY="9.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.POP" Width="1.5" PointX="30.75" PointY="12.75" Height="11.159933268229224" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.POPBlackList" Width="1.5" PointX="30.75" PointY="24.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.POPChangeDetail" Width="1.5" PointX="30.75" PointY="27.75" Height="5.4313159179687318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.POPOrderDetail" Width="1.5" PointX="2.75" PointY="31.75" Height="7.2792569986979743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Position" Width="1.5" PointX="14.75" PointY="31.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.POSScaleInfo" Width="1.5" PointX="16.75" PointY="31.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.PriceOrderDetail" Width="1.5" PointX="32.75" PointY="0.75" Height="4.692139485677103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.PropOrderDetail" Width="1.5" PointX="32.75" PointY="6.75" Height="6.7248746744792243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.PropOutsourceOrderDetail" Width="1.5" PointX="10.75" PointY="32.75" Height="3.583374837239603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ProvinceInOrderPlan" Width="1.5" PointX="32.75" PointY="14.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ProvinceInRegion" Width="1.5" PointX="32.75" PointY="17.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationAccount" Width="1.5" PointX="32.75" PointY="20.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationBlongs" Width="1.5" PointX="32.75" PointY="23.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationCategory" Width="1.5" PointX="32.75" PointY="26.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationClassification" Width="1.5" PointX="32.75" PointY="29.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationItem" Width="1.5" PointX="32.75" PointY="32.75" Height="4.3225512695312318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Quotations" Width="1.5" PointX="4.75" PointY="33.75" Height="4.5073453776042243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuotationTaxRate" Width="1.5" PointX="6.75" PointY="33.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteAddRateAtSize" Width="1.5" PointX="22.75" PointY="33.75" Height="2.2898160807292243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteDifferenceDetail" Width="1.5" PointX="24.75" PointY="33.75" Height="3.3985807291667243" />
         <EntityTypeShape EntityType="KalerOrderDBModel.QuoteMaterial" Width="1.5" PointX="34.75" PointY="0.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteOrderDetail" Width="1.5" PointX="34.75" PointY="3.75" Height="16.703756510416724" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteOrderSetting" Width="1.5" PointX="4.75" PointY="34.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Region" Width="1.5" PointX="6.75" PointY="34.75" Height="1.7354337565104743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.RegionOrderDetail" Width="1.5" PointX="12.75" PointY="34.75" Height="5.9856982421874818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.RegionOrderPrice" Width="1.5" PointX="14.75" PointY="34.75" Height="3.028992513020853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteOrderDetail" Width="1.5" PointX="34.75" PointY="3.75" Height="16.888550618489603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.QuoteOrderSetting" Width="1.5" PointX="12.75" PointY="34.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Region" Width="1.5" PointX="14.75" PointY="34.75" Height="1.7354337565104743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.RegionOrderDetail" Width="1.5" PointX="16.75" PointY="34.75" Height="6.1704923502604743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.RegionOrderPrice" Width="1.5" PointX="18.75" PointY="34.75" Height="3.028992513020853" />
         <EntityTypeShape EntityType="KalerOrderDBModel.RegionSupplement" Width="1.5" PointX="34.75" PointY="21.75" Height="3.028992513020853" />
         <EntityTypeShape EntityType="KalerOrderDBModel.RegionSupplementDetail" Width="1.5" PointX="34.75" PointY="25.75" Height="5.4313159179687318" />
         <EntityTypeShape EntityType="KalerOrderDBModel.Role" Width="1.5" PointX="34.75" PointY="32.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.RoleInModule" Width="1.5" PointX="8.75" PointY="35.75" Height="1.7354337565104743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SecondInstallFeeDetail" Width="1.5" PointX="16.75" PointY="35.75" Height="2.474610188802103" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Send" Width="1.5" PointX="32.75" PointY="35.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SendERPResult" Width="1.5" PointX="34.75" PointY="35.75" Height="2.1050219726562318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Shop" Width="1.5" PointX="36.75" PointY="0.75" Height="10.975139160156232" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ShopChangeDetail" Width="1.5" PointX="36.75" PointY="12.75" Height="7.0944628906249818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMachineFrame" Width="1.5" PointX="36.75" PointY="20.75" Height="2.8441984049479743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMachineFrameChangeDetail" Width="1.5" PointX="36.75" PointY="24.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMaterialSupport" Width="1.5" PointX="26.75" PointY="36.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SmallMaterial" Width="1.5" PointX="36.75" PointY="29.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SmallMaterialMapping" Width="1.5" PointX="36.75" PointY="32.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SpecialPriceQuoteDetail" Width="1.5" PointX="36.75" PointY="35.75" Height="3.3985807291667243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SpecialPriceQuoteItem" Width="1.5" PointX="0.75" PointY="37.75" Height="1.7354337565104743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SplitOrderDetailPerShop" Width="1.5" PointX="2.75" PointY="37.75" Height="4.3225512695312318" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SplitOrderPlanDetail" Width="1.5" PointX="4.75" PointY="37.75" Height="5.246521809895853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.Subject" Width="1.5" PointX="28.75" PointY="37.75" Height="9.681580403645853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectGuidance" Width="1.5" PointX="38.75" PointY="0.75" Height="6.7248746744792243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectLog" Width="1.5" PointX="6.75" PointY="38.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectType" Width="1.5" PointX="38.75" PointY="8.75" Height="1.7354337565104743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementDetail" Width="1.5" PointX="8.75" PointY="38.75" Height="3.583374837239603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementItem" Width="1.5" PointX="38.75" PointY="11.75" Height="3.9529630533854743" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementOrderDetail" Width="1.5" PointX="38.75" PointY="16.75" Height="3.7681689453124818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.TableSize" Width="1.5" PointX="18.75" PointY="38.75" Height="3.028992513020853" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UnitInfo" Width="1.5" PointX="20.75" PointY="38.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInActivity" Width="1.5" PointX="38.75" PointY="21.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInCustomer" Width="1.5" PointX="38.75" PointY="24.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInfo" Width="1.5" PointX="38.75" PointY="27.75" Height="2.474610188802103" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInModule" Width="1.5" PointX="38.75" PointY="31.75" Height="1.920227864583353" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInRegion" Width="1.5" PointX="38.75" PointY="34.75" Height="2.2898160807292243" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserInRole" Width="1.5" PointX="38.75" PointY="38.75" Height="1.5506396484374818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.UserLevel" Width="1.5" PointX="14.75" PointY="39.75" Height="1.365845540364603" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourcePayRecord" Width="1.5" PointX="31.375" PointY="40.75" Height="2.6594042968749818" />
-        <EntityTypeShape EntityType="KalerOrderDBModel.OutsourceInstallPriceLevel" Width="1.5" PointX="33.375" PointY="40.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.RoleInModule" Width="1.5" PointX="34.75" PointY="35.75" Height="1.7354337565104743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SecondInstallFeeDetail" Width="1.5" PointX="36.75" PointY="0.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Send" Width="1.5" PointX="36.75" PointY="4.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SendERPResult" Width="1.5" PointX="6.75" PointY="36.75" Height="2.1050219726562318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Shop" Width="1.5" PointX="36.75" PointY="9.75" Height="10.975139160156232" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ShopChangeDetail" Width="1.5" PointX="36.75" PointY="21.75" Height="7.0944628906249818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMachineFrame" Width="1.5" PointX="36.75" PointY="29.75" Height="2.8441984049479743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMachineFrameChangeDetail" Width="1.5" PointX="36.75" PointY="33.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.ShopMaterialSupport" Width="1.5" PointX="8.75" PointY="37.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SmallMaterial" Width="1.5" PointX="10.75" PointY="37.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SmallMaterialMapping" Width="1.5" PointX="12.75" PointY="37.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SpecialPriceQuoteDetail" Width="1.5" PointX="20.75" PointY="37.75" Height="3.3985807291667243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SpecialPriceQuoteItem" Width="1.5" PointX="38.75" PointY="0.75" Height="1.7354337565104743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SplitOrderDetailPerShop" Width="1.5" PointX="38.75" PointY="3.75" Height="4.3225512695312318" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SplitOrderPlanDetail" Width="1.5" PointX="38.75" PointY="9.75" Height="5.246521809895853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.Subject" Width="1.5" PointX="38.75" PointY="15.75" Height="9.681580403645853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectGuidance" Width="1.5" PointX="22.75" PointY="38.75" Height="6.7248746744792243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectLog" Width="1.5" PointX="24.75" PointY="38.75" Height="2.2898160807292243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SubjectType" Width="1.5" PointX="38.75" PointY="26.75" Height="1.7354337565104743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementDetail" Width="1.5" PointX="26.75" PointY="38.75" Height="3.583374837239603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementItem" Width="1.5" PointX="28.75" PointY="38.75" Height="3.9529630533854743" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.SupplementOrderDetail" Width="1.5" PointX="38.75" PointY="29.75" Height="3.7681689453124818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.TableSize" Width="1.5" PointX="30.75" PointY="38.75" Height="3.028992513020853" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UnitInfo" Width="1.5" PointX="32.75" PointY="38.75" Height="1.365845540364603" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInActivity" Width="1.5" PointX="38.75" PointY="34.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInCustomer" Width="1.5" PointX="34.75" PointY="38.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInfo" Width="1.5" PointX="36.75" PointY="38.75" Height="2.474610188802103" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInModule" Width="1.5" PointX="38.75" PointY="37.75" Height="1.920227864583353" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInRegion" Width="1.5" PointX="4.75" PointY="39.75" Height="2.2898160807292243" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserInRole" Width="1.5" PointX="40.75" PointY="0.75" Height="1.5506396484374818" />
+        <EntityTypeShape EntityType="KalerOrderDBModel.UserLevel" Width="1.5" PointX="0.75" PointY="40.75" Height="1.365845540364603" />
       </Diagram>
     </Diagrams>
   </Designer>

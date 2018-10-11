@@ -353,7 +353,6 @@ namespace WebApp.Subjects.RegionSubject.handler
                         on material.ShopId equals shop.Id
                         join subject in CurrentContext.DbContext.Subject
                         on material.SubjectId equals subject.Id
-
                         where material.RegionSupplementId == subjectId
                         select new
                         {
@@ -403,7 +402,10 @@ namespace WebApp.Subjects.RegionSubject.handler
                             RegionOrderDetail orderModel;
                             int shopId = orderList[0].ShopId ?? 0;
                             int subjectId = orderList[0].SubjectId ?? 0;
-
+                            int customerId = 0;
+                            Subject subjectModel = new SubjectBLL().GetModel(subjectId);
+                            if (subjectModel != null)
+                                customerId = subjectModel.CustomerId ?? 0;
                             StringBuilder msg = new StringBuilder();
                             int successNum = 0;
                             orderList.ForEach(s =>
@@ -411,7 +413,7 @@ namespace WebApp.Subjects.RegionSubject.handler
                                 bool canSave = true;
                                 if (s.OrderType == 1)
                                 {
-                                    canSave = CheckMaterial(s.GraphicMaterial);
+                                    canSave = CheckMaterial(customerId,s.GraphicMaterial);
                                 }
 
                                 if (canSave)
@@ -640,7 +642,7 @@ namespace WebApp.Subjects.RegionSubject.handler
         }
 
         List<string> materialList = new List<string>();
-        bool CheckMaterial(string materialName)
+        bool CheckMaterial(int customerId,string materialName)
         {
             bool flag = true;
             materialName = materialName.Trim().ToLower();
@@ -650,7 +652,7 @@ namespace WebApp.Subjects.RegionSubject.handler
             }
             else
             {
-                OrderMaterialMpping materialModel = new OrderMaterialMppingBLL().GetList(s => s.OrderMaterialName.ToLower() == materialName).FirstOrDefault();
+                OrderMaterialMpping materialModel = new OrderMaterialMppingBLL().GetList(s =>s.CustomerId==customerId &&  s.OrderMaterialName.ToLower() == materialName).FirstOrDefault();
                 if (materialModel != null)
                     materialList.Add(materialName);
                 else

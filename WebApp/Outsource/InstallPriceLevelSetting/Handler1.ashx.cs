@@ -48,6 +48,9 @@ namespace WebApp.Outsource.InstallPriceLevelSetting
                 case "delete":
                     result = DeleteSetting();
                     break;
+                case "edit":
+                    result = EditSetting();
+                    break;
             }
             context.Response.Write(result);
         }
@@ -290,6 +293,37 @@ namespace WebApp.Outsource.InstallPriceLevelSetting
                 catch (Exception ex)
                 {
                     result = "删除失败："+ex.Message;
+                }
+            }
+            return result;
+        }
+
+        string EditSetting()
+        {
+            string result = "更新失败";
+            string jsonStr = string.Empty;
+            if (context1.Request.Form["jsonStr"] != null)
+            {
+                jsonStr = context1.Request.Form["jsonStr"];
+            }
+            if (!string.IsNullOrWhiteSpace(jsonStr))
+            {
+                OutsourceInstallPriceLevel editModel = JsonConvert.DeserializeObject<OutsourceInstallPriceLevel>(jsonStr);
+                if (editModel != null)
+                {
+                    OutsourceInstallPriceLevelBLL bll = new OutsourceInstallPriceLevelBLL();
+                    var list = bll.GetList(s=>s.CustomerId==editModel.CustomerId && s.ProvinceId==editModel.ProvinceId && s.MaterialSupport.ToLower()==editModel.MaterialSupport.ToLower());
+                    if ((editModel.CityId ?? 0) > 0)
+                    {
+                        list = list.Where(s=>s.CityId==editModel.CityId).ToList();
+                    }
+                    OutsourceInstallPriceLevel model = list.FirstOrDefault();
+                    if (model!=null)
+                    {
+                        model.BasicInstallPrice = editModel.BasicInstallPrice;
+                        bll.Update(model);
+                        result = "ok";
+                    }
                 }
             }
             return result;

@@ -45,6 +45,15 @@
     </blockquote>
     <table class="layui-table" style="margin-top: -10px;">
         <tr class="tr_bai">
+           <td>活动名称</td>
+           <td colspan="3" style="text-align: left; padding-left: 5px;">
+              <asp:Label ID="labGuidanceName" runat="server" Text=""></asp:Label>
+              <span id="spanChangeGuidance" style=" cursor:pointer; text-decoration:underline; color:Blue; margin-left:30px;">更换活动名称</span>
+              (提示：不能更新安装费和快递费的活动名称)
+           </td>
+          
+        </tr>
+        <tr class="tr_bai">
             <td style="width: 100px;">
                 项目名称
             </td>
@@ -531,7 +540,23 @@
             </tr>
         </table>
     </div>
+
+    <div id="changeGuidanceDiv" title="更换活动名称" style="width: 500px; height:80px; display:none;">
+        <table class="table">
+           <tr class="tr_bai">
+              <td style=" width:150px;">请选择新活动名称：</td>
+              <td style=" padding-left:5px; text-align:left;">
+                  <asp:DropDownList ID="ddlGuidanceList" runat="server">
+                     <asp:ListItem Value="0">--请选择--</asp:ListItem>
+                  </asp:DropDownList>
+              </td>
+           </tr>
+        </table>
+    </div>
+
     <asp:HiddenField ID="hfIsRegionSubject" runat="server" />
+    <asp:Button ID="btnRefreshSubject" runat="server" Text="Button" style=" display:none;"
+        onclick="btnRefreshSubject_Click" />
     </form>
 </body>
 </html>

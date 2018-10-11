@@ -7,12 +7,16 @@ using System.Web.UI.WebControls;
 
 namespace WebApp.Materials
 {
-    public partial class BasicMaterialList : System.Web.UI.Page
+    public partial class BasicMaterialList :BasePage
     {
         public string url = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
         {
             url = Request.FilePath;
+            if (!IsPostBack)
+            {
+                BindCustomerList(ddlCustmoer);
+            }
         }
     }
 }

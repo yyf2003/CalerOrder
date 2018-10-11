@@ -232,6 +232,7 @@ namespace WebApp.Subjects.HandMadeOrder
                                     {
                                         orderModel = new FinalOrderDetailTemp();
                                         orderModel.AddDate = s.order.AddDate;
+                                        orderModel.AddUserId = s.subject.AddUserId;
                                         orderModel.ChooseImg = s.order.ChooseImg;
                                         orderModel.Gender = s.order.Gender;
                                         orderModel.GraphicLength = s.order.GraphicLength;

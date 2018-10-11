@@ -1162,6 +1162,12 @@ namespace WebApp.Subjects.ADOrders
                                             canSave = false;
                                             msg.Append("HC店铺；");
                                         }
+                                        else if (format.Contains("YA"))
+                                        {
+                                            IsHc = true;
+                                            canSave = false;
+                                            msg.Append("YA店铺；");
+                                        }
                                     }
                                     if (!IsHc)
                                     {
@@ -1583,6 +1589,12 @@ namespace WebApp.Subjects.ADOrders
                                             IsHc = true;
                                             canSave = false;
                                             msg.Append("HC店铺；");
+                                        }
+                                        else if (format.Contains("YA"))
+                                        {
+                                            IsHc = true;
+                                            canSave = false;
+                                            msg.Append("YA店铺；");
                                         }
                                     }
                                     if (!IsHc)
@@ -2160,8 +2172,26 @@ namespace WebApp.Subjects.ADOrders
                 string payPrice = string.Empty;
                 string contents = string.Empty;
                 string remark = string.Empty;
+
+                int outsourceId = 0;
+                string outsourceName = string.Empty;
+
                 for (int i = 0; i < dt1.Rows.Count; i++)
                 {
+                    shopId = 0;
+                    orderType = string.Empty;
+                    //店铺编号
+                    shopNo = string.Empty;
+                    //应收费用金额
+                    price = string.Empty;
+                    //应付费用金额
+                    payPrice = string.Empty;
+                    contents = string.Empty;
+                    remark = string.Empty;
+
+                    outsourceId = 0;
+                    outsourceName = string.Empty;
+
                     StringBuilder msg = new StringBuilder();
                     int orderTypeIndex = 0;
                     bool canSave = true;
@@ -2196,6 +2226,13 @@ namespace WebApp.Subjects.ADOrders
                         payPrice = dt1.Rows[i]["应付金额"].ToString().Trim();
                     if (cols.Contains("备注"))
                         remark = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["备注"].ToString().Trim());
+                    if (cols.Contains("外协"))
+                        outsourceName = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["外协"].ToString().Trim());
+                    else if (cols.Contains("外协名称"))
+                        outsourceName = StringHelper.ReplaceSpecialChar(dt1.Rows[i]["外协名称"].ToString().Trim());
+
+
+
                     if (string.IsNullOrWhiteSpace(orderType))
                     {
                         canSave = false;
@@ -2250,6 +2287,15 @@ namespace WebApp.Subjects.ADOrders
                         canSave = false;
                         msg.Append("应付金额填写不正确；");
                     }
+                    if (!string.IsNullOrWhiteSpace(outsourceName))
+                    {
+                        if (!GetOutsourceName(outsourceName, out outsourceId))
+                        {
+                            canSave = false;
+                            msg.Append("外协不存在；");
+                        }
+                    }
+
                     if (canSave)
                     {
                         if (string.IsNullOrWhiteSpace(payPrice))
@@ -2270,6 +2316,7 @@ namespace WebApp.Subjects.ADOrders
                         priceModel.OrderType = orderTypeIndex;
                         priceModel.GuidanceId = int.Parse(hfGuidanceId.Value);
                         priceModel.ShopNo = shopFromDB.ShopNo;
+                        priceModel.OutsourceId = outsourceId;
                         priceOrderBll.Add(priceModel);
                         successNum++;
                     }
@@ -4595,6 +4642,7 @@ namespace WebApp.Subjects.ADOrders
 
                             orderModel = new FinalOrderDetailTemp();
                             orderModel.AddDate = DateTime.Now;
+                            orderModel.AddUserId = s.subject.AddUserId;
                             orderModel.ChooseImg = s.order.ChooseImg;
                             orderModel.Gender = s.order.Gender;
                             orderModel.GraphicLength = s.order.GraphicLength;
@@ -4791,6 +4839,7 @@ namespace WebApp.Subjects.ADOrders
 
                             orderModel = new FinalOrderDetailTemp();
                             orderModel.AddDate = DateTime.Now;
+                            orderModel.AddUserId = o.subject.AddUserId;
                             orderModel.AgentCode = o.shop.AgentCode;
                             orderModel.AgentName = o.shop.AgentName;
                             orderModel.BusinessModel = o.shop.BusinessModel;

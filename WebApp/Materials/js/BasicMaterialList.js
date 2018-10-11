@@ -4,6 +4,10 @@ $(function () {
     Material.getCategory();
     Material.getMaterialList(pageIndex, pageSize);
 
+    $("#ddlCustmoer").change(function () {
+        pageIndex = 1;
+        Material.getMaterialList(pageIndex, pageSize);
+    })
 
     $("#btnAdd").click(function () {
         ClearVal();
@@ -124,6 +128,7 @@ var pageIndex = 1;
 var pageSize = 15;
 var Material = {
     model: function () {
+        this.CustomerId = 0;
         this.MaterialId = 0;
         this.CategoryId = 0;
         this.MaterialName = "";
@@ -149,13 +154,16 @@ var Material = {
         })
     },
     getMaterialList: function (pageIndex, pageSize) {
+        var customerId = $("#ddlCustmoer").val() || 1;
+       
         $("#tbMaterial").datagrid({
-            queryParams: { type: "getList", categoryId: currCategoryId, currpage: pageIndex, pagesize: pageSize },
+            queryParams: { type: "getList", customerId: customerId, categoryId: currCategoryId, currpage: pageIndex, pagesize: pageSize },
             method: 'get',
             url: './Handler/BasicMaterialList.ashx',
             columns: [[
                         { field: 'rowIndex', title: '序号' },
                         { field: 'Id', title: '序号', hidden: true },
+                        { field: 'CustomerName', title: '客户名称' },
                         { field: 'CategoryName', title: '类别名称' },
                         { field: 'MaterialName', title: '材料名称' },
                         { field: 'Unit', title: '单位' },
@@ -170,7 +178,7 @@ var Material = {
             ]],
             height: "100%",
             toolbar: "#toolbar",
-            pageList: [10,15,20],
+            pageList: [10, 15, 20],
             striped: true,
             border: false,
             singleSelect: true,
@@ -181,7 +189,7 @@ var Material = {
             iconCls: 'icon-save',
             emptyMsg: '没有相关记录',
             onLoadSuccess: function (data) {
-         
+
             }
 
 
@@ -233,8 +241,8 @@ var Material = {
     },
     submit: function () {
         if (CheckVal()) {
-
-            var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"MaterialCategoryId":' + this.model.CategoryId + ',"MaterialName":"' + this.model.MaterialName + '","UnitId":' + this.model.UnitId + '}';
+            var customerId = $("#ddlCustmoer").val() || 1;
+            var jsonStr = '{"Id":' + (this.model.MaterialId || 0) + ',"CustomerId":' + customerId + ',"MaterialCategoryId":' + this.model.CategoryId + ',"MaterialName":"' + this.model.MaterialName + '","UnitId":' + this.model.UnitId + '}';
 
             $.ajax({
                 type: "post",

@@ -136,11 +136,17 @@ namespace WebApp.Materials.Handler
 
         string GetBasicMaterial1(int categoryId)
         {
+            int customerId = 0;
+            if (context1.Request.QueryString["customerId"] != null)
+            {
+                customerId = int.Parse(context1.Request.QueryString["customerId"]);
+            }
             var list = (from basicMaterial in CurrentContext.DbContext.BasicMaterial
                        join unit in CurrentContext.DbContext.UnitInfo
                        on basicMaterial.UnitId equals unit.Id
                        where basicMaterial.MaterialCategoryId == categoryId
                        && (basicMaterial.IsDelete == null || basicMaterial.IsDelete==false)
+                       && basicMaterial.CustomerId == customerId
                        select new {
                            basicMaterial.UnitId,
                            basicMaterial.Id,
@@ -223,10 +229,10 @@ namespace WebApp.Materials.Handler
             int customerId = 0;
             int categoryId = 0;
             string orderMaterialName = string.Empty;
-            //if (context1.Request.QueryString["customerId"] != null)
-            //{
-            //    customerId = int.Parse(context1.Request.QueryString["customerId"]);
-            //}
+            if (context1.Request.QueryString["customerId"] != null)
+            {
+                customerId = int.Parse(context1.Request.QueryString["customerId"]);
+            }
             if (context1.Request.QueryString["categoryId"] != null)
             {
                 categoryId = int.Parse(context1.Request.QueryString["categoryId"]);
@@ -237,17 +243,17 @@ namespace WebApp.Materials.Handler
             }
             
             var list=(from orderMaterial in CurrentContext.DbContext.OrderMaterialMpping
-                     //join customer in CurrentContext.DbContext.Customer
-                     //   on orderMaterial.CustomerId equals customer.Id
+                      join customer in CurrentContext.DbContext.Customer
+                         on orderMaterial.CustomerId equals customer.Id
                         join category in CurrentContext.DbContext.MaterialCategory
                         on orderMaterial.BasicCategoryId equals category.Id
                         join basicMaterial in CurrentContext.DbContext.BasicMaterial
                         on orderMaterial.BasicMaterialId equals basicMaterial.Id
-                        //where orderMaterial.CustomerId == customerId
+                        where orderMaterial.CustomerId == customerId
                         select new
                         {
                             orderMaterial,
-                            //customer.CustomerName,
+                            customer.CustomerName,
                             category.CategoryName,
                             basicMaterial.MaterialName
                             
@@ -269,7 +275,7 @@ namespace WebApp.Materials.Handler
                 list.ForEach(s =>
                 {
                     string state = s.orderMaterial.IsDelete != null && s.orderMaterial.IsDelete == true ? "已删除" : "正常";
-                    json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.orderMaterial.Id + "\",\"OrderMaterialName\":\"" + s.orderMaterial.OrderMaterialName + "\",\"State\":\"" + state + "\",\"BasicCategoryId\":\"" + s.orderMaterial.BasicCategoryId + "\",\"CategoryName\":\"" + s.CategoryName + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"BasicMaterialId\":\"" + s.orderMaterial.BasicMaterialId + "\"},");
+                    json.Append("{\"rowIndex\":\"" + index + "\",\"CustomerName\":\"" + s.CustomerName + "\",\"Id\":\"" + s.orderMaterial.Id + "\",\"OrderMaterialName\":\"" + s.orderMaterial.OrderMaterialName + "\",\"State\":\"" + state + "\",\"BasicCategoryId\":\"" + s.orderMaterial.BasicCategoryId + "\",\"CategoryName\":\"" + s.CategoryName + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"BasicMaterialId\":\"" + s.orderMaterial.BasicMaterialId + "\"},");
                     index++;
                 });
                 if (json.Length > 0)
@@ -293,7 +299,7 @@ namespace WebApp.Materials.Handler
                 {
                     if (model.Id > 0)
                     {
-                        if (!CheckExist(model.Id, model.OrderMaterialName))
+                        if (!CheckExist(model.Id, model.CustomerId ?? 1, model.OrderMaterialName))
                         {
                             OrderMaterialMpping newModel = bll.GetModel(model.Id);
                             if (newModel != null)
@@ -316,7 +322,7 @@ namespace WebApp.Materials.Handler
                     }
                     else
                     {
-                        if (!CheckExist(0, model.OrderMaterialName))
+                        if (!CheckExist(0,model.CustomerId??1, model.OrderMaterialName))
                         {
                             //model.OrderMaterialName = DateTime.Now;
                             //model.AddUserId = new BasePage().CurrentUser.UserId;
@@ -331,9 +337,9 @@ namespace WebApp.Materials.Handler
             return result;
         }
 
-        bool CheckExist(int id, string name)
+        bool CheckExist(int id,int customerId, string name)
         {
-            var list = bll.GetList(s =>s.OrderMaterialName.ToLower() == name.ToLower() && (id > 0 ? (s.Id != id) : 1 == 1));
+            var list = bll.GetList(s =>s.CustomerId==customerId && s.OrderMaterialName.ToLower() == name.ToLower() && (id > 0 ? (s.Id != id) : 1 == 1));
             return list.Any();
         }
 

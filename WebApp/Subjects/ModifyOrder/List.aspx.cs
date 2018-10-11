@@ -23,6 +23,7 @@ namespace WebApp.Subjects.ModifyOrder
             }
             if (!IsPostBack)
             {
+                
                 BindSubject();
                 //var orderTypeList = CommonMethod.GetEnumList<OrderTypeEnum>().Where(s => !s.Desction.Contains("费用订单")).ToList();
                 var orderTypeList = CommonMethod.GetEnumList<OrderTypeEnum>().ToList();
@@ -43,16 +44,19 @@ namespace WebApp.Subjects.ModifyOrder
                                 on subject.CustomerId equals customer.Id
                                 join user in CurrentContext.DbContext.UserInfo
                                 on subject.AddUserId equals user.UserId
-
+                                join guidance in CurrentContext.DbContext.SubjectGuidance
+                                on subject.GuidanceId equals guidance.ItemId
                                 where subject.Id == subjectId
                                 select new
                                 {
                                     subject,
                                     customer.CustomerName,
-                                    AddUserName = user.UserName
+                                    AddUserName = user.UserName,
+                                    guidance.ItemName
                                 }).FirstOrDefault();
             if (subjectModel != null)
             {
+                labGuidanceName.Text = subjectModel.ItemName;
                 labSubjectNo.Text = subjectModel.subject.SubjectNo;
                 labSubjectName.Text = subjectModel.subject.SubjectName;
                 
@@ -77,7 +81,31 @@ namespace WebApp.Subjects.ModifyOrder
                         ddlSubjectList.Items.Add(li);
                     });
                 }
+                BindChangeGuidanceList(subjectModel.subject.GuidanceId??0);
             }
         }
+
+        void BindChangeGuidanceList(int gid)
+        {
+            ddlGuidanceList.Items.Clear();
+            var list = new SubjectGuidanceBLL().GetList(s => (s.IsDelete == null || s.IsDelete == false) && s.ItemId != gid).OrderByDescending(s => s.ItemId).Take(10).ToList();
+            if (list.Any())
+            {
+                list.ForEach(s => {
+                    ListItem li = new ListItem();
+                    li.Value = s.ItemId.ToString();
+                    li.Text = s.ItemName;
+                    ddlGuidanceList.Items.Add(li);
+                });
+            }
+            ddlGuidanceList.Items.Insert(0,new ListItem("--请选择--","0"));
+        }
+
+        protected void btnRefreshSubject_Click(object sender, EventArgs e)
+        {
+            BindSubject();
+        }
+
+
     }
 }

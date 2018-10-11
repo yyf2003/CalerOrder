@@ -288,7 +288,7 @@
     }
 
     function checkUpdate() {
-        $("#labUpdateMsg").html("更新中...");
+        
         var guidanceId = "";
         $("input[name^='cblGuidanceList']:checked").each(function () {
             guidanceId += $(this).val() + ",";
@@ -307,6 +307,7 @@
             layer.msg("请选择价格条目");
             return false;
         }
+        $("#labUpdateMsg").html("更新中...");
         $("#loadUpdatePrice").show();
         //$.ajaxSettings.async = true;
         $.ajax({

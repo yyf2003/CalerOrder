@@ -190,7 +190,7 @@ namespace WebApp.Outsource.handler
                     list.ForEach(s =>
                     {
 
-                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.cm.Id + "\",\"CompanyId\":\"" + s.cm.OutsourctId + "\",\"CompanyName\":\"" + s.CompanyName + "\",\"UnitId\":\"" + s.bm.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"InstallPrice\":\"" + s.cm.InstallPrice + "\",\"InstallAndProductPrice\":\"" + s.cm.InstallAndProductPrice + "\",\"SendPrice\":\"" + s.cm.SendPrice + "\",\"BasicMaterialName\":\"" + s.bm.MaterialName + "\",\"BasicMaterialId\":\"" + s.cm.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.cm.BasicCategoryId + "\",\"BasicCategoryName\":\"" + s.CategoryName + "\"},");
+                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.cm.Id + "\",\"CompanyId\":\"" + s.cm.OutsourctId + "\",\"CompanyName\":\"" + s.CompanyName + "\",\"UnitId\":\"" + s.bm.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"InstallPrice\":\"" + s.cm.InstallPrice + "\",\"SubInstallPrice\":\"" + s.cm.SubInstallPrice + "\",\"SendPrice\":\"" + s.cm.SendPrice + "\",\"BasicMaterialName\":\"" + s.bm.MaterialName + "\",\"BasicMaterialId\":\"" + s.cm.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.cm.BasicCategoryId + "\",\"BasicCategoryName\":\"" + s.CategoryName + "\"},");
                         index++;
                     });
                     if (json.Length > 0)
@@ -233,7 +233,7 @@ namespace WebApp.Outsource.handler
                                     newModel.BasicCategoryId = model.BasicCategoryId;
                                     newModel.BasicMaterialId = model.BasicMaterialId;
                                     newModel.InstallPrice = model.InstallPrice;
-                                    newModel.InstallAndProductPrice = model.InstallAndProductPrice;
+                                    newModel.SubInstallPrice = model.SubInstallPrice;
                                     newModel.SendPrice = model.SendPrice;
                                     newModel.UnitId = model.UnitId;
                                     bll.Update(newModel);
@@ -327,7 +327,7 @@ namespace WebApp.Outsource.handler
                                 var oldModel = bll.GetList(p=>p.OutsourctId==s.OutsourctId && p.PriceItemId==s.PriceItemId && p.CustomerId==s.CustomerId && p.BasicMaterialId==s.BasicMaterialId).FirstOrDefault();
                                 if (oldModel != null)
                                 {
-                                    oldModel.InstallAndProductPrice = s.InstallAndProductPrice;
+                                    oldModel.SubInstallPrice = s.SubInstallPrice;
                                     oldModel.InstallPrice = s.InstallPrice;
                                     oldModel.SendPrice = s.SendPrice;
                                     bll.Update(oldModel);
@@ -340,7 +340,7 @@ namespace WebApp.Outsource.handler
                                     model.BasicCategoryId = s.BasicCategoryId;
                                     model.BasicMaterialId = s.BasicMaterialId;
                                     model.CustomerId = s.CustomerId;
-                                    model.InstallAndProductPrice = s.InstallAndProductPrice;
+                                    model.SubInstallPrice = s.SubInstallPrice;
                                     model.InstallPrice = s.InstallPrice;
                                     model.IsDelete = false;
                                     model.OutsourctId = s.OutsourctId;

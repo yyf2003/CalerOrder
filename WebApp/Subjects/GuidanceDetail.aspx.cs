@@ -438,5 +438,10 @@ namespace WebApp.Subjects
         {
             BindSubjectList();
         }
+
+        protected void btnToExport_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("ExportOrder2.aspx?guidanceId="+itemId,false);
+        }
     }
 }

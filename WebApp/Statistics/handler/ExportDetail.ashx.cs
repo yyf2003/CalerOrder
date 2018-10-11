@@ -148,6 +148,9 @@ namespace WebApp.Statistics.handler
                                      join user1 in CurrentContext.DbContext.UserInfo
                                      on order.CSUserId equals user1.UserId into userTemp
                                      from user in userTemp.DefaultIfEmpty()
+                                     join user2 in CurrentContext.DbContext.UserInfo
+                                     on order.AddUserId equals user2.UserId into userTemp1
+                                     from addUser in userTemp1.DefaultIfEmpty()
                                      where guidanceIdList.Contains(order.GuidanceId ?? 0)
                                     && (subject.IsDelete == null || subject.IsDelete == false)
                                     && (subject.ApproveState == 1)
@@ -160,8 +163,8 @@ namespace WebApp.Statistics.handler
                                          shop,
                                          subject,
                                          guindance,
-                                         CSName=user!=null?user.RealName:""
-
+                                         CSName=user!=null?user.RealName:"",
+                                         AddUserName=addUser!=null?addUser.RealName:""
                                      }).ToList();
                     if (!string.IsNullOrWhiteSpace(begin))
                     {
@@ -690,6 +693,7 @@ namespace WebApp.Statistics.handler
                                         orderModel.Channel = s.order.Channel;
                                         orderModel.Format = s.order.Format;
                                         orderModel.CustomServiceName = s.CSName;
+                                        orderModel.AddUserName = s.AddUserName;
                                         newOrderList.Add(orderModel);
                                     }
                                 });
@@ -1023,6 +1027,7 @@ namespace WebApp.Statistics.handler
                             dataRow.GetCell(20).SetCellValue(s.TotalPrice);
                             dataRow.GetCell(21).SetCellValue(s.SubjectName);
                             dataRow.GetCell(22).SetCellValue(s.Remark);
+                            dataRow.GetCell(23).SetCellValue(s.AddUserName);
                             startRow++;
                         });
                         HttpCookie cookie = context1.Request.Cookies["项目费用统计明细"];

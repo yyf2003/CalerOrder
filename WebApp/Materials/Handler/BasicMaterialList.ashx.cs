@@ -94,17 +94,26 @@ namespace WebApp.Materials.Handler
         //BasicMaterialBLL materialBll = new BasicMaterialBLL();
         string GetMaterialList(int currPage, int pageSize)
         {
+            int customerId = 0;
+            if (context1.Request.QueryString["customerId"] != null)
+            {
+                customerId = int.Parse(context1.Request.QueryString["customerId"]);
+            }
             var list = (from material in CurrentContext.DbContext.BasicMaterial
+                        join customer in CurrentContext.DbContext.Customer
+                        on material.CustomerId equals customer.Id
                         join category in CurrentContext.DbContext.MaterialCategory
                         on material.MaterialCategoryId equals category.Id
                         join unit1 in CurrentContext.DbContext.UnitInfo
                         on material.UnitId equals unit1.Id into unitTemp
                         from unit in unitTemp.DefaultIfEmpty()
+                        where material.CustomerId == customerId
                         select new
                         {
                             category.CategoryName,
                             material,
-                            unit.UnitName
+                            unit.UnitName,
+                            customer.CustomerName
                         }).ToList();
             int categoryId = 0;
             if (context1.Request.QueryString["categoryId"] != null)
@@ -122,7 +131,7 @@ namespace WebApp.Materials.Handler
                 list.ForEach(s =>
                 {
                     string state = s.material.IsDelete != null && s.material.IsDelete == true ? "已删除" : "正常";
-                    json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.material.Id + "\",\"MaterialCategoryId\":\"" + s.material.MaterialCategoryId + "\",\"CategoryName\":\"" + s.CategoryName + "\",\"MaterialName\":\"" + s.material.MaterialName + "\",\"Unit\":\"" + s.UnitName + "\",\"State\":\"" + state + "\"},");
+                    json.Append("{\"rowIndex\":\"" + index + "\",\"CustomerId\":\""+(s.material.CustomerId??0)+"\",\"CustomerName\":\""+s.CustomerName+"\",\"Id\":\"" + s.material.Id + "\",\"MaterialCategoryId\":\"" + s.material.MaterialCategoryId + "\",\"CategoryName\":\"" + s.CategoryName + "\",\"MaterialName\":\"" + s.material.MaterialName + "\",\"Unit\":\"" + s.UnitName + "\",\"State\":\"" + state + "\"},");
                     index++;
                 });
                 if (json.Length > 0)
@@ -159,7 +168,7 @@ namespace WebApp.Materials.Handler
                 {
                     if (model.Id > 0)
                     {
-                        if (!CheckExist(model.Id, model.MaterialName))
+                        if (!CheckExist(model.Id,model.CustomerId??1, model.MaterialName))
                         {
                             BasicMaterial newModel = bll.GetModel(model.Id);
                             int categoryId = newModel.MaterialCategoryId??0;
@@ -192,7 +201,6 @@ namespace WebApp.Materials.Handler
                                             list1.ForEach(s =>
                                             {
                                                 s.BasicCategoryId = model.MaterialCategoryId;
-
                                                 ommBll.Update(s);
                                             });
                                         }
@@ -210,7 +218,7 @@ namespace WebApp.Materials.Handler
                     }
                     else 
                     {
-                        if (!CheckExist(0, model.MaterialName))
+                        if (!CheckExist(0,model.CustomerId??1, model.MaterialName))
                            bll.Add(model);
                         else
                             result = "exist";
@@ -220,9 +228,9 @@ namespace WebApp.Materials.Handler
             return result;
         }
 
-        bool CheckExist(int id, string materialName)
+        bool CheckExist(int id,int customerId, string materialName)
         {
-            var model = bll.GetList(s => s.MaterialName.ToLower() == materialName.ToLower() && (id>0?(s.Id!=id):1==1));
+            var model = bll.GetList(s =>s.CustomerId==customerId && s.MaterialName.ToLower() == materialName.ToLower() && (id>0?(s.Id!=id):1==1));
             return model.Any();
         }
 

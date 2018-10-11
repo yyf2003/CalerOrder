@@ -172,7 +172,8 @@ namespace WebApp.Subjects.SupplementByRegion
                                 finalOrderTempModel.UnitPrice = unitPrice;
                                 finalOrderTempModel.TotalPrice = totalPrice;
                                 finalOrderTempModel.CSUserId = o.shop.CSUserId;
-
+                                finalOrderTempModel.AddUserId = model.AddUserId;
+                                finalOrderTempModel.AddDate = o.order.AddDate;
                                 finalOrderTempBll.Add(finalOrderTempModel);
                             });
 

@@ -282,6 +282,11 @@ namespace WebApp.Subjects.HandMadeOrder
         {
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
+                int customerId = 0;
+                if (!string.IsNullOrWhiteSpace(hfCustomerId.Value))
+                {
+                    customerId = StringHelper.IsInt(hfCustomerId.Value);
+                }
                 HandMadeOrderDetailBLL handOrderBll = new HandMadeOrderDetailBLL();
                 Dictionary<string, int> orderTypeDic = new Dictionary<string, int>();
                 orderTypeDic.Add("pop", 1);
@@ -493,7 +498,7 @@ namespace WebApp.Subjects.HandMadeOrder
                         canSave = false;
                         msg.Append("材质 为空；");
                     }
-                    else if (!CheckMaterial(material))
+                    else if (!CheckMaterial(customerId,material))
                     {
                         canSave = false;
                         msg.Append("材质不存在；");
@@ -606,6 +611,13 @@ namespace WebApp.Subjects.HandMadeOrder
 
             if (ds != null && ds.Tables[0].Rows.Count > 0)
             {
+
+                int customerId = 0;
+                if (!string.IsNullOrWhiteSpace(hfCustomerId.Value))
+                {
+                    customerId = StringHelper.IsInt(hfCustomerId.Value);
+                }
+
                 HCOrderDetailBLL hcOrderBll = new HCOrderDetailBLL();
 
                 HCOrderDetail hcOrderModel;
@@ -888,7 +900,7 @@ namespace WebApp.Subjects.HandMadeOrder
                         canSave = false;
                         msg.Append("材质 为空；");
                     }
-                    else if (!CheckMaterial(material))
+                    else if (!CheckMaterial(customerId,material))
                     {
                         canSave = false;
                         msg.Append("材质不存在；");
@@ -1163,37 +1175,37 @@ namespace WebApp.Subjects.HandMadeOrder
         
 
 
-        OrderMaterialMppingBLL OrderMaterialMppingBll = new OrderMaterialMppingBLL();
-        List<string> materialStrList = new List<string>();
-        bool CheckMaterial(string materialName)
-        {
+        //OrderMaterialMppingBLL OrderMaterialMppingBll = new OrderMaterialMppingBLL();
+        //List<string> materialStrList = new List<string>();
+        //bool CheckMaterial(string materialName)
+        //{
 
-            bool flag = false;
-            if (materialStrList.Contains(materialName.ToLower()))
-            {
-                flag = true;
-            }
-            else
-            {
-                int customerId = 0;
-                if (!string.IsNullOrWhiteSpace(hfCustomerId.Value))
-                    customerId = StringHelper.IsInt(hfCustomerId.Value);
-                if (!string.IsNullOrWhiteSpace(materialName))
-                {
-                    var model = OrderMaterialMppingBll.GetList(s => s.OrderMaterialName.ToLower() == materialName.ToLower()).FirstOrDefault();
-                    if (model != null)
-                    {
-                        flag = true;
-                        materialStrList.Add(materialName.ToLower());
-                    }
-                    else
-                    {
-                        flag = false;
-                    }
-                }
-            }
-            return flag;
-        }
+        //    bool flag = false;
+        //    if (materialStrList.Contains(materialName.ToLower()))
+        //    {
+        //        flag = true;
+        //    }
+        //    else
+        //    {
+        //        int customerId = 0;
+        //        if (!string.IsNullOrWhiteSpace(hfCustomerId.Value))
+        //            customerId = StringHelper.IsInt(hfCustomerId.Value);
+        //        if (!string.IsNullOrWhiteSpace(materialName))
+        //        {
+        //            var model = OrderMaterialMppingBll.GetList(s => s.OrderMaterialName.ToLower() == materialName.ToLower()).FirstOrDefault();
+        //            if (model != null)
+        //            {
+        //                flag = true;
+        //                materialStrList.Add(materialName.ToLower());
+        //            }
+        //            else
+        //            {
+        //                flag = false;
+        //            }
+        //        }
+        //    }
+        //    return flag;
+        //}
 
 
         /// <summary>

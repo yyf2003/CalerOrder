@@ -242,7 +242,7 @@ namespace WebApp.Subjects.InstallPrice
                
                 //东区的户外店不自动算安装费，手动下安装费
                 List<int> terrexIdList = finalOrderDetailTempList.Where(s =>s.Region != null && (s.Region.ToLower().Contains("east")|| s.Region.ToLower().Contains("south"))).Select(s => s.Id).ToList();
-                finalOrderDetailTempList = finalOrderDetailTempList.Where(s => !terrexIdList.Contains(s.Id)).ToList();
+                finalOrderDetailTempList = finalOrderDetailTempList.Where(s => !terrexIdList.Contains(s.Id) && s.IsInstall!=null && s.IsInstall.ToUpper()=="Y").ToList();
 
                 //活动订单
                 List<FinalOrderDetailTemp> activityOrderList = new List<FinalOrderDetailTemp>();
@@ -259,7 +259,6 @@ namespace WebApp.Subjects.InstallPrice
                                  on subject.SubjectCategoryId equals subjectCategory1.Id into subjectCategoryTemp
                                  from subjectCategory in subjectCategoryTemp.DefaultIfEmpty()
                                  where order.GuidanceId == guidanceId
-                                
                                  select new { order, subject, subjectCategory }).ToList();
                 if (orderList.Any())
                 {
@@ -270,9 +269,9 @@ namespace WebApp.Subjects.InstallPrice
                     {
                         genericOrderIdList = genericOrderList.Select(s => s.Id).ToList();
                         genericOrderList = genericOrderList.Where(s => ((!s.Region.ToLower().Contains("west") && cityCierList.Contains(s.CityTier) && s.IsInstall == "Y") || (s.Region.ToLower().Contains("west") && s.IsInstall == "Y"))).ToList();
-                    
+                        
                     }
-                    activityOrderList = orderList.Where(s => !genericOrderIdList.Contains(s.order.Id) && (s.order.IsInstall == "Y" || s.order.BCSIsInstall == "Y")).Select(s => s.order).ToList();
+                    activityOrderList = orderList.Where(s => !genericOrderIdList.Contains(s.order.Id)).Select(s => s.order).ToList();
                     Session["activityOrderListIPTotal"] = activityOrderList;
                     Session["genericOrderListIPTotal"] = genericOrderList;
                 }
@@ -280,23 +279,27 @@ namespace WebApp.Subjects.InstallPrice
                 var installPriceShopInfoList = new InstallPriceShopInfoBLL().GetList(s => s.GuidanceId == guidanceId && (s.AddType == null || s.AddType == 1));
                 if (installPriceShopInfoList.Any())
                 {
-                    List<int> assginShopIdList = installPriceShopInfoList.Where(s => s.SubjectType == null || s.SubjectType == (int)InstallPriceSubjectTypeEnum.活动安装费).Select(s => s.ShopId ?? 0).Distinct().ToList();
-                    if (assginShopIdList.Any())
+                    List<int> activityShopIdList = installPriceShopInfoList.Where(s => (s.SubjectType ?? 1) == (int)InstallPriceSubjectTypeEnum.活动安装费).Select(s => s.ShopId ?? 0).Distinct().ToList();
+                    if (activityShopIdList.Any())
                     {
-                        Session["assginActivityShopIdIP"] = assginShopIdList;
-                        activityOrderList = activityOrderList.Where(s => !assginShopIdList.Contains(s.ShopId ?? 0)).ToList();
+                        Session["assginActivityShopIdIP"] = activityShopIdList;
+                        activityOrderList = activityOrderList.Where(s => !activityShopIdList.Contains(s.ShopId ?? 0)).ToList();
                     }
-                    assginShopIdList = installPriceShopInfoList.Where(s => s.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费).Select(s => s.ShopId ?? 0).Distinct().ToList();
-                    if (assginShopIdList.Any())
+                    List<int> genericShopIdList = installPriceShopInfoList.Where(s => (s.SubjectType??1) == (int)InstallPriceSubjectTypeEnum.常规安装费).Select(s => s.ShopId ?? 0).Distinct().ToList();
+                    if (genericShopIdList.Any())
                     {
-                        Session["assginGenericShopIdIP"] = assginShopIdList;
-                        genericOrderList = genericOrderList.Where(s => !assginShopIdList.Contains(s.ShopId ?? 0)).ToList();
+                        Session["assginGenericShopIdIP"] = genericShopIdList;
+                        genericOrderList = genericOrderList.Where(s => !genericShopIdList.Contains(s.ShopId ?? 0)).ToList();
                     }
 
                 }
+                //剩余的活动订单
                 Session["activityOrderListIP"] = activityOrderList;
+                //剩余的常规订单
                 Session["genericOrderListIP"] = genericOrderList;
+                //全部
                 Session["totalOrderListIP"] = finalOrderDetailTempList;
+                //全部项目
                 Session["subjectListIP"] = orderList.Select(s => s.subject).Distinct().ToList();
             }
         }
@@ -1429,7 +1432,8 @@ namespace WebApp.Subjects.InstallPrice
                 {
                     List<int> shopIdList = orderList0.Select(s => s.order.ShopId ?? 0).Distinct().ToList();
                     int shopCount = shopIdList.Count;
-                    string text = "<span name='spanCheckLeftShop' style=' color:Blue; cursor:pointer; text-decoration:underline;'>" + shopCount + "</span>";
+                    string shopIdStr = StringHelper.ListToString(shopIdList);
+                    string text = "<span name='spanCheckLeftShop' data-shopids='" + shopIdStr + "' style=' color:Blue; cursor:pointer; text-decoration:underline;'>" + shopCount + "</span>";
                     labShopCount.Text = text;
                 }
                 else
@@ -2332,6 +2336,7 @@ namespace WebApp.Subjects.InstallPrice
                                     {
                                         isInstall = shop.IsInstall == "Y";
                                     }
+                                    isInstall = shop.IsInstall == "Y";
                                     if (isInstall)
                                     {
                                         List<FinalOrderDetailTemp> oohOrderList = oneShopOrderList.Where(s => s.order.ShopId == shop.Id && s.order.Sheet != null && (s.order.Sheet.ToLower() == "ooh" || s.order.Sheet == "户外")).Select(s => s.order).ToList();
@@ -2603,7 +2608,7 @@ namespace WebApp.Subjects.InstallPrice
                                     #region 保存InstallPriceShopInfo
                                     if (basicInstallPrice > 0)
                                     {
-                                        InstallPriceShopInfo installPriceShopModel = installShopBll.GetList(i => i.GuidanceId == guidanceId && i.ShopId == shop.Id && i.AddType == 1 && (i.SubjectType == null || i.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费)).FirstOrDefault();
+                                        InstallPriceShopInfo installPriceShopModel = installShopBll.GetList(i => i.GuidanceId == guidanceId && i.ShopId == shop.Id && i.AddType == 1 && (i.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费)).FirstOrDefault();
                                         if (installPriceShopModel == null)
                                         {
                                             installPriceShopModel = new InstallPriceShopInfo();

@@ -15,6 +15,7 @@ namespace Models
     public partial class BasicMaterial
     {
         public int Id { get; set; }
+        public Nullable<int> CustomerId { get; set; }
         public Nullable<int> MaterialCategoryId { get; set; }
         public string MaterialName { get; set; }
         public string Units { get; set; }

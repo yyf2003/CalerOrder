@@ -151,8 +151,7 @@ namespace Common
         Promotion,
         [Description("分区活动")]
         Others
-        //[Description("安装和发货")]
-        //InstallAndDelivery
+       
 
     }
 

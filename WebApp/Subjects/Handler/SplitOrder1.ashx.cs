@@ -2193,6 +2193,7 @@ namespace WebApp.Subjects.Handler
                                                             finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
                                                         }
                                                         finalOrderTempModel.AddDate = DateTime.Now;
+                                                        finalOrderTempModel.AddUserId = subjectModel.AddUserId;
                                                         finalOrderTempBll.Add(finalOrderTempModel);
                                                         
                                                     });
@@ -2352,6 +2353,7 @@ namespace WebApp.Subjects.Handler
                                                             {
                                                                 finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
                                                             }
+                                                            finalOrderTempModel.AddUserId = subjectModel.AddUserId;
                                                             finalOrderTempBll.Add(finalOrderTempModel);
                                                            
                                                         }
@@ -2461,6 +2463,7 @@ namespace WebApp.Subjects.Handler
                                                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                                     finalOrderTempModel.UnitName = unitName;
                                                                     finalOrderTempModel.AddDate = DateTime.Now;
+                                                                    finalOrderTempModel.AddUserId = subjectModel.AddUserId;
                                                                     if ((subjectModel.OutsourceId ?? 0) > 0)
                                                                     {
                                                                         finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
@@ -2640,6 +2643,7 @@ namespace WebApp.Subjects.Handler
                                                                 finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                                 finalOrderTempModel.UnitName = unitName;
                                                                 finalOrderTempModel.AddDate = DateTime.Now;
+                                                                finalOrderTempModel.AddUserId = subjectModel.AddUserId;
                                                                 if ((subjectModel.OutsourceId ?? 0) > 0)
                                                                 {
                                                                     finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
@@ -2762,6 +2766,7 @@ namespace WebApp.Subjects.Handler
                                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                             finalOrderTempModel.UnitName = unitName;
                                             finalOrderTempModel.AddDate = DateTime.Now;
+                                            finalOrderTempModel.AddUserId = subjectModel.AddUserId;
                                             if ((subjectModel.OutsourceId ?? 0) > 0)
                                             {
                                                 finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
@@ -2874,6 +2879,7 @@ namespace WebApp.Subjects.Handler
                                                     finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                     finalOrderTempModel.UnitName = unitName;
                                                     finalOrderTempModel.AddDate = DateTime.Now;
+                                                    finalOrderTempModel.AddUserId = subjectModel.AddUserId;
                                                     if ((subjectModel.OutsourceId ?? 0) > 0)
                                                     {
                                                         finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
@@ -3058,6 +3064,7 @@ namespace WebApp.Subjects.Handler
                                                 finalOrderTempModel.CSUserId = o.shop.CSUserId;
                                                 finalOrderTempModel.AddDate = DateTime.Now;
                                                 finalOrderTempModel.UnitName = unitName;
+                                                finalOrderTempModel.AddUserId = subjectModel.AddUserId;
                                                 if ((subjectModel.OutsourceId ?? 0) > 0)
                                                 {
                                                     finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
@@ -3173,6 +3180,7 @@ namespace WebApp.Subjects.Handler
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                             finalOrderTempModel.UnitName = unitName;
                             finalOrderTempModel.AddDate = DateTime.Now;
+                            finalOrderTempModel.AddUserId = subjectModel.AddUserId;
                             if ((subjectModel.OutsourceId ?? 0) > 0)
                             {
                                 finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;
@@ -3269,6 +3277,7 @@ namespace WebApp.Subjects.Handler
                             finalOrderTempModel.CSUserId = o.shop.CSUserId;
                             finalOrderTempModel.UnitName = unitName;
                             finalOrderTempModel.AddDate = DateTime.Now;
+                            finalOrderTempModel.AddUserId = subjectModel.AddUserId;
                             //if ((subjectModel.OutsourceId ?? 0) > 0)
                             //{
                             //    finalOrderTempModel.ProduceOutsourceId = subjectModel.OutsourceId;

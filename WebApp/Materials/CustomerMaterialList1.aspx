@@ -135,21 +135,21 @@
                     <span style="color: Red;">*</span>
                 </td>
             </tr>
-            <tr class="tr_bai">
-                <td style=" height: 25px;">
-                    应付单价（生产+安装）：
-                </td>
-                <td style="text-align: left; padding-left: 5px;">
-                    <input type="text" id="txtPayPriceInstallAndProduct" maxlength="20" style="width: 100px;" />
-                    <span style="color: Red;">*</span>
-                </td>
-            </tr>
              <tr class="tr_bai">
                 <td style=" height: 25px;">
                     应付单价（发货）：
                 </td>
                 <td style="text-align: left; padding-left: 5px;">
                     <input type="text" id="txtPayPriceSend" maxlength="20" style="width: 100px;" />
+                    <span style="color: Red;">*</span>
+                </td>
+            </tr>
+            <tr class="tr_bai" style=" display:none;">
+                <td style=" height: 25px;">
+                    应付单价（辅料+安装）：
+                </td>
+                <td style="text-align: left; padding-left: 5px;">
+                    <input type="text" id="txtPayPriceSubInstall" maxlength="20" style="width: 100px;" />
                     <span style="color: Red;">*</span>
                 </td>
             </tr>

@@ -102,6 +102,7 @@ namespace Models
         public DbSet<OrderType> OrderType { get; set; }
         public DbSet<OutsourceAssignShop> OutsourceAssignShop { get; set; }
         public DbSet<OutsourceInfo> OutsourceInfo { get; set; }
+        public DbSet<OutsourceInstallPriceLevel> OutsourceInstallPriceLevel { get; set; }
         public DbSet<OutsourceInUser> OutsourceInUser { get; set; }
         public DbSet<OutSourceMaterial> OutSourceMaterial { get; set; }
         public DbSet<OutsourceMaterialInfo> OutsourceMaterialInfo { get; set; }
@@ -115,6 +116,7 @@ namespace Models
         public DbSet<OutsourceOrderPlaceConfig> OutsourceOrderPlaceConfig { get; set; }
         public DbSet<OutsourceOrderPrice> OutsourceOrderPrice { get; set; }
         public DbSet<OutsourceOrderSavingLog> OutsourceOrderSavingLog { get; set; }
+        public DbSet<OutsourcePayRecord> OutsourcePayRecord { get; set; }
         public DbSet<OutsourcePriceOrder> OutsourcePriceOrder { get; set; }
         public DbSet<OutsourceReceivePriceOrder> OutsourceReceivePriceOrder { get; set; }
         public DbSet<Place> Place { get; set; }
@@ -179,7 +181,5 @@ namespace Models
         public DbSet<UserInRegion> UserInRegion { get; set; }
         public DbSet<UserInRole> UserInRole { get; set; }
         public DbSet<UserLevel> UserLevel { get; set; }
-        public DbSet<OutsourcePayRecord> OutsourcePayRecord { get; set; }
-        public DbSet<OutsourceInstallPriceLevel> OutsourceInstallPriceLevel { get; set; }
     }
 }

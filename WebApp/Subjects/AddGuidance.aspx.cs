@@ -210,12 +210,21 @@ namespace WebApp.Subjects
             string guidanceMonth = txtGuidanceMonth.Text.Trim();
             int priceItemId = int.Parse(ddlPriceItemList.SelectedValue);
             bool canSave = false;
-            if (id > 0)
+            string errorMsg = string.Empty;
+            if (priceItemId == 0)
             {
-                canSave = !CheckItemName(ItemName, id);
+                canSave = false;
+                errorMsg = "请选择材质价格方案";
             }
             else
-                canSave = !CheckItemName(ItemName, null);
+            {
+                if (id > 0)
+                {
+                    canSave = !CheckItemName(ItemName, id);
+                }
+                else
+                    canSave = !CheckItemName(ItemName, null);
+            }
             if (canSave)
             {
                 try
@@ -341,7 +350,11 @@ namespace WebApp.Subjects
             }
             else
             {
-                Alert("该活动名称已存在！");
+                if (string.IsNullOrWhiteSpace(errorMsg))
+                {
+                    errorMsg = "该活动名称已存在";
+                }
+                Alert(errorMsg);
             }
 
         }

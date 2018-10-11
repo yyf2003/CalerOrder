@@ -21,6 +21,7 @@
     </script>
 </head>
 <body class="easyui-layout">
+    <form id="form1" runat="server">
     <div data-options="region:'north',split:true," style="height: 44px; overflow: hidden;">
         <div class="nav_title">
             <img src="/image/home.gif" width="47" height="44" style="float: left;" alt="" /><p
@@ -37,22 +38,38 @@
         <div id="materialTitle" class="easyui-panel" title=">>类别名称：" data-options="height:'100%',overflow:'auto'">
             <table id="tbMaterial" style="width: 100%;">
             </table>
-            <div id="toolbar" style="height: 28px">
-                <a id="btnRefresh" style="float: left;" class="easyui-linkbutton" plain="true" icon="icon-reload">
-                    刷新</a>
-                <div class='datagrid-btn-separator'>
+            <div id="toolbar" style="height: 60px">
+                <div>
+                    <table class="table" style="width: 100%;">
+                        <tr class="tr_hui">
+                            <td style="width: 70px; border: 0px; font-weight: bold;">
+                                客户名称：
+                            </td>
+                            <td style="text-align: left; padding-left: 5px; border: 0px;">
+                                <asp:DropDownList ID="ddlCustmoer" runat="server">
+                                </asp:DropDownList>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
-                <a id="btnAdd" style="float: left;display:none;" class="easyui-linkbutton" plain="true" icon="icon-add">新增</a>
-                <a id="btnEdit" style="float: left;display:none;" class="easyui-linkbutton" plain="true"icon="icon-edit">编辑</a>
-                <a id="btnDelete" style="float: left;display:none;" class="easyui-linkbutton" plain="true" icon="icon-remove">删除</a>
-                <a id="btnRecover" style="float: left;display:none;" class="easyui-linkbutton" plain="true" icon="icon-redo">恢复</a>
-                <div id="separator1" style="display:none;" class='datagrid-btn-separator'>
-                </div>
-                <a id="btnImport" style="float: left;" class="easyui-linkbutton" plain="true" icon="icon-back">
-                    导入</a>
-                <a id="btnExport" style="float: left;" class="easyui-linkbutton" plain="true" icon="icon-redo">
-                    导出</a>
-                <div class='datagrid-btn-separator'>
+                <div>
+                    <a id="btnRefresh" style="float: left;" class="easyui-linkbutton" plain="true" icon="icon-reload">
+                        刷新</a>
+                    <div class='datagrid-btn-separator'>
+                    </div>
+                    <a id="btnAdd" style="float: left; display: none;" class="easyui-linkbutton" plain="true"
+                        icon="icon-add">新增</a> <a id="btnEdit" style="float: left; display: none;" class="easyui-linkbutton"
+                            plain="true" icon="icon-edit">编辑</a> <a id="btnDelete" style="float: left; display: none;"
+                                class="easyui-linkbutton" plain="true" icon="icon-remove">删除</a> <a id="btnRecover"
+                                    style="float: left; display: none;" class="easyui-linkbutton" plain="true" icon="icon-redo">
+                                    恢复</a>
+                    <div id="separator1" style="display: none;" class='datagrid-btn-separator'>
+                    </div>
+                    <a id="btnImport" style="float: left;" class="easyui-linkbutton" plain="true" icon="icon-back">
+                        导入</a> <a id="btnExport" style="float: left;" class="easyui-linkbutton" plain="true"
+                            icon="icon-redo">导出</a>
+                    <div class='datagrid-btn-separator'>
+                    </div>
                 </div>
             </div>
         </div>
@@ -97,6 +114,7 @@
             width="100%"></iframe>
     </div>
     <input type="hidden" id="hfIsFinishImport" value="0" />
+    </form>
 </body>
 </html>
 <script src="../Scripts/common.js" type="text/javascript"></script>

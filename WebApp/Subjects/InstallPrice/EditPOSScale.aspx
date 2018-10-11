@@ -176,40 +176,40 @@
                     </td>
                     
                     <td>
-                        <%#Eval("shop.ShopNo") %>
+                        <%#Eval("ShopNo") %>
 
                     </td>
                     <td>
                         <%--<asp:TextBox ID="txtPOSScale" runat="server" Text='<%#Eval("POSScale")%>'></asp:TextBox>--%>
-                        <asp:DropDownList ID="ddlPOSScale" runat="server" Visible="false">
+                        <%--<asp:DropDownList ID="ddlPOSScale" runat="server" Visible="false">
                            <asp:ListItem Value="">空</asp:ListItem>
                         </asp:DropDownList>
                         <asp:Label ID="labPOSScale" runat="server" Text='<%#Eval("POSScale")%>'></asp:Label>
-                        <asp:HiddenField ID="hfShopId" runat="server" Value='<%#Eval("shop.Id") %>'/>
+                        <asp:HiddenField ID="hfShopId" runat="server" Value='<%#Eval("shop.Id") %>'/>--%>
                     </td>
                     <td>
-                        <%#Eval("MaterialSupport")%>
+                        <%--<%#Eval("MaterialSupport")%>--%>
                     </td>
                     <td>
-                        <%#Eval("shop.ShopName") %>
+                        <%#Eval("ShopName") %>
                     </td>
                     <td>
-                        <%#Eval("shop.RegionName") %>
+                        <%#Eval("RegionName") %>
                     </td>
                     <td>
-                        <%#Eval("shop.ProvinceName") %>
+                        <%#Eval("ProvinceName") %>
                     </td>
                     <td>
-                        <%#Eval("shop.CityName") %>
+                        <%#Eval("CityName") %>
                     </td>
                     <td>
-                        <%#Eval("shop.CityTier")%>
+                        <%#Eval("CityTier")%>
                     </td>
                     <td>
-                        <%#Eval("shop.IsInstall")%>
+                        <%#Eval("IsInstall")%>
                     </td>
                     <td>
-                        <%#Eval("shop.POPAddress")%>
+                        <%#Eval("POPAddress")%>
                     </td>
                     
                    

@@ -154,6 +154,9 @@
                 <asp:Button ID="btnRefresh" runat="server"  Text="刷 新" class="layui-btn layui-btn-small"
             style="width: 65px; height:26px; float:right; margin-right:30px;" 
                 onclick="btnRefresh_Click" />
+                 <asp:Button ID="btnToExport" runat="server"  Text="导出订单" class="layui-btn layui-btn-small"
+            style="width: 65px; height:26px; float:right; margin-right:30px;" onclick="btnToExport_Click" 
+                 />
         </div>
         
         <div class="tr" >

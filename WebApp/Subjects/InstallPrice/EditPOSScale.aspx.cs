@@ -19,6 +19,7 @@ namespace WebApp.Subjects.InstallPrice
         string subjectTypeId = string.Empty;
         string subjectId = string.Empty;
         string posScale = string.Empty;
+        string shopId = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["guidanceId"] != null)
@@ -40,6 +41,10 @@ namespace WebApp.Subjects.InstallPrice
             if (Request.QueryString["posScale"] != null)
             {
                 posScale = Request.QueryString["posScale"];
+            }
+            if (Request.QueryString["shopId"] != null)
+            {
+                shopId = Request.QueryString["shopId"];
             }
             if (!IsPostBack)
             {
@@ -68,7 +73,7 @@ namespace WebApp.Subjects.InstallPrice
         }
 
 
-        void BindData()
+        void BindData11()
         {
             
             var orderList = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
@@ -253,6 +258,63 @@ namespace WebApp.Subjects.InstallPrice
             gvShop.DataBind();
         }
 
+        void BindData()
+        {
+            ////活动订单
+            //List<FinalOrderDetailTemp> activityOrderList = new List<FinalOrderDetailTemp>();
+            ////常规订单
+            //List<FinalOrderDetailTemp> genericOrderList = new List<FinalOrderDetailTemp>();
+
+            //List<Subject> subjectList = new List<Subject>();
+
+            //if (Session["activityOrderListIP"] != null)
+            //{
+            //    activityOrderList = Session["activityOrderListIP"] as List<FinalOrderDetailTemp>;
+
+            //}
+            //if (Session["genericOrderListIP"] != null)
+            //{
+            //    genericOrderList = Session["genericOrderListIP"] as List<FinalOrderDetailTemp>;
+            //}
+            //List<FinalOrderDetailTemp> totalOrderList = activityOrderList.Concat(genericOrderList).ToList();
+            //if (totalOrderList.Any())
+            //{
+            //    var orderList = (from order in totalOrderList
+            //                     join subject in CurrentContext.DbContext.Subject
+            //                     on order.SubjectId equals subject.Id
+            //                     join shop in CurrentContext.DbContext.Shop
+            //                     on order.ShopId equals shop.Id
+            //                     join guidance in CurrentContext.DbContext.SubjectGuidance
+            //                      on subject.GuidanceId equals guidance.ItemId
+            //                     where subject.GuidanceId == guidanceId && (subject.IsDelete == null || subject.IsDelete == false)
+            //                     && subject.ApproveState == 1
+            //                     && (order.IsDelete == null || order.IsDelete == false)
+            //                     select new
+            //                     {
+            //                         subject,
+            //                         shop,
+            //                         POSScale = order.InstallPricePOSScale,
+            //                         MaterialSupport = order.MaterialSupport,
+            //                         guidance.ItemName
+            //                     }).ToList();
+            //    if (!string.IsNullOrWhiteSpace(shopId))
+            //    { 
+                   
+            //    }
+            //}
+            List<Shop> shopList = new List<Shop>();
+            if (!string.IsNullOrWhiteSpace(shopId))
+            {
+                List<int> shopIdList = StringHelper.ToIntList(shopId, ',');
+                shopList = new ShopBLL().GetList(s => shopIdList.Contains(s.Id));
+            }
+            labShopCount.Text = shopList.Count.ToString();
+            AspNetPager1.RecordCount = shopList.Count;
+            this.AspNetPager1.CustomInfoHTML = string.Format("当前第{0}/{1}页 共{2}条记录 每页{3}条", new object[] { this.AspNetPager1.CurrentPageIndex, this.AspNetPager1.PageCount, this.AspNetPager1.RecordCount, this.AspNetPager1.PageSize });
+            gvShop.DataSource = shopList.OrderBy(s => s.ShopNo).Skip((AspNetPager1.CurrentPageIndex - 1) * AspNetPager1.PageSize).Take(AspNetPager1.PageSize).ToList();
+            gvShop.DataBind();
+        }
+
         protected void AspNetPager1_PageChanged(object sender, EventArgs e)
         {
             BindData();
@@ -264,35 +326,35 @@ namespace WebApp.Subjects.InstallPrice
             if (e.Item.ItemIndex != -1)
             {
                 
-                object item = e.Item.DataItem;
-                if (item != null)
-                {
-                    object posScaleObj = item.GetType().GetProperty("POSScale").GetValue(item, null);
-                    string posScale = posScaleObj != null ? posScaleObj.ToString() : "";
-                    if (string.IsNullOrWhiteSpace(posScale))
-                    {
-                        if (!POSScaleData.Any())
-                        {
-                            POSScaleData = new POSScaleInfoBLL().GetList(s => 1 == 1).Select(s => s.POSScaleName).ToList();
-                        }
-                        DropDownList ddlPOSScale = (DropDownList)e.Item.FindControl("ddlPOSScale");
-                        ddlPOSScale.Visible = true;
+                //object item = e.Item.DataItem;
+                //if (item != null)
+                //{
+                //    object posScaleObj = item.GetType().GetProperty("POSScale").GetValue(item, null);
+                //    string posScale = posScaleObj != null ? posScaleObj.ToString() : "";
+                //    if (string.IsNullOrWhiteSpace(posScale))
+                //    {
+                //        if (!POSScaleData.Any())
+                //        {
+                //            POSScaleData = new POSScaleInfoBLL().GetList(s => 1 == 1).Select(s => s.POSScaleName).ToList();
+                //        }
+                //        DropDownList ddlPOSScale = (DropDownList)e.Item.FindControl("ddlPOSScale");
+                //        ddlPOSScale.Visible = true;
 
-                        Label labPOSScale = (Label)e.Item.FindControl("labPOSScale");
-                        labPOSScale.Visible = false;
-                        if (POSScaleData.Any())
-                        {
-                            POSScaleData.ForEach(s =>
-                            {
-                                ListItem li = new ListItem();
-                                li.Text = s;
-                                li.Value = s;
-                                ddlPOSScale.Items.Add(li);
-                            });
-                        }
-                    }
+                //        Label labPOSScale = (Label)e.Item.FindControl("labPOSScale");
+                //        labPOSScale.Visible = false;
+                //        if (POSScaleData.Any())
+                //        {
+                //            POSScaleData.ForEach(s =>
+                //            {
+                //                ListItem li = new ListItem();
+                //                li.Text = s;
+                //                li.Value = s;
+                //                ddlPOSScale.Items.Add(li);
+                //            });
+                //        }
+                //    }
                     
-                }
+                //}
             }
         }
 

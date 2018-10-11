@@ -11,6 +11,7 @@
     <script src="/easyui1.4/jquery.easyui.min.js"></script>
     <link href="/layui230/css/layui.css" rel="stylesheet" type="text/css" media="all" />
     <script src="/layui230/layui.all.js" type="text/javascript"></script>
+    
 </head>
 <body class="easyui-layout">
     <form id="form1" runat="server">
@@ -28,14 +29,14 @@
     </div>
     <div data-options="region:'center',title:'',height:'100%',iconCls:'icon-ok'" style="overflow: hidden;">
         <div id="orderTitle" class="easyui-panel" title=">>区域：" data-options="height:'100%',overflow:'auto'">
-            <div style=" margin-top:10px; margin-left:10px;">
-                <div class="layui-btn-group">
+            
+                <div id="operatorToolbar" runat="server" class="layui-btn-group" style=" margin-top:10px; margin-left:10px; display:none;">
                     <span id="btnAdd" class="layui-btn layui-btn-sm"><i class="layui-icon">&#xe654;</i>添加设置</span>
                     <span id="btnEdit" class="layui-btn layui-btn-sm" style="margin-left: 30px;"><i class="layui-icon">
-                        &#xe642;</i>修改设置</span> <span id="btnDelete" class="layui-btn layui-btn-sm" style="margin-left: 30px;">
+                        &#xe642;</i><span id='editSpan'>编辑设置</span></span> <span id="btnDelete" class="layui-btn layui-btn-sm" style="margin-left: 30px;">
                             <i class="layui-icon">&#xe640;</i>删除设置</span>
                 </div>
-            </div>
+            
             <div style="clear: both; margin-top: 5px;">
                 <table id="tbSetList" class="layui-hide" lay-filter="tbSetList">
                 </table>
@@ -172,7 +173,9 @@
             <tbody id="citySettingData">
             </tbody>
         </table>
-    </div>
+    </div>  
+
+
     </form>
 </body>
 </html>

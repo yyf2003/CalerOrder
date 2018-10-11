@@ -98,6 +98,9 @@
                             应收费用
                         </td>
                         <td>
+                            数量
+                        </td>
+                        <td>
                             备注
                         </td>
                     </tr>
@@ -131,6 +134,9 @@
                     <td>
                         <%#Eval("ReceiveExpressPrice")%>
                     </td>
+                    <td>
+                        <%#Eval("ReceiveExpressPrice") == null ? 1 : Eval("ReceiveExpressPrice")%>
+                     </td>
                      <td>
                         <%#Eval("Remark")%>
                     </td>
@@ -140,7 +146,7 @@
                 <%if (gvPrice.Items.Count == 0)
                   { %>
                 <tr class="tr_bai">
-                    <td colspan="14" style="text-align: center;">
+                    <td colspan="15" style="text-align: center;">
                         --无数据--
                     </td>
                 </tr>

@@ -172,7 +172,7 @@ namespace WebApp.Outsource.MaterialInfo
                     list.ForEach(s =>
                     {
                         string state = s.om.IsDelete != null && s.om.IsDelete == true ? "已删除" : "正常";
-                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.om.Id + "\",\"MaterialName\":\"" + s.MaterialName + "\",\"CustomerId\":\"" + s.om.CustomerId + "\",\"CustomerName\":\"" + s.CustomerName + "\",\"UnitId\":\"" + s.om.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"State\":\"" + state + "\",\"InstallPrice\":\"" + s.om.InstallPrice + "\",\"InstallAndProductPrice\":\"" + s.om.InstallAndProductPrice + "\",\"SendPrice\":\"" + s.om.SendPrice + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"BasicMaterialId\":\"" + s.om.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.om.BasicCategoryId + "\"},");
+                        json.Append("{\"rowIndex\":\"" + index + "\",\"Id\":\"" + s.om.Id + "\",\"MaterialName\":\"" + s.MaterialName + "\",\"CustomerId\":\"" + s.om.CustomerId + "\",\"CustomerName\":\"" + s.CustomerName + "\",\"UnitId\":\"" + s.om.UnitId + "\",\"Unit\":\"" + s.UnitName + "\",\"State\":\"" + state + "\",\"InstallPrice\":\"" + s.om.InstallPrice + "\",\"SubInstallPrice\":\"" + s.om.SubInstallPrice + "\",\"SendPrice\":\"" + s.om.SendPrice + "\",\"BasicMaterialName\":\"" + s.MaterialName + "\",\"BasicMaterialId\":\"" + s.om.BasicMaterialId + "\",\"BasicCategoryId\":\"" + s.om.BasicCategoryId + "\"},");
                         index++;
                     });
                     if (json.Length > 0)
@@ -215,7 +215,7 @@ namespace WebApp.Outsource.MaterialInfo
                                 newModel.CustomerId = model.CustomerId;
                                 newModel.PriceItemId = model.PriceItemId;
                                 newModel.InstallPrice = model.InstallPrice;
-                                newModel.InstallAndProductPrice = model.InstallAndProductPrice;
+                                newModel.SubInstallPrice = model.SubInstallPrice;
                                 newModel.SendPrice = model.SendPrice;
                                 newModel.UnitId = model.UnitId;
                                 bll.Update(newModel);
@@ -303,8 +303,8 @@ namespace WebApp.Outsource.MaterialInfo
                         if (itemModel != null)
                         {
                             OutsourceMaterialPriceItemBLL itemBll = new OutsourceMaterialPriceItemBLL();
-                            var itemList = itemBll.GetList(s => s.ItemName.ToLower() == itemModel.ItemName.Trim().ToLower());
-                            if (itemList.Any())
+                            var itemList = itemBll.GetList(s =>s.CustomerId==itemModel.CustomerId);
+                            if (itemList.Any(s => s.ItemName.ToLower() == itemModel.ItemName.Trim().ToLower()))
                             {
                                 result = "类型名称重复";
                             }
@@ -317,7 +317,10 @@ namespace WebApp.Outsource.MaterialInfo
                                 }
                                 itemModel.Materials = null;
                                 itemModel.ItemName = itemModel.ItemName.Trim();
-                                itemModel.IsDelete = true;
+                                if (itemList.Any(s => (itemModel.IsDelete??false)==false))
+                                   itemModel.IsDelete = true;
+                                else
+                                    itemModel.IsDelete = false;
                                 itemBll.Add(itemModel);
                                 if (materialList.Any())
                                 {
@@ -370,7 +373,7 @@ namespace WebApp.Outsource.MaterialInfo
                 //原来是禁用的，（不能同时有2个启用）
                 if (model.IsDelete ?? false)
                 {
-                    var list = itemBll.GetList(s => (s.IsDelete ?? false) == false);
+                    var list = itemBll.GetList(s =>s.CustomerId==model.CustomerId && (s.IsDelete ?? false) == false);
                     if (list.Any())
                     {
                         result = "更新失败：不能同时有2个启用的项目，请先禁用其他项目！";
@@ -383,8 +386,16 @@ namespace WebApp.Outsource.MaterialInfo
                 }
                 else
                 {
-                    model.IsDelete = true;
-                    itemBll.Update(model);
+                    int count = itemBll.GetList(s => s.CustomerId == model.CustomerId).Count;
+                    if (count == 1)
+                    {
+                        result = "更新失败：当前只有一个项目，所以不能禁用！";
+                    }
+                    else
+                    {
+                        model.IsDelete = true;
+                        itemBll.Update(model);
+                    }
                 }
             }
             else

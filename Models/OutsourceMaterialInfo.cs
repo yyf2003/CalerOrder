@@ -15,18 +15,18 @@ namespace Models
     public partial class OutsourceMaterialInfo
     {
         public int Id { get; set; }
+        public Nullable<int> RegionId { get; set; }
+        public Nullable<int> OutsourctId { get; set; }
         public Nullable<int> CustomerId { get; set; }
         public Nullable<int> PriceItemId { get; set; }
         public Nullable<int> UnitId { get; set; }
         public Nullable<decimal> InstallPrice { get; set; }
         public Nullable<decimal> SendPrice { get; set; }
+        public Nullable<decimal> SubInstallPrice { get; set; }
         public Nullable<int> BasicCategoryId { get; set; }
         public Nullable<int> BasicMaterialId { get; set; }
         public Nullable<bool> IsDelete { get; set; }
         public Nullable<int> AddUserId { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
-        public Nullable<decimal> InstallAndProductPrice { get; set; }
-        public Nullable<int> OutsourctId { get; set; }
-        public Nullable<int> RegionId { get; set; }
     }
 }

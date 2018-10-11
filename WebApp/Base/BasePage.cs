@@ -248,6 +248,39 @@ namespace WebApp
                 return "";
         }
 
+        public List<string> GetPromissionList(string pageUrl = null)
+        {
+            List<string> promissionList = new List<string>();
+
+            string url = !string.IsNullOrWhiteSpace(pageUrl) ? pageUrl : Request.FilePath;
+            int moduleId = 0;
+            ModuleBLL moduleBll = new ModuleBLL();
+            var module = moduleBll.GetList(s => s.Url == url).FirstOrDefault();
+            if (module != null)
+            {
+                moduleId = module.Id;
+            }
+            int roleId = CurrentUser.RoleId;
+            var promission = new RoleInModuleBLL().GetList(s => s.RoleId == roleId && s.ModuleId == moduleId).FirstOrDefault();
+            if (promission != null)
+            {
+                promissionList = promission.OperatePermission.Split('|').ToList();
+            }
+            int userId = CurrentUser.UserId;
+            var userInModuleList = new UserInModuleBLL().GetList(s => s.UserId == userId && s.RoleId == roleId && s.ModuleId == moduleId).FirstOrDefault();
+            if (userInModuleList != null && userInModuleList.OperatePermission != null)
+            {
+                List<string> promissionList0 = userInModuleList.OperatePermission.Split('|').ToList();
+                promissionList0.ForEach(s =>
+                {
+                    if (!string.IsNullOrWhiteSpace(s) && !promissionList.Contains(s))
+                    {
+                        promissionList.Add(s);
+                    }
+                });
+            }
+            return promissionList;
+        }
 
         /// <summary>
         /// 开放编辑/删除权限
@@ -994,10 +1027,18 @@ namespace WebApp
             return BasicInstallPrice;
         }
 
+        /// <summary>
+        /// 外协基本安装费--从区域设置中获取
+        /// </summary>
+        /// <param name="MaterialSupport"></param>
+        /// <returns></returns>
+        //public decimal GetOutsourceBasicInstallPriceBySetting(Shop shop, string MaterialSupport)
+        //{ 
 
+        //}
 
         /// <summary>
-        /// 外协基本安装费
+        /// 外协基本安装费--公用级别
         /// </summary>
         /// <param name="MaterialSupport"></param>
         /// <returns></returns>
@@ -1851,7 +1892,7 @@ namespace WebApp
 
         OrderMaterialMppingBLL OrderMaterialMppingBll = new OrderMaterialMppingBLL();
         List<string> materialStrList = new List<string>();
-        public bool CheckMaterial(string materialName)
+        public bool CheckMaterial(int customerId,string materialName)
         {
 
             bool flag = false;
@@ -1864,7 +1905,7 @@ namespace WebApp
 
                 if (!string.IsNullOrWhiteSpace(materialName))
                 {
-                    var model = OrderMaterialMppingBll.GetList(s => s.OrderMaterialName.ToLower() == materialName.ToLower()).FirstOrDefault();
+                    var model = OrderMaterialMppingBll.GetList(s =>s.CustomerId==customerId && s.OrderMaterialName.ToLower() == materialName.ToLower()).FirstOrDefault();
                     if (model != null)
                     {
                         flag = true;
@@ -1904,9 +1945,9 @@ namespace WebApp
                     {
                         if (materialName.Contains("+挂轴") || materialName.Contains("+上挂轴") || materialName.Contains("+下挂轴"))
                         {
-                            decimal unitPrice1 = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, "挂轴", pop.OutsourceType ?? 0, pop.PriceItemId, pop.OutsourceId??0, out unitName);
+                            decimal unitPrice1 = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, "挂轴", pop.OutsourceType ?? 0, pop.PriceItemId, pop.OutsourceId ?? 0, out unitName);
                             string newMaterial = materialName.Substring(0, materialName.LastIndexOf('+'));
-                            unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, newMaterial, pop.OutsourceType ?? 0, pop.PriceItemId, pop.OutsourceId??0, out unitName);
+                            unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, newMaterial, pop.OutsourceType ?? 0, pop.PriceItemId, pop.OutsourceId ?? 0, out unitName);
                             decimal totalPrice0 = 0;
                             if (unitName == "平米")
                             {
@@ -1930,13 +1971,13 @@ namespace WebApp
                         else
                         {
 
-                            unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, materialName, pop.OutsourceType ?? 0, pop.PriceItemId, pop.OutsourceId??0, out unitName);
+                            unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, materialName, pop.OutsourceType ?? 0, pop.PriceItemId, pop.OutsourceId ?? 0, out unitName);
                             totalPrice = (width / 1000) * 2 * quantity * unitPrice;
                         }
                     }
                     else
                     {
-                        unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, materialName, pop.OutsourceType ?? 0, pop.PriceItemId, pop.OutsourceId??0, out unitName);
+                        unitPrice = GetOutsourceMaterialUnitPrice(pop.CustomerId ?? 0, materialName, pop.OutsourceType ?? 0, pop.PriceItemId, pop.OutsourceId ?? 0, out unitName);
                         if (unitName == "平米")
                         {
                             totalPrice = ((width * length) / 1000000) * quantity * unitPrice;
@@ -1997,12 +2038,12 @@ namespace WebApp
                                      where basicM.MaterialName.ToLower() == name
                                      && (osMprice.IsDelete == null || osMprice.IsDelete == false)
                                      && (osMprice.CustomerId == customerId)
-                                     && (priceItemId > 0 ? (priceItem.Id == priceItemId) : (priceItem.IsDelete == null || priceItem.IsDelete == false))
+                                     && (priceItemId > 0 ? (priceItem.Id == priceItemId) : (priceItem.IsDelete == null || priceItem.IsDelete == false && priceItem.CustomerId == customerId))
                                      //&& (osMprice.OutsourctId ?? 0) == outsourceId
                                      select new
                                      {
                                          osMprice.InstallPrice,
-                                         osMprice.InstallAndProductPrice,
+                                         osMprice.SubInstallPrice,
                                          osMprice.SendPrice,
                                          unit.UnitName,
                                          osMprice.OutsourctId
@@ -2018,10 +2059,10 @@ namespace WebApp
                         {
                             price = model.InstallPrice ?? 0;
                         }
-                        else if (outsourceType == (int)OutsourceOrderTypeEnum.InstallAndProduce)
-                        {
-                            price = model.InstallAndProductPrice ?? 0;
-                        }
+                        //else if (outsourceType == (int)OutsourceOrderTypeEnum.InstallAndProduce)
+                        //{
+                        //    price = model.SubInstallPrice ?? 0;
+                        //}
                         else
                         {
                             price = model.SendPrice ?? 0;
@@ -2353,7 +2394,7 @@ namespace WebApp
         /// <summary>
         /// 项目审批的时候保存安装费
         /// </summary>
-        public void SaveInstallPrice(int guidanceId, int subjectId, int subjectType)
+        public void SaveInstallPrice_old2(int guidanceId, int subjectId, int subjectType)
         {
             InstallPriceTempBLL installPriceTempBll = new InstallPriceTempBLL();
 
@@ -2383,7 +2424,8 @@ namespace WebApp
                                 from subjectCategory in categortTemp.DefaultIfEmpty()
                                 where order.GuidanceId == guidanceId
                                 && shopIdList0.Contains(order.ShopId ?? 0)
-                                && ((order.IsInstall != null && order.IsInstall == "Y" && (subject.CornerType == null || subject.CornerType == "" || subject.CornerType != "三叶草")) || (subject.CornerType == "三叶草" && order.BCSIsInstall == "Y"))
+                                    //&& ((order.IsInstall != null && order.IsInstall == "Y" && (subject.CornerType == null || subject.CornerType == "" || subject.CornerType != "三叶草")) || (subject.CornerType == "三叶草" && order.BCSIsInstall == "Y"))
+                                && (order.IsInstall == "Y" || order.BCSIsInstall == "Y")
                                 && ((order.OrderType == (int)OrderTypeEnum.POP && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || order.OrderType == (int)OrderTypeEnum.道具)
                                 && (order.IsDelete == null || order.IsDelete == false)
                                 && (subject.IsDelete == null || subject.IsDelete == false)
@@ -2589,6 +2631,387 @@ namespace WebApp
                         }
                     }
                 });
+            }
+
+
+        }
+
+        /// <summary>
+        /// 项目审批的时候保存安装费
+        /// </summary>
+        public void SaveInstallPrice(int guidanceId, int subjectId, int subjectType)
+        {
+            InstallPriceTempBLL installPriceTempBll = new InstallPriceTempBLL();
+
+            List<int> shopIdList0 = new List<int>();
+            List<FinalOrderDetailTemp> orderList = new List<FinalOrderDetailTemp>();
+            if (subjectType == (int)SubjectTypeEnum.HC订单 || subjectType == (int)SubjectTypeEnum.分区补单)
+            {
+                orderList = new FinalOrderDetailTempBLL().GetList(s => s.RegionSupplementId == subjectId && (s.IsDelete == null || s.IsDelete == false));
+            }
+            else
+            {
+                orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0 && (s.IsDelete == null || s.IsDelete == false));
+            }
+            if (orderList.Any())
+            {
+                shopIdList0 = orderList.Select(s => s.ShopId ?? 0).Distinct().ToList();
+            }
+            //删除
+            installPriceTempBll.Delete(s => s.GuidanceId == guidanceId && shopIdList0.Contains(s.ShopId ?? 0));
+            var allOrderlist = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
+                                join shop in CurrentContext.DbContext.Shop
+                                on order.ShopId equals shop.Id
+                                join subject in CurrentContext.DbContext.Subject
+                                on order.SubjectId equals subject.Id
+                                join subjectCategory1 in CurrentContext.DbContext.ADSubjectCategory
+                                on subject.SubjectCategoryId equals subjectCategory1.Id into categortTemp
+                                from subjectCategory in categortTemp.DefaultIfEmpty()
+                                where order.GuidanceId == guidanceId
+                                && shopIdList0.Contains(order.ShopId ?? 0)
+                                    //&& ((order.IsInstall != null && order.IsInstall == "Y" && (subject.CornerType == null || subject.CornerType == "" || subject.CornerType != "三叶草")) || (subject.CornerType == "三叶草" && order.BCSIsInstall == "Y"))
+                                && (order.IsInstall == "Y" || order.BCSIsInstall == "Y")
+                                && ((order.OrderType == (int)OrderTypeEnum.POP && order.GraphicLength != null && order.GraphicLength > 0 && order.GraphicWidth != null && order.GraphicWidth > 0) || order.OrderType == (int)OrderTypeEnum.道具)
+                                && (order.IsDelete == null || order.IsDelete == false)
+                                && (subject.IsDelete == null || subject.IsDelete == false)
+                                && subject.ApproveState == 1
+                                && subject.SubjectType != (int)SubjectTypeEnum.二次安装
+                                && (subject.IsSecondInstall ?? false) == false
+                                //&& (shop.Channel!=null?(!shop.Channel.ToLower().Contains("terrex")):1==1)
+                                select new
+                                {
+                                    subject,
+                                    order,
+                                    shop,
+                                    CategoryName = subjectCategory != null ? (subjectCategory.CategoryName) : ""
+                                }).ToList();
+
+            if (allOrderlist.Any())
+            {
+                List<string> cityCierList = new List<string>() { "T1", "T2", "T3" };
+                //活动订单
+                List<FinalOrderDetailTemp> activityOrderList = new List<FinalOrderDetailTemp>();
+                //常规订单
+                List<FinalOrderDetailTemp> genericOrderList = new List<FinalOrderDetailTemp>();
+
+                genericOrderList = allOrderlist.Where(s => s.CategoryName.Contains("常规-非活动")).Select(s => s.order).ToList();
+
+                List<int> genericOrderIdList = new List<int>();
+                if (genericOrderList.Any())
+                {
+                    
+                    genericOrderIdList = genericOrderList.Select(s => s.Id).ToList();
+                    genericOrderList = genericOrderList.Where(s => ((!s.Region.ToLower().Contains("west") && cityCierList.Contains(s.CityTier) && s.IsInstall == "Y") || (s.Region.ToLower().Contains("west") && s.IsInstall == "Y"))).ToList();
+
+                }
+                activityOrderList = allOrderlist.Where(s => !genericOrderIdList.Contains(s.order.Id)).Select(s => s.order).ToList();
+
+                List<Subject> subjectList= allOrderlist.Select(s=>s.subject).Distinct().ToList();
+                InstallPriceTempBLL installShopBll = new InstallPriceTempBLL();
+                if (activityOrderList.Any())
+                {
+                    #region 活动订单
+
+                    var activityOrderList0 = (from order in activityOrderList
+                                                  join subject in subjectList
+                                                  on order.SubjectId equals subject.Id
+                                                  join shop in CurrentContext.DbContext.Shop
+                                                  on order.ShopId equals shop.Id
+                                                  select new { order, shop, subject }).ToList();
+
+                    List<string> BCSInstallCityTierList = new List<string>();
+                    decimal bcsBasicInstallPrice = 150;//三叶草t1-t3安装费
+                    if (!BCSInstallCityTierList.Any())
+                    {
+                        string BCSInstallCityTier = string.Empty;
+                        try
+                        {
+                            BCSInstallCityTier = ConfigurationManager.AppSettings["BCSBasicInstallPrice"];
+                            if (!string.IsNullOrWhiteSpace(BCSInstallCityTier))
+                            {
+                                string[] str = BCSInstallCityTier.Split(':');
+                                BCSInstallCityTierList = StringHelper.ToStringList(str[0], ',', LowerUpperEnum.ToUpper);
+                                bcsBasicInstallPrice = StringHelper.IsDecimal(str[1]);
+                            }
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    List<Shop> shopList0 = activityOrderList0.Select(s => s.shop).Distinct().ToList();
+                    List<int> shopIdList = shopList0.Select(s => s.Id).ToList();
+                    var oohPOPList = new POPBLL().GetList(s => shopIdList.Contains(s.ShopId ?? 0) && (s.Sheet.ToLower() == "ooh" || s.Sheet == "户外") && (s.OOHInstallPrice ?? 0) > 0);
+                   
+                    shopList0.ForEach(shop =>
+                    {
+                        bool isBCSSubject = true;
+
+                        //基础安装费
+                        decimal basicInstallPrice = 0;
+                        //橱窗安装费
+                        decimal windowInstallPrice = 0;
+                        //OOH安装费
+                        decimal oohInstallPrice = 0;
+                        string materialSupport = string.Empty;
+                        string POSScale = string.Empty;
+                        List<string> materialSupportList = new List<string>();
+                        var oneShopOrderList = activityOrderList0.Where(s => s.order.ShopId == shop.Id).ToList();
+                        if (oneShopOrderList.Any())
+                        {
+                            oneShopOrderList.ForEach(s =>
+                            {
+                                if (!string.IsNullOrWhiteSpace(s.order.InstallPriceMaterialSupport) && !materialSupportList.Contains(s.order.InstallPriceMaterialSupport.ToLower()))
+                                {
+                                    materialSupportList.Add(s.order.InstallPriceMaterialSupport.ToLower());
+                                }
+                                if (string.IsNullOrWhiteSpace(POSScale) && !string.IsNullOrWhiteSpace(s.order.InstallPricePOSScale))
+                                    POSScale = s.order.InstallPricePOSScale;
+                                if (s.subject.CornerType != "三叶草")
+                                    isBCSSubject = false;
+                            });
+                            if (!materialSupportList.Any())
+                            {
+                                materialSupportList.Add("Basic");
+                            }
+                            bool isInstall = false;
+                            if (isBCSSubject)
+                            {
+                                if (!string.IsNullOrWhiteSpace(shop.BCSIsInstall))
+                                    isInstall = shop.BCSIsInstall == "Y";
+                                else
+                                    isInstall = shop.IsInstall == "Y";
+                            }
+                            else
+                            {
+                                isInstall = shop.IsInstall == "Y";
+                            }
+                            if (isInstall)
+                            {
+                                List<FinalOrderDetailTemp> oohOrderList = oneShopOrderList.Where(s => s.order.ShopId == shop.Id && s.order.Sheet != null && (s.order.Sheet.ToLower() == "ooh" || s.order.Sheet == "户外")).Select(s => s.order).ToList();
+                                List<FinalOrderDetailTemp> windowOrderList = oneShopOrderList.Where(s => s.order.ShopId == shop.Id && s.order.Sheet != null && (s.order.Sheet.ToLower().Contains("橱窗") || s.order.Sheet.ToLower().Contains("window"))).Select(s => s.order).ToList();
+
+                                
+
+                                #region 店内安装费
+                                materialSupportList.ForEach(ma =>
+                                {
+                                    decimal basicInstallPrice0 = GetBasicInstallPrice(ma);
+                                    if (basicInstallPrice0 > basicInstallPrice)
+                                    {
+                                        basicInstallPrice = basicInstallPrice0;
+                                        materialSupport = ma;
+                                    }
+                                });
+                                if (isBCSSubject)
+                                {
+                                    if ((shop.BCSInstallPrice ?? 0) > 0)
+                                    {
+                                        basicInstallPrice = (shop.BCSInstallPrice ?? 0);
+                                    }
+                                    else if (BCSInstallCityTierList.Contains(shop.CityTier.ToUpper()))
+                                    {
+                                        basicInstallPrice = bcsBasicInstallPrice;
+                                    }
+                                    else
+                                    {
+                                        basicInstallPrice = 0;
+                                    }
+                                }
+
+                                else if ((shop.BasicInstallPrice ?? 0) > 0)
+                                {
+                                    basicInstallPrice = (shop.BasicInstallPrice ?? 0);
+                                }
+                                #endregion
+                                #region 橱窗安装
+                                if (windowOrderList.Any())
+                                {
+                                    windowInstallPrice = GetWindowInstallPrice(materialSupport);
+                                }
+                                #endregion
+                                #region OOH安装费
+                                if (oohOrderList.Any())
+                                {
+
+                                    oohOrderList.ForEach(s =>
+                                    {
+                                        decimal price = 0;
+                                        if (!string.IsNullOrWhiteSpace(s.GraphicNo))
+                                        {
+                                            price = oohPOPList.Where(p => p.ShopId == shop.Id && p.GraphicNo.ToLower() == s.GraphicNo.ToLower()).Select(p => p.OOHInstallPrice ?? 0).FirstOrDefault();
+
+                                        }
+                                        else
+                                            price = oohPOPList.Where(p => p.ShopId == shop.Id && p.GraphicLength == s.GraphicLength && p.GraphicWidth == s.GraphicWidth).Select(p => p.OOHInstallPrice ?? 0).FirstOrDefault();
+
+                                        if (price > oohInstallPrice)
+                                        {
+                                            oohInstallPrice = price;
+                                        }
+                                    });
+                                }
+                                #endregion
+                                #region 保存
+                                if (basicInstallPrice > 0)
+                                {
+                                    InstallPriceTemp installPriceTempModel = installShopBll.GetList(i => i.GuidanceId == guidanceId && i.ShopId == shop.Id && (i.SubjectType == null || i.SubjectType == (int)InstallPriceSubjectTypeEnum.活动安装费)).FirstOrDefault();
+                                    if (installPriceTempModel == null)
+                                    {
+                                        installPriceTempModel = new InstallPriceTemp();
+                                        installPriceTempModel.GuidanceId = guidanceId;
+                                        installPriceTempModel.ShopId = shop.Id;
+                                        installPriceTempModel.BasicPrice = basicInstallPrice;
+                                        installPriceTempModel.OOHPrice = oohInstallPrice;
+                                        installPriceTempModel.WindowPrice = windowInstallPrice;
+                                        installPriceTempModel.TotalPrice = basicInstallPrice + oohInstallPrice + windowInstallPrice;
+                                        installPriceTempModel.SubjectType = (int)InstallPriceSubjectTypeEnum.活动安装费;
+                                        installPriceTempModel.AddDate = DateTime.Now;
+                                        installPriceTempBll.Add(installPriceTempModel);
+                                    }
+                                }
+
+                                #endregion
+                            }
+
+                        }
+
+                    });
+
+
+                    #endregion
+                }
+                if (genericOrderList.Any())
+                {
+                    #region 常规订单
+                    var genericOrderList0 = (from order in genericOrderList
+                                             join subject in subjectList
+                                             on order.SubjectId equals subject.Id
+                                             join shop in CurrentContext.DbContext.Shop
+                                             on order.ShopId equals shop.Id
+                                             select new { order, shop, subject }).ToList();
+                    
+                    List<Shop> shopList0 = genericOrderList0.Select(s => s.shop).Distinct().ToList();
+                    List<int> shopIdList = shopList0.Select(s => s.Id).ToList();
+                    var oohPOPList = new POPBLL().GetList(s => shopIdList.Contains(s.ShopId ?? 0) && (s.Sheet.ToLower() == "ooh" || s.Sheet == "户外") && (s.OOHInstallPrice ?? 0) > 0);
+                   
+                    shopList0.ForEach(shop =>
+                    {
+                        //基础安装费
+                        decimal basicInstallPrice = 0;
+                        //橱窗安装费
+                        decimal windowInstallPrice = 0;
+                        //OOH安装费
+                        decimal oohInstallPrice = 0;
+                        string materialSupport = string.Empty;
+                        string POSScale = string.Empty;
+                        List<string> materialSupportList = new List<string>();
+                        var oneShopOrderList = genericOrderList0.Where(s => s.order.ShopId == shop.Id).ToList();
+                        if (oneShopOrderList.Any())
+                        {
+                            oneShopOrderList.ForEach(s =>
+                            {
+                                if (!string.IsNullOrWhiteSpace(s.order.InstallPriceMaterialSupport) && !materialSupportList.Contains(s.order.InstallPriceMaterialSupport.ToLower()))
+                                {
+                                    materialSupportList.Add(s.order.InstallPriceMaterialSupport.ToLower());
+                                }
+                                if (string.IsNullOrWhiteSpace(POSScale) && !string.IsNullOrWhiteSpace(s.order.InstallPricePOSScale))
+                                    POSScale = s.order.InstallPricePOSScale;
+
+                            });
+                            if (!materialSupportList.Any())
+                            {
+                                materialSupportList.Add("generic");
+                            }
+                            bool isInstall = false;
+                            if (shop.RegionName != null && shop.RegionName.ToLower() == "west")
+                            {
+                                isInstall = shop.IsInstall == "Y";
+                            }
+                            else if (cityCierList.Contains(shop.CityTier))
+                            {
+                                isInstall = true;
+                            }
+                            if (isInstall)
+                            {
+                                List<FinalOrderDetailTemp> oohOrderList = oneShopOrderList.Where(s => s.order.ShopId == shop.Id && s.order.Sheet != null && (s.order.Sheet.ToLower() == "ooh" || s.order.Sheet == "户外")).Select(s => s.order).ToList();
+                               
+                               
+                                #region 店内安装费
+                                materialSupportList.ForEach(ma =>
+                                {
+                                    decimal basicInstallPrice0 = GetBasicInstallPrice(ma);
+                                    if (basicInstallPrice0 > basicInstallPrice)
+                                    {
+                                        basicInstallPrice = basicInstallPrice0;
+                                        materialSupport = ma;
+                                    }
+                                });
+                                if ((shop.GenericInstallPrice ?? 0) > 0)
+                                {
+                                    basicInstallPrice = (shop.GenericInstallPrice ?? 0);
+                                }
+                                if (basicInstallPrice == 0)
+                                {
+                                    basicInstallPrice = 150;
+                                }
+
+                                #endregion
+                                #region 橱窗安装
+                                //if (windowOrderList.Any())
+                                //{
+                                //    windowInstallPrice = GetWindowInstallPrice(materialSupport);
+                                //}
+                                #endregion
+                                #region OOH安装费
+                                if (oohOrderList.Any())
+                                {
+
+                                    oohOrderList.ForEach(s =>
+                                    {
+                                        decimal price = 0;
+                                        if (!string.IsNullOrWhiteSpace(s.GraphicNo))
+                                        {
+                                            price = oohPOPList.Where(p => p.ShopId == shop.Id && p.GraphicNo.ToLower() == s.GraphicNo.ToLower()).Select(p => p.OOHInstallPrice ?? 0).FirstOrDefault();
+
+                                        }
+                                        else
+                                            price = oohPOPList.Where(p => p.ShopId == shop.Id && p.GraphicLength == s.GraphicLength && p.GraphicWidth == s.GraphicWidth).Select(p => p.OOHInstallPrice ?? 0).FirstOrDefault();
+
+                                        if (price > oohInstallPrice)
+                                        {
+                                            oohInstallPrice = price;
+                                        }
+                                    });
+                                }
+                                #endregion
+                                #region 保存
+                                if (basicInstallPrice > 0)
+                                {
+                                    InstallPriceTemp installPriceTempModel = installShopBll.GetList(i => i.GuidanceId == guidanceId && i.ShopId == shop.Id && (i.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费)).FirstOrDefault();
+                                    if (installPriceTempModel == null)
+                                    {
+                                        installPriceTempModel = new InstallPriceTemp();
+                                        installPriceTempModel.GuidanceId = guidanceId;
+                                        installPriceTempModel.ShopId = shop.Id;
+                                        installPriceTempModel.BasicPrice = basicInstallPrice;
+                                        installPriceTempModel.OOHPrice = oohInstallPrice;
+                                        installPriceTempModel.WindowPrice = windowInstallPrice;
+                                        installPriceTempModel.TotalPrice = basicInstallPrice + oohInstallPrice;
+                                        installPriceTempModel.SubjectType = (int)InstallPriceSubjectTypeEnum.常规安装费;
+                                        installPriceTempModel.AddDate = DateTime.Now;
+                                        installPriceTempBll.Add(installPriceTempModel);
+                                    }
+                                }
+
+                                #endregion
+                            }
+
+                        }
+                    });
+
+                    #endregion
+                }
             }
 
 
@@ -3064,10 +3487,11 @@ namespace WebApp
                 orderList = new FinalOrderDetailTempBLL().GetList(s => s.SubjectId == subjectId && (s.RegionSupplementId ?? 0) == 0 && (s.IsDelete == null || s.IsDelete == false) && (s.OrderType == (int)OrderTypeEnum.POP || s.OrderType == (int)OrderTypeEnum.道具));
             }
             int installSubjectId = 0;
+            List<FinalOrderDetailTemp> windowOrderList = new List<FinalOrderDetailTemp>();
             if (orderList.Any())
             {
-                installSubjectId = orderList[0].SubjectId ?? 0;
-                var windowOrderList = orderList.Where(s => s.Sheet != null && (s.Sheet.Contains("橱窗") || s.Sheet.Contains("窗贴")) && s.GraphicLength > 1 && s.GraphicWidth > 1 && s.GraphicMaterial != null && s.GraphicMaterial.Contains("全透贴") && s.IsInstall == "Y").ToList();
+
+                windowOrderList = orderList.Where(s => s.Sheet != null && (s.Sheet.Contains("橱窗") || s.Sheet.Contains("窗贴")) && s.GraphicLength > 1 && s.GraphicWidth > 1 && s.GraphicMaterial != null && s.IsInstall == "Y").ToList();
                 if (windowOrderList.Any())
                 {
                     windowShopIdList = windowOrderList.Select(s => s.ShopId ?? 0).Distinct().ToList();
@@ -3112,13 +3536,18 @@ namespace WebApp
             }
             if (windowShopIdList.Any())
             {
-
+                
 
                 InstallPriceShopInfoBLL InstallPriceShopInfoBll = new InstallPriceShopInfoBLL();
                 InstallPriceShopInfo installPriceShopInfoModel;
                 expressPriceBll.Delete(s => windowShopIdList.Contains(s.ShopId ?? 0) && s.GuidanceId == guidanceId);
                 windowShopIdList.ForEach(s =>
                 {
+                    var model1=windowOrderList.FirstOrDefault(order => order.ShopId==s);
+                    if (model1 != null)
+                    {
+                        installSubjectId = model1.SubjectId ?? 0;
+                    }
                     installPriceTempModel = installPriceTempBll.GetList(i => i.ShopId == s && i.GuidanceId == guidanceId).FirstOrDefault();
                     if (installPriceTempModel == null)
                     {
@@ -7153,7 +7582,7 @@ namespace WebApp
                     orderList.ForEach(order =>
                     {
 
-                        string basicGraphicMaterial = this.GetBasicMaterialByOrderMaterial(order.GraphicMaterial);
+                        string basicGraphicMaterial = this.GetBasicMaterialByOrderMaterial(guidanceModel.CustomerId??0,order.GraphicMaterial);
 
                         if (basicGraphicMaterial == "阿迪磁贴")
                         {
@@ -7526,7 +7955,7 @@ namespace WebApp
                                     else
                                         quoteOrderModel.QuoteGraphicMaterial = GraphicMaterial;
                                 }
-                                
+
 
                             }
 
@@ -7762,31 +8191,32 @@ namespace WebApp
         /// 根据订单材质获取基础材质名称
         /// </summary>
         Dictionary<string, string> basicMaterialDic = new Dictionary<string, string>();
-        protected string GetBasicMaterialByOrderMaterial(string materialName)
-        { 
-           string result = string.Empty;
-           if (!string.IsNullOrWhiteSpace(materialName))
-           {
-               materialName = materialName.ToLower();
-               if (basicMaterialDic.Keys.Contains(materialName))
-               {
-                   result = basicMaterialDic[materialName];
-               }
-               else
-               {
-                   var model = (from mapping in CurrentContext.DbContext.OrderMaterialMpping
-                                join basicMaterial in CurrentContext.DbContext.BasicMaterial
-                                on mapping.BasicMaterialId equals basicMaterial.Id
-                                where mapping.OrderMaterialName.ToLower() == materialName
-                                select basicMaterial).FirstOrDefault();
-                   if (model != null)
-                   {
-                       result = model.MaterialName;
-                       basicMaterialDic.Add(materialName, result);
-                   }
-               }
-           }
-           return result;
+        protected string GetBasicMaterialByOrderMaterial(int customerId,string materialName)
+        {
+            string result = string.Empty;
+            if (!string.IsNullOrWhiteSpace(materialName))
+            {
+                materialName = materialName.ToLower();
+                if (basicMaterialDic.Keys.Contains(materialName))
+                {
+                    result = basicMaterialDic[materialName];
+                }
+                else
+                {
+                    var model = (from mapping in CurrentContext.DbContext.OrderMaterialMpping
+                                 join basicMaterial in CurrentContext.DbContext.BasicMaterial
+                                 on mapping.BasicMaterialId equals basicMaterial.Id
+                                 where mapping.OrderMaterialName.ToLower() == materialName
+                                 && mapping.CustomerId == customerId
+                                 select basicMaterial).FirstOrDefault();
+                    if (model != null)
+                    {
+                        result = model.MaterialName;
+                        basicMaterialDic.Add(materialName, result);
+                    }
+                }
+            }
+            return result;
         }
 
         /// <summary>
@@ -7809,11 +8239,12 @@ namespace WebApp
                     if (!string.IsNullOrWhiteSpace(s.QuoteGraphicMaterial))
                     {
                         MaterialClass mc = new MaterialClass();
-                        if (s.UnitName == "平米")
+                        string unitname = !string.IsNullOrWhiteSpace(s.UnitName) ? s.UnitName : "平米";
+                        if (unitname == "平米")
                         {
                             mc.Area = (width * length) / 1000000 * Quantity;
                         }
-                        else if (s.UnitName == "米")
+                        else if (unitname == "米")
                         {
                             mc.Area = (width / 1000) * 2 * Quantity;
                         }
@@ -7823,7 +8254,7 @@ namespace WebApp
                         }
                         mc.MaterialName = s.QuoteGraphicMaterial;
                         mc.UnitPrice = s.UnitPrice ?? 0;
-                        mc.UnitName = s.UnitName;
+                        //mc.UnitName = unitname;
                         materialList.Add(mc);
                     }
                 });
@@ -7832,7 +8263,7 @@ namespace WebApp
                              {
                                  material.MaterialName,
                                  material.UnitPrice,
-                                 material.UnitName
+                                 //material.UnitName
                              }
                                  into g
                                  select new
@@ -7840,7 +8271,7 @@ namespace WebApp
                                      GraphicMaterial = g.Key.MaterialName,
                                      Area = g.Sum(s => s.Area > 0 ? s.Area : 0),
                                      UnitPrice = g.Key.UnitPrice,
-                                     UnitName = g.Key.UnitName
+                                     //UnitName = g.Key.UnitName
                                  }).ToList();
                 if (list0.Any())
                 {
@@ -7851,7 +8282,7 @@ namespace WebApp
                         model.Amount = s.Area;
                         model.QuoteGraphicMaterial = s.GraphicMaterial;
                         model.UnitPrice = s.UnitPrice;
-                        model.UnitName = s.UnitName;
+                        //model.UnitName = s.UnitName;
                         if (!string.IsNullOrWhiteSpace(sheet))
                         {
                             model.Sheet = sheet;
@@ -7904,7 +8335,7 @@ namespace WebApp
                         }
                         mc.MaterialName = s.QuoteGraphicMaterial;
                         mc.UnitPrice = s.UnitPrice ?? 0;
-                        mc.UnitName = s.UnitName;
+                        //mc.UnitName = s.UnitName;
                         materialList.Add(mc);
                     }
                 });
@@ -7913,7 +8344,7 @@ namespace WebApp
                              {
                                  material.MaterialName,
                                  material.UnitPrice,
-                                 material.UnitName
+                                 //material.UnitName
                              }
                                  into g
                                  select new
@@ -7921,7 +8352,7 @@ namespace WebApp
                                      GraphicMaterial = g.Key.MaterialName,
                                      Area = g.Sum(s => s.Area > 0 ? s.Area : 0),
                                      UnitPrice = g.Key.UnitPrice,
-                                     UnitName = g.Key.UnitName
+                                     //UnitName = g.Key.UnitName
                                  }).ToList();
                 if (list0.Any())
                 {
@@ -7932,7 +8363,7 @@ namespace WebApp
                         model.Amount = s.Area;
                         model.QuoteGraphicMaterial = s.GraphicMaterial;
                         model.UnitPrice = s.UnitPrice;
-                        model.UnitName = s.UnitName;
+                        //model.UnitName = s.UnitName;
                         if (!string.IsNullOrWhiteSpace(sheet))
                         {
                             model.Sheet = sheet;
@@ -7958,7 +8389,7 @@ namespace WebApp
         /// <param name="repeater"></param>
         /// <param name="combineTDNameList"></param>
         /// <param name="allValIsSame">所有单元格的值一样才合并</param>
-        protected void CombineCell(Repeater repeater, List<string> combineTDNameList,bool? allValIsSame=null)
+        protected void CombineCell(Repeater repeater, List<string> combineTDNameList, bool? allValIsSame = null)
         {
             if (allValIsSame ?? false)
             {
@@ -8029,7 +8460,7 @@ namespace WebApp
                     {
                         string firstTD = item.Key;
                         Dictionary<string, bool> otherTdListDic = item.Value;
-                        
+
                         Dictionary<Dictionary<HtmlTableCell, HtmlTableCell>, bool> otherCellDic = new Dictionary<Dictionary<HtmlTableCell, HtmlTableCell>, bool>();
                         if (otherTdListDic.Keys.Any())
                         {
@@ -8201,6 +8632,7 @@ namespace WebApp
                                 }).FirstOrDefault();
             if (subjectModel != null)
             {
+                int customerId = subjectModel.subject.CompanyId ?? 0;
                 //保存外协订单
                 int guidanceType = subjectModel.gudiance.ActivityTypeId ?? 0;
                 int guidanceId = subjectModel.gudiance.ItemId;
@@ -8219,7 +8651,7 @@ namespace WebApp
                     orderList0 = OrderDetailTempBll.GetList(s => s.RegionSupplementId == subjectId && (s.IsDelete == null || s.IsDelete == false) && (s.IsValid == null || s.IsValid == true) && (s.ShopStatus == null || s.ShopStatus == "" || s.ShopStatus == ShopStatusEnum.正常.ToString()) && ((s.OrderType == (int)OrderTypeEnum.POP && s.GraphicLength > 1 && s.GraphicWidth > 1) || (s.OrderType > 1)) && (s.OrderType != (int)OrderTypeEnum.物料));
                     //删除旧POP订单数据
                     //outsourceOrderDetailBll.Delete(s => s.RegionSupplementId == subjectId);
-                    outsourceOrderDetailBll.DeleteByOrderType(subjectId,1);
+                    outsourceOrderDetailBll.DeleteByOrderType(subjectId, 1);
                 }
                 else
                 {
@@ -8237,6 +8669,7 @@ namespace WebApp
                         isProductInNorth = true;
                     }
 
+                    List<OutsourceInstallPriceLevel> outsourceInstallPriceLevelList = new OutsourceInstallPriceLevelBLL().GetList(s => s.CustomerId == customerId);
 
                     List<ExpressPriceConfig> expressPriceConfigList = new ExpressPriceConfigBLL().GetList(s => s.Id > 0);
                     ExpressPriceDetailBLL expressPriceDetailBll = new ExpressPriceDetailBLL();
@@ -8299,11 +8732,11 @@ namespace WebApp
                     //删除安装费和发货费
                     //outsourceOrderDetailBll.Delete(s => s.GuidanceId == subjectModel.gudiance.ItemId && shopIdList.Contains(s.ShopId ?? 0) && s.SubjectId == 0 && (s.InstallPriceAddType ?? 1) == 1);
                     string shopIdStr = StringHelper.ListToString(shopIdList);
-                    
-                    List<int> orderTypeList=new List<int>(){(int)OrderTypeEnum.安装费,(int)OrderTypeEnum.发货费};
-                    string delorderType=StringHelper.ListToString(orderTypeList);
+
+                    List<int> orderTypeList = new List<int>() { (int)OrderTypeEnum.安装费, (int)OrderTypeEnum.发货费 };
+                    string delorderType = StringHelper.ListToString(orderTypeList);
                     outsourceOrderDetailBll.DeleteOutsourceActivityOrderPrice(subjectModel.gudiance.ItemId, shopIdStr, delorderType);
-                    
+
                     //var assignedList = outsourceOrderDetailBll.GetList(s => s.GuidanceId == subjectModel.gudiance.ItemId && s.SubjectId > 0);
                     var assignedList = (from order in CurrentContext.DbContext.OutsourceOrderDetail
                                         join subject in CurrentContext.DbContext.Subject
@@ -8322,9 +8755,13 @@ namespace WebApp
                         int mainOutsourceId = shop.OutsourceId ?? 0;
                         //生产外协
                         int produceOutsourceId = shop.ProductOutsourceId ?? 0;
-                        
+
                         bool isInstallShop = shop.IsInstall == "Y";
-                        bool isBCSInstallShop = shop.BCSIsInstall == "Y";//三叶草是否安装
+                        bool isBCSInstallShop = false;//三叶草是否安装
+                        if (!string.IsNullOrWhiteSpace(shop.BCSIsInstall))
+                            isBCSInstallShop = shop.BCSIsInstall == "Y";
+                        else
+                            isBCSInstallShop = shop.IsInstall == "Y";
                         //if (shop.Id == 709)
                         //{
                         //int iddd = 0;
@@ -8409,16 +8846,18 @@ namespace WebApp
                                 else
                                 {
                                     isContainsNotGeneric = true;
-                                    if (isBCSInstallShop && !isInstallShop)
-                                    {
-                                        if (order.subject.CornerType == "三叶草")
-                                            isBCSSubject = true;
-                                    }
-                                    else
-                                    {
-                                        if (order.subject.CornerType != "三叶草")
-                                            isBCSSubject = false;
-                                    }
+                                    //if (isBCSInstallShop && !isInstallShop)
+                                    //{
+                                    //    if (order.subject.CornerType == "三叶草")
+                                    //        isBCSSubject = true;
+                                    //}
+                                    //else
+                                    //{
+                                    //    if (order.subject.CornerType != "三叶草")
+                                    //        isBCSSubject = false;
+                                    //}
+                                    if (order.subject.CornerType != "三叶草")
+                                        isBCSSubject = false;
                                 }
                                 if (!string.IsNullOrWhiteSpace(order.order.InstallPriceMaterialSupport) && !materialSupportList.Contains(order.order.InstallPriceMaterialSupport.ToLower()))
                                 {
@@ -8439,8 +8878,10 @@ namespace WebApp
                                 {
                                     if (isBCSSubject)
                                     {
-                                        assignType = shop.BCSIsInstall == "Y" ? (int)OutsourceOrderTypeEnum.Install : (int)OutsourceOrderTypeEnum.Send;
-                                        isInstallShop = shop.BCSIsInstall == "Y";
+                                        //assignType = shop.BCSIsInstall == "Y" ? (int)OutsourceOrderTypeEnum.Install : (int)OutsourceOrderTypeEnum.Send;
+                                        //isInstallShop = shop.BCSIsInstall == "Y";
+                                        assignType = isBCSInstallShop ? (int)OutsourceOrderTypeEnum.Install : (int)OutsourceOrderTypeEnum.Send;
+                                        isInstallShop = isBCSInstallShop;
                                     }
                                     else
                                     {
@@ -8468,10 +8909,20 @@ namespace WebApp
                                 var materialConfig = configList.Where(s => s.ConfigTypeId == (int)OutsourceOrderConfigType.Material).ToList();
                                 if (materialConfig.Any())
                                 {
-
+                                    OutsourceOrderPlaceConfigBLL placeConfigBll = new OutsourceOrderPlaceConfigBLL();
+                                    RegionBLL regionBll = new RegionBLL();
+                                    List<Region> regionList = regionBll.GetList(s=>s.IsDelete==null || s.IsDelete==false);
                                     materialConfig.ForEach(config =>
                                     {
-                                        OutsourceOrderPlaceConfigBLL placeConfigBll = new OutsourceOrderPlaceConfigBLL();
+                                        string configRegion = string.Empty;
+                                        if (config.Region != null)
+                                        {
+                                            Region regionModel = regionList.FirstOrDefault(r => r.Id == (config.Region??0));
+                                            if (regionModel != null)
+                                            {
+                                                configRegion = regionModel.RegionName.ToLower();
+                                            }
+                                        }
                                         if (!string.IsNullOrWhiteSpace(config.MaterialName))
                                         {
                                             List<string> MaterialNameList = StringHelper.ToStringList(config.MaterialName, ',', LowerUpperEnum.ToLower);
@@ -8511,8 +8962,10 @@ namespace WebApp
                                                     }
                                                 }
                                             }
-
-
+                                            if (!string.IsNullOrWhiteSpace(configRegion))
+                                            {
+                                                orderList = orderList.Where(order => order.order.Region != null && order.order.Region.ToLower() == configRegion).ToList();
+                                            }
 
                                             List<int> cityIdList = new List<int>();
 
@@ -8671,7 +9124,7 @@ namespace WebApp
                                 {
                                     orderList1.ForEach(s =>
                                     {
-                                       
+
                                         int Quantity = s.order.Quantity ?? 1;
                                         if (!string.IsNullOrWhiteSpace(s.order.Sheet) && ChangePOPCountSheetList.Any() && ChangePOPCountSheetList.Contains(s.order.Sheet.ToUpper()))
                                         {
@@ -8766,7 +9219,7 @@ namespace WebApp
                                                 outsourceOrderDetailModel.CSUserId = s.order.CSUserId;
                                                 outsourceOrderDetailModel.OutsourceId = calerOutsourceId;//北京卡乐
                                                 outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
-                                                if (guidanceType == (int)GuidanceTypeEnum.Promotion && s.order.Sheet != null && (s.order.Sheet.Contains("橱窗") || s.order.Sheet.Contains("窗贴")) && s.order.GraphicLength > 1 && s.order.GraphicWidth > 1 && material0.Contains("全透贴"))
+                                                if (guidanceType == (int)GuidanceTypeEnum.Promotion && s.order.Sheet != null && (s.order.Sheet.Contains("橱窗") || s.order.Sheet.Contains("窗贴")) && s.order.GraphicLength > 1 && s.order.GraphicWidth > 1)
                                                 {
 
                                                     promotionInstallPrice = 150;
@@ -8932,8 +9385,8 @@ namespace WebApp
                                                         pop.GraphicWidth = s.order.GraphicWidth;
                                                         pop.Quantity = Quantity;
                                                         pop.CustomerId = subjectModel.subject.CustomerId;
-                                                        //pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
-                                                        pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                        pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                                        //pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
                                                         pop.OutsourceId = mainOutsourceId;
                                                         new BasePage().GetOutsourceOrderMaterialPrice(pop, out unitPrice1, out totalPrice1);
                                                         outsourceOrderDetailModel.UnitPrice = unitPrice1;
@@ -9026,16 +9479,16 @@ namespace WebApp
                                                         pop.Quantity = Quantity;
                                                         pop.CustomerId = subjectModel.subject.CustomerId;
                                                         pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
-                                                        if ((s.order.ProduceOutsourceId ?? 0) > 0)
-                                                        {
-                                                            if (s.order.ProduceOutsourceId == mainOutsourceId)
-                                                                pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
-                                                        }
-                                                        else if (produceOutsourceId > 0)
-                                                        {
-                                                            if (produceOutsourceId == mainOutsourceId)
-                                                                pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
-                                                        }
+                                                        //if ((s.order.ProduceOutsourceId ?? 0) > 0)
+                                                        //{
+                                                        //    if (s.order.ProduceOutsourceId == mainOutsourceId)
+                                                        //        pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                        //}
+                                                        //else if (produceOutsourceId > 0)
+                                                        //{
+                                                        //    if (produceOutsourceId == mainOutsourceId)
+                                                        //        pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                        //}
 
                                                         if ((s.order.ProduceOutsourceId ?? 0) > 0)
                                                             pop.OutsourceId = s.order.ProduceOutsourceId;
@@ -9167,24 +9620,25 @@ namespace WebApp
                                                 }
                                                 else if (guidanceType == (int)GuidanceTypeEnum.Delivery)
                                                     pop.OutsourceType = (int)OutsourceOrderTypeEnum.Send;
-                                                else if (assignType == (int)OutsourceOrderTypeEnum.Install)
-                                                {
-                                                    if ((s.order.ProduceOutsourceId ?? 0) > 0)
-                                                    {
-                                                        if (s.order.ProduceOutsourceId == mainOutsourceId)
-                                                            pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
-                                                        else
-                                                            pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
-                                                    }
-                                                    else if (produceOutsourceId > 0)
-                                                    {
-                                                        if (produceOutsourceId == mainOutsourceId)
-                                                            pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
-                                                        else
-                                                            pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
-                                                    }
+                                                //else if (assignType == (int)OutsourceOrderTypeEnum.Install)
+                                                //{
+                                                    //pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                                    //if ((s.order.ProduceOutsourceId ?? 0) > 0)
+                                                    //{
+                                                    //    if (s.order.ProduceOutsourceId == mainOutsourceId)
+                                                    //        pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                    //    else
+                                                    //        pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                                    //}
+                                                    //else if (produceOutsourceId > 0)
+                                                    //{
+                                                    //    if (produceOutsourceId == mainOutsourceId)
+                                                    //        pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                                    //    else
+                                                    //        pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                                    //}
 
-                                                }
+                                                //}
                                                 pop.OutsourceId = mainOutsourceId;
                                                 if ((s.order.ProduceOutsourceId ?? 0) > 0)
                                                 {
@@ -9236,16 +9690,17 @@ namespace WebApp
                                                 if (s.order.OrderType == (int)OrderTypeEnum.安装费 || s.order.OrderType == (int)OrderTypeEnum.测量费 || s.order.OrderType == (int)OrderTypeEnum.其他费用)
                                                 {
 
-                                                    if (!string.IsNullOrWhiteSpace(s.order.Region) && (s.order.Region.ToLower() == "east" || s.order.Region.ToLower() == "south"))
-                                                    {
-                                                        outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
-                                                        outsourceOrderDetailModel.PayOrderPrice = 0;
-                                                    }
-                                                    else
-                                                    {
-                                                        outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
-                                                    }
-                                                    
+                                                    //if (!string.IsNullOrWhiteSpace(s.order.Region) && (s.order.Region.ToLower() == "east" || s.order.Region.ToLower() == "south"))
+                                                    //{
+                                                    //    outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
+                                                    //    outsourceOrderDetailModel.PayOrderPrice = 0;
+                                                    //}
+                                                    //else
+                                                    //{
+                                                    //    outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
+                                                    //}
+                                                    outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
+
                                                 }
                                                 if (s.order.OrderType == (int)OrderTypeEnum.发货费)
                                                 {
@@ -9268,7 +9723,7 @@ namespace WebApp
                                             if (guidanceType == (int)GuidanceTypeEnum.Promotion || guidanceType == (int)GuidanceTypeEnum.Delivery)
                                             {
                                                 outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
-                                                if (guidanceType == (int)GuidanceTypeEnum.Promotion && s.order.Sheet != null && (s.order.Sheet.Contains("橱窗") || s.order.Sheet.Contains("窗贴")) && s.order.GraphicLength > 1 && s.order.GraphicWidth > 1 && material0.Contains("全透贴"))
+                                                if (guidanceType == (int)GuidanceTypeEnum.Promotion && s.order.Sheet != null && (s.order.Sheet.Contains("橱窗") || s.order.Sheet.Contains("窗贴")) && s.order.GraphicLength > 1 && s.order.GraphicWidth > 1)
                                                 {
                                                     outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
                                                     promotionInstallPrice = 150;
@@ -9372,25 +9827,25 @@ namespace WebApp
                                         pop.OutsourceType = assignType;
                                         if (guidanceType == (int)GuidanceTypeEnum.Promotion || guidanceType == (int)GuidanceTypeEnum.Delivery)
                                             pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
-                                        else if (assignType == (int)OutsourceOrderTypeEnum.Install)
-                                        {
-                                            if ((s.ProduceOutsourceId ?? 0) > 0)
-                                            {
-                                                if (s.ProduceOutsourceId == mainOutsourceId)
-                                                    pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
-                                                else
-                                                    pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
-                                            }
-                                            else if (produceOutsourceId > 0)
-                                            {
-                                                if (produceOutsourceId == mainOutsourceId)
-                                                    pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
-                                                else
-                                                    pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
-                                            }
-                                            else
-                                                pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
-                                        }
+                                        //else if (assignType == (int)OutsourceOrderTypeEnum.Install)
+                                        //{
+                                        //    if ((s.ProduceOutsourceId ?? 0) > 0)
+                                        //    {
+                                        //        if (s.ProduceOutsourceId == mainOutsourceId)
+                                        //            pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                        //        else
+                                        //            pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                        //    }
+                                        //    else if (produceOutsourceId > 0)
+                                        //    {
+                                        //        if (produceOutsourceId == mainOutsourceId)
+                                        //            pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                        //        else
+                                        //            pop.OutsourceType = (int)OutsourceOrderTypeEnum.Install;
+                                        //    }
+                                        //    else
+                                        //        pop.OutsourceType = (int)OutsourceOrderTypeEnum.InstallAndProduce;
+                                        //}
                                         pop.OutsourceId = mainOutsourceId;
                                         if ((s.ProduceOutsourceId ?? 0) > 0)
                                         {
@@ -9454,7 +9909,7 @@ namespace WebApp
                                     {
 
                                         outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Send;
-                                        if (guidanceType == (int)GuidanceTypeEnum.Promotion && s.Sheet != null && (s.Sheet.Contains("橱窗") || s.Sheet.Contains("窗贴")) && s.GraphicLength > 1 && s.GraphicWidth > 1 && s.GraphicMaterial.Contains("全透贴"))
+                                        if (guidanceType == (int)GuidanceTypeEnum.Promotion && s.Sheet != null && (s.Sheet.Contains("橱窗") || s.Sheet.Contains("窗贴")) && s.GraphicLength > 1 && s.GraphicWidth > 1)
                                         {
 
                                             outsourceOrderDetailModel.AssignType = (int)OutsourceOrderTypeEnum.Install;
@@ -9518,7 +9973,27 @@ namespace WebApp
 
                                     materialSupportList.ForEach(ma =>
                                     {
-                                        decimal basicInstallPrice0 = new BasePage().GetOutsourceBasicInstallPrice(ma);
+
+                                        decimal basicInstallPrice0 = 0;
+                                        //指定区域安装费级别设置
+                                        var levelList = outsourceInstallPriceLevelList.Where(level => level.ProvinceId == shop.ProvinceId && level.MaterialSupport.ToLower() == ma).ToList();
+                                        if (levelList.Any())
+                                        {
+                                            var cityLevelList = levelList.Where(level => level.CityId == shop.CityId).ToList();
+                                            if (cityLevelList.Any())
+                                            {
+                                                basicInstallPrice0 = cityLevelList[0].BasicInstallPrice ?? 0;
+                                            }
+                                            else
+                                            {
+                                                basicInstallPrice0 = levelList[0].BasicInstallPrice ?? 0;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            //统一级别设置安装费
+                                            basicInstallPrice0 = new BasePage().GetOutsourceBasicInstallPrice(ma);
+                                        }
                                         if (basicInstallPrice0 > basicInstallPrice)
                                         {
                                             basicInstallPrice = basicInstallPrice0;
@@ -9757,7 +10232,7 @@ namespace WebApp
                                     outsourceOrderDetailModel.BCSIsInstall = oneShopOrderList[0].BCSIsInstall;
                                     outsourceOrderDetailModel.LocationType = oneShopOrderList[0].LocationType;
                                     outsourceOrderDetailModel.MachineFrame = string.Empty;
-                                    outsourceOrderDetailModel.MaterialSupport = materialSupport;
+                                    outsourceOrderDetailModel.MaterialSupport = "generic";
                                     outsourceOrderDetailModel.OrderGender = string.Empty;
                                     outsourceOrderDetailModel.OrderType = (int)OrderTypeEnum.安装费;
                                     outsourceOrderDetailModel.POPAddress = shop.POPAddress;
@@ -9922,10 +10397,11 @@ namespace WebApp
                         join region in CurrentContext.DbContext.Region
                         on company.RegionId equals region.Id
                         where company.IsDelete == null || company.IsDelete == false
-                        select region).Distinct().OrderBy(s=>s.Id).ToList();
+                        select region).Distinct().OrderBy(s => s.Id).ToList();
             if (list.Any())
             {
-                list.ForEach(s => {
+                list.ForEach(s =>
+                {
                     ListItem li = new ListItem();
                     li.Value = s.Id.ToString();
                     li.Text = s.RegionName;

@@ -215,7 +215,7 @@ namespace WebApp.Subjects.InstallPrice
         List<Subject> subjectList = new List<Subject>();
 
         FinalOrderDetailTempBLL orderBll = new FinalOrderDetailTempBLL();
-        protected void gv_RowDataBound(object sender, GridViewRowEventArgs e)
+        protected void gv_RowDataBound1(object sender, GridViewRowEventArgs e)
         {
             if (e.Row.RowIndex != -1)
             {
@@ -240,15 +240,7 @@ namespace WebApp.Subjects.InstallPrice
                     try
                     {
                         orderListSave = RedisHelper.Get<List<FinalOrderDetailTemp>>(redisOrderKey);
-                        //orderListSave = (from order in CurrentContext.DbContext.FinalOrderDetailTemp
-                        //                 join subject in CurrentContext.DbContext.Subject
-                        //                 on order.SubjectId equals subject.Id
-                        //                 where (order.IsDelete == null || order.IsDelete == false)
-                        //                 && (subject.IsDelete == null || subject.IsDelete == false)
-                        //                 && subject.ApproveState == 1
-                        //                 && order.GuidanceId == Id
-                        //                 && order.OrderType == (int)OrderTypeEnum.POP
-                        //                 select order).ToList();
+                       
                     }
                     catch (Exception ex)
                     {
@@ -275,7 +267,7 @@ namespace WebApp.Subjects.InstallPrice
                                                     select new { order, subjectCategory }).ToList();
 
 
-                        //东区的户外店不自动算安装费，手动下安装费
+                        //东区和南区不自动算安装费，手动下安装费
                         List<int> terrexIdList = installShopOrderList.Where(s => s.order.Region != null && (s.order.Region.ToLower().Contains("east") || s.order.Region.ToLower().Contains("south"))).Select(s => s.order.Id).ToList();
                         installShopOrderList = installShopOrderList.Where(s => !terrexIdList.Contains(s.order.Id)).ToList();
 
@@ -331,6 +323,84 @@ namespace WebApp.Subjects.InstallPrice
 
             }
         }
+
+        protected void gv_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowIndex != -1)
+            {
+                object item = e.Row.DataItem;
+                if (item != null)
+                {
+                    object IdObj = item.GetType().GetProperty("ItemId").GetValue(item, null);
+                    int Id = IdObj != null ? int.Parse(IdObj.ToString()) : 0;
+                    object typeIdObj = item.GetType().GetProperty("ActivityTypeId").GetValue(item, null);
+                    int typeId = typeIdObj != null ? int.Parse(typeIdObj.ToString()) : 1;
+
+                    Label labActivityName = (Label)e.Row.FindControl("labActivityName");
+                    labActivityName.Text = CommonMethod.GetEnumDescription<GuidanceTypeEnum>(typeId.ToString());
+                    Label labInstallShopCount = (Label)e.Row.FindControl("labInstallShopCount");
+                    Label labFinishCount = (Label)e.Row.FindControl("labFinishCount");
+
+                    List<int> myInstallShopIdList = new List<int>();
+
+                    string redisOrderKey = "InstallPriceOrderList" + Id;
+                    List<FinalOrderDetailTemp> orderListSave = null;
+                    bool isError = false;
+                    try
+                    {
+                        orderListSave = RedisHelper.Get<List<FinalOrderDetailTemp>>(redisOrderKey);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        isError = true;
+                    }
+                    if (!isError && orderListSave == null)
+                    {
+                        new DelegateClass().UpdateInstallOrderRedisDataByGuidanceId(Id);
+                    }
+                    if (orderListSave != null)
+                    {
+
+                        orderListSave = orderListSave.Where(s => ((s.IsInstall != null && s.IsInstall.ToUpper() == "Y") || (s.BCSIsInstall != null && s.BCSIsInstall.ToUpper() == "Y")) && s.OrderType == (int)OrderTypeEnum.POP).ToList();
+                        //东区和南区不自动算安装费，手动下安装费
+                        List<int> terrexIdList = orderListSave.Where(s => s.Region != null && (s.Region.ToLower().Contains("east") || s.Region.ToLower().Contains("south"))).Select(s => s.Id).ToList();
+                        orderListSave = orderListSave.Where(s => !terrexIdList.Contains(s.Id)).ToList();
+
+
+                        myInstallShopIdList = orderListSave.Select(s => s.ShopId ?? 0).Distinct().ToList();
+                        labInstallShopCount.Text = myInstallShopIdList.Count.ToString();
+
+                        //已提交的店铺
+                        List<int> installPriceShopInfoShopIdList = InstallPriceShopInfoBll.GetList(s => s.GuidanceId == Id && (s.AddType == null || s.AddType == 1)).Select(s=>s.ShopId??0).Distinct().ToList();
+                        //List<int> genericAssginShopIdList = new List<int>();
+                        //List<int> activityAssginShopIdList = new List<int>();
+                        //if (installPriceShopInfoList.Any())
+                        //{
+                        //    activityAssginShopIdList = installPriceShopInfoList.Where(s => s.SubjectType == null || s.SubjectType == (int)InstallPriceSubjectTypeEnum.活动安装费).Select(s => s.ShopId ?? 0).Distinct().ToList();
+
+                        //    genericAssginShopIdList = installPriceShopInfoList.Where(s => s.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费).Select(s => s.ShopId ?? 0).Distinct().ToList();
+
+                        //}
+
+                        labFinishCount.Text = installPriceShopInfoShopIdList.Count.ToString();
+                    }
+
+                    //List<FinalOrderDetailTemp> orderList = installShopOrderList.Where(s => s.GuidanceId == Id && (s.InstallPriceAddType ?? 1) == 1).ToList();
+
+
+                    if (!myInstallShopIdList.Any())
+                    {
+                        LinkButton lbCheck = (LinkButton)e.Row.FindControl("lbCheck");
+                        lbCheck.CommandName = "";
+                        lbCheck.Enabled = false;
+                        lbCheck.Style.Add("color", "#ccc");
+                    }
+                }
+
+            }
+        }
+
 
         protected void btnSearch_Click(object sender, EventArgs e)
         {

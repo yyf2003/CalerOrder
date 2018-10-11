@@ -44,8 +44,9 @@ Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(function (sender,
         $("#loadSubject").show();
        
     }
-    
+
     if (eleId.indexOf("cblOutsourceId") != -1) {
+        $("#loadSubject").show();
         $("#loadMaterial").show();
     }
     if (eleId.indexOf("cbAllGuidance") != -1) {

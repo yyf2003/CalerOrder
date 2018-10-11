@@ -220,6 +220,10 @@ namespace WebApp.Subjects.SecondInstallFee.handler
                             //RegionOrderPrice orderPriceModel;
                             int shopId = orderList[0].ShopId ?? 0;
                             int subjectId = orderList[0].SubjectId ?? 0;
+                            int customerId = 0;
+                            Subject subjectModel = new SubjectBLL().GetModel(subjectId);
+                            if (subjectModel != null)
+                                customerId = subjectModel.CustomerId ?? 0;
                             StringBuilder msg = new StringBuilder();
                             int successNum = 0;
                             orderList.ForEach(s =>
@@ -227,7 +231,7 @@ namespace WebApp.Subjects.SecondInstallFee.handler
                                 bool canSave = true;
                                 if (s.OrderType == (int)OrderTypeEnum.POP)
                                 {
-                                    canSave =new BasePage().CheckMaterial(s.GraphicMaterial);
+                                    canSave = new BasePage().CheckMaterial(customerId,s.GraphicMaterial);
                                 }
                                 if (canSave)
                                 {

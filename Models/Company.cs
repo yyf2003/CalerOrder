@@ -23,6 +23,7 @@ namespace Models
         public string ShortName { get; set; }
         public string Contact { get; set; }
         public string Tel { get; set; }
+        public Nullable<int> RegionId { get; set; }
         public Nullable<int> ProvinceId { get; set; }
         public Nullable<int> CityId { get; set; }
         public string Address { get; set; }
@@ -30,6 +31,5 @@ namespace Models
         public Nullable<System.DateTime> AddDate { get; set; }
         public Nullable<bool> IsDelete { get; set; }
         public Nullable<int> CustomerServiceId { get; set; }
-        public Nullable<int> RegionId { get; set; }
     }
 }

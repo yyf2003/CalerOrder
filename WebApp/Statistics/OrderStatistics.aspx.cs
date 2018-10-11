@@ -2660,7 +2660,7 @@ namespace WebApp.Statistics
                 decimal total1 = shutShopPopPrice + shutShopInstallPrice + shutShopMaterialPrice + shutShopExpressPrice;
                 labTotalPrice1.Text = total1 > 0 ? (Math.Round(total1, 2) + "元") : "0";
 
-                if (CurrentUser.UserLevelId == (int)UserLevelEnum.总部)
+                if (CurrentUser.RoleId != 2 && CurrentUser.RoleId != 3)
                 {
                     Panel1.Visible = true;
                 }

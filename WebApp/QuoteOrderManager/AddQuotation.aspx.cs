@@ -14,8 +14,8 @@ using Common;
 using DAL;
 using Models;
 using Newtonsoft.Json;
-using NPOI.SS.UserModel;
 using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 //using NPOI.HSSF.UserModel;
 //using OfficeOpenXml;
@@ -39,10 +39,6 @@ namespace WebApp.QuoteOrderManager
             {
                 itemId = int.Parse(Request.QueryString["itemId"]);
             }
-            //else if (ViewState["quoteId"] != null)
-            //{
-            //    itemId = StringHelper.IsInt(ViewState["quoteId"].ToString());
-            //}
             if (Request.QueryString["month"] != null)
             {
                 month = Request.QueryString["month"];
@@ -191,10 +187,10 @@ namespace WebApp.QuoteOrderManager
             }
             subjectList = new SubjectBLL().GetList(s => subjectIdList.Contains(s.Id) && (s.HandMakeSubjectId ?? 0) == 0).OrderBy(s => s.SubjectName).ToList();
 
-           
+
             if (subjectList.Any())
             {
-               
+
                 if (!IsPostBack)
                 {
                     StringBuilder subjectNameSr = new StringBuilder();
@@ -1182,7 +1178,7 @@ namespace WebApp.QuoteOrderManager
                              && (subject.IsDelete == null || subject.IsDelete == false)
                              && subject.ApproveState == 1
                              where guidanceIdList.Contains(order.GuidanceId ?? 0)
-                             && (categoryIdList.Any() ? categoryIdList.Contains(subject.SubjectCategoryId ?? 0) : 1 == 1)
+                             //&& (categoryIdList.Any() ? categoryIdList.Contains(subject.SubjectCategoryId ?? 0) : 1 == 1)
                              select new
                              {
                                  order,
@@ -1753,7 +1749,7 @@ namespace WebApp.QuoteOrderManager
                                     shop.OOHInstallPrice = s.install.OOHPrice ?? 0;
                                     oohInstalShopList.Add(shop);
                                 }
-                                
+
                                 if (s.install.OOHPrice == 5000)
                                 {
                                     oohLevelOneCount++;
@@ -1979,7 +1975,7 @@ namespace WebApp.QuoteOrderManager
                 #endregion
 
                 #region 安装费订单
-                var installnstallPriceOrderList = orderList.Where(s=>s.GuidanceId==gid && (subjectIdList.Any() ? subjectIdList.Contains(s.SubjectId ?? 0) : 1 == 1) && s.OrderType==(int)OrderTypeEnum.安装费 && (s.OrderPrice??0)>0).ToList();
+                var installnstallPriceOrderList = orderList.Where(s => s.GuidanceId == gid && (subjectIdList.Any() ? subjectIdList.Contains(s.SubjectId ?? 0) : 1 == 1) && s.OrderType == (int)OrderTypeEnum.安装费 && (s.OrderPrice ?? 0) > 0).ToList();
                 if (itemId == 0)
                 {
                     installnstallPriceOrderList = installnstallPriceOrderList.Where(s => (s.QuoteItemId ?? 0) == 0).ToList();
@@ -1987,7 +1983,8 @@ namespace WebApp.QuoteOrderManager
                 if (installnstallPriceOrderList.Any())
                 {
                     List<decimal> orderInstallPriceList = installnstallPriceOrderList.Select(s => s.OrderPrice ?? 0).ToList();
-                    orderInstallPriceList.ForEach(price => {
+                    orderInstallPriceList.ForEach(price =>
+                    {
                         if (price == 800)
                         {
                             basicLevelOneCount++;
@@ -2705,7 +2702,7 @@ namespace WebApp.QuoteOrderManager
         decimal popImportTotalPrice = 0;
         decimal popImportTotalArea = 0;
         decimal addRateTotalPrie = 0;
-       
+
         List<ImportQuoteOrder> importPOPQuoteList = new List<ImportQuoteOrder>();
         List<QuoteOrderDetail> quoteOrderDetailList = new List<QuoteOrderDetail>();
         List<QuoteDifferenceDetail> differenceDetailList = new List<QuoteDifferenceDetail>();
@@ -3072,7 +3069,7 @@ namespace WebApp.QuoteOrderManager
         {
             string msg = SubmitQuote();
             ExcuteJs("finish", msg);
-            
+
         }
 
         /// <summary>
@@ -3123,7 +3120,7 @@ namespace WebApp.QuoteOrderManager
                 try
                 {
                     SpecialPriceQuoteDetailBLL specialDetailBll = new SpecialPriceQuoteDetailBLL();
-                    
+
                     if (ViewState["quoteId"] != null)
                     {
                         itemId = StringHelper.IsInt(ViewState["quoteId"].ToString());
@@ -3135,7 +3132,7 @@ namespace WebApp.QuoteOrderManager
                         specialDetailBll.Delete(s => s.ItemId == itemId);
                     }
                     model.TotalPrice = StringHelper.IsDecimal(total);
-                   
+
                     model.QuoteSubjectName = ddlQuoteSubject.SelectedItem.Text;
                     int quoteSubjectId = int.Parse(ddlQuoteSubject.SelectedValue);
                     Subject subjectModel = new SubjectBLL().GetModel(quoteSubjectId);
@@ -3144,7 +3141,7 @@ namespace WebApp.QuoteOrderManager
                         model.QuoteSubjectCategoryId = subjectModel.SubjectCategoryId;
                     }
                     model.QuoteSubjectId = quoteSubjectId;
-                    
+
                     if (itemId > 0)
                     {
 
@@ -3165,10 +3162,10 @@ namespace WebApp.QuoteOrderManager
                         model.GuidanceYear = guidanceYear;
                         model.GuidanceMonth = guidanceMonth;
                         model.SubjectCategoryId = subjectCategory;
-                      
+
                         model.SubjectIds = subjectId;
                         model.GuidanceId = guidanceId;
-                       
+
                         model.AddDate = DateTime.Now;
                         model.AddUserId = CurrentUser.UserId;
                         model.CustomerId = customerId;
@@ -3312,7 +3309,7 @@ namespace WebApp.QuoteOrderManager
             if (msg == "ok" && !isUpdate)
             {
                 new QuoteOrderDetailBLL().UpdateQuoteItemId(model.GuidanceId.TrimEnd(','), subjectId.TrimEnd(','), model.Id, "edit");
-                
+
             }
             return msg;
         }
@@ -4187,7 +4184,7 @@ namespace WebApp.QuoteOrderManager
 
                 IWorkbook workBook = WorkbookFactory.Create(outFile, ImportOption.All);
                 ISheet sheet = workBook.GetSheetAt(0);
-                
+
                 int startRow = 12;
                 int oneSheetRowCount = 0;
                 int insertRowTotalCount = 0;
@@ -4205,22 +4202,23 @@ namespace WebApp.QuoteOrderManager
                 IRow dataRowSubjectName1 = sheet.GetRow(7);
                 dataRowSubjectName1.GetCell(1).SetCellValue(subjectName);
                 dataRowSubjectName1.GetCell(5).SetCellValue(normalShopCount);
-                
+
 
                 #region 导出POP
+
                 
                 exportQuoteOrderList.ToList().ForEach(s =>
                 {
                     bool isGo = false;
                     if (startRow == 12)
                     {
-                        
+
                         currSheet = s.Sheet;
                         string cellVal = string.Empty;
                         IRow row0 = sheet.GetRow(startRow);
                         if (row0 != null)
                         {
-                            cellVal=row0.Cells[0].ToString();
+                            cellVal = row0.Cells[0].ToString();
                         }
                         while (string.IsNullOrWhiteSpace(cellVal) || (!string.IsNullOrWhiteSpace(cellVal) && StringHelper.ReplaceSpace(cellVal).ToLower() != StringHelper.ReplaceSpace(currSheet).ToLower()))
                         {
@@ -4233,7 +4231,7 @@ namespace WebApp.QuoteOrderManager
                             if (!string.IsNullOrWhiteSpace(cellVal) && cellVal.Contains("材质成本统计"))
                                 break;
                         }
-                        
+
                         if (!string.IsNullOrWhiteSpace(cellVal) && StringHelper.ReplaceSpace(cellVal).ToLower() == StringHelper.ReplaceSpace(currSheet).ToLower())
                         {
                             isGo = true;
@@ -4276,7 +4274,7 @@ namespace WebApp.QuoteOrderManager
                             if (!string.IsNullOrWhiteSpace(cellVal) && StringHelper.ReplaceSpace(cellVal).ToLower() == StringHelper.ReplaceSpace(s.Sheet).ToLower())
                             {
                                 isGo = true;
-                              
+
                                 oneSheetRowCount = 0;
                                 currSheet = s.Sheet;
                                 int listCount = exportQuoteOrderList.Where(q => q.Sheet == currSheet).Count();
@@ -4286,7 +4284,7 @@ namespace WebApp.QuoteOrderManager
                                     int insertRowCount = listCount - 3;
                                     insertRowTotalCount += insertRowCount;
                                     InsertRow(sheet, startRow + 2, insertRowCount, sourceRow);
-                                   
+
                                 }
                             }
                         }
@@ -4304,26 +4302,51 @@ namespace WebApp.QuoteOrderManager
                                 cell = dataRow.CreateCell(i);
 
                         }
-                       
                         dataRow.GetCell(1).SetCellValue(s.PositionDescription);
                         dataRow.GetCell(2).SetCellValue(s.QuoteGraphicMaterial);
                         dataRow.GetCell(4).SetCellValue(double.Parse(s.Amount.ToString()));
+                        
                         startRow++;
                     }
-                   
+
                 });
-                int formulaBeginRow = 34 + insertRowTotalCount;
-                int formulaEndRow = 59 + insertRowTotalCount;
+                //int formulaBeginRow = 34 + insertRowTotalCount;
+                //int formulaEndRow = 59 + insertRowTotalCount;
                 int totalRow = 33 + insertRowTotalCount;
-                //for (int i = 12; i < totalRow; i++)
-                //{
-                //    IRow dataRow = sheet.GetRow(i);
-                //    ICell cell = dataRow.GetCell(2, MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                //    //cell.SetCellFormula(string.Format("$X${0}:$X${1}", formulaBeginRow, formulaEndRow));
+                int formulaBeginRow = totalRow;
+                int formulaEndRow = 26 + totalRow;
+                string prvPosition = string.Empty;
+                for (int popRowIndex = 12; popRowIndex < totalRow; popRowIndex++)
+                {
+                    
+                    IRow dataRow1 = sheet.GetRow(popRowIndex);
+                    if (dataRow1 == null)
+                        dataRow1 = sheet.CreateRow(popRowIndex);
+                    for (int i = 0; i < 20; i++)
+                    {
+                        ICell cell = dataRow1.GetCell(i);
+                        if (cell == null)
+                            cell = dataRow1.CreateCell(i);
 
-                //}
-                
+                    }
+                    if (popRowIndex == 0)
+                    {
+                        prvPosition = dataRow1.Cells[0].ToString();
+                    }
+                    else
+                    {
+                        if (dataRow1.Cells[0].ToString() == prvPosition)
+                            sheet.AddMergedRegion(new CellRangeAddress(popRowIndex - 2, popRowIndex, 0, 0));
+                        else
+                            prvPosition = dataRow1.Cells[0].ToString();
+                    }
+                }
 
+                //下拉材质设置
+                HSSFDataValidation validate = SetValidata(12,
+                   totalRow, 2, 2, formulaBeginRow, formulaEndRow);
+                // 设定规则  
+                sheet.AddValidationData(validate);
                 #endregion
 
 
@@ -4335,11 +4358,11 @@ namespace WebApp.QuoteOrderManager
                 decimal basicLevel1Count = 0;
                 decimal basicLevel2Count = 0;
                 decimal basicLevel3Count = 0;
-                
+
 
                 if (Session["InstallPriceQuoteModel"] != null)
                 {
-                        InstallPriceQuoteModelList = Session["InstallPriceQuoteModel"] as List<InstallPriceQuoteModel>;
+                    InstallPriceQuoteModelList = Session["InstallPriceQuoteModel"] as List<InstallPriceQuoteModel>;
                 }
                 if (InstallPriceQuoteModelList.Any())
                 {
@@ -4354,7 +4377,7 @@ namespace WebApp.QuoteOrderManager
                             {
                                 //sheet.Cells[46 + addRowCount, 7].Value = s.Amount.ToString();
                                 rowIndex = 46 + insertRowTotalCount;
-                                oohLevel1Count+=s.Amount;
+                                oohLevel1Count += s.Amount;
 
                             }
                             if (s.UnitPrice == 2700)
@@ -4493,7 +4516,8 @@ namespace WebApp.QuoteOrderManager
                 //折算的安装费
                 List<SpecialPriceQuoteDetail> otherInstallPriceList = new SpecialPriceQuoteDetailBLL().GetList(s => s.ItemId == itemId);
                 var otherOohList = otherInstallPriceList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.OOH).ToList();
-                otherOohList.ForEach(s => {
+                otherOohList.ForEach(s =>
+                {
                     int rowIndex = 0;
                     if (s.InstallPriceLevel == 5000)
                     {
@@ -4535,7 +4559,7 @@ namespace WebApp.QuoteOrderManager
                         //sheet.Cells[48 + addRowCount, 7].Value = s.Amount.ToString();
                         rowIndex = 48 + insertRowTotalCount;
                         oohLevel3Count += (s.Quantity ?? 0);
-                       
+
                         IRow dataRow = sheet.GetRow(rowIndex);
                         if (dataRow == null)
                             dataRow = sheet.CreateRow(rowIndex);
@@ -4566,10 +4590,11 @@ namespace WebApp.QuoteOrderManager
                         }
                         dataRow.GetCell(6).SetCellValue(double.Parse(oohLevel4Count.ToString()));
                     }
-                    
+
                 });
                 var otherBasicList = otherInstallPriceList.Where(s => s.ChangeType == (int)QuoteInstallPriceChangeTypeEnum.Basic).ToList();
-                otherBasicList.ForEach(s => {
+                otherBasicList.ForEach(s =>
+                {
                     int rowIndex = 0;
                     if (s.InstallPriceLevel == 800)
                     {
@@ -4626,18 +4651,17 @@ namespace WebApp.QuoteOrderManager
                         }
                         dataRow.GetCell(6).SetCellValue(double.Parse(basicLevel3Count.ToString()));
                     }
-                    
+
                 });
                 #endregion
-                HSSFDataValidation validate = SetValidata(12,
-                    totalRow, 2, 2, formulaBeginRow, formulaEndRow);
-                // 设定规则  
-                sheet.AddValidationData(validate);
+               
                 sheet.ForceFormulaRecalculation = true;
 
-                HSSFWorkbook book11 = new HSSFWorkbook();
-                
-                
+
+
+                //HSSFWorkbook book11 = new HSSFWorkbook();
+
+
                 #region 导出快递费
 
                 List<ExpressPriceClass> expressPriceList = new List<ExpressPriceClass>();
@@ -4681,7 +4705,8 @@ namespace WebApp.QuoteOrderManager
                 {
                     ISheet oohInstallShopSheet = workBook.GetSheetAt(2);
                     int rowIndex = 11;
-                    OOHInstallShopList.ForEach(ooh => {
+                    OOHInstallShopList.ForEach(ooh =>
+                    {
                         IRow dataRow = oohInstallShopSheet.GetRow(rowIndex);
                         if (dataRow == null)
                             dataRow = oohInstallShopSheet.CreateRow(rowIndex);
@@ -4708,18 +4733,20 @@ namespace WebApp.QuoteOrderManager
                     if (quoteOrderDetailList.Any())
                     {
                         var list = (from order in quoteOrderDetailList
-                                   join guidance in CurrentContext.DbContext.SubjectGuidance
-                                   on order.GuidanceId equals guidance.ItemId
-                                   join subject in CurrentContext.DbContext.Subject
-                                   on order.SubjectId equals subject.Id
-                                   select new {
-                                       order,
-                                       subject,
-                                       guidance
-                                   }).ToList();
+                                    join guidance in CurrentContext.DbContext.SubjectGuidance
+                                    on order.GuidanceId equals guidance.ItemId
+                                    join subject in CurrentContext.DbContext.Subject
+                                    on order.SubjectId equals subject.Id
+                                    select new
+                                    {
+                                        order,
+                                        subject,
+                                        guidance
+                                    }).ToList();
                         ISheet orderSheet = workBook.GetSheetAt(3);
                         int rowIndex = 1;
-                        list.ForEach(s => {
+                        list.ForEach(s =>
+                        {
                             IRow dataRow = orderSheet.GetRow(rowIndex);
                             if (dataRow == null)
                                 dataRow = orderSheet.CreateRow(rowIndex);
@@ -4733,7 +4760,7 @@ namespace WebApp.QuoteOrderManager
                             dataRow.GetCell(0).SetCellValue(s.guidance.ItemName);
                             dataRow.GetCell(1).SetCellValue(s.subject.SubjectName);
                             dataRow.GetCell(2).SetCellValue("POP");
-                            if(s.order.AddDate!=null)
+                            if (s.order.AddDate != null)
                                 dataRow.GetCell(3).SetCellValue(DateTime.Parse(s.order.AddDate.ToString()).ToShortDateString());
                             dataRow.GetCell(4).SetCellValue(s.order.ShopNo);
                             dataRow.GetCell(5).SetCellValue(s.order.ShopName);
@@ -4751,7 +4778,7 @@ namespace WebApp.QuoteOrderManager
                             dataRow.GetCell(16).SetCellValue(quantity);
                             dataRow.GetCell(17).SetCellValue(s.order.GraphicMaterial);
                             dataRow.GetCell(18).SetCellValue(s.order.QuoteGraphicMaterial);
-                            dataRow.GetCell(19).SetCellValue(double.Parse((s.order.UnitPrice??0).ToString()));
+                            dataRow.GetCell(19).SetCellValue(double.Parse((s.order.UnitPrice ?? 0).ToString()));
                             double width = double.Parse((s.order.TotalGraphicWidth ?? 0).ToString());
                             double length = double.Parse((s.order.TotalGraphicLength ?? 0).ToString());
                             double area = (width * length) / 1000000 * quantity;
@@ -4770,7 +4797,7 @@ namespace WebApp.QuoteOrderManager
                     ms.Flush();
                     sheet = null;
                     workBook = null;
-                    OperateFile.DownLoadFile(ms, "活动报价模板",".xls");
+                    OperateFile.DownLoadFile(ms, "活动报价模板", ".xls");
 
                 }
             }
@@ -4873,7 +4900,7 @@ namespace WebApp.QuoteOrderManager
                     ms.Flush();
                     tableSheet = null;
                     workBook = null;
-                    OperateFile.DownLoadFile(ms,"报价订单明细");
+                    OperateFile.DownLoadFile(ms, "报价订单明细");
                 }
             }
         }
@@ -4987,7 +5014,7 @@ namespace WebApp.QuoteOrderManager
         /// <param name="formulaBeginRow"></param>
         /// <param name="formulaEndRow"></param>
         /// <returns></returns>
-        HSSFDataValidation SetValidata(int firstRow, int lastRow, int firstCell, int lastCell, int formulaBeginRow,int formulaEndRow)
+        HSSFDataValidation SetValidata(int firstRow, int lastRow, int firstCell, int lastCell, int formulaBeginRow, int formulaEndRow)
         {
 
             //DVConstraint constraint = DVConstraint.CreateExplicitListConstraint(new String[] { "aa", "bb", "cc" });

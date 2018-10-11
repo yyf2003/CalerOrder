@@ -153,6 +153,7 @@ namespace WebApp.OutsourcingOrder.Statistics
                          shopModel.ReceiveExpressPrice = rlPrice;
                          shopModel.GuidanceName = s.guidance.ItemName;
                          shopModel.Remark = s.orderDetail.Remark;
+                         shopModel.Quantity = s.orderDetail.Quantity;
                          shopList.Add(shopModel);
                      });
             }
@@ -166,8 +167,8 @@ namespace WebApp.OutsourcingOrder.Statistics
         void BindData() {
             GetData();
             labShopCount.Text = shopList.Select(s => s.Id).Distinct().Count().ToString();
-            decimal totalPrice = shopList.Sum(s => s.ExpressPrice);
-            decimal rTotalPrice = shopList.Sum(s => s.ReceiveExpressPrice);
+            decimal totalPrice = shopList.Sum(s => (s.ExpressPrice*(s.Quantity??1)));
+            decimal rTotalPrice = shopList.Sum(s => (s.ReceiveExpressPrice *(s.Quantity ?? 1)));
             labTotalPrice.Text = Math.Round(totalPrice, 2).ToString();
             labRTotalPrice.Text = Math.Round(rTotalPrice, 2).ToString();
             var list = shopList;

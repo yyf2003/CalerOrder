@@ -160,7 +160,11 @@ namespace WebApp.Subjects.SupplementByRegion
                 string path = OperateFile.UpLoadFile(FileUpload1.PostedFile);
                 if (path != "")
                 {
-                    
+                    int customerId = 0;
+                    if (!string.IsNullOrWhiteSpace(hfCustomerId.Value))
+                    {
+                        customerId = StringHelper.IsInt(hfCustomerId.Value);
+                    }
                     string MaterialSupportStr = string.Empty;
                     try
                     {
@@ -572,7 +576,7 @@ namespace WebApp.Subjects.SupplementByRegion
                                     canSave = false;
                                     msg.Append("材质 为空；");
                                 }
-                                else if (!CheckMaterial(material))
+                                else if (!CheckMaterial(customerId,material))
                                 {
                                     canSave = false;
                                     msg.Append("材质不存在；");

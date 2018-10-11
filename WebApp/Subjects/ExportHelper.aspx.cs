@@ -1053,7 +1053,7 @@ namespace WebApp.Subjects
                                 model.PositionDescription = "";
                                 model.Province = "";
                                 // model.Quantity = item.order.Quantity != null ? double.Parse(item.order.Quantity.ToString()) : 0;
-                                model.Quantity = 1;
+                                model.Quantity = item.order.Quantity??1;
                                 model.Sheet = "";
                                 model.ShopName = item.order.ShopName;
                                 model.ShopNo = item.order.ShopNo;
@@ -1169,8 +1169,8 @@ namespace WebApp.Subjects
                     if (installList.Any())
                     {
 
-                        var genericInstallList = installList.Where(s => genericShopIdList.Contains(s.install.ShopId ?? 0) && s.install.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费).ToList();
-                        var notGenericInstallList = installList.Where(s => normalShopIdList.Contains(s.install.ShopId ?? 0) && s.install.SubjectType == (int)InstallPriceSubjectTypeEnum.活动安装费).ToList();
+                        var genericInstallList = installList.Where(s => genericShopIdList.Contains(s.install.ShopId ?? 0) && (s.install.SubjectType??1) == (int)InstallPriceSubjectTypeEnum.常规安装费).ToList();
+                        var notGenericInstallList = installList.Where(s => normalShopIdList.Contains(s.install.ShopId ?? 0) && (s.install.SubjectType??1) == (int)InstallPriceSubjectTypeEnum.活动安装费).ToList();
 
                         genericInstallList.ForEach(s =>
                         {
@@ -1859,7 +1859,7 @@ namespace WebApp.Subjects
                                 model.PositionDescription = "";
                                 model.Province = "";
                                 // model.Quantity = item.order.Quantity != null ? double.Parse(item.order.Quantity.ToString()) : 0;
-                                model.Quantity = 1;
+                                model.Quantity = item.order.Quantity ?? 1;
                                 model.Sheet = "";
                                 model.ShopName = item.order.ShopName;
                                 model.ShopNo = item.order.ShopNo;
@@ -1965,8 +1965,8 @@ namespace WebApp.Subjects
                                        }).ToList();
                     if (installList.Any())
                     {
-                        var genericInstallList = installList.Where(s => genericShopIdList.Contains(s.install.ShopId ?? 0) && s.install.SubjectType == (int)InstallPriceSubjectTypeEnum.常规安装费).ToList();
-                        var notGenericInstallList = installList.Where(s => normalShopIdList.Contains(s.install.ShopId ?? 0) && s.install.SubjectType == (int)InstallPriceSubjectTypeEnum.活动安装费).ToList();
+                        var genericInstallList = installList.Where(s => genericShopIdList.Contains(s.install.ShopId ?? 0) && (s.install.SubjectType??1) == (int)InstallPriceSubjectTypeEnum.常规安装费).ToList();
+                        var notGenericInstallList = installList.Where(s => normalShopIdList.Contains(s.install.ShopId ?? 0) && (s.install.SubjectType??1) == (int)InstallPriceSubjectTypeEnum.活动安装费).ToList();
 
                         genericInstallList.ForEach(s =>
                         {

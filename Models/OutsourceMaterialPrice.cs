@@ -19,9 +19,9 @@ namespace Models
         public Nullable<int> BasicCategoryId { get; set; }
         public Nullable<int> BasicMaterialId { get; set; }
         public Nullable<decimal> InstallPrice { get; set; }
+        public Nullable<decimal> InstallAndProductPrice { get; set; }
         public Nullable<decimal> SendPrice { get; set; }
         public Nullable<int> AddUserId { get; set; }
         public Nullable<System.DateTime> AddDate { get; set; }
-        public Nullable<decimal> InstallAndProductPrice { get; set; }
     }
 }

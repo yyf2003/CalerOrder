@@ -84,13 +84,13 @@ Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(function () {
             region += $(this).val() + ',';
         })
         $("#hfIsChange").val("");
-        var url = "AddQuotation.aspx?customerId=" + customerId + "&month=" + month + "&guidanceId=" + guidanceId + "&subjectCategory=" + subjectCategory + "&subjectId=" + subjectId + "&region=" + region;
+        var url = "SubmitAuotation.aspx?customerId=" + customerId + "&month=" + month + "&guidanceId=" + guidanceId + "&subjectCategory=" + subjectCategory + "&subjectId=" + subjectId + "&region=" + region;
         layer.open({
             type: 2,
             time: 0,
             title: '添加报价单',
             skin: 'layui-layer-rim', //加上边框
-            area: ['95%', '90%'],
+            area: ['100%', '100%'],
             content: url,
             id: 'layer1',
             cancel: function (index) {

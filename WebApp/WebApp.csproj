@@ -59,6 +59,14 @@
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="LitJson, Version=2.0.0.14, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MarkerMetro.Unity.LitJson.2.0.0.14\lib\net35\LitJson.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MarkerMetro.Unity.WinLegacy, Version=1.8.0.23, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MarkerMetro.Unity.WinLegacy.1.8.0.23\lib\net35\MarkerMetro.Unity.WinLegacy.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -79,6 +87,18 @@
     <Reference Include="NPOI.OpenXmlFormats, Version=2.2.0.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>DLL\npoi\NPOI.OpenXmlFormats.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\redis\ServiceStack.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\redis\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.ServiceInterface, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\redis\ServiceStack.ServiceInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -123,6 +143,7 @@
     <Content Include="Common\Js\GetFiles.js" />
     <Content Include="CompanyManage\js\list.js" />
     <Content Include="CompanyManage\List.aspx" />
+    <Content Include="ConfigFile\Config11.txt" />
     <Content Include="CSS\Attestationuse.css" />
     <Content Include="CSS\DefaultTX.css" />
     <Content Include="CSS\demo.css" />
@@ -191,6 +212,9 @@
     <Content Include="DLL\npoi\NPOI.OOXML.dll" />
     <Content Include="DLL\npoi\NPOI.OpenXml4Net.dll" />
     <Content Include="DLL\npoi\NPOI.OpenXmlFormats.dll" />
+    <Content Include="DLL\redis\ServiceStack.dll" />
+    <Content Include="DLL\redis\ServiceStack.Interfaces.dll" />
+    <Content Include="DLL\redis\ServiceStack.ServiceInterface.dll" />
     <Content Include="down.html" />
     <Content Include="easyui1.4\changelog.txt" />
     <Content Include="easyui1.4\datagrid-detailview.js" />
@@ -1021,6 +1045,8 @@
     <Content Include="importPlace.aspx" />
     <Content Include="index.aspx" />
     <Content Include="index.htm" />
+    <Content Include="InstallPriceManage\js\list.js" />
+    <Content Include="InstallPriceManage\List.aspx" />
     <Content Include="jqGrid\css\ui.jqgrid-bootstrap-ui.css" />
     <Content Include="jqGrid\css\ui.jqgrid-bootstrap.css" />
     <Content Include="jqGrid\css\ui.jqgrid.css" />
@@ -1150,6 +1176,108 @@
     <Content Include="layer\skin\default\loading-2.gif" />
     <Content Include="laypagev1.3\laypage\laypage.js" />
     <Content Include="laypagev1.3\laypage\skin\laypage.css" />
+    <Content Include="layui230\css\layui.css" />
+    <Content Include="layui230\css\layui.mobile.css" />
+    <Content Include="layui230\css\modules\code.css" />
+    <Content Include="layui230\css\modules\laydate\default\laydate.css" />
+    <Content Include="layui230\css\modules\layer\default\icon-ext.png" />
+    <Content Include="layui230\css\modules\layer\default\icon.png" />
+    <Content Include="layui230\css\modules\layer\default\layer.css" />
+    <Content Include="layui230\css\modules\layer\default\loading-0.gif" />
+    <Content Include="layui230\css\modules\layer\default\loading-1.gif" />
+    <Content Include="layui230\css\modules\layer\default\loading-2.gif" />
+    <Content Include="layui230\font\iconfont.svg" />
+    <Content Include="layui230\images\face\0.gif" />
+    <Content Include="layui230\images\face\1.gif" />
+    <Content Include="layui230\images\face\10.gif" />
+    <Content Include="layui230\images\face\11.gif" />
+    <Content Include="layui230\images\face\12.gif" />
+    <Content Include="layui230\images\face\13.gif" />
+    <Content Include="layui230\images\face\14.gif" />
+    <Content Include="layui230\images\face\15.gif" />
+    <Content Include="layui230\images\face\16.gif" />
+    <Content Include="layui230\images\face\17.gif" />
+    <Content Include="layui230\images\face\18.gif" />
+    <Content Include="layui230\images\face\19.gif" />
+    <Content Include="layui230\images\face\2.gif" />
+    <Content Include="layui230\images\face\20.gif" />
+    <Content Include="layui230\images\face\21.gif" />
+    <Content Include="layui230\images\face\22.gif" />
+    <Content Include="layui230\images\face\23.gif" />
+    <Content Include="layui230\images\face\24.gif" />
+    <Content Include="layui230\images\face\25.gif" />
+    <Content Include="layui230\images\face\26.gif" />
+    <Content Include="layui230\images\face\27.gif" />
+    <Content Include="layui230\images\face\28.gif" />
+    <Content Include="layui230\images\face\29.gif" />
+    <Content Include="layui230\images\face\3.gif" />
+    <Content Include="layui230\images\face\30.gif" />
+    <Content Include="layui230\images\face\31.gif" />
+    <Content Include="layui230\images\face\32.gif" />
+    <Content Include="layui230\images\face\33.gif" />
+    <Content Include="layui230\images\face\34.gif" />
+    <Content Include="layui230\images\face\35.gif" />
+    <Content Include="layui230\images\face\36.gif" />
+    <Content Include="layui230\images\face\37.gif" />
+    <Content Include="layui230\images\face\38.gif" />
+    <Content Include="layui230\images\face\39.gif" />
+    <Content Include="layui230\images\face\4.gif" />
+    <Content Include="layui230\images\face\40.gif" />
+    <Content Include="layui230\images\face\41.gif" />
+    <Content Include="layui230\images\face\42.gif" />
+    <Content Include="layui230\images\face\43.gif" />
+    <Content Include="layui230\images\face\44.gif" />
+    <Content Include="layui230\images\face\45.gif" />
+    <Content Include="layui230\images\face\46.gif" />
+    <Content Include="layui230\images\face\47.gif" />
+    <Content Include="layui230\images\face\48.gif" />
+    <Content Include="layui230\images\face\49.gif" />
+    <Content Include="layui230\images\face\5.gif" />
+    <Content Include="layui230\images\face\50.gif" />
+    <Content Include="layui230\images\face\51.gif" />
+    <Content Include="layui230\images\face\52.gif" />
+    <Content Include="layui230\images\face\53.gif" />
+    <Content Include="layui230\images\face\54.gif" />
+    <Content Include="layui230\images\face\55.gif" />
+    <Content Include="layui230\images\face\56.gif" />
+    <Content Include="layui230\images\face\57.gif" />
+    <Content Include="layui230\images\face\58.gif" />
+    <Content Include="layui230\images\face\59.gif" />
+    <Content Include="layui230\images\face\6.gif" />
+    <Content Include="layui230\images\face\60.gif" />
+    <Content Include="layui230\images\face\61.gif" />
+    <Content Include="layui230\images\face\62.gif" />
+    <Content Include="layui230\images\face\63.gif" />
+    <Content Include="layui230\images\face\64.gif" />
+    <Content Include="layui230\images\face\65.gif" />
+    <Content Include="layui230\images\face\66.gif" />
+    <Content Include="layui230\images\face\67.gif" />
+    <Content Include="layui230\images\face\68.gif" />
+    <Content Include="layui230\images\face\69.gif" />
+    <Content Include="layui230\images\face\7.gif" />
+    <Content Include="layui230\images\face\70.gif" />
+    <Content Include="layui230\images\face\71.gif" />
+    <Content Include="layui230\images\face\8.gif" />
+    <Content Include="layui230\images\face\9.gif" />
+    <Content Include="layui230\layui.all.js" />
+    <Content Include="layui230\layui.js" />
+    <Content Include="layui230\lay\modules\carousel.js" />
+    <Content Include="layui230\lay\modules\code.js" />
+    <Content Include="layui230\lay\modules\element.js" />
+    <Content Include="layui230\lay\modules\flow.js" />
+    <Content Include="layui230\lay\modules\form.js" />
+    <Content Include="layui230\lay\modules\jquery.js" />
+    <Content Include="layui230\lay\modules\laydate.js" />
+    <Content Include="layui230\lay\modules\layedit.js" />
+    <Content Include="layui230\lay\modules\layer.js" />
+    <Content Include="layui230\lay\modules\laypage.js" />
+    <Content Include="layui230\lay\modules\laytpl.js" />
+    <Content Include="layui230\lay\modules\mobile.js" />
+    <Content Include="layui230\lay\modules\rate.js" />
+    <Content Include="layui230\lay\modules\table.js" />
+    <Content Include="layui230\lay\modules\tree.js" />
+    <Content Include="layui230\lay\modules\upload.js" />
+    <Content Include="layui230\lay\modules\util.js" />
     <Content Include="layui\css\layui.css" />
     <Content Include="layui\css\layui.mobile.css" />
     <Content Include="layui\css\modules\code.css" />
@@ -1323,6 +1451,8 @@
     <Content Include="OrderChangeManage\js\applicationList.js" />
     <Content Include="Outsource\BasicMaterial\List.aspx" />
     <Content Include="Outsource\BasicMaterial\list.js" />
+    <Content Include="Outsource\InstallPriceLevelSetting\List.aspx" />
+    <Content Include="Outsource\InstallPriceLevelSetting\list.js" />
     <Content Include="Outsource\js\list.js" />
     <Content Include="Outsource\js\priceList.js" />
     <Content Include="Outsource\List.aspx" />
@@ -1332,6 +1462,7 @@
     <Content Include="OutsourcingOrder\AssignConfigs\AssignConfig.aspx" />
     <Content Include="OutsourcingOrder\AssignOrder.aspx" />
     <Content Include="OutsourcingOrder\AutoAssignOrder.aspx" />
+    <Content Include="OutsourcingOrder\ChangeMaterialPrice\List.aspx" />
     <Content Include="OutsourcingOrder\CheckNotAssignOrder.aspx" />
     <Content Include="OutsourcingOrder\CheckOrderDetail.aspx" />
     <Content Include="OutsourcingOrder\CheckRepeatOrder.aspx" />
@@ -1343,9 +1474,16 @@
     <Content Include="OutsourcingOrder\js\AssignOrder.js" />
     <Content Include="OutsourcingOrder\js\export.js" />
     <Content Include="OutsourcingOrder\js\orderList.js" />
+    <Content Include="OutsourcingOrder\js\OutsourceSubject.js" />
     <Content Include="OutsourcingOrder\js\reAssignOrder.js" />
     <Content Include="OutsourcingOrder\NoAssginOrderList.aspx" />
     <Content Include="OutsourcingOrder\OrderList.aspx" />
+    <Content Include="OutsourcingOrder\OutsourceSubject.aspx" />
+    <Content Include="OutsourcingOrder\PayRecord\AddPayment.aspx" />
+    <Content Include="OutsourcingOrder\PayRecord\CheckPayDetail.aspx" />
+    <Content Include="OutsourcingOrder\PayRecord\js\checkDetail.js" />
+    <Content Include="OutsourcingOrder\PayRecord\js\list.js" />
+    <Content Include="OutsourcingOrder\PayRecord\List.aspx" />
     <Content Include="OutsourcingOrder\PriceOrder\Add.aspx" />
     <Content Include="OutsourcingOrder\PriceOrder\List.aspx" />
     <Content Include="OutsourcingOrder\ReAssignOrder.aspx" />
@@ -1353,6 +1491,7 @@
     <Content Include="OutsourcingOrder\Statistics\CheckOtherPriceDetail.aspx" />
     <Content Include="OutsourcingOrder\Statistics\CheckPOPPriceDetail.aspx" />
     <Content Include="OutsourcingOrder\Statistics\ExportHelper.aspx" />
+    <Content Include="OutsourcingOrder\Statistics\ExpressPriceDetail.aspx" />
     <Content Include="OutsourcingOrder\Statistics\InstallOrderDetail.aspx" />
     <Content Include="OutsourcingOrder\Statistics\List.aspx" />
     <Content Include="OutsourcingOrder\Statistics\list.js" />
@@ -1367,6 +1506,10 @@
     <Content Include="PrintControl\LodopFuncs.js" />
     <Content Include="PrintControl\Print.js" />
     <Content Include="PrintControl\smsx.cab" />
+    <Content Include="PropSubject\AddOrder.aspx" />
+    <Content Include="PropSubject\AddSubject.aspx" />
+    <Content Include="PropSubject\Approve.aspx" />
+    <Content Include="PropSubject\CheckOrderDetail.aspx" />
     <Content Include="Quotation\CheckFiles.aspx" />
     <Content Include="Quotation\Edit.aspx" />
     <Content Include="Quotation\EditSupplement.aspx" />
@@ -1380,8 +1523,18 @@
     <Content Include="Quotation\PriceList.aspx" />
     <Content Include="Quotation\QuotationDetail.aspx" />
     <Content Include="Quotation\UploadFiles.aspx" />
+    <Content Include="QuoteOrderManager\AddQuotation.aspx" />
+    <Content Include="QuoteOrderManager\CheckPOPOrderDetail.aspx" />
+    <Content Include="QuoteOrderManager\CheckQuotation.aspx" />
+    <Content Include="QuoteOrderManager\CheckQuoteInstallPrice.aspx" />
+    <Content Include="QuoteOrderManager\js\addQuotation.js" />
+    <Content Include="QuoteOrderManager\js\checkQuotation.js" />
     <Content Include="QuoteOrderManager\js\orderStatistics.js" />
+    <Content Include="QuoteOrderManager\js\quoteOperate.js" />
+    <Content Include="QuoteOrderManager\js\submitQuotation.js" />
     <Content Include="QuoteOrderManager\OrderStatistics.aspx" />
+    <Content Include="QuoteOrderManager\QuoteOperate.aspx" />
+    <Content Include="QuoteOrderManager\SubmitAuotation.aspx" />
     <Content Include="Regions\js\regions.js" />
     <Content Include="Regions\List.aspx" />
     <Content Include="Register.aspx" />
@@ -1403,6 +1556,10 @@
     <Content Include="Statistics\CheckShops.aspx" />
     <Content Include="Statistics\ExpressPriceDetail.aspx" />
     <Content Include="Statistics\FreightDetail.aspx" />
+    <Content Include="Statistics\InOutStatistics\CheckSelfAddDetail.aspx" />
+    <Content Include="Statistics\InOutStatistics\js\list.js" />
+    <Content Include="Statistics\InOutStatistics\List.aspx" />
+    <Content Include="Statistics\InOutStatistics\StatisticDetail.aspx" />
     <Content Include="Statistics\InstallPriceDetail.aspx" />
     <Content Include="Statistics\js\OrderStatistics.js" />
     <Content Include="Statistics\js\SubjectStatistics.js" />
@@ -1410,6 +1567,10 @@
     <Content Include="Statistics\NewShopInstallPriceDetail.aspx" />
     <Content Include="Statistics\OrderStatistics.aspx" />
     <Content Include="Statistics\PriceSubjectStatistic.aspx" />
+    <Content Include="Statistics\PropStatistics\Index.aspx" />
+    <Content Include="Statistics\PropStatistics\js\index.js" />
+    <Content Include="Statistics\PropStatistics\OrderList.aspx" />
+    <Content Include="Statistics\PropStatistics\OutsourceOrderList.aspx" />
     <Content Include="Statistics\SecondInstallPriceStatistic.aspx" />
     <Content Include="Statistics\ShopOrderDetail.aspx" />
     <Content Include="Statistics\StatisticsByRegion.aspx" />
@@ -1439,6 +1600,7 @@
     <Content Include="Subjects\ADOrders\ExportEmptyFrameShop.aspx" />
     <Content Include="Subjects\ADOrders\ImportCheckPlan.aspx" />
     <Content Include="Subjects\ADOrders\ImportOrder.aspx" />
+    <Content Include="Subjects\ADOrders\ImportOrder1.aspx" />
     <Content Include="Subjects\ADOrders\ImportSplitPlanDetail.aspx" />
     <Content Include="Subjects\ADOrders\loadUC.aspx" />
     <Content Include="Subjects\ADOrders\SplitOrder.aspx" />
@@ -1446,11 +1608,13 @@
     <Content Include="Subjects\ADOrders\SplitPlan.aspx" />
     <Content Include="Subjects\Approve.aspx" />
     <Content Include="Subjects\ApproveList.aspx" />
+    <Content Include="Subjects\ChangeMaterialPrice\List.aspx" />
     <Content Include="Subjects\CheckDataBase\CheckData.aspx" />
     <Content Include="Subjects\CheckOrderDetail.aspx" />
     <Content Include="Subjects\EmptyDateWarn.aspx" />
     <Content Include="Subjects\ExportHelper.aspx" />
     <Content Include="Subjects\ExportOrder.aspx" />
+    <Content Include="Subjects\ExportOrder2.aspx" />
     <Content Include="Subjects\ExportOrders.aspx" />
     <Content Include="Subjects\ExtraOrder\AddOrderDetail.aspx" />
     <Content Include="Subjects\ExtraOrder\js\addOrderDetail.js" />
@@ -1607,6 +1771,7 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
+    <Content Include="web1.aspx" />
     <Content Include="zTree_v3\api\apiCss\api.js" />
     <Content Include="zTree_v3\api\apiCss\common.css" />
     <Content Include="zTree_v3\api\apiCss\common_ie6.css" />
@@ -2161,6 +2326,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Base\DelegateClass.cs" />
+    <Compile Include="Base\ImportOrderExtend.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Base\MyHttpModel.cs" />
     <Compile Include="CompanyManage\handler\List1.ashx.cs">
       <DependentUpon>List1.ashx</DependentUpon>
@@ -2471,6 +2639,16 @@
     <Compile Include="index.aspx.designer.cs">
       <DependentUpon>index.aspx</DependentUpon>
     </Compile>
+    <Compile Include="InstallPriceManage\handler\List.ashx.cs">
+      <DependentUpon>List.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="InstallPriceManage\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="InstallPriceManage\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2757,6 +2935,16 @@
     <Compile Include="Outsource\handler\PriceList.ashx.cs">
       <DependentUpon>PriceList.ashx</DependentUpon>
     </Compile>
+    <Compile Include="Outsource\InstallPriceLevelSetting\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Outsource\InstallPriceLevelSetting\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Outsource\InstallPriceLevelSetting\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Outsource\List.aspx.cs">
       <DependentUpon>List.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2801,6 +2989,16 @@
     </Compile>
     <Compile Include="OutsourcingOrder\AutoAssignOrder.aspx.designer.cs">
       <DependentUpon>AutoAssignOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\ChangeMaterialPrice\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\ChangeMaterialPrice\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OutsourcingOrder\ChangeMaterialPrice\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
     </Compile>
     <Compile Include="OutsourcingOrder\CheckNotAssignOrder.aspx.cs">
       <DependentUpon>CheckNotAssignOrder.aspx</DependentUpon>
@@ -2866,6 +3064,9 @@
     <Compile Include="OutsourcingOrder\handler\OrderList.ashx.cs">
       <DependentUpon>OrderList.ashx</DependentUpon>
     </Compile>
+    <Compile Include="OutsourcingOrder\handler\OutsourceSubject.ashx.cs">
+      <DependentUpon>OutsourceSubject.ashx</DependentUpon>
+    </Compile>
     <Compile Include="OutsourcingOrder\NoAssginOrderList.aspx.cs">
       <DependentUpon>NoAssginOrderList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2879,6 +3080,37 @@
     </Compile>
     <Compile Include="OutsourcingOrder\OrderList.aspx.designer.cs">
       <DependentUpon>OrderList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\OutsourceSubject.aspx.cs">
+      <DependentUpon>OutsourceSubject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OutsourcingOrder\OutsourceSubject.aspx.designer.cs">
+      <DependentUpon>OutsourceSubject.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\PayRecord\AddPayment.aspx.cs">
+      <DependentUpon>AddPayment.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OutsourcingOrder\PayRecord\AddPayment.aspx.designer.cs">
+      <DependentUpon>AddPayment.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\PayRecord\CheckPayDetail.aspx.cs">
+      <DependentUpon>CheckPayDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OutsourcingOrder\PayRecord\CheckPayDetail.aspx.designer.cs">
+      <DependentUpon>CheckPayDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\PayRecord\list.ashx.cs">
+      <DependentUpon>list.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="OutsourcingOrder\PayRecord\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OutsourcingOrder\PayRecord\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
     </Compile>
     <Compile Include="OutsourcingOrder\PriceOrder\Add.aspx.cs">
       <DependentUpon>Add.aspx</DependentUpon>
@@ -2929,6 +3161,13 @@
     <Compile Include="OutsourcingOrder\Statistics\ExportHelper.aspx.designer.cs">
       <DependentUpon>ExportHelper.aspx</DependentUpon>
     </Compile>
+    <Compile Include="OutsourcingOrder\Statistics\ExpressPriceDetail.aspx.cs">
+      <DependentUpon>ExpressPriceDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OutsourcingOrder\Statistics\ExpressPriceDetail.aspx.designer.cs">
+      <DependentUpon>ExpressPriceDetail.aspx</DependentUpon>
+    </Compile>
     <Compile Include="OutsourcingOrder\Statistics\InstallOrderDetail.aspx.cs">
       <DependentUpon>InstallOrderDetail.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2961,6 +3200,34 @@
       <DependentUpon>List.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PropSubject\AddOrder.aspx.cs">
+      <DependentUpon>AddOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PropSubject\AddOrder.aspx.designer.cs">
+      <DependentUpon>AddOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PropSubject\AddSubject.aspx.cs">
+      <DependentUpon>AddSubject.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PropSubject\AddSubject.aspx.designer.cs">
+      <DependentUpon>AddSubject.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PropSubject\Approve.aspx.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PropSubject\Approve.aspx.designer.cs">
+      <DependentUpon>Approve.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PropSubject\CheckOrderDetail.aspx.cs">
+      <DependentUpon>CheckOrderDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PropSubject\CheckOrderDetail.aspx.designer.cs">
+      <DependentUpon>CheckOrderDetail.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Quotation\CheckFiles.aspx.cs">
       <DependentUpon>CheckFiles.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -3044,6 +3311,40 @@
     <Compile Include="Quotation\UploadFiles.aspx.designer.cs">
       <DependentUpon>UploadFiles.aspx</DependentUpon>
     </Compile>
+    <Compile Include="QuoteOrderManager\AddQuotation.aspx.cs">
+      <DependentUpon>AddQuotation.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="QuoteOrderManager\AddQuotation.aspx.designer.cs">
+      <DependentUpon>AddQuotation.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="QuoteOrderManager\CheckPOPOrderDetail.aspx.cs">
+      <DependentUpon>CheckPOPOrderDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="QuoteOrderManager\CheckPOPOrderDetail.aspx.designer.cs">
+      <DependentUpon>CheckPOPOrderDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="QuoteOrderManager\CheckQuotation.aspx.cs">
+      <DependentUpon>CheckQuotation.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="QuoteOrderManager\CheckQuotation.aspx.designer.cs">
+      <DependentUpon>CheckQuotation.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="QuoteOrderManager\CheckQuoteInstallPrice.aspx.cs">
+      <DependentUpon>CheckQuoteInstallPrice.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="QuoteOrderManager\CheckQuoteInstallPrice.aspx.designer.cs">
+      <DependentUpon>CheckQuoteInstallPrice.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="QuoteOrderManager\handler\AddQuotation.ashx.cs">
+      <DependentUpon>AddQuotation.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="QuoteOrderManager\handler\CheckExport.ashx.cs">
+      <DependentUpon>CheckExport.ashx</DependentUpon>
+    </Compile>
     <Compile Include="QuoteOrderManager\handler\ExportDetail.ashx.cs">
       <DependentUpon>ExportDetail.ashx</DependentUpon>
     </Compile>
@@ -3053,6 +3354,20 @@
     </Compile>
     <Compile Include="QuoteOrderManager\OrderStatistics.aspx.designer.cs">
       <DependentUpon>OrderStatistics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="QuoteOrderManager\QuoteOperate.aspx.cs">
+      <DependentUpon>QuoteOperate.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="QuoteOrderManager\QuoteOperate.aspx.designer.cs">
+      <DependentUpon>QuoteOperate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="QuoteOrderManager\SubmitAuotation.aspx.cs">
+      <DependentUpon>SubmitAuotation.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="QuoteOrderManager\SubmitAuotation.aspx.designer.cs">
+      <DependentUpon>SubmitAuotation.aspx</DependentUpon>
     </Compile>
     <Compile Include="Regions\Handler\Handler1.ashx.cs">
       <DependentUpon>Handler1.ashx</DependentUpon>
@@ -3135,6 +3450,27 @@
     <Compile Include="Statistics\handler\SubjectStatistics.ashx.cs">
       <DependentUpon>SubjectStatistics.ashx</DependentUpon>
     </Compile>
+    <Compile Include="Statistics\InOutStatistics\CheckSelfAddDetail.aspx.cs">
+      <DependentUpon>CheckSelfAddDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\InOutStatistics\CheckSelfAddDetail.aspx.designer.cs">
+      <DependentUpon>CheckSelfAddDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\InOutStatistics\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\InOutStatistics\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\InOutStatistics\StatisticDetail.aspx.cs">
+      <DependentUpon>StatisticDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\InOutStatistics\StatisticDetail.aspx.designer.cs">
+      <DependentUpon>StatisticDetail.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Statistics\InstallPriceDetail.aspx.cs">
       <DependentUpon>InstallPriceDetail.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -3169,6 +3505,27 @@
     </Compile>
     <Compile Include="Statistics\PriceSubjectStatistic.aspx.designer.cs">
       <DependentUpon>PriceSubjectStatistic.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\PropStatistics\Index.aspx.cs">
+      <DependentUpon>Index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\PropStatistics\Index.aspx.designer.cs">
+      <DependentUpon>Index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\PropStatistics\OrderList.aspx.cs">
+      <DependentUpon>OrderList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\PropStatistics\OrderList.aspx.designer.cs">
+      <DependentUpon>OrderList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Statistics\PropStatistics\OutsourceOrderList.aspx.cs">
+      <DependentUpon>OutsourceOrderList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Statistics\PropStatistics\OutsourceOrderList.aspx.designer.cs">
+      <DependentUpon>OutsourceOrderList.aspx</DependentUpon>
     </Compile>
     <Compile Include="Statistics\SecondInstallPriceStatistic.aspx.cs">
       <DependentUpon>SecondInstallPriceStatistic.aspx</DependentUpon>
@@ -3330,6 +3687,13 @@
     <Compile Include="Subjects\ADOrders\ImportOrder.aspx.designer.cs">
       <DependentUpon>ImportOrder.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Subjects\ADOrders\ImportOrder1.aspx.cs">
+      <DependentUpon>ImportOrder1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ADOrders\ImportOrder1.aspx.designer.cs">
+      <DependentUpon>ImportOrder1.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Subjects\ADOrders\ImportSplitPlanDetail.aspx.cs">
       <DependentUpon>ImportSplitPlanDetail.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -3379,6 +3743,19 @@
     <Compile Include="Subjects\ApproveList.aspx.designer.cs">
       <DependentUpon>ApproveList.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Subjects\ChangeMaterialPrice\CheckUpdateState.ashx.cs">
+      <DependentUpon>CheckUpdateState.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ChangeMaterialPrice\Handler1.ashx.cs">
+      <DependentUpon>Handler1.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ChangeMaterialPrice\List.aspx.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ChangeMaterialPrice\List.aspx.designer.cs">
+      <DependentUpon>List.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Subjects\CheckDataBase\CheckData.aspx.cs">
       <DependentUpon>CheckData.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -3413,6 +3790,13 @@
     </Compile>
     <Compile Include="Subjects\ExportOrder.aspx.designer.cs">
       <DependentUpon>ExportOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Subjects\ExportOrder2.aspx.cs">
+      <DependentUpon>ExportOrder2.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Subjects\ExportOrder2.aspx.designer.cs">
+      <DependentUpon>ExportOrder2.aspx</DependentUpon>
     </Compile>
     <Compile Include="Subjects\ExportOrders.aspx.cs">
       <DependentUpon>ExportOrders.aspx</DependentUpon>
@@ -4215,6 +4599,13 @@
     <Compile Include="Users\SetAuthority\List.aspx.designer.cs">
       <DependentUpon>List.aspx</DependentUpon>
     </Compile>
+    <Compile Include="web1.aspx.cs">
+      <DependentUpon>web1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="web1.aspx.designer.cs">
+      <DependentUpon>web1.aspx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -4222,10 +4613,13 @@
     <Folder Include="OutsourcingOrder\OrderStatistics\" />
     <Folder Include="PlaceInfo\handler\" />
     <Folder Include="PlaceInfo\js\" />
+    <Folder Include="Statistics\InOutStatistics\handler\" />
     <Folder Include="Subjects\YAOrder\handler\" />
     <Folder Include="Subjects\YAOrder\js\" />
     <Folder Include="TemplateFile\TempFile\" />
     <Folder Include="UploadFiles\ModuleImgs\" />
+    <Folder Include="UploadFiles\QuoteFile\" />
+    <Folder Include="UploadFiles\TempFiles\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Account\Web.config" />
@@ -4335,6 +4729,10 @@
     <Content Include="Outsource\handler\PriceList.ashx" />
     <Content Include="Materials\Handler\QuoteMaterialList.ashx" />
     <Content Include="Handler\index.ashx" />
+    <Content Include="InstallPriceManage\handler\List.ashx" />
+    <None Include="layui230\font\iconfont.eot" />
+    <None Include="layui230\font\iconfont.ttf" />
+    <None Include="layui230\font\iconfont.woff" />
     <None Include="layui\font\iconfont.eot" />
     <None Include="layui\font\iconfont.ttf" />
     <None Include="layui\font\iconfont.woff" />
@@ -4363,6 +4761,14 @@
     <Content Include="Outsource\BasicMaterial\Handler1.ashx" />
     <Content Include="OutsourcingOrder\AssignConfigs\AssignConfig.ashx" />
     <Content Include="QuoteOrderManager\handler\ExportDetail.ashx" />
+    <Content Include="QuoteOrderManager\handler\CheckExport.ashx" />
+    <Content Include="QuoteOrderManager\handler\AddQuotation.ashx" />
+    <Content Include="Subjects\ChangeMaterialPrice\Handler1.ashx" />
+    <Content Include="Subjects\ChangeMaterialPrice\CheckUpdateState.ashx" />
+    <Content Include="OutsourcingOrder\ChangeMaterialPrice\Handler1.ashx" />
+    <Content Include="OutsourcingOrder\handler\OutsourceSubject.ashx" />
+    <Content Include="OutsourcingOrder\PayRecord\list.ashx" />
+    <Content Include="Outsource\InstallPriceLevelSetting\Handler1.ashx" />
     <None Include="TemplateFile\Export\350Template.xlsx" />
     <None Include="TemplateFile\Export\350Template1.xlsx" />
     <None Include="TemplateFile\Export\350模板.xlsx" />
@@ -4375,7 +4781,10 @@
     <None Include="TemplateFile\Export\phwTemplate.xlsx" />
     <None Include="TemplateFile\Export\外协订单明细.xlsx" />
     <None Include="TemplateFile\Export\外协项目费用统计明细.xlsx" />
+    <None Include="TemplateFile\Export\安装店铺清单统计模板.xlsx" />
+    <None Include="TemplateFile\Export\项目报价模板.xls" />
     <None Include="TemplateFile\Export\报价模板.xlsx" />
+    <None Include="TemplateFile\Export\项目统计-按店统计.xlsx" />
     <None Include="TemplateFile\Import\NewShopOrderTemplate.xlsx" />
     <None Include="TemplateFile\Import\ShopMaterialSupportTemplate.xlsx" />
     <None Include="TemplateFile\Export\ShopTemplate.xlsx" />
@@ -4388,6 +4797,7 @@
     <None Include="TemplateFile\Import\ShopAndPOPImportTemplate.xlsx" />
     <None Include="TemplateFile\Import\SISOrderTemplate.xlsx" />
     <None Include="TemplateFile\Import\二次安装费明细模板.xlsx" />
+    <None Include="TemplateFile\Import\批量更改外协模板.xlsx" />
     <None Include="TemplateFile\Import\特殊店铺基础安装费.xlsx" />
     <None Include="TemplateFile\Import\费用订单模板.xlsx" />
     <None Include="TemplateFile\Import\ADOrderMaterialTemplate.xlsx" />
@@ -4403,6 +4813,7 @@
     <None Include="TemplateFile\Import\店铺器架类型模板.xlsx" />
     <None Include="TemplateFile\Export\项目费用统计明细.xlsx" />
     <None Include="TemplateFile\Import\运费模板.xlsx" />
+    <None Include="TemplateFile\Import\道具订单模板.xlsx" />
     <None Include="uploadify\check-exists.php" />
     <Content Include="uploadify\Handler1.ashx" />
     <None Include="uploadify\index.php" />
@@ -4449,7 +4860,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7443</DevelopmentServerPort>
+          <DevelopmentServerPort>5551</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/WebApp</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

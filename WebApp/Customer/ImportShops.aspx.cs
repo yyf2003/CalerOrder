@@ -228,7 +228,7 @@ namespace WebApp.Customer
                 string county = string.Empty;
                 string cityLevel = string.Empty;
                 string isInstall = string.Empty;
-                
+                string bcsIsInstall = string.Empty;
                 string angentCode = string.Empty;
                 string angentName = string.Empty;
                 string adress = string.Empty;
@@ -275,6 +275,7 @@ namespace WebApp.Customer
                     county = string.Empty;
                     cityLevel = string.Empty;
                     isInstall = string.Empty;
+                    bcsIsInstall = string.Empty;
                     angentCode = string.Empty;
                     angentName = string.Empty;
                     adress = string.Empty;
@@ -355,14 +356,24 @@ namespace WebApp.Customer
 
                     if (cols.Contains("是否安装"))
                         isInstall = StringHelper.ReplaceSpecialChar(dr["是否安装"].ToString().Trim());
+                    else if (cols.Contains("sp是否安装"))
+                        isInstall = StringHelper.ReplaceSpecialChar(dr["sp是否安装"].ToString().Trim());
                     else if (cols.Contains("IsInstall"))
                         isInstall = StringHelper.ReplaceSpecialChar(dr["IsInstall"].ToString().Trim());
                     else if (cols.Contains("安装级别"))
                         isInstall = StringHelper.ReplaceSpecialChar(dr["安装级别"].ToString().Trim());
                     else if (cols.Contains("sp安装级别"))
                         isInstall = StringHelper.ReplaceSpecialChar(dr["sp安装级别"].ToString().Trim());
+                    else if (cols.Contains("SP安装级别"))
+                        isInstall = StringHelper.ReplaceSpecialChar(dr["SP安装级别"].ToString().Trim());
                     else if (cols.Contains("大货安装级别"))
                         isInstall = StringHelper.ReplaceSpecialChar(dr["大货安装级别"].ToString().Trim());
+
+                    if (cols.Contains("三叶草是否安装"))
+                        bcsIsInstall = StringHelper.ReplaceSpecialChar(dr["三叶草是否安装"].ToString().Trim());
+                    else if (cols.Contains("三叶草安装级别"))
+                        bcsIsInstall = StringHelper.ReplaceSpecialChar(dr["三叶草安装级别"].ToString().Trim());
+
 
                     if (cols.Contains("Customer Code"))
                         angentCode = StringHelper.ReplaceSpecialChar(dr["Customer Code"].ToString().Trim());
@@ -472,9 +483,7 @@ namespace WebApp.Customer
                         installPrice = dr["SP特殊安装费"].ToString().Trim();
                     else if (cols.Contains("sp特殊安装费"))
                         installPrice = dr["sp特殊安装费"].ToString().Trim();
-                    //if (cols.Contains("橱窗安装费"))
-                    //    windowInstallPrice = dr["橱窗安装费"].ToString().Trim();
-
+                   
                     if (cols.Contains("外协特殊安装费"))
                         osInstallPrice = dr["外协特殊安装费"].ToString().Trim();
                     else if (cols.Contains("应付特殊安装费"))
@@ -645,7 +654,14 @@ namespace WebApp.Customer
                     
                     bool isShut = false;
                     bool isInstall0 = false;
-                    isexist = CheckShop(shopNo, out shopId, out isShut, out isInstall0);
+                    string shopErrorMsg = string.Empty;
+                    isexist = CheckShop(shopNo, out shopId, out isShut, out isInstall0,out shopErrorMsg);
+                    if (!string.IsNullOrWhiteSpace(shopErrorMsg))
+                    {
+                        canSave = false;
+                        errorMsg.Append(shopErrorMsg);
+                        errorMsg.Append("；");
+                    }
                     //if (isexist)
                     //{
 
@@ -743,6 +759,8 @@ namespace WebApp.Customer
                             shopModel.Format = format.Replace("（", "(").Replace("）", ")");
                         if (!string.IsNullOrWhiteSpace(isInstall))
                             shopModel.IsInstall = isInstall.ToUpper();
+                        if (!string.IsNullOrWhiteSpace(bcsIsInstall))
+                            shopModel.BCSIsInstall = bcsIsInstall.ToUpper();
                         if (!string.IsNullOrWhiteSpace(locationType))
                             shopModel.LocationType = locationType;
                         if (StringHelper.IsDateTime(openDate))
@@ -1279,12 +1297,13 @@ namespace WebApp.Customer
 
                     bool isShut = false;
                     bool isInstall = false;
+                    string shopErrorMsg = string.Empty;
                     if (string.IsNullOrWhiteSpace(shopNo))
                     {
                         canSave = false;
                         errorMsg.Append("店铺编号 为空；");
                     }
-                    else if (!CheckShop(shopNo, out shopId, out isShut, out isInstall))
+                    else if (!CheckShop(shopNo, out shopId, out isShut, out isInstall, out shopErrorMsg))
                     {
                         canSave = false;
                         errorMsg.Append("店铺编号 不存在；");
@@ -1620,12 +1639,13 @@ namespace WebApp.Customer
                         levelNum = StringHelper.ReplaceSpecialChar(dr["级别"].ToString().Trim());
                     bool isShut = false;
                     bool isInstall = false;
+                    string shopErrorMsg = string.Empty;
                     if (string.IsNullOrWhiteSpace(shopNo))
                     {
                         canSave = false;
                         errorMsg.Append("店铺编号 为空；");
                     }
-                    else if (!CheckShop(shopNo, out shopId, out isShut, out isInstall))
+                    else if (!CheckShop(shopNo, out shopId, out isShut, out isInstall, out shopErrorMsg))
                     {
                         canSave = false;
                         errorMsg.Append("店铺编号 不存在；");
@@ -1783,12 +1803,13 @@ namespace WebApp.Customer
 
                     bool isShut = false;
                     bool isInstall0 = false;
+                    string shopErrorMsg = string.Empty;
                     if (string.IsNullOrWhiteSpace(shopNo))
                     {
                         canSave = false;
                         errorMsg.Append("店铺编号为空；");
                     }
-                    else if (!CheckShop(shopNo, out shopId, out isShut, out isInstall0))
+                    else if (!CheckShop(shopNo, out shopId, out isShut, out isInstall0, out shopErrorMsg))
                     {
                         canSave = false;
                         errorMsg.Append("店铺编号不存在；");
@@ -1992,12 +2013,13 @@ namespace WebApp.Customer
 
                     bool isShut = false;
                     bool isInsatll = false;
+                    string shopErrorMsg = string.Empty;
                     if (string.IsNullOrWhiteSpace(shopNo))
                     {
                         canSave = false;
                         errorMsg.Append("店铺编号 为空；");
                     }
-                    else if (!CheckShop(shopNo, out shopId, out isShut, out isInsatll))
+                    else if (!CheckShop(shopNo, out shopId, out isShut, out isInsatll, out shopErrorMsg))
                     {
                         canSave = false;
                         errorMsg.Append("店铺编号 不存在；");
@@ -2078,6 +2100,7 @@ namespace WebApp.Customer
                         outsourceInstallPrice = dr["外协费用"].ToString().Trim();
                     bool isShut = false;
                     bool isInsatll = false;
+                    string shopErrorMsg = string.Empty;
                     if (string.IsNullOrWhiteSpace(shopNo))
                     {
                         canSave = false;
@@ -2088,7 +2111,7 @@ namespace WebApp.Customer
                         canSave = false;
                         errorMsg.Append("店铺编号重复 ；");
                     }
-                    else if (!CheckShop(shopNo, out shopId, out isShut,out isInsatll))
+                    else if (!CheckShop(shopNo, out shopId, out isShut, out isInsatll, out shopErrorMsg))
                     {
                         canSave = false;
                         errorMsg.Append("店铺编号 不存在；");
@@ -2158,31 +2181,41 @@ namespace WebApp.Customer
         /// </summary>
         /// <param name="shopName"></param>
         /// <returns></returns>
-        bool CheckShop(string shopNo, out int shopId, out bool isShut, out bool isInstall)
+        bool CheckShop(string shopNo, out int shopId, out bool isShut, out bool isInstall,out string errorMsg)
         {
             shopId = 0;
             isShut = false; isInstall = false;
+            errorMsg = string.Empty;
             var list = shopBll.GetList(s => s.ShopNo.ToUpper() == shopNo.ToUpper());
             if (list.Any())
             {
-                var model0 = list.Where(s=>s.IsDelete==null || s.IsDelete==false).FirstOrDefault();
-                if (model0 != null)
+                if (list.Any(s => s.CustomerId != customerId))
                 {
-                    isShut = false;
-                    shopId = model0.Id;
-                    isInstall = (model0.IsInstall != null && model0.IsInstall.ToLower() == "y");
+                    errorMsg = "其他客户已存在该编号的店铺";
+                    return false;
                 }
                 else
                 {
-                    model0 = list.Where(s => s.IsDelete == true).FirstOrDefault();
+                    var model0 = list.Where(s => s.IsDelete == null || s.IsDelete == false).FirstOrDefault();
                     if (model0 != null)
                     {
-                        isShut = true;
+                        isShut = false;
                         shopId = model0.Id;
                         isInstall = (model0.IsInstall != null && model0.IsInstall.ToLower() == "y");
                     }
+                    else
+                    {
+                        model0 = list.Where(s => s.IsDelete == true).FirstOrDefault();
+                        if (model0 != null)
+                        {
+                            isShut = true;
+                            shopId = model0.Id;
+                            isInstall = (model0.IsInstall != null && model0.IsInstall.ToLower() == "y");
+                        }
+                    }
+                    return true;
                 }
-                return true;
+                
             }
             return false;
         }
@@ -2465,14 +2498,14 @@ namespace WebApp.Customer
             }
             else
             {
-                var model = orderMaterialBll.GetList(s => s.OrderMaterialName.ToLower() == materialName.ToLower()).FirstOrDefault();
+                var model = orderMaterialBll.GetList(s =>s.CustomerId==customerId && s.OrderMaterialName.ToLower() == materialName.ToLower()).FirstOrDefault();
                 if (model != null)
                 {
                     flag = true;
                     categoryId = model.BasicCategoryId ?? 0;
                     materialId = model.Id;
                     dicMateril.Add(materialName.ToLower(), categoryId + "|" + materialId);
-                    //ExistMaterialList.Add(materialName.ToLower());
+                   
                 }
             }
             return flag;
